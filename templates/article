@@ -7,13 +7,8 @@
 
 <div class="alert alert-success text-center">
 
-The <b><i>Go 101</i></b> project is hosted on both
-<a href="https://github.com/go101/go101">github</a>
-and <a href="https://gitlab.com/Go101/go101">gitlab</a>.
-Welcome to improve <b><i>Go 101</i></b> articles
-by submitting corrections for all kinds of mistakes,
-such as typos, grammar errors, wording inaccuracies,
-description flaws and code bugs.
-
+Go 101 项目目前同时托管在 <a href="https://github.com/go101/go101">Github</a> 
+和 <a href="https://gitlab.com/Go101/go101">Gitlab</a> 上。
+欢迎各位在这两个项目中通过提交 bug 和 PR 的方式来改进完善 Go 101 中的各篇文章。
 </div>
 

@@ -54,27 +54,27 @@
 <div class="row nav-bar-with-borders">
 	{{- if $is_book -}}
 	<div class="col-xs-6 col-sm-3 {{ if $is_book }}nav-item-active{{ else }}nav-item-inactive{{ end }}">
-		{{- if eq .FilenameWithoutExt "101" -}}The Book{{- else -}}<a href="/article/101.html">The Book</a>{{- end -}}
+		{{- if eq .FilenameWithoutExt "101" -}}本书目录{{- else -}}<a href="/article/101.html">本书目录</a>{{- end -}}
 	</div>
 	{{- else -}}
 	<div class="col-xs-6 col-sm-3 nav-item-inactive">
-		<a href="/article/101.html">The Book</a>
+		<a href="/article/101.html">本书目录</a>
 	</div>
 	{{- end -}}
 	
 	{{- if $is_details -}}
-	<div class="col-xs-6 col-sm-3 nav-item-active">Go Details 101</div>
+	<div class="col-xs-6 col-sm-3 nav-item-active">Go 细节 101</div>
 	{{- else -}}
-	<div class="col-xs-6 col-sm-3 nav-item-inactive"><a href="/article/details.html">Go Details 101</a></div>
+	<div class="col-xs-6 col-sm-3 nav-item-inactive"><a href="/article/details.html">Go 细节 101</a></div>
 	{{- end -}}
 	
 	{{- if $is_faq -}}
-	<div class="col-xs-6 col-sm-3 nav-item-active">Go FAQ 101</div>
+	<div class="col-xs-6 col-sm-3 nav-item-active">Go 问答 101</div>
 	{{- else -}}
-	<div class="col-xs-6 col-sm-3 nav-item-inactive"><a href="/article/unofficial-faq.html">Go FAQ 101</a></div>
+	<div class="col-xs-6 col-sm-3 nav-item-inactive"><a href="/article/unofficial-faq.html">Go 问答 101</a></div>
 	{{- end -}}
 	
-	<div class="col-xs-6 col-sm-3 nav-item-inactive" style="color: #ccc;">Go Tips 101</div>
+	<div class="col-xs-6 col-sm-3 nav-item-inactive" style="color: #ccc;">Go 技巧 101</div>
 </div>
 {{ end }}
 
@@ -82,21 +82,7 @@
 
 {{ define "social-buttons" }}
 {{- if .SocialLinkURL -}}
-  <div class="alert alert-info text-center">
-    <a rel="nofollow" target="_blank" class="btn btn-primary btn-xs social-button" role="button" style="vertical-align:top;"
-      href="https://plus.google.com/share?url={{.SocialLinkURL}}">Post On Google+</a>
-    <a rel="nofollow" target="_blank" class="btn btn-primary btn-xs social-button" role="button" style="vertical-align:top;"
-      href="http://twitter.com/home?status={{.Title}}, {{.SocialLinkURL}} %23Golang %23Go101">Tweet On Twitter</a>
-    <a rel="nofollow" target="_blank" class="btn btn-primary btn-xs social-button" role="button" style="vertical-align:top;"
-      href="http://www.facebook.com/share.php?u={{.SocialLinkURL}}&t={{.Title}}">Share On Facebook</a>
-    <a rel="nofollow" target="_blank" class="btn btn-primary btn-xs social-button" role="button" style="vertical-align:top;"
-      href="https://www.reddit.com/submit?url={{.SocialLinkURL}}&title={{.Title}}">Submit To Reddit</a>
-    <br/>
-    <a rel="nofollow" target="_blank" class="btn btn-success btn-xs social-button" role="button" style="vertical-align:top;"
-      href="https://github.com/go101/go101">Star On Github</a>
-    <a rel="nofollow" target="_blank" class="btn btn-success btn-xs social-button" role="button" style="vertical-align:top;"
-      href="https://gitlab.com/go101/go101">Star On Gitlab</a>
-  </div>
+
 {{- end -}}
 {{ end }}
 

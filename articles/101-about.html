@@ -1,188 +1,160 @@
-﻿
-<h1>About Go 101</h1>
+<h1>关于 Go 101</h1>
 
 <p>
-I feel it is hard to describe the contents in this article
-in the general description manner.
-So this article will use the interview manner to make descriptions instead.
+我觉得很难用通常的描述方式来描述本文中的内容。
+所以本文将采用采访的形式来进行描述。
 </p>
 
-<h3>Hi Tapir, when and why did you plan to write this book?</h3>
+<h3>你好，老貘，你是什么时候开始写这本书的？</h3>
 
 <p>
-At about July 2016, after (not very intensive) using Go for two years,
-I felt that Go is a simple language and I had mastered Go programming.
-At that time, I had collected many details in Go programming.
-I thought I can archive these details into a book.
-I thought it should be an easy job.
-</p>
-
-<p>
-I was wrong. I was overconfident.
-In trying to make explanations for some details,
-I found I couldn't explain them clearly.
-With more and more confusions were gathered,
-I felt my Go knowledge was so limited that I was still a newbie Go programmer.
-</p>
-	
-<p>
-I gave up writing that book.
-</p>
-
-<h3>Gave up? Isn't this book almost finished now?</h3>
-
-<p>
-It was that book being cancelled, not the book <b><i>Go 101</i></b>.
-I eventually cleared almost all the confusions by reading many official
-Go documentations and all kinds of Go articles on Internet,
-and by finding answers from some Go forums and the Go project issue tracker. 
+大概在2016年七月份左右，不是很密集地使用了Go两年后，
+我觉得Go是一种简单的语言，我感觉我已經精通了Go编程。
+在那个时候，我在日常编程中已经搜集了不少关于Go编程的细节。
+我觉得我可以将这些细节写成一本书。
+我觉得这应该是一件容易的事。
 </p>
 
 <p>
-I spent about one year clearing the confusions.
-In the period, from time to time,
-once I had cleared most confusions on a topic
-and regained the confidence on explaining that topic,
-I wrote one blog article for that topic.
-In the end, I had written about twenty Go articles.
-And I had collected more Go details than before.
-It was the time to restart the plan of writing a Go book.
+但是我发现我错了。我太过于自信了。
+在试图解释一些细节时，我发现我无法把它们解释清楚。
+我对Go编程中的很多细节的底层原因产生了困惑。
+随着越来越多的困惑的积攒，我觉得我对Go的领悟非常有限。
+我感觉我仍然是一个Go新手程序员。   
+</p>
+    
+<p>
+我放弃了写那本书。
+</p>
+
+<h3>放弃？Go 101 现在不是几乎已经完成了吗？</h3>
+
+<p>
+那本曾经计划要写的书不是 Go 101。
+我通过阅读许多官方Go文档和网络中的各种Go文章、
+关注Go官方项目的问题跟踪列表和一些Go论坛、查看一些代码等途径，
+逐渐地，我几乎消除了我所有关于Go编程细节中的困惑。
 </p>
 
 <p>
-I wrote another ten basic tutorial articles and twenty more articles
-on all kinds of other Go topics.
-So now <a href="https://go101.org"><i>Go 101</i></a> has about 50 articles.
-</p>
-
-<h3>What were your ever confusions?</h3>
-
-<p>
-Some of the confusions were a few syntax and semantics design details,
-some of them involved values of certain kinds of types
-(mainly slices, interfaces and channels),
-and a few of them were related to standard package APIs.
-<p>
-
-<h3>What are the causes of your ever confusions do you think?</h3>
-
-<p>
-Thinking Go is simple is considered harmful.
-Holding this view will make you understand Go shallowly
-and prevent you from mastering Go.
+我大概花了大约一年时间来消除这些困惑。
+在这个时期，每当我消除了某个主题的困惑，
+我就以该主题写一篇博客文章。
+最后，我写了大约20篇Go文章。
+与此同时，我收集了比以前更多Go编程中细节。
+此时到了重启编写一本Go编程书籍的计划的时候了。
 </p>
 
 <p>
-Go is a feature rich language.
-Its syntax set is surely not large, but we also can't say it is small.
-Some syntax and semantics designs in Go are straightforward,
-some are a little counter-intuitive or inconsistent with others.
-There are several trade-offs in Go syntax and semantics designs.
-A programmer needs certain Go programming experiences to comprehend the trade-offs.
+我写了另外大约十篇Go基础教程和另外大约二十篇关于各种Go其它主题的文章。
+所以现在 <a href="https://go101.org">Go 101</a>大约有50篇文章。
+</p>
+
+<h3>你曾经的困惑主要包括哪些方面？</h3>
+
+<p>
+一些困惑是关于一些Go语法和语义设计细节的。
+一些困惑涉及到某些类型的值，主要是切片，接口和通道类型。
+另外一些涉及到标准包API的使用细节。
+<p>
+
+<h3>你认为造成你曾经的困惑的主要原因是什么？</h3>
+
+<p>
+我觉得最主要的原因是我当时抱着Go是一门非常简单的语言的态度去学习和使用Go。
+持有这种态度阻止了我更深刻地理解Go。
 </p>
 
 <p>
-Go provides several first-citizen non-essential kinds of types.
-Some encapsulations are made in implementing these types
-to hide the internal structures of these types.
-On one hand, the encapsulations bring much convenience to Go programming.
-On the other hand, the encapsulations make some obstacles to
-understand the behaviors of values of these types more deeply.
+Go是一门特性丰富的语言。它的语法集肯定不大，但我们也不能说它很小。
+Go中的一些语法和语义设计很简单明了，但也有一些设计略微反直觉，甚至自相矛盾。
+Go语法和语义设计中有很多折衷和权衡。一个Go程序员需要相当的Go编程经验来才能理解这些权衡。
 </p>
 
 <p>
-Many official and unoffical Go tutorials are very simple
-and only cover the general use cases by ignoring many details.
-This may be good to encourage new Go programmers to learn and use Go.
-On the other hand, this also makes many Go programmers overconfident
-on the extent of their Go knowledge.
+Go提供了几种基本但非必需的类型，比如切片，接口和通道
+Go编译器和运行时在实现这些类型的时候，进行了必要的封装。
+一方面，这些封装为Go编程带来了许多便利，使得我们不用从头实现这些类型。
+但另一方面，这些封装是隐藏这些类型的内部结构，
+从而对我们更深入地理解这些类型的值的行为带来了一些障碍。
+</p>
+
+<p>。
+许多官方和非官方的Go教程都非常简单。
+这些教程只涵盖了一般典型用例，而忽略了许多细节。
+这对鼓励新的Go程序员学习和使用Go非常有好处，
+但另一方面，这也使许多Go程序员对他们的Go知识程度过度自信。
+从长远看，这不利于一个Go程序员更好地理解和使用Go。
 </p>
 
 <p>
-Several functions and types declared in some standard packages
-are not got detailed explainations. This is understandable,
-for many details are so substle that it is hard
-to find proper wordings to explain them clearly.
-Saying a few accurate words is better than says some lots of words with inaccuracies.
-But this really leaves some confusions for the package users.
+标准包中声明的某些函数和类型没有得到详细的解释。很多时候这是可以理解的。
+因为很多细节解释起来很拗口和微妙，有时很难找到适当的措词来清楚地解释它们。
+少量但准确的描述比大量但不准确的描述要好。但这确实也给Go程序员们留下了一些困惑。
 </p>
 
-<h3>So do you think simplicity is not a selling point of Go?</h3>
 
-<p>
-I think, at least, simplicity is not a main selling point of Go.
-After all, there are several other languages simpler than Go.
-On the other hand, in any case, Go is also not a complicated language.
-A new Go programmer with right attitudes can master Go programming in one year.
+<h3>所以你认为简单不是Go的卖点吗？</h3>
+
+<p>    
+我认为，至少简单不是Go的主要卖点。毕竟有一些语言确实比Go简单。
+另一方面，无论如何，我们也不应该将Go看作是一门复杂的语言。
+一个具有积极的学习态度的新Go新手程序员可以在一年内精通Go编程。
 </p>
 
-<h3>Then what are the selling points of Go do you think?</h3>
+<h3>那你觉得Go的卖点是什么呢？</h3>
 
 <p>
-Personally, I think the fact that, as a static language, Go is flexible
-as many dynamic script languages is the main selling point of Go language.
+我个人的观点是，作为一种静态语言，Go却和很多动态脚本语言一样的灵活是Go的主要卖点。
 </p>
 
 <p>
-Memory saving, fast program warming-up and fast code execution speed combined
-is another main selling point of Go.
-Although this is a common selling point of many C family langauges.
-But for web development area, seldom languages own the three characteristics at the same time.
-In fact, this is the reason why I switched to Go from Java for web development.
+节省内存，程序启动快和代码执行速度快和在一块儿是Go的另一个主要卖点。
+虽然这三项是C家族语言的共同特征，但是在web开发领域，很少有语言同时拥有这三个特征。
+事实上，这就是为什么我当初从Java转到Go进行Web开发的原因。
 </p>
 
 <p>
-Built-in concurrent programming support is also a selling point of Go,
-though personally I don't think it is the main selling point of Go.
+内并发编程支持也算是Go的卖点，虽然我个人认为它不是Go的主要卖点。
 </p>
 
 <p>
-Great code readability is another important selling point of Go.
-I feel readability is the most important factor considered in designing Go.
+良好的代码可读性是Go的另一个重要卖点。
+我感觉可读性是Go在设计的时候最重要的一个考虑因素。
 </p>
 
 <p>
-Great cross-platform support is also a selling point of Go,
-though this selling point is not much unique nowadays.
+良好的跨平台支持也应该算是Go的一个卖点，尽管如今这个卖点并不是很新鲜。
 </p>
 
 <p>
-A stable core design and development team and an active community together
-can also be viewed as a selling point of Go.
+一个稳定的Go核心设计和开发团队以及一个活跃的社区也可以被视为Go的一个卖点。
 </p>
 
-<h3>What does Go 101 do to clear these confusions?</h3>
+<h3>Go 101 做了什么来消除Go编程中可能出现的困惑？</h3>
 
 <div>
-<i>Go 101</i> tries to clear many confusions by doing the followings.
+
+Go 101 做了一下这些方面来试图清除很多Go编程中可能出现的混乱。
 <ol>
 <li>
-	Emphasizes on basic concepts and terminologies.
-	Without understanding these basic concepts and terminologies,
-	it is hard to fully understand many rules and high level concepts.
+	着重于基本概念和术语。如果不理解或者不熟悉这些基本概念和术语，就很难完全理解很Go中的规则和高层次的概念。
 </li>
 <li>
-	Adds the <b><i>value part</i></b> terminology and use one special article
-	to explain value parts. This article uncovers the underlying structures
-	of some kinds of types, so that Go programmers could understand
-	Go values of those types more deeply.
-	I think knowing a little possible underlying implementations is very
-	helpful to clear some confusions about all kinds of Go values.
+	使用了值片（value part）这个术语并单独用一篇文章来解释值片。
+	这篇文章揭示了某些类型的底层结构，从而使得Go程序员可以更深入地理解这些类型的值。
+	我认为知道一些可能的底层实现对于清楚某些Go变成中的困惑非常有帮助。
 </li>
 <li>
-	Explains memory blocks in detail. Knowing the relations between
-	Go values and memory blocks is very helpful to understand
-	how a garbage collector works and how to avoid memory leaking.
+	详细地解释了内存块（memory block）。
+	了解Go值和内存块之间的关系对于理解垃圾收集器如何工作以及如何避免内存泄漏非常有帮助。
 </li>
 <li>
-	Views interface values as boxes for wrapping non-interface values.
-	I found thinking interface values as value boxes is very helpful
-	to clear many interface related confusions.
+	将接口值视为用于填装非接口值的盒子。
+	我发现将接口值视为用于填装非接口值的盒子对于清除很多和接口相关的困惑非常有帮助。
 </li>
 <li>
-	Makes several summary articles and special topic articles by
-	aggregating many knowledge points and details, which would save
-	Go programmers much learning time.
+        通过汇总许多知识点和细节，可以帮助Go程序员节省很多的学习时间。
 </li>
 </ol>
 </div>
