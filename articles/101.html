@@ -2,27 +2,27 @@
 
 
 <div class="row">
-	<div class="col-xs-12 col-sm-7">
+	<!--div class="col-xs-12 col-sm-7"-->
+	<div class="col-xs-12">
 		<div><small>
 		<p>
-		<i>Go 101</i> is a book focusing on Go syntax/semantics
-		and all kinds of details (Go 1.10 ready).
-		The book also tries to help gophers understand Go deeply and thoroughly.
+		Go 101 是一本着墨于Go语法和语义的编程书。
+		这本书也搜集了很多Go编程中的的细节。
+		这本书的宗旨是尽量帮助Go程序员更深和更全面地理解Go。
 		</p>
 		<ul>
 		<li>
-		The book is written by <a href="https://twitter.com/TapirLiu">@TapirLiu</a>.
+		本书由<a href="http://gfw.tapirgames.com">老貘</a>编写。
 		</li>
-		<li>
+		<!--li>
 		The <a href="https://go101.org">go101.org</a> website is hosted on
 		<a href="https://cloud.google.com/appengine/docs/standard/go/">App Engine</a>.
 		Surely, it is built with <a href="https://golang.org">Go</a>.
-		</li>
+		</li-->
 		<li>
-		Code is hosted both on <a href="https://gitlab.com/go101/go101">Gitlab</a>
-		and <a href="https://github.com/go101/go101">Github</a>.
-		You can also start a local go101 server for faster browsing
-		by running either of the following two commands:
+		网站源代码同时托管在<a href="https://gitlab.com/go101/go101">Gitlab</a>
+		和<a href="https://github.com/go101/go101">Github</a>上。
+		你也可以运行一下命令启动一个本地服务器阅读本书：
 		<ul>
 		<li><code>go get -u gitlab.com/go101/go101 && go101</code></li>
 		<li><code>go get -u github.com/go101/go101 && go101</code></li>
@@ -31,7 +31,7 @@
 		</ul>
 		</small></div>
 	</div>
-	<div class="col-xs-12 col-sm-5">
+	<!--div class="col-xs-12 col-sm-5">
 		<div class="alert alert-success"><small>
 		Support Go 101 by playing <a href="https://www.tapirgames.com">Tapir's games</a>.
 		<ul>
@@ -46,18 +46,18 @@
 		</li>
 		</ul>
 		</small></div>
-	</div>
+	</div-->
 </div>
 
 <div>
 
-Index:
+目录：
 
 <ul>
-	<li><a href="101-about.html">About Go 101</a> - why this book is written.</li>
-	<li><A href="acknowledgements.html">Acknowledgements</a></li>
-	<li><a href="introduction.html">An Introduction Of Go</a> - why Go is worth learning.</li>
-	<li><a href="go-sdk.html">The Official Go SDK</a> - how to compile and run Go programs.</li>
+	<li><a href="101-about.html">关于 Go 101</a> - 为什么写这本书</li>
+	<li><A href="acknowledgements.html">致谢</a></li>
+	<li><a href="introduction.html">Go语言简介</a> - 为什么Go语言值得学习</li>
+	<li><a href="go-sdk.html">官方 Go SDK</a> - 如何编译和运行Go程序</li>
 </ul>
 
 <ul>
@@ -65,16 +65,16 @@ Index:
 Be Familiar With Go Code
 
 	<ul>
-	<li><a href="basic-code-elements-introduction.html">Introduction Of Source Code Elements</a></li>
-	<li><a href="keywords-and-identifiers.html">Keywords And Identifiers</a></li>
-	<li><a href="basic-types-and-value-literals.html">Basic Types And Their Value Literals</a></li>
-	<li><a href="constants-and-variables.html">Constants And Variables</a> - also introduces untyped values and type deductions.</li>
-	<li><a href="operators.html">Common Operators</a> - more type deduction rules are introduced.</li>
-	<li><a href="function-declarations-and-calls.html">Function Declarations And Calls</a></li>
-	<li><a href="packages-and-imports.html">Code Packages And Package Imports</a></li>
-	<li><a href="expressions-and-statements.html">Expressions, Statements And Simple Statements</a></li>
-	<li><a href="control-flows.html">Basic Control Flows</a></li>
-	<li><a href="control-flows-more.html">Goroutines, Deferred Function Calls And Panic/Recover</a></li>
+	<li><a href="basic-code-elements-introduction.html">程序源代码基本元素介绍</a></li>
+	<li><a href="keywords-and-identifiers.html">关键字和标识符</a></li>
+	<li><a href="basic-types-and-value-literals.html">基本类型和它们的值的字面表示形式</a></li>
+	<li><a href="constants-and-variables.html">常量和变量</a> - 顺便介绍了类型非确定值和类型推导</li>
+	<li><a href="operators.html">常用操作符</a> - 介绍了更多的类型推导规则</li>
+	<li><a href="function-declarations-and-calls.html">函数声明和调用</a></li>
+	<li><a href="packages-and-imports.html">代码包和包引入</a></li>
+	<li><a href="expressions-and-statements.html">表达式、语句和简单语句</a></li>
+	<li><a href="control-flows.html">基本流程控制语法</a></li>
+	<li><a href="control-flows-more.html">协程、延迟函数调用、以及恐慌和恢复</a></li>
 	</ul>
 
 </li>
@@ -85,20 +85,20 @@ Be Familiar With Go Code
 Go Type System
 
 	<ul>
-	<li><a href="type-system-overview.html">Overview Of Go Type System</a> - a must read to master Go programming.</li>
-	<li><a href="pointer.html">Pointers</a></li>
-	<li><a href="struct.html">Structs</a></li>
-	<li><a href="value-part.html">Value Parts</a> - to easily and deeply understand Go values.</li>
-	<li><a href="container.html">Arrays, Slices And Maps</a> - first-level citizen container types.</li>
-	<li><a href="string.html">Strings</a></li>
-	<li><a href="function.html">Functions</a> - variadic functions, function types and values.</li>
-	<li><a href="channel.html">Channels</a> - the Go way to do concurrency synchronizations.</li>
-	<li><a href="method.html">Methods</a></li>
-	<li><a href="interface.html">Interfaces</a></li>
-	<li><a href="type-embedding.html">Type Embedding</a></li>
-	<li><a href="unsafe.html">Type-Unsafe Pointers</a></li>
-	<li><a href="generic.html">Type Compositions</a> - built-in generic support in Go.</li>
-	<li><a href="reflection.html">Reflections in Go</a> - the <code>reflect</code> standard package.</li>
+	<li><a href="type-system-overview.html">Go类型系统概述</a> - 精通Go编程必读</li>
+	<li><a href="pointer.html">指针</a></li>
+	<li><a href="struct.html">结构体</a></li>
+	<li><a href="value-part.html">值片</a> - 为了更容易和更深剋地理解Go中的各种值</li>
+	<li><a href="container.html">数组、切片和映射表</a> - Go中的首要容器类型</li>
+	<li><a href="string.html">字符串</a></li>
+	<li><a href="function.html">函数</a> - 主要解释了函数类型和函数值</li>
+	<li><a href="channel.html">数据通道</a> - Go特色的并发同步方式</li>
+	<li><a href="method.html">方法</a></li>
+	<li><a href="interface.html">接口</a> - 多态和内置反射</li>
+	<li><a href="type-embedding.html">类型内嵌</a></li>
+	<li><a href="unsafe.html">非类型安全指针</a></li>
+	<li><a href="generic.html">类型组合</a> - Go中的内置范型支持</li>
+	<li><a href="reflection.html">反射</a> - <code>reflect</code>标准库包中提供的反射支持</li>
 	</ul>
 </li>
 </ul>
@@ -108,20 +108,20 @@ Go Type System
 Miscellanies
 
 	<ul>
-	<li><a href="summaries.html">Some Simple Summaries</a></li>
-	<li><a href="nil.html"><code>nil</code> In Go</a></li>
-	<li><a href="value-conversions-assignments-and-comparisons.html">Value Conversion, Assignment And Comparison Rules</a></li>
-	<li><a href="exceptions.html">Syntax/Semantics Exceptions</a></li>
-	<li><a href="line-break-rules.html">Line Break Rules</a></li>
-	<li><a href="defer-more.html">More About Deferred Function Calls</a></li>
-	<li><a href="panic-and-recover-use-cases.html">Some Panic/Recover Use Cases</a></li>
-	<li><a href="panic-and-recover-more.html">The Right Places To Call The Built-in <code>recover</code> Function</a></li>
-	<li><a href="blocks-and-scopes.html">Code Blocks And Identifier Scopes</a></li>
+	<li><a href="summaries.html">一些简单的总结</a></li>
+	<li><a href="nil.html">关于Go中的<code>nil</code></a></li>
+	<li><a href="value-conversions-assignments-and-comparisons.html">值类型转换、赋值和值比较规则大全</a></li>
+	<li><a href="exceptions.html">Go中的一些语法/语义例外</a></li>
+	<li><a href="line-break-rules.html">代码断行规则</a></li>
+	<li><a href="defer-more.html">更多关于延迟函数调用的知识点</a></li>
+	<li><a href="panic-and-recover-use-cases.html">一些恐慌/恢复用例</a></li>
+	<li><a href="panic-and-recover-more.html">在正确的位置调用内置<code>recover</code>函数</a></li>
+	<li><a href="blocks-and-scopes.html">代码块和标识符作用域</a></li>
 	<!--
-	<li><a href="evaluation-orders.html">Expression Evaluation Orders</a></li>
+	<li><a href="evaluation-orders.html">表达式估值顺序规则</a></li>
 	-->
-	<li><a href="value-copy-cost.html">Value Copy Costs In Go</a></li>
-	<li><a href="bounds-check-elimination.html">Bounds Check Elimination</a></li>
+	<li><a href="value-copy-cost.html">值复制成本</a></li>
+	<li><a href="bounds-check-elimination.html">边界检查消除</a></li>
 	</ul>
 
 </li>
@@ -132,13 +132,13 @@ Miscellanies
 Concurrent Programming
 
 	<ul>
-	<li><a href="concurrent-synchronization-overview.html">Concurrency Synchronization Overview</a></li>
-	<li><a href="channel-use-cases.html">Channel Use Cases</a></li>
-	<li><a href="channel-closing.html">How To Gracefully Close Channels</a></li>
-	<li><a href="concurrent-synchronization-more.html">Other Concurrency Synchronization Techniques</a> - the <code>sync</code> standard package.</li>
-	<li><a href="concurrent-atomic-operation.html">Atomic Operations</a> - the <code>sync/atomic</code> standard package.</li>
-	<li><a href="memory-model.html">Memory Order Guarantees In Go</a></li>
-	<li><a href="concurrent-common-mistakes.html">Some Common Concurrent Programming Mistakes</a></li>
+	<li><a href="concurrent-synchronization-overview.html">并发同步概述</a></li>
+	<li><a href="channel-use-cases.html">数据通道用例大全</a></li>
+	<li><a href="channel-closing.html">如何优雅地关闭数据通道</a></li>
+	<li><a href="concurrent-synchronization-more.html">其它并发同步技术</a> - 如何使用<code>sync</code>标准库包</li>
+	<li><a href="concurrent-atomic-operation.html">原子操作</a> - 如何使用<code>sync/atomic</code>标准库包</li>
+	<li><a href="memory-model.html">Go中的内存顺序保证</a></li>
+	<li><a href="concurrent-common-mistakes.html">一些常见并发编程错误</a></li>
 	</ul>
 
 </li>
@@ -150,9 +150,9 @@ Concurrent Programming
 Memory
 
 	<ul>
-	<li><a href="memory-block.html">Memory Blocks</a></li>
-	<li><a href="memory-layout.html">Memory Layouts</a></li>
-	<li><a href="memory-leaking.html">Memory Leaking</a></li>
+	<li><a href="memory-block.html">内存块</a></li>
+	<li><a href="memory-layout.html">关于Go值内存布局</a></li>
+	<li><a href="memory-leaking.html">一些可能的内存泄漏场景</a></li>
 	<!--
 	<li>Memory Garbage Collection</li>
 	<li>Memory Management</li>
@@ -163,7 +163,7 @@ Memory
 </ul>
 
 <ul>
-<li><a href="more.html">More Go Related Knowledges</a></li>
+<li><a href="more.html">更多关于Go的话题</a></li>
 </ul>
 
 <ul>
