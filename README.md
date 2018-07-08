@@ -6,13 +6,13 @@ The book also tries to help gophers understand Go deeply and thoroughly.
 Run
 
 ```
-$ go get -u gitlab.com/go101/go101
+$ go get -u gitlab.com/golang101/golang101
 ```
 
 or
 
 ```
-$ go get -u github.com/go101/go101
+$ go get -u github.com/golang101/golang101
 ```
 
 to install and update ***Go 101***.

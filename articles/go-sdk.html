@@ -1,78 +1,65 @@
-﻿<h1>The Official Go SDK</h1>
+﻿<h1>官方Go SDK</h1>
 
 <p>
-Currently, the tools in the official Go SDK are the most used tools to develop Go projects.
-In Go 101 article series, all examples are compiled and verified with the standard Go compiler.
+目前，官方Go SDK中提供的工具是使用的最广泛的Go开发工具。
+Go 101所有中所有的实例代码都使用标准编译器编译验证过。
 </p>
 
 <p>
-This article will introduce how to setup the Go development environment
-and how to run simple Go programs.
-Some tools of the official Go SDK will also be introduced.
+本文将介绍如何配置Go开发环境和如何使用Go SDK中的<code>go</code>命令运行简单的Go程序。
+各种<code>go</code>子命令也将获得简单的介绍。
 </p>
 
-<h3>Install Go SDK</h3>
+<h3>安装Go SDK</h3>
 
 <p>
-Please <a href="https://golang.org/doc/install">download</a> the official Go SDK
-and install it according the instructions at the same page.
-</p>
-
-<p>
-The version of an official Go SDK release is consistent with
-the highest Go language verison the release supports.
-For example, Go SDK 1.10.x supports all Go versions from 1.0 to Go 1.10.
+请从<a href="https://golang.org/doc/install">国际官网</a>或
+者<a href="https://golang.google.com/doc/install">国内官网</a>下载Go SDK，
+并按照消灾页面中的说明安装Go SDK。
 </p>
 
 <p>
-The path to the <code>bin</code> subfolder in the Go SDK installation root path
-must be put in the <code>PATH</code> environment variable to execute the tools in the SDK.
+Go SDK的版本和其所支持的最高Go语言版本是一致的。
+比如，Go SDK 1.10.x支持从1.0到1.10的所有Go语言版本。
+</p>
+
+<p>
+为了从任意目录运行Go SDK中工具命令（主要各种<code>go</code>子命令），
+Go SDK安装目录下的<code>bin</code>子目录路径必须配置在<code>PATH</code>环境变量中。
 </p>
 
 <p><i>
-(Before Go SDK 1.9, a <code>GOROOT</code> environment variable had to be configured
-as the root path of the SDK installation.
-<a href="https://golang.org/doc/go1.9#goroot">With Go SDK 1.9</a>,
-this environment variable became optional, and it is recommended to leave it unset.)
+在Go SDK 1.9之前，<code>GOROOT</code>环境变量必须被配置为Go SDK的安装目录。
+自从Go SDK 1.9，此环境变量变为可选的，并且不推荐配置之。
 </i></p>
 
 <p>
-Before Go SDK 1.8, a <code>GOPATH</code> environment variable must be set.
-<a href="https://golang.org/doc/go1.8#gopath">Since Go SDK 1.8</a>,
-the default value of this environment variable is the path of the <code>go</code>
-folder under the home directory of the current user.
-You may specify <code>GOPATH</code> manually in order to work with one (or more) different location(s).
-Yes, the <code>GOPATH</code> environment variable may list multiple paths.
+在Go SDK 1.8之前，<code>GOPATH</code>环境变量必须被配置。
+自从Go SDK 1.8，此环境变量变为可选的。它的默认值为当前用户目录下的<code>go</code>子目录路径。
+此环境变量可以包含多个路径。
 </p>
 
 <p>
-It is highly recommended to add the <code>bin</code> subfolder of the very first path specified in
-the <code>GOPATH</code> environment variable to the <code>PATH</code> environment variable as this allows to run
-some third-party Go programs
-due to the <code>go install</code> command putting
-any resulting executables into this <code>bin</code> subfolder of the first path.
+强烈建议将<code>GOPATH</code>环境变量指定的第一个路径下的<code>bin</code>子目录路径
+配置在<code>PATH</code>环境变量中，以便可以从任意目录运行<code>go install</code>子命令
+生成的可执行程序。<code>go install</code>子命令将会把第三方Go程序安装在此子目录下。
 </p>
 
 <p>
-The current official Go SDK (v1.10) recommends to put all
-your Go packages
-into the <code>src</code> subfolder of any path specified
-in the <code>GOPATH</code> environment variable,
-especially when a Go project depends on some third party packages.
-However, all examples in Go 101 articles are very simple so that
-the example files can be put in any folder.
-Packages will be introduced in the
-<a href="packages-and-imports.html">packages and imports</a> article.
+目前，Go SDK推荐将所有第三方Go包，包括你自己的Go项目代码文件夹都
+放置在<code>GOPATH</code>环境变量指定
+的某个路径下的<code>src</code>子目录中。
+Go 101中的所有代码示例都非常简单，所以可与不遵从此规则。
 </p>
 
-<h3>The Simplest Go Program</h3>
+<h3>最简单的Go程序</h3>
 
 <div>
 <p>
-Let's write a simple exmaple and learn how to run simple Go programs.
+让我们写一个简单的Go程序，并且学习如何运行之。
 </p>
 
-The following program is the simplest Go program.
+下面的程序应该是最简单的Go程序。
 <pre class="line-numbers"><code class="language-go">package main
 
 func main() {
@@ -80,156 +67,124 @@ func main() {
 </code></pre>
 
 <p>
-The words <code>package</code> and <code>func</code> are two keywords.
-The two <code>main</code> words are two identifiers.
-Keywords and identifiers are introduced in
-<a href="keywords-and-identifiers.html">a coming article</a>.
+在此程序中，单词<code>package</code>和<code>func</code>是两个关键字。
+两个<code>main</code>是两个标识符。
+标识符和关键字将在后续的一篇文章中讲解。
 </p>
 
 <p>
-The first line <code>package main</code> specifies the package name
-(<b>main</b> here) of the source file.
-</p>
-
-<p>
-The second line is a blank line for better readability.
-</p>
-
-<p>
-The remaining code declares a function
-which is also called <b>main</b>.
-This <b>main</b> function in a <b>main</b> package
-specifies the entry point of a program.
-(Note that some other user code might be executed
-before the <code>main</code> function becomes invoked.)
+此程序的第一行指定了当前源代码文件所处的包的包名（此处为<code>main</code>）。
+第二行是一个空行，用来增强可读性。
+第三和第四行声明了一个名为<code>main</code>的函数。
+此函数为程序的入口函数。
 </p>
 
 </div>
 
-<h3>Run a Go Program</h3>
+<h3>运行一个Go程序</h3>
 
 <div>
 
 <p>
-The official Go SDK requires that Go source code file
-to have the extension <code>.go</code>.
-Here, we assume the above source code is saved in a file
-named <code>simplest-go-program.go</code>.
+Go SDK工具要求所有的Go源代码文件必须以<code>.go</code>后缀结尾。
+这里，我们假设上面展示的最简单的Go程序存放在一个名叫<code>simplest-go-program.go</code>的文件中。
 </p>
 
-<p>
-Open a terminal and change the current directory to the directory
-which contains the above source file, then run
+打开一个终端（控制台）并进入上述源文件所在的目录，然后运行
+
 <pre class="output"><code>$ go run simplest-go-program.go
 </code></pre>
 
 <p>
-Nothing is output? Yes, this program outputs nothing.
+什么也没输出？是的，此程序不干什么又实质意义的事儿。
+如果代码中有语法错误，这些错误将输出在终端中。
 </p>
 
-<p>
-If there are some syntax errors in the source code,
-then there would be some compile errors reported.
-</p>
+如果一个程序的<code>main</code>包中有若干Go源代码，
+我们也可以使用下面的命令运行此程序。
 
-Note: If multiple source files are
-in the <code>main</code> package of a program,
-then we should run the program with the following command
 <pre class="output"><code>$ go run *.go
 </code></pre>
 
 <p>
-Note, the <code>go run</code> command is not recommended
-to compile and run large Go projects.
-It is just a convenient way to run simple Go programs,
-just like the ones in the Go 101 articles.
-For large Go projects,
-use the commands <code>go build</code> or <code>go install</code>
-instead.
+注意：<code>go run</code>子命令并不推荐在正式的大项目中使用。
+<code>go run</code>子命令只是一种方便的方式来运行简单的Go程序。
+对于正式的项目，最好使用<code>go build</code>或者<code>go install</code>子命令。
 </p>
 
-<h3>More <code>go</code> Subcommands</h3>
+<h3>更多<code>go</code>子命令</h3>
 
 <p>
-The three commands, <code>go run</code>, <code>go build</code> and <code>go install</code>,
-will only show code syntax errors (if any).
-They don't (try to) show code warnings (a.k.a, possible code logic mistakes).
-We can use the <code>go vet</code> command to check and report such warnings.
+上面提到的三个<code>go</code>子命令（<code>go run</code>,、<code>go build</code>和<code>go install</code>）
+将只会显示代码语法错误。它们不会显示可能的代码逻辑错误（或者成为警告）。
+<code>go vet</code>子命令可以用来检查可能的代码逻辑错误。
 </p>
 
 <p>
-We can use the <code>go fmt</code> command to format Go source code
-with a consistent coding style.
+我们可以使用<code>go fmt</code>子命令来用一种同一个风格格式化Go代码。
 </p>
 
 <p>
-We can use the <code>go get</code> command to clone and checkout
-a remote third-party go package repository.
-<code>go get</code> requires the corresponding version control tool must be installed.
-If the command succeeds, the third-party go package will be put in
-the <code>src</code> folder under the first path specified
-in the <code>GOPATH</code> environment variable.
+我们可以使用<code>go get</code>子命令将一个远程Go代码库克隆到本地以便将其
+做为第三方Go包引入并使用其中的资源。
+<code>go get</code>子命令需要相应的代码版本管理工具已经安装在本机。
 </p>
 
 <p>
-We can use the <code>go test</code> command to run tests and benchmarks.
+我们可以使用<code>go test</code>子命令来运行单元和基准测试用例。
 </p>
 
 <p>
-We can use the <code>go doc</code> command to view Go documentations.
+我们可以使用<code>go doc</code>子命令来查看Go包的文档。
 </p>
 
 <p>
-The <code>go</code> command run without any arguments
-shows the supported subcommands.
+运行不带参数的<code>go</code>命令将会列出所有支持的<code>go</code>子命令。
 </p>
 
 <p>
-The Go 101 article series will not explain much more on how to use the tools
-provided by the official Go SDK.
-Please read the <a href="https://golang.org/cmd/go/">official documentations</a> for details.
+Go 101系列文章将不再对各种<code>go</code>子命令做更多的解释。
+请阅读<a href="https://golang.org/cmd/go/">官方文档</a>
+（<a href="https://golang.google.com/cmd/go/">国内版</a>）以获取更多信息。
 </p>
 
-<h3>About The <code>vgo</code> Command</h3>
+<h3>关于<code>vgo</code>命令</h3>
 
 <p>
-Note, the next major Go SDK release (v1.11) will experiment a new command
-which is called <code>vgo</code>. The functionalities of the <code>vgo</code>
-are much like the <code>go</code> command, but <code>vgo</code> also supports
-package dependency management. Another big difference is <code>vgo</code>
-doesn't require your Go packages must be put into the <code>src</code> subfolder
-of a path specified in the <code>GOPATH</code> environment variable,
+下一个Go SDK的主发行版（v1.11）中将包含一个新的试验性质的命令<code>vgo</code>。
+<code>vgo</code>的功能和<code>go</code>命令类似，不过增添了项目依赖库版本管理的功能。
+另一个重大区别是<code>vgo</code>不再要求Go项目代码必须放置在<code>GOPATH</code>环境变量
+指定的某个路径的的<code>src</code>子目录下。
 </p>
 
 <p>
-The <code>vgo</code> command may be renamed to <code>go</code>
-and replace the current <code>go</code> command totally in the future.
+将来，<code>vgo</code>命令将被重命名为<code>go</code>并取代现在<code>go</code>命令。
 </p>
 
 <p class="anchor" id="doc"></p>
-<h3>View Go Documentations</h3>
+<h3>查看Go文档</h3>
 
 <p>
-We can view all kinds of Go documentations at the official Go
-website <a href="https://golang.org">golang.org</a>.
+我们可以在Go官网<a href="https://golang.org">golang.org</a>
+（国内版：<a href="https://golang.google.com">golang.google.com</a>）阅读各种Go文档。
 </p>
 
 <p>
-We can also run <code>godoc -http=:9999</code> to start a local clone of the
-official website at <a href="http://localhost:9999">localhost:9999</a>.
+我们也可以运行<code>godoc -http=:9999</code>开启一个官网的一个本地镜像来阅读各种Go文档。
 </p>
 
 <p>
-Please note that currently (v1.10), if the <code>GOROOT</code> environment variable is unset,
-we must specify the <code>goroot</code> flag when running the local godoc server,
-e. g. <code>godoc -http=:9999 -goroot path/to/go/sdk</code>.
-This inconvenience may be caused by a bug which may be fixed later.
+请注意对于1.09和1.1版本的Go SDK,如果<code>GOROOT</code>环境变量没有设置，
+那么我们需要在开启本地镜像的时候指定一个<code>goroot</code>选项：
+<code>godoc -http=:9999 -goroot path/to/go/sdk</code>。
+这个不便可能是<code>godoc</code>的一个bug造成的。
+这个bug将在Go SDK 1.11中修复。
 </p>
 
 <p>
-If you only want to view the documentations of the standard packages,
-you can set the <code>GOPATH</code> environment variable to a non-exist path
-before running <code>godoc</code>.
+<code>godoc</code>默认将会为所有本地已经下载的Go第三方库包生成文档。
+有时这需要很长的时间。如果你只想查看标准库的文档，你可以在<code>godoc</code>命令
+运行之前在终端中将<code>GOPATH</code>环境变量暂时设为一个不存在的路径。
 </p>
 
 <!--

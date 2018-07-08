@@ -1,147 +1,121 @@
-﻿<h1>Introduction Of Source Code Elements</h1>
+﻿<h1>程序源代码基本元素介绍</h1>
 
 <p>
-Go is known for its simple and clean syntax.
-This article will introduce the common source code elements in programming
-and show a simple Go program so that
-new gophers (Go programmers) will get a basic impression of Go code
-and how all kinds of code elements are used in Go code.
-
+相比很多其它流行语言，Go的语法相对简洁。
+此篇文章将介绍编程中常用的代码元素，
+并展示一份简单的Go程序代码，
+以便让刚开始学Go编程的程序员对Go代码结构有一个大概的印象。
 </p>
 
-<h3>Programming And Source Code Elements</h3>
+<h3>编程和程序代码元素</h3>
 
 <p>
-Simply speaking,
-programming can be viewed as manipulating
-all kinds of operations in all kinds of ways.
-Operations write data to and read data from
-all kinds of hardware devices to achieve all kinds of goals.
-For modern computers, elemental operations are low-level instructions,
-such as CPU and GPU instructions.
-Common hardware devices include memory, disk, network card, graphics card,
-monitor, keyboard and mouse, etc.
+简单来讲，编程可以看作是以各种方式控制和组合计算机运行中的各种操作，
+以达到各种各样的目的。
+一个操作可能从一个硬件设备读取，或者向一个硬件设备写入一些数据，
+从而完成一个特定的任务。
+对于现代计算机来说，最基本的操作是底层计算机指令，
+比如CPU和GPU指令。
+常见的硬件设备包括内存、磁盘、网卡、显卡，显示器、键盘和鼠标等。
 </p>
 
 <p>
-Programming by manipulating low-level instructions directly
-is tedious and error prone.
-High-level programing languages make
-some encapsulations for low-level operations,
-and make some abstracts for data,
-to make programing more intuitive and human friendly.
+直接操控底层计算机指令进行编程是非常繁琐和容易出错得。
+高级编程语言通过对底层指令进行一些封装和对数据进行一些抽象，
+从而使得编程变得直观和易于理解。
 </p>
 
 <p>
-In popular high-level programming languages,
-operations are mainly achieved by calling
-<b>functions</b> and using <b>operators</b>.
-Most popular high-level programming languages support several kinds of
-conditional and loop <b>control flows</b>,
-we can think them as special operations.
-The syntax of these control flows is close to human languages
-so that the code written by one programmers is easy to be understood by others.
+在流行高级编程语言中，一个操作通常是通过<b>函数</b>调用或者使用<b>操作符</b>
+（或者<b>运算符</b>）运算来完成的。
+大多数高级编程语言都支持一些条件和循环控制语句。
+这些条件和循环控制语句可以看作是特殊的操作。
+它们的语法接近于人类语言，因此一个人写的代码很容易被其他人理解。
 </p>
 
 <p>
-Data is abstracted as <b>types</b> and <b>values</b>
-in most high-level programming languages.
-Types can be viewed as value templates,
-and values can be viewed as type instances.
-Most languages support several built-in types, and also support custom types.
-The type system of a programming language is the spirit of the language.
+在大多数高级编程语中，数据通常被抽象为各种<b>类型</b>和<b>值</b>。
+一个类型可以看作是值的模板。一个值可以看作是某个类型的实例。
+大多数编程语言支持若干内置类型和自定义类型。
+一门语言的类型系统可以说是这门语言的灵魂。
 </p>
 
 <p>
-There may be a large quantity of values used in programming.
-Some of them can be represented with their <b>literals</b>
-(text representations) directly, but others can't.
-To make programming convenient and less mistake prone, many values are named.
-Such values include <b>variables</b> and named <b>constants</b>.
-For the same reason, many functions and types also have names.
+编程中常常会使用大量的值。
+一些值可以用它们的<b>字面形式</b>直接表示，但其它大多数值不可以或不推荐使用它们的字面形式來表示。
+为了编程灵活和不易出错，这些其它值一般使用<b>变量</b>和<b>（有名）常量</b>来表示。
 </p>
 
 <p>
-Named functions, named types and named values
-(including variables and named constants)
-are called <b>resources</b> in Go 101.
-The names of resources must be
-<a href="keywords-and-identifiers.html#identifier">identifiers</a>.
+在Go 101中，有名字的函数、类型和值（包括变量和有名常量）将被统称为资源。
+资源名必须为<b><a href="keywords-and-identifiers.html#identifier">标识符</a></b>。
 </p>
 
 <p>
-Many modern high-level programming languages
-use <b>packages</b> to organize code.
-A package must <b>import</b> another package
-to use the exported (public) resources in the other package.
+高级编程语言代码将被编译器或者解释器转换为底层机器码进行执行。
+为了帮助编译器和解释器解析高级语言代码，一些单词将被用作<b>关键字</b>。
+这些单词必能被当做标识符使用。
 </p>
 
 <p>
-High-level programming code will be translated to low-level CPU instructions
-by compilers to get executed.
-To help compilers parse high-level programming code,
-many words are reserved to prevent them being used as identifiers.
-Such words are called
-<a href="keywords-and-identifiers.html#keywords">keywords</a>.
+很多现代高级语言使用<b>包</b>来组织代码。
+一个包必须<b>引入</b>另一个包才能使用另一个包中的公有（导出的）资源。
+包名和包的引入名也必须都是标识符。
 </p>
 
 <p>
-Although the code written in high-level programming languages is
-more understandable than low-level machine machine languages,
-we still need some comments for some code to explain the logic.
-The example program in the next section contains many comments.
+尽管高级编程语言代码比底层机器指令友好和易懂，
+我们还是需要一些<b>注释</b>来帮助自己和其他程序员理解我们所写的代码。
+在下一节的程序示例中，我们可以看到很多注释。
 </p>
 
-<h3>A Simple Go Demo Program</h3>
+<h3>一个简单的Go示例程序</h3>
 
 <p>
-Let's view a short Go demo program to know all kinds of code elements in Go.
-Like some other languages, in Go, line comments start with <code>//</code>,
-and each block comment is enclosed in a pair of <code>/*</code> and <code>*/</code>.
+为了对各种代码元素有一个更清楚的认识，让我们来看一个简短的Go示例程序。
+和很多其流行语言一样，Go使用<code>//</code>来起始一个行注释，
+使用一个<code>/*</code>和<code>*/</code>对来包裹一个块注释。
 </p>
 
 <div>
 
-Below is the demo Go program.
-Please read the comments for explanations.
-More explanations are following the program.
+下面是这个Go示例程序。请注意阅读其中的注释。程序之后有更多解释。
 
-<pre class="line-numbers"><code class="language-go">package main // specify the package name of the current source file.
+<pre class="line-numbers"><code class="language-go">package main // 指定当前源文件所在的包名
 
-import "math/rand" // import a standard package.
+import "math/rand" // 引入一个标准库包（引入名为rand）
 
-const MaxRand = 16 // a named constant declaration.
+const MaxRand = 16 // 声明一个有名整型常量
 
 /*
- StatRandomNumbers produces certain number of non-negative random
- integers which are less than MaxRand, then counts and returns the
- numbers of small and large ones among the produced random integers.
- The input, numRands, specifies the number of randoms to be produced.
+ StatRandomNumbers生成一些不大于MaxRand的非负随机整数，并统计和返回小于
+ 和大于MaxRand/2的随机数个数。输入参数numRands指定了要生成的随机数的总数。
 */
-func StatRandomNumbers(numRands int) (int, int) { // a function declaration
-	var a, b int // declare two variables (both are initialized as 0).
-	for i := 0; i < numRands; i++ { // a for-loop control flow.
-		if rand.Intn(MaxRand) < MaxRand/2 { // an if-else control flow.
+func StatRandomNumbers(numRands int) (int, int) { // 一个函数声明
+	var a, b int // 声明了两个变量（类型都为int，初始值都为0）
+	for i := 0; i < numRands; i++ { // 一个for循环代码块
+		// 一个if-else条件控制代码块
+		if rand.Intn(MaxRand) < MaxRand/2 {
 			a = a + 1
 		} else {
-			b++ // same as: b = b + 1
+			b++ // 等价于：b = b + 1
 		}
 	}
-	return a, b // this function has two results to return.
+	return a, b // 此函数返回两个结果
 }
 
-// The main function is the entry function of this program.
+// main函数，或主函数，是一个程序的入口函数。
 func main() {
 	var num = 100
-	// Call StatRandomNumbers and two built-in functions.
-	x, y := StatRandomNumbers(num) // a short variable declaration.
+	// 调用上面声明的StatRandomNumbers和另外两个内置函数。
+	x, y := StatRandomNumbers(num) // 一个短变量声明语句
 	print("Result: ", x, " + ", y, " = ", num, "? ")
 	println(x+y == num)
 }
 </code></pre>
 
-Save above source code to a file named
-<code>basic-code-element-demo.go</code> and run this program by:
+将上面的程序代码存盘到一个名为<code>basic-code-element-demo.go</code>
+的文件中并使用下列命令运行此程序：
 <pre class="output"><code>$ go run basic-code-element-demo.go
 Result: 46 + 54 = 100? true
 </code></pre>
@@ -149,131 +123,114 @@ Result: 46 + 54 = 100? true
 <p></p>
 
 <p>
-In the above program, the words with blue color are keywords
-(JavaScript needs to be enabled to colorize the code).
-Most other words in the program are identifiers.
-Please read <a href="keywords-and-identifiers.html">keywords and identifiers</a>
-for more information about keywords and identifiers.
+在上面的程序示例中，蓝色的单词为关键字（需要JavaScript支持才能高亮显示代码）。
+其它单词均为标识符。
+请阅读<a href="keywords-and-identifiers.html">关键字和标识符</a>以
+获得更多关于关键字和标识符的信息。
 <p>
 
 <p>
-The green <code>int</code> words at line <i>14</i> and line <i>16</i>
-denote the built-in <code>int</code> type, one of many kinds of integer types in Go.
-The <code>16</code> at line <i>5</i>, <code>0</code> at line <i>15</i>,
-<code>1</code> at line <i>17</i> and <code>100</code> at line <i>27</i>
-are some value literals of the <code>int</code> type.
-The <code>"Result: "</code> at line <i>30</i> is a value literal
-of the built-in <code>string</code> type.
-Please read <a href="basic-types-and-value-literals.html">basic types and their value literals</a>
-for more information about above built-in basic types and their value literals.
-Some other types (composite types) will be introduced later in other articles.
+四个绿色的单词<code>int</code>（一个在<i>14</i>行，另三个在<i>13</i>行）
+表示内置基本类型<code>int</code>。<code>int</code>是Go中的基本整数类型之一。
+第<i>5</i>行中的<code>16</code>、第<i>13</i>中的<code>0</code>、
+第<i>16</i>行中的<code>1</code>以及第<i>26</i>行的<code>100</code>均为整型字面值。
+第<i>29</i>行的<code>"Result: "</code>是一个字符串字面值。
+请阅读<a href="basic-types-and-value-literals.html">基本类型和它们的字面值表示</a>以
+获取更多关于基本类型和它们的字面值的信息。
+Go中的其它类型（均为组合类型）将在以后的其它文章中介绍和解释。
 </p>
 
 <p>
-Line <i>27</i> is an assignment.
-Line <i>5</i> declares a named constant, <code>MaxRand</code>.
-Line <i>14</i> and line <i>27</i> declare three variables,
-with the standard variable declaration form.
-Variables <code>i</code> at line <i>15</i>, <code>x</code> and <code>y</code> at line <i>29</i>
-are declared with the short variable declaration form. We have specified the type
-for variables <code>a</code> and <code>b</code> as <code>int</code>.
-Go compiler will deduce that the types of <code>i</code>, <code>num</code>,
-<code>x</code> and <code>y</code> are all <code>int</code> because they are initialized with integer literals.
-Please read <a href="constants-and-variables.html">constants and variables</a>
-for more information about untyped values, type deduction,
-value assignments and how to declare variables and named constants.
+第<i>16</i>行是一个赋值语句。
+第<i>5</i>行声明了有名常量，叫做<code>MaxRand</code>。
+第<i>12</i>行和第<i>26</i>行使用标准变量声明语句声明了三个变量。
+第<i>13</i>行的变量<code>i</code>以及第<i>28</i>行的变量<code>x</code>和<code>y</code>是
+使用短变量声明语句声明的。
+变量<code>a</code>和<code>b</code>在声明的时候被指定为<code>int</code>类型。
+编译器会自动推导出变量<code>i</code>、<code>num</code>、<code>x</code>和<code>y</code>的
+类型均为<code>int</code>类型，因为它们的初始值都是整型字面值表示的。
+请阅读<a href="constants-and-variables.html">常量和变量</a>以获取
+什么是类型未确定值、类型推导、赋值和如何声明变量和有名常量。
 </p>
 
 <p>
-There are many operators used in the program, such as the less-than
-comparison operator <code>&lt;</code> at line <i>15</i> and <i>16</i>,
-the equal-to operator <code>==</code> at line <i>31</i>,
-and the addition operator <code>+</code> at line <i>17</i> and line <i>31</i>.
-Yes, <code>+</code> at line <i>30</i> is not an operator, it is part of a string literal.
-The values involved in an operator operation are called operands.
-Please read <a href="operators.html">common operators</a> for more information.
-More operators will be introduced in other articles later.
+上面的示例程序中使用了很多操作符，比如第<i>15</i>和<i>16</i>行的小于比较符<code>&lt;</code>，
+第<i>30</i>行的等于比较符<code>==</code>，
+还有第<i>16</i>和<i>30</i>行的加法运算符<code>+</code>。
+第<i>29</i>行中的<code>+</code>不是一个运算符，它是一个字符串字面值。
+一个使用操作符的操作中涉及到的值成为操作值（又是也可成为运算数）。
+请阅读<a href="operators.html">常用操作符</a>以获取更多关操作符的信息。
+更多操作符将在后续其它文章中介绍。
 </p>
 
 <p>
-At line <i>30</i> and line <i>31</i>, two built-in functions,
-<code>print</code> and <code>println</code>, are called.
-A custom function <code>StatRandomNumbers</code> is declared from line
-<i>13</i> to line <i>23</i>, and it is called at line <i>29</i>.
-Line <i>16</i> also calls a function, <code>Intn</code>,
-which is a function declared in the <code>math/rand</code> standard package.
-A function call is a function operation.
-The input values used in a function call are called arguments.
-Please read <a href="function-declarations-and-calls.html">function
-declarations and calls</a> for more information.
+第<i>29</i>和<i>30</i>行调用了两个内置函数<code>print</code>和<code>println</code>。
+从第<i>11</i>行到第<i>22</i>行声明的函数<code>StatRandomNumbers</code>在
+第<i>28</i>行被调用。
+第<i>15</i>行也调用了一个函数 <code>Intn</code>。
+这个函数声明在<code>math/rand</code>标准库包中。
+请阅读<a href="function-declarations-and-calls.html">函数声明及函数调用</a>以获取
+更多关于函数声明及函数调用的信息。
 </p>
 
 <p><i>
-(Note, the built-in <code>print</code> and <code>println</code> functions
-are not recommended to be used in formal Go programming.
-The corresponding functions in the <code>fmt</code> standard packages
-should be used instead in formal Go projects.
-In Go 101, the two functions are only used in the several starting articles.)
+（注意，一般<code>print</code>和<code>println</code>这两个内置函数并不推荐使用。
+在正式的项目中，我们应该尽量使用<code>fmt</code>标准库包中声明的相应函数。
+Go 101只在开始的几篇文章中使用了这两个函数。）
 </i></p>
 
 <p>
-Line <i>1</i> specifies the package name of the current source file.
-The <code>main</code> entry function must be declared in a package
-which is also called <code>main</code>.
-Line <i>3</i> imports a package, the <code>math/rand</code>
-standard code package. The function <code>Intn</code> declared in this
-standard package is called at line <i>16</i>.
-Please read <a href="packages-and-imports.html">code packages and package imports</a>
-for more information about how to organize code packages and import packages.
+第<i>1</i>行指定了当前源文件所处的包的名称。
+一个Go程序的主函数（<code>main</code>函数）必须被声明在一个名称为<code>main</code>的包中。
+第<i>3</i>行引入了<code>math/rand</code>标准库包。
+在这个包中声明的<code>Intn</code>函数将在第<i>16</i>行被调用。
+请阅读<a href="packages-and-imports.html">代码包和包引入</a>、以获取更多
+关于代码包和包引入的信息。
 </p>
 
 <p>
-The article <a href="expressions-and-statements.html">expressions, statements
-and simple statements</a> will introduce what are expressions and statements.
-In particular, all kinds of simple statements, which are special statements,
-are listed.
-Some portions of all kinds of control flows must be simple statements,
-and some portions must be expressions.
+<a href="expressions-and-statements.html">表达式、语句和简单语句</a>一文中
+介绍了什么是表达式和语句。特别地，此文累出了所有的简单语句类型。
+在Go代码中，某些部分必须为简单语句，某些部分必须为表达式。
 </p>
 
 <p>
-In the <code>StatRandomNumbers</code> function body, two control flows are used.
-One is a <code>for</code> loop control flow, which nests
-the other one, an <code>if-else</code> conditional control flow.
-Please read <a href="control-flows.html">basic control flows</a>
-for more information about all kinds of basic control flows.
-Some other special controls flows will be introduced in other articles later.
+<code>StatRandomNumbers</code>函数的声明体中使用了两个流程控制语句块。
+其中一个是<code>for</code>循环语句块，它内嵌了另外一个语句块。
+另外一个语句块是一个<code>if-else</code>条件语句控制块。
+请阅读<a href="control-flows.html">基本流程控制语法</a>以
+获取更多关于流程控制语句块的信息。
+更多的特殊的流程控制语句块将在以后的其它文章中介绍。
 </p>
 
 <p>
-Blank lines have been used in the above program to improve the readability of the code.
-And as this program is for code elements introduction purpose,
-there are many comments in it.
-Except the documentation comment for the <code>StatRandomNumbers</code> function,
-other comments are for demonstration purpose only.
-We should try to make code self-explanatory
-and only use necessary comments in formal projects.
+空行常常用来增加代码的可读性。
+上面的程序中也包涵了很多注释。
+其实，在一个正式的项目中，
+除了<code>StatRandomNumbers</code>的文档注释
+（<code>/*</code>和<code>*/</code>对中的部分），
+其它注释都是没有必要的。
+我们应该尽量使代码自解释，只在确实需要解释的地方进行注释。
 </p>
 </div>
 
 <p class="anchor" id="line-break"></p>
-<h3>About Line Breaks</h3>
+<h3>关于代码断行</h3>
 
 <div>
-Like many other languages, Go also uses a pair of braces (<code>{</code> and <code>}</code>)
-to form an explicit code block. In Go programming, coding style can't be
-arbitrary. For example, many of the starting curly braces (<code>{</code>)
-can't be put on the next line. If we modify the <code>StatRandomNumbers</code>
-function declaration in the above program as the following,
-the program will fail to compile.
+像很多其它流行编程语言一样，Go也使用一对大括号（<code>{</code> and <code>}</code>）
+来形成一个显式代码块。但是在Go代码中，编码样式风格有一些限制。
+比如，很多左大括号（<code>{</code>）不能被放到下一行。
+如果，上面的<code>StatRandomNumbers</code>被修改成如下所示，
+则上面的示例程序将编译不通过。
 
 <pre class="line-numbers"><code class="language-go">func StatRandomNumbers(numRands int) (int, int)
-{ // syntax error
+{ // 编译错误：语法错误
 	var a, b int
 	for i := 0; i < numRands; i++
-	{ // syntax error
+	{ // 编译错误：语法错误
 		if rand.Intn(MaxRand) < MaxRand/2
-		{ // syntax error
+		{ // 编译错误：语法错误
 			a = a + 1
 		} else {
 			b++
@@ -284,25 +241,23 @@ the program will fail to compile.
 </code></pre>
 
 <p></p>
-Some programmers may not like the line break restrictions.
-But the restrictions have two benefits:
+
+一些程序员不是很喜欢这些限制。但是这些限制有两个害处：
+
 <ol>
 <li>
-	they make code compilations faster.
+	它们使得Go程序编译得非常快。
 </li>
 <li>
-	they make the coding styles written by different gophers similar,
-	so that it is more easily for gophers to read and understand
-	the code written by other gophers.
+	它们使得不同的Go程序员编写的代码风格类似，
+	从而一个Go程序员写的代码很容易被另一个程序员看懂。
 </li>
 </ol>
 
 <p>
-We can learn more about line break rules in
-<a href="line-break-rules.html">a later article</a>.
-At present, we should avoid putting a starting curly brace on a new line.
-In other words, generally, the first non-blank character of a code line
-should not be the starting curly brace character.
+我们可以阅读<a href="line-break-rules.html">代码断行规则</a>以
+获取更多关于代码换行的信息。在目前，我们最好避免将左大括号放在下一行。
+或者说，每行的非空起始字符不能是左大括号。
 </p>
 
 </div>

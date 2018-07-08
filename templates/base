@@ -63,18 +63,18 @@
 	{{- end -}}
 	
 	{{- if $is_details -}}
-	<div class="col-xs-6 col-sm-3 nav-item-active">Go 细节 101</div>
+	<div class="col-xs-6 col-sm-3 nav-item-active">Go细节101</div>
 	{{- else -}}
-	<div class="col-xs-6 col-sm-3 nav-item-inactive"><a href="/article/details.html">Go 细节 101</a></div>
+	<div class="col-xs-6 col-sm-3 nav-item-inactive"><a href="/article/details.html">Go细节101</a></div>
 	{{- end -}}
 	
 	{{- if $is_faq -}}
-	<div class="col-xs-6 col-sm-3 nav-item-active">Go 问答 101</div>
+	<div class="col-xs-6 col-sm-3 nav-item-active">Go问答101</div>
 	{{- else -}}
-	<div class="col-xs-6 col-sm-3 nav-item-inactive"><a href="/article/unofficial-faq.html">Go 问答 101</a></div>
+	<div class="col-xs-6 col-sm-3 nav-item-inactive"><a href="/article/unofficial-faq.html">Go问答101</a></div>
 	{{- end -}}
 	
-	<div class="col-xs-6 col-sm-3 nav-item-inactive" style="color: #ccc;">Go 技巧 101</div>
+	<div class="col-xs-6 col-sm-3 nav-item-inactive" style="color: #ccc;">Go技巧101</div>
 </div>
 {{ end }}
 

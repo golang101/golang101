@@ -1,178 +1,180 @@
-﻿<h1>An Introduction Of Go</h1>
+﻿<h1>Go语言简介</h1>
 
 <p>
-Go is a compiled and static typed programming language born from Google.
-Many of the core Go design and SDK development team members have many years
-of experience in the field of programming language research.
+Go是一门编译型的和静态的编程语言。
+Go诞生于谷歌研究院。
+Go的核心设计成员有很多有着数十年编程语言研究领域经验的研究者。
 </p>
 
 <div>
-Go has many features. Some are unique, some are borrowed from other programming languages:
+Go有很多特性，有一些是独特的，有一些借鉴于一些其它编程语言。
+
 <ul>
 <li>
-	built-in concurrent programming support
+	内置并发变成支持：
 	<ul>
 	<li>
-		goroutines (green threads) and easy to start new goroutines
+		使用协程（goroutine）做为基本的计算单元。
 	</li>
 	<li>
-		channels (based on CSP model) and select mechanisms to do synchronizations between goroutines
+		使用数据通道（基于CSP模型channels）来实现协程间的同步和通信。
 	</li>
 	</ul>
 </li>
 <li>
-	the container types <code>map</code> and <code>slice</code> are first-level citizens
+	内置了映射表（map）和切片（slice）类型。
 </li>
 <li>
-	polymorphism through interfaces
+	支持多态（polymorphism）。
 </li>
 <li>
-	value boxing and reflection through interfaces
+	使用接口（interface）来实现裝盒（value boxing）和反射（reflection）。
 </li>
 <li>
-	pointers
+	支持指针。
 </li>
 <li>
-	function closures
+	支持函数闭包（closure）。
 </li>
 <li>
-	methods
+	支持方法。
 </li>
 <li>
-	deferred function calls
+	支持延迟函数调用（defer）。
 </li>
 <li>
-	type safety
+	支持类型内嵌（type embedding）。
 </li>
 <li>
-	type embedding
+	支持类型推导（type deduction or type inference）。
 </li>
 <li>
-	type deduction
+	内存安全。
 </li>
 <li>
-	memory safety
+	自动垃圾回收。
 </li>
 <li>
-	automatic garbage collection
+	良好的代码跨平台性。
 </li>
 </ul>
 
-Besides above features, further highlights are:
+除了以上特性，Go还有如下亮点.
 <ul>
 <li>
-	The syntax of Go is deliberately designed to be simple, clean,
-	and similar to other popular programming languages.
-	This makes Go programming easy to pick up and makes
-	the Go code written by one programmer easy to be understood by others.
+	Go的语法很简洁并且和其它流行语言相似。
+	这使得具有一定编程经验的程序员很容易上手Go编程。
+	当然，对于没有编程经验的初学者，Go也比很多流行编程语言更容易上手一些。
 </li>
 <li>
-	Go comes with a great set of standard code packages which provide all kinds of
-	common functionalities. Most of the packages are cross-platform.
+	Go拥有一个比较齐全的标准库。这个标准库提供了很多常用的功能。
 </li>
 <li>
-	Go also has an active community, and there are
-	<a href="https://github.com/avelino/awesome-go">plenty of
-	high quality third party Go packages and projects</a> to import and use.
+	Go拥有一个活跃和回应快速的社区。
+	社区贡献了<a href="https://github.com/avelino/awesome-go">大量高质量的第三方库包</a>。
 </li>
 </ul>
 
 </div>
 
 <p>
-Go programmers are often called gophers.
+Go程序员常常被称为地鼠（gopher）。
 </p>
 
 <p>
-In fact, although Go is a compiled and static typed programming language,
-Go also has many features which are usually only available for dynamic script languages.
-It is hard to combine these two kinds into one language, but Go did it.
-In other words, Go owns both the strictness of static languages
-and the flexibility of dynamic languages.
-I can't say there are not any compromises between the two,
-but the effect of the compromises is much weaker than the benefits of the combination in Go.
+上面已经提到，Go属于编译型的静态语言。但是Go的很多特性使得用Go编程像动态脚本语言一样得灵活。
+一般很难将静态语言的严格性和动态语言灵活性的优点合二为一。但是Go做到了这一点。
+当然，合二为一也会不可避免地带来一些弊端。
+但是，对于Go来说，合二为一带来的好处远多于合二为一的带来的弊端。
 </p>
 
 <p>
-Readability is an important factor which affects the design of Go heavily.
-It is not hard for a gopher to understand the Go code written by other gophers.
+可读性是在Go语言的设计中一个非常重要的考虑因素。
+一个Go程序员常常可以轻松读懂其他Go程序员写的代码。
+甚至对于一个没有Go编程经验但具有其它语言编程经验的程序员来说，
+读懂一份Go源码也不是一件难事。
 </p>
 
 <p>
-Currently, the most popular Go compiler is written in Go and maintained by the Go design team.
-Later we shall call it the standard Go compiler, or <code>gc</code>
-(an abbreviation for Go compiler, not for garbage collection GC).
-The Go design team also maintains a second Go compiler, <code>gccgo</code>.
-Nowadays it's use is less popular than <code>gc</code>, but it always serves as a reference,
-and both compilers are in active development.
-As of now the Go team focuses on the improvement of <code>gc</code>.
+目前，使用最广泛的Go编译器由Go官方设计和开发团队维护。
+以后我们将称此编译器为标准编译器。标准编译器也常常成为<code>gc</code>（是Go compiler的缩写，
+不是垃圾回首garbage collection的缩写）。
+Go官方设计和开发团队也维护着另外一个编译器，<code>gccgo</code>。
+<code>gccgo</code>是gcc编译器项目的一个子项目。
+<code>gccgo</code>的使用广泛度大不如<code>gc</code>，
+它的主要作用是做为一个参考，来保证<code>gc</code>的实现正确性。
+目前两个编译器的开发都很活跃，尽管Go开发团队在<code>gc</code>的开发上花费的精力更多。
 </p>
 
 <p>
-There are many improvements for <code>gc</code> from version to version (two versions each year).
-For example, noticeable lags caused by garbage collecting is a common
-criticism for languages with automatic memory management.
-But since Go 1.8, improvements made for the concurrent garbage collection implementation
-in <code>gc</code> basically eliminated the lag problem.
+<code>gc</code>编译器是Go SDK中一个组件。
+Go SDK的使用将在下一篇文章中介绍。
+Go SDK 1.0发布于2012年三月。
+Go语言规范的版本和Go SDK的版本总是保持一致。
+每年Go SDK发行两个主版本。
 </p>
 
 <p>
-<code>gc</code> supports cross-platform compilation.
-For example, we can build a Windows executable on a Linux OS, and vice versa.
+自从Go语言正式发布后，Go的语法变化很小。
+但是标准编译器<code>gc</code>却在不断地改进。
+使用早期的<code>gc</code>编译的程序运行时在每次垃圾回收的结尾常常会有明显的停顿。
+但是自从Go 1.8，使用<code>gc</code>编译的程序在运行时已经基本消除了停顿现象。
 </p>
 
 <p>
-Programs written in go language mostly compile very fast.
-Compilation time is an important factor for the happiness in development.
-Short build time is one reason why many programmers like programming with Go.
+<code>gc</code>支持跨平台编译。
+比如，我们可以在Linux平台上编译出Windows程序，反之亦然。
+</p>
+
+<p>
+使用Go编写的程序常常编译得非常快。
+编译时间的长短是开发愉悦度的一个重要因素。
+编译时间短是很多程序员喜欢Go的一个原因。
 </p>
 
 <div>
-Advantages of Go executables are:
+Go程序生成的二进制可执行文件常常拥有以下优点：
 <ul>
 <li>
-	small memory footprint
+	内存消耗少
 </li>
 <li>
-	fast code execution
+	执行速度快
 </li>
 <li>
-	short warm-up duration (so great deployment experience)
+	启动快
 </li>
 </ul>
 
-Some other compiled languages, such as C/C++/Rust may also have these three advantages
-(and they may have their respective advantages compared to Go),
-but they lack two important characteristics of Go:
+很多C家族语言，比如C/C++/Rust等，也拥有上述的优点。
+但它们缺少Go语言的几个重要优点：
 <ul>
 <li>
-	fast compilation results in happy local development experience
-	and short deployment iteration cycles
+	程序编译时间短
 </li>
 <li>
-	flexible like dynamic langauges
+	像动态语言一样灵活
 </li>
 <li>
-	built-in concurrent programming supports
+	内置并发支持
 </li>
 </ul>
 </div>
 
 <p>
-All the above advantages combined make Go become an outstanding language
-and a good choice for many kinds of projects.
-Currently, Go is popularly used in network, system tools,
-database development and block chain development areas.
-But there are also more and more game, big data and AI projects starting to use Go.
+上面所有提到的优点使得Go成为一个出众的编程语言。
+对于很多项目来说，Go是一个相当不错的选择。
+目前，Go主要用于网络开发、系统工具开发、数据库开发和区块链开发。
+也有越来越多的游戏、大数据和人工智能项目开始使用Go开发。
 </p>
 
 <p>
-Finally, Go is not perfect in all aspects.
-There are certain trade-offs in Go design.
-And the current Go 1.x has some shortcomings.
-For example, Go doesn't support generics for custom types and functions now.
-Go team members are not against introducing custom generics into Go,
-they just haven't found a good solution yet which keeps Go clean and simple.
-Go is a mature language, and is still evolving and in active development.
-Nothing is impossible in the future.
+最后，我们应该知道，没有一门语言是完美的。Go也一样。
+Go的设计中有很多折衷和各种权衡。
+Go 1 确实有一些不足。
+比如，Go不支持自定义范型。
+Go设计团队并不排斥自定义范型，他们只是还没有找到一个优美的自定义范型设计方案
+能够保持Go语法的简洁性。
+目前 Go 2 的设计工作已经提上日程。
+未来没有什么是不可能的。
 </p>

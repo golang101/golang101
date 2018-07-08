@@ -353,8 +353,8 @@ func findGo101ProjectRoot() string {
 	}
 
 	for _, name := range []string{
-		"gitlab.com/go101/go101", "gitlab.com/Go101/go101",
-		"github.com/go101/go101", "github.com/Go101/go101",
+		"gitlab.com/golang101/golang101", "gitlab.com/Golang101/golang101",
+		"github.com/golang101/golang101", "github.com/Golang101/golang101",
 	} {
 		pkg, err := build.Import(name, "", build.FindOnly)
 		if err == nil {
