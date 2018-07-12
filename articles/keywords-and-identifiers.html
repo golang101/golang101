@@ -1,18 +1,18 @@
-﻿<h1>Keywords And Identifiers In Go</h1>
+﻿<h1>关键字和标识符</h1>
 
 <p>
-This article will introduce keywords and identifiers in Go.
+此篇文章将介绍Go中的关键字和标识符。
 </p>
 
 <p class="anchor" id="keyword"></p>
-<h3>Keywords</h3>
+<h3>关键字</h3>
 
 <div>
 <p>
-Keywords are the special words which help compilers to understand and parse user code.
+关键字是一些特殊的用来帮助编译器理解和解析源代码的单词。
 </p>
 
-Up to now (Go 1.10), Go has only 25 keywords:
+截止目前（Go 1.10），Go中共有25个关键字。
 
 <pre class="line-numbers"><code class="language-go">break     default      func    interface  select
 case      defer        go      map        struct
@@ -21,82 +21,71 @@ const     fallthrough  if      range      type
 continue  for          import  return     var
 </code></pre>
 
-They can be categorized as four groups:
+这些关键字可以分为四组：
 <ul>
 <li>
-	<code>const</code>, <code>func</code>, <code>import</code>, <code>package</code>, <code>type</code> and <code>var</code>
-	are used to declare all kinds of code elements in Go programs.
+	<code>const</code>、<code>func</code>、<code>import</code>、<code>package</code>、<code>type</code>和<code>var</code>用来声明各种代码元素。
 </li>
 <li>
-	<code>chan</code>, <code>interface</code>, <code>map</code> and <code>struct</code>
-	are used as parts in some composite type denotations.
+	<code>chan</code>、<code>interface</code>、<code>map</code>和<code>struct</code>用作
+	一些组合类型的字面表示中。
 </li>
 <li>
-	<code>break</code>, <code>case</code>, <code>continue</code>, <code>default</code>, <code>else</code>, <code>fallthrough</code>,
-	<code>for</code>, <code>goto</code>, <code>if</code>, <code>range</code>, <code>return</code>, <code>select</code> and <code>switch</code>
-    are used to control flow of code.
+	<code>break</code>、<code>case</code>、<code>continue</code>、<code>default</code>、<code>else</code>、<code>fallthrough</code>、<code>for</code>、<code>goto</code>、<code>if</code>、<code>range</code>、<code>return</code>、<code>select</code>和<code>switch</code>用在流程控制语句中。
+	详见<a href="control-flows.html">基本流程控制语法</a>。
 </li>
 <li>
-	<code>defer</code> and <code>go</code> are also control flow keywords, but in other specific manners.
-	They modify function calls, which we'll talk about in
-	<a href="control-flows-more.html">this article</a>.
+	<code>defer</code>和<code>go</code>也可以看作是流程控制关键字，
+	但它们有一些特殊的作用。详见<a href="control-flows-more.html">协程和延迟函数调用</a>。
 </li>
 </ul>
 
 <p>
-These keywords will be explained in details in other articles.
+这些关键字将在后续文章中的到详细介绍。
 </p>
 </div>
 
 <p class="anchor" id="identifier"></p>
-<h3>Identifiers</h3>
+<h3>标识符</h3>
 
 <div>
-An identifier is a token which must be composed of Unicode letters,
-Unicode digits (Number category <i>Nd</i> in Unicode Standard 8.0)
-and <code>_</code> (underscore) and start with
-either an Unicode letter or <code>_</code>.
-Here,
+一个标识符是一个以Unicode字母或者<code>_</code>开头并且完全由Unicode字母和Unicode数字组成的单词。
 <ul>
 <li>
-	Unicode letters mean the characters defined in Letter categories
-	<i>Lu</i>, <i>Ll</i>, <i>Lt</i>, <i>Lm</i>, or <i>Lo</i> of Unicode Standard 8.0.
+	Unicode字母是定义在<a href="http://www.unicode.org/versions/Unicode8.0.0/">Unicode标准8.0</a>
+	中的<i>Lu</i>、<i>Ll</i>、<i>Lt</i>、<i>Lm</i>和<i>Lo</i>分类中的字符。
 </li>
 <li>
-	Unicode digits mean the characters defined
-	in Number category <i>Nd</i> of Unicode Standard 8.0.
+	Unicode数字是定义在Unicode标准8.0中的<i>Nd</i>数字字符分类中的字符。
 </li>
 </ul>
 </div>
 
 <p>
-Note, <b>keywords can not be used as identifiers.</b>
+注意：<b>关键字不能被用作标识符。</b>
 </p>
 
 <p>
-Identifier <code>_</code> is a special identifier, it is called <b>blank identifier</b>.
+标识符<code>_</code>是一个特殊字符，它叫做<b>空标识符</b>。
 </p>
 
 <p>
-Later we will learn that all names of types, variables, constants, labels,
-package names and package import names must be identifiers.
+以后，我们将知道所有的类型名、变量名、常量名、跳转标签、包名和包的引入名都必须是标识符。
 </p>
 
 <p>
-An identifier starting with an
-<a href="http://www.fileformat.info/info/unicode/category/Lu/list.htm">Unicode upper case letter</a>
-is called an <b>exported identifier</b>.
-The word <b><i>exported</i></b> can be interpreted as
-<b><i>public</i></b> in many other languages.
+一个由<a href="http://www.fileformat.info/info/unicode/category/Lu/list.htm">Unicode大写字母</a>开头
+的标识符称为<b>导出标识符</b>。这里<b><i>导出</i></b>可以被理解为<b><i>公开</i></b>（public）。
 </p>
 
 <p>
-Currently (Go 1.10), eastern characters are viewed as non-exported letters.
-Non-exported identifiers are also called unexported or private identifiers in many documentations.
+截至目前（Go 1.10），东方字符都被视为<b>未导出</b>。
+<b><i>未导出</i></b>可以被理解为<b><i>私有</i></b>（private）。
+<b>未导出</b>有时候也被称为<b><i>非导出</i></b>。
 </p>
 
 <div>
-Here are some legal exported identifiers:
+下面是一些合法的导出标识符：
 <pre class="line-numbers"><code class="language-go">Player_9
 DoSomething
 VERSION
@@ -104,7 +93,7 @@ VERSION
 Ⲡ
 </code></pre>
 
-Here are some legal non-exported identifiers:
+下面是一些合法的未导出标识符：
 <pre class="line-numbers"><code class="language-go">_
 _status
 memStat
@@ -115,18 +104,18 @@ book
 エラー
 </code></pre>
 
-And here are some tokens which are illegal to be used as identifiers:
-<pre class="line-numbers"><code class="language-go">// Starting with a unicode digit.
+下面这些不能被用作标识符：
+<pre class="line-numbers"><code class="language-go">// Unicode数字开头
 123
 3apples
 
-// Containing illegal unicode characters.
+// 含有非法Unicode字符
 a.b
 *ptr
 $name
 a@b.c
 
-// These are keywords.
+// 这两个是关键字
 type
 range
 </code></pre>
