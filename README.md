@@ -3,7 +3,7 @@
 
 此书的英文项目地址为：
 * [gitlib.com/go101/go101](https://gitlib.com/go101/go101)
-* [gitlib.com/go101/go101](https://gitlib.com/go101/go101)
+* [github.com/go101/go101](https://github.com/go101/go101)
 
 ### 安装和更新
 
