@@ -1,7 +1,7 @@
 <b>Golang 101</b>是一本侧重于Go语言语法和语义的编程解释和指导书。
 这本书旨在尽可能地帮助Go程序员更深更全面地理解Go语言。
 
-此书的英文本项目地址为：
+此书的英文项目地址为：
 * [gitlib.com/go101/go101](https://gitlib.com/go101/go101)
 * [gitlib.com/go101/go101](https://gitlib.com/go101/go101)
 

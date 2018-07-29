@@ -1,58 +1,57 @@
-﻿<h1>Constants And Variables</h1>
+﻿<h1>常量和变量</h1>
 
 <p>
-This article will introduce constant and variable declarations in Go.
-The concept of untyped values and explict conversions will also be introduced.
+这篇文章将介绍常量和变量相关的知识。
+类型不确定值、类型推断和值的显式类型转换等概念也将被介绍。
+</p>
+
+<p>
+上一章中提到的<a href="basic-types-and-value-literals.html">各种基本类型的字面表示形式</a>
+（除了<code>false</code>和<code>true</code>）都属于无名常量（unnamed constant），或者叫字面常量（literal constant）。
+<code>false</code>和<code>true</code>是预声明的两个有名常量。
+本文将介绍如何声明自定义的有名常量。
 </p>
 
 <p class="anchor" id="untyped-value"></p>
-<h3>Untyped Values And Typed Values</h3>
+<h3>类型不确定值（untyped value）和类型确定值（typed value）</h3>
 
 <p>
-In Go, some values are untyped.
-An untyped value means the type of the value has not been confirmed yet.
-On the contrary, the type of a typed value is determined.
+在Go中，有些值的类型是不确定的。换句话说，有些值的类型有很多可能性。
+这些值称为类型不确定值。对于大多数类型不确定值来说，它们各自都有一个默认类型，
+除了预定义的<code>nil</code>。<code>nil</code>是没有默认类型的。
+我们在后续的文章中将了解到很多关于<code>nil</code>的知识。
 </p>
 
 <p>
-For most untyped values, each of them has one default type.
-The predeclared <code>nil</code> is the only untyped value
-which has no default type.
-We will learn more about <code>nil</code> in other Go 101 articles later.
+与类型不确定值相对应的概念称为类型确定值。
 </p>
 
 <p>
-The basic value literals (also called literal constants) introduced in
-the last article (<a href="basic-types-and-value-literals.html">basic types
-and their value literals</a>) are all untyped values.
-In fact, in Go,
-most untyped values are literal constants and the to be introduced
-untyped named constants. The other untyped values include the just mentioned
-<code>nil</code> and some boolean results returned by some operations
-which will be introduced in other articles later.
+上一章提到的字面常量（无名常量）都属于类型不确定值。
+事实上，Go中大多数的类型不确定值都属于字面常量和本文即将介绍的有名常量。
+少数类型不确定值包括刚提到的<code>nil</code>和以后会逐步解触到的某些操作的布尔返回值。
 </p>
 
 <div>
-The default type of a literal constant is determined by its literal form.
+一个字面常量的默认类型取决于它的字面表示形式：
 <ul>
 <li>
-	The default type of string literal is <code>string</code>.
+	一个字符串字面值的默认类型是预定义的<code>string</code>类型。
 </li>
 <li>
-	The default type of a boolean literal is <code>bool</code>.
+	一个布尔字面值的默认类型是预定义的<code>bool</code>类型。
 </li>
 <li>
-	The default type of integer literal is <code>int</code>.
+	一个整数型字面值的默认类型是预定义的<code>int</code>类型。
 </li>
 <li>
-	The default type of rune literal is <code>rune</code> (a.k.a, <code>int32</code>).
+	一个rune字面值的默认类型是预定义的<code>rune</code>（亦即<code>int32</code>）类型。
 </li>
 <li>
-	The default type of a floating-point literal is <code>float64</code>.
+	一个浮点数字面值的默认类型是预定义的<code>float64</code>类型。
 </li>
 <li>
-	If a literal contains an imaginary part,
-	then its default type is <code>complex128</code>.
+	如果一个字面值含有虚部字面形式，则此字面值的默认类型是预定义的<code>complex128</code>类型。
 </li>
 </ul>
 
@@ -61,66 +60,51 @@ The default type of a literal constant is determined by its literal form.
 
 </div>
 
-
-
 <p class="anchor" id="explicit-conversion"></p>
-<h3>Explicit Conversions Of Constants</h3>
+<h3>类型不确定常量的显式类型转换</h3>
 
 <p>
-Like many other languages, Go also supports value conversions.
-We can use the form <code>T(v)</code> to convert a value <code>v</code>
-to the type denoted by <code>T</code>
-(or simplily speaking, type <code>T</code>).
-Surely, for a certain type <code>T</code>,
-to make the conversion <code>T(v)</code> legal,
-the value <code>v</code> can't be arbitrary.
-If the conversion <code>T(v)</code> is legal,
-Go compilers view <code>T(v)</code> as a typed value of type <code>T</code>.
+和很多语言一样，Go也支持类型转换。
+一个显式类型转换的形式为<code>T(v)</code>，其表示将一个值<code>v</code>转换为类型<code>T</code>。
+编译器将<code>T(v)</code>的转换结果视为一个类型为<code>T</code>的类型确定值。
+当然，对于一个特定的类型<code>T</code>，<code>T(v)</code>并非对任意的值<code>v</code>都合法。
 </p>
 
 <p>
-The next section will introduce named constants.
-The basic value literals introduced in the last article is
-called literal constants, or unnamed constants.
-We will learn that each named constant also denote a literal constant
-in the next section.
-A constant in Go must be a boolean, numeric or string value.
+下面介绍的规则同时适用于上一章介绍的字面常量和即将介绍的类型不确定无名常量。
 </p>
 
 <div>
-For a constant value <Code>v</code>,
-there are two senarios where <code>T(v)</code> is legal.
+对于一个类型不确定常量值<code>v</code>，有两种情形显式转换<code>T(v)</code>是合法的：
 <ol>
 <li>
-	<code>v</code> (or the literal denoted by <code>v</code>) is
-	<a href="basic-types-and-value-literals.html#representability">representable</a>
-	as a value of a basic type <code>T</code>.
-	The result value is a typed constant of type <code>T</code>.
+	<code>v</code><a href="basic-types-and-value-literals.html#representability">可以表示为</a><code>T</code>类型的一个值。
+    转换结果为一个类型为<code>T</code>的类型确定常量值。
 </li>
 <li>
-	The default type of <code>v</code>is an integer type
-	and <code>T</code> is a string type.
-	The result of <code>T(v)</code> is a string of type <code>T</code>
-	and contains the UTF-8 representation of the integer.
-	Integer values outside the range of valid Unicode code points
-	result a string represented by <code>"\uFFFD"</code>
-	(a.k.a., <code>"\xef\xbf\xbd"</code>).
-	<code>0xFFFD</code> is the code point for the Unicode replacement character.
-	The result string of a conversion from an interger always contains one and only one rune.
+	<code>v</code>的默认类型是一个整数类型（<code>int</code>或者<code>rune</code>）
+    并且<code>T</code>是一个字符串类型。
+    转换<code>T(v)</code>将<code>v</code>看作是一个Unicode码点。
+    转换结果为一个类型为<code>T</code>的字符串常量。
+    此字符串常量只包含一个Unicode码点，并且可以看作是此Unicode码点的UTF-8表示形式。
+    对于不在合法的Unicode码点取值范围内的整数<code>v</code>，
+    转换结果等同于字符串字面值<code>"\uFFFD"</code>（或<code>"\xef\xbf\xbd"</code>）。
+    <code>0xFFFD</code>是Unicode标准中的（非法码点的）替换字符。
 </li>
 </ol>
 
+<div class="note">
 <p>
-Note, in fact,
-the second senario doesn't require <code>v</code> must be a constant.
-If <code>v</code> is a constant, then the result is also a constant,
-otherwise, the result is not a constant.
+事实上，第二种情形并不要求<code>v</code>必须是一个常量。
+如果<code>v</code>是一个常量，则转换结果也是一个常量。
+如果<code>v</code>不是一个常量，则转换结果也不是一个常量。
 </p>
+</div>
 
-For example, the following conversions are all legal.
-<pre><code class="language-go">complex128(1 + -1e-1000i)  // 1.0+0.0i of type complex128. Rounding happens here.
-float32(0.49999999)        // 0.5 of type float32. Rounding happens here.
-float32(17000000000000000) // rounding happens here.
+一些合法的转换例子：
+<pre><code class="language-go">complex128(1 + -1e-1000i)  // 结果为complex128类型的1.0+0.0i。这里虚部被舍入了。
+float32(0.49999999)        // 结果为float32类型的0.5。这里也舍入了。
+float32(17000000000000000) // 只要目标类型不是整数类型，舍入都是允许的。
 float32(123)
 uint(1.0)
 int8(-123)
@@ -138,188 +122,162 @@ string(0x2FFFFFFFF) // "\uFFFD"
 <p>
 </p>
 
-And the following conversions are all illegal.
-<pre><code class="language-go">int(1.23)        // 1.23 is not representable as a value of int.
-uint8(-1)        // -1 is not representable as a value of uint8.
-float64(1+2i)    // 1+2i is not representable as a value of float64.
+下面是一个非法的转换：
+<pre><code class="language-go">int(1.23)        // 1.23不能被表示为int类型值。
+uint8(-1)        // -1不能被表示为uint8类型值。
+float64(1+2i)    // 1+2i不能被表示为float64类型值。
 
-float64(-1e1000)         // constant -1e+1000 overflows float64.
-int(0x10000000000000000) // constant 0x10000000000000000 overflows int.
+float64(-1e1000)         // -1e+1000不能被表示为float64类型值。不允许溢出。
+int(0x10000000000000000) // 0x10000000000000000作为int值将溢出.
 
-string(65.0)  // the default type of 65.0 is float64 (not an integer type).
-string(66+0i) // the default type of 66+0i is complex128 (not an integer type).
+string(65.0)  // 字面值65.0的默认类型是float64（不是一个整数类型）。
+string(66+0i) // 66+0i的默认类型是complex128（不是一个整数类型）。
 </code></pre>
 
+<div class="note">
 <p>
-From the examples, we know that a basic value literal,
-for example, <code>-1e1000</code> and <code>0x10000000000000000</code>,
-may even not be able to represent as a value of its default type.
+从上面的例子可以看出，一个类型不确定值可能不能被转换为类型为它的默认类型的类型确定值。
+比如<code>-1e1000</code>和<code>0x10000000000000000</code>。
+</p>
+</div>
+
+<p>
+主义，有时一个显式转换形式必须被写成<code>(T)(v)</code>以免发生歧义。
+比如当<code>T</code>为一个无名指针类型的时候。
+（我们将在以后<a href="pointer.html">指针</a>一文中了解指针类型。）
 </p>
 
 <p>
-Please note,
-sometimes, the form of explicit conversions must
-be written as <code>(T)(v)</code> to avoid ambiguities.
-For example, <code>T</code> is an unnamed pointer type.
-We can learn more about pointers in the article
-<a href="pointer.html">pointers in Go</a> later.
+我们以后将在其它章节学到更多的显式类型转换规则。
 </p>
 
 </div>
 
 <p class="anchor" id="type-deduce"></p>
-<h3>Introduction Of Type Deductions In Go</h3>
+<h3>类型推断介绍</h3>
 
 <p>
-Go supports type deduction. In other words, in many circumstances, programmers
-don't need to explicitly speficify the types of some values in code.
-Go compilers will deduce the types for these values by context.
+Go支持类型推断（type deduction or type inference）。
+类型推断是指在某些场合下，程序员可以在代码中使用一些类型不确定值，
+编译器会自动推断出这些类型不确定值在特定情景下应被视为某些特定类型的值。
 </p>
 
 <p>
-Type deduction is also often called type inference.
+在Go代码中，如果某处需要一个特定类型的值并且一个类型不确定值可以表示为此特定类型的值，
+则此类型不确定值可以使用在此处。Go编译器将此类型不确定值视为此特定类型的类型确定值。
+这种情形常常出现在运算符运算、函数调用和赋值语句中。
 </p>
 
 <p>
-In Go code, if a place needs a value of a certain type and an untyped value
-(often a constant) is representable as a value of the certain type,
-then the untyped value can be used in the place.
-Go compilers will view the untyped value as a typed value of the certain type.
-Such places include an operand in an operator operation, an argument in
-a function call, a destination value or a source value in an assignment, etc.
+有些场景对某些类型不确定值并没有特定的类型要求。
+在这种情况下，Go编译器将这些类型不确定值视为类型为它们各自的默认类型的类型确定值。
 </p>
 
 <p>
-Some circumstances have no requirements on the types of the used values.
-If an untyped value is used in such a circumstance, Go compilers will
-treat the untyped value as a typed value of its default type.
+上述两条类型推断规则可以被视为是隐式转换规则。
+注意，Go白皮书中并没有隐式转换的术语，此术语只在本书中使用。
 </p>
 
 <p>
-The two type deduction cases can be viewed as implicit conversions.
-Please note that, there is no the implicit conversion concept
-in Go specification. This concept is only used in Go 101.
-</p>
-
-<p>
-The below constant and variable declaration sections
-will show some type deduction cases.
-More type deduction rules and cases will be introduced in other articles.
+本文下面的章节将展示一些类型推断的例子。
+后续其它文章将会展示更多类型推断的例子和规则。
 </p>
 
 <p class="anchor" id="constant"></p>
-<h3>Constant Declarations</h3>
+<h3>（有名）常量声明（constant declaration）</h3>
 
 <div>
-<p>
-The literals introduced in <a href="basic-types-and-value-literals.html">the
-last article</a> are all called unnamed constants,
-except <code>false</code> and <code>true</code>,
-which are two predeclared (built-in) named constants.
-This section will introduce how to declare custom named constants.
-</p>
 
-Like unnamed constants, named constants can also only be
-boolean, numeric and string values.
-The keyword <code>const</code> is used to declare named constants.
-The following program contains some constant declarations.
+<p>
+和无名字面常量一样，有名常量也必须都是布尔、数字或者字符串值。
+在Go中，关键字<code>const</code>用来声明有名常量。
+下面是一些常量声明的例子。
+</p>
 
 <pre class="line-numbers"><code class="language-go">package main
 
-// Declare a single constant.
-// Yes, non-ASCII letters can be used in identifiers.
+// 声明了两个单独的有名常量。（是的，非ASCII字符可以用作标识符。）
 const π = 3.1416
-const Pi = π // equivalent to: Pi == 3.1416
+const Pi = π // 等价于：Pi == 3.1416
 
-// Declare multiple constants as a group by using ().
+// 声明了一组有名常量。
 const (
 	No         = !Yes
 	Yes        = true
 	MaxDegrees = 360
-	Unit       = "radian"
+	Unit       = "弧度"
 )
 
 func main() {
-	// Declare multiple constants in one code line.
-	const DoublePi, HalfPi, Unit2 = π * 2, π * 0.5, "degree"
+	// 声明了三个局部有名常量。
+	const DoublePi, HalfPi, Unit2 = π * 2, π * 0.5, "度"
 }
 </code></pre>
 
 <p>
-Go specification calls each of the lines containing a <code>=</code> symbol in
-the above constant declaration group as a <b><i>constant specification</i></b>.
-In the following part of this section,
-each constant specification will be called a <b><i>logic code line</i></b>.
+Go白皮书把上面每行含有一个等号<code>=</code>的语句称为一个常量描述（constant specification）。
+每个<code>const</code>关键字对应一个常量声明。一个常量声明中可以有若干个常量描述。
+上面的例子中含有4个常量声明。除了第3个，其它的常量声明中都各自只有一个常量描述。
+第3个常量声明中有4个常量描述。
 </p>
 
 <p>
-In the above example,
-the <code>*</code> symbol is the multiplication operator
-and the <code>!</code> symbol is the boolean-not operator.
-Operators will be introduced in the next article,
-<a href="operators.html">common operators</a>.
+在上面的例子中，符号<code>*</code>是一个乘法运算符，
+符号<code>!</code>是一个布尔取否运算符。
+运算符将在<a href="operators.html">下一篇文章</a>中详述。
 </p>
 
 <p>
-The <code>=</code> symbol means "assign".
-So each logic code line in a constant declaration
-can be viewed as an assignment.
-However, more strictly speaking, we should interpret each logic code line
-as a declared identifier is bound to a corresponding basic value literal.
-Please read the last section in the current article for more explanations.
+等号<code>=</code>表示赋值。每个常量描述可以看作是一个赋值语句。
+更严格得讲，常量描述中的等号应该被理解为绑定。
+每个常量描述将一个或多个字面值绑定到各自对应的有名常量上。
+或者说，每个有名常量其实代表着一个字面常量。
 </p>
 
 <p>
-In the above example, the name constants <code>π</code> and <code>Pi</code>
-are both bound to the literal <code>3.1416</code>.
-The two named constants may be used at many places in code.
-Without constant declarations, the literal <code>3.1416</code> would be
-populated at those places. If we want to change the literal
-to <code>3.14</code> later, many places need to be modified.
-With the help of constant declarations, the literal <code>3.1416</code>
-will only appear in one constant declaration,
-so only one place needs to be modified.
-This is the main purpose of constant declarations.
+在上面的例子中，有名常量<code>π</code>和<code>Pi</code>都绑定到（或者说代表着）字面常量<code>3.1416</code>。
+这两个有名变量可以在程序代码中被多次使用，从而有效避免了字面常量<code>3.1416</code>在代码中出现在多处。
+如果字面常量<code>3.1416</code>在代码中出现在多处，
+当我们以后欲将<code>3.1416</code>改为<code>3.14</code>的时候，
+所有出现在代码中的<code>3.1416</code>得逐个修改。
+有了有名变量的帮助，我们只需修改对应常量描述中的<code>3.1416</code>即可。
+这是常量声明的主要作用。当然常量声明也可常常增加代码的可读性（代码即注释）。
 </p>
 
 <p>
-Later, we use the terminology <b><i>non-constant</i></b> values
-to denote the values who are not constants.
-The to be introduced variables below
-all belong to one kind of non-constant values.
+以后，我们使用非常量这一术语表示不是常量的值。
+下一节将要介绍的变量就属于非常量。
 </p>
 
 <p>
-Please note that, constants can be declared both
-at package level (out of any function body) and in function bodies.
-The constants declared in function bodies are called local constants.
-The variables declared out of any function body
-are called package-level constants.
-We also often call package-level constants as global constants.
+注意，常量可以直接声明在包中，也可以声明在函数体中。
+声明在函数体中的常量称为局部常量（local constant），直接声明在包中的常量称为包级常量（package-level constant）。
+包级常量也常常被称为全局常量。
 </p>
 
 <p>
-The declaration orders of two package-level constants are not important.
-In the above example, the declaration orders of
-<code>No</code> and <Code>Yes</code> can be exchanged.
+包级常量声明中的常量描述的顺序并不重要。比如在上面的例子中，
+常量描述<code>No</code>和<Code>Yes</code>的顺序可以掉换一下。
 </p>
 
 <p>
-All constants declared in the last example are untyped.
-The default type of a named untyped constant is
-the same as the literal it denotes.
+上面例子中声明的所有常量都是类型不确定的。
+它们各自的默认类型和它们各自代表的字面值的默认类型是一样的。
 </p>
 
 </div>
 
-<h4>Typed Named Constants</h4>
+<h4>类型确定有名变量</h4>
 
 <div>
 
-We can declare typed constants, typed constants are all named.
-In the following example, all the four declared constants are typed values.
-The types of <code>X</code> and <code>Y</code> are both <code>float32</code>
-and the types of <code>A</code> and <code>B</code> are both <code>int64</code>.
+<p>
+我们可以在声明一些常量的时候指定这些常量的确切类型。
+这样声明的常量称为类型确定有名常量。
+在下面这个例子中，所有这4个声明的常量都是类型确定的。
+<code>X</code>和<code>Y</code>的类型都是<code>float32</code>，
+<code>A</code>和<code>B</code>的类型都是<code>int64</code>。
+</p>
 
 <pre class="line-numbers"><code class="language-go">const X float32 = 3.14
 
@@ -330,16 +288,14 @@ const (
 </code></pre>
 
 <p>
-If multiple typed constants are declared in the same one logic code line,
-then their types must be the same, just as the constants
-<code>A</code> and <code>B</code> in the above example.
+如果一个常量描述中包含多个类型确定常量，则这些常量的类型必然是一样的，
+比如上例中的<code>A</code>和<code>B</code>。
 </p>
 
-We can also use explicit conversions to provide enough information
-for Go compilers to deduce the types of typed named constants.
-The above code snippet is equivalent to the following one,
-in which <code>X</code>, <code>Y</code>, <code>A</code> and <code>B</code>
-are all typed constants.
+<p>
+我们也可以使用显式类型转换来声明类型确定常量。
+下面的例子和上面的例子是完全等价的。
+</p>
 
 <pre class="line-numbers"><code class="language-go">const X = float32(3.14)
 
@@ -351,42 +307,42 @@ const (
 
 <p></p>
 
-If a basic value literal is bound to a typed constant, the basic value
-literal must be representable as a value of the type of the constant.
-The following typed constant declarations are invalid.
+欲将一个字面常量绑定到一个类型确定有名常量上，此字面常量必须能够表示为此常量的确定类型的值。
+否则，编译将报错。
 
-<pre class="line-numbers"><code class="language-go">const a uint8 = 256             // error: 256 overflows uint8
-const b = uint8(255) + uint8(1) // error: 256 overflows uint8
-const c = int8(-128) / int8(-1) // error: 128 overflows int8
-const MaxUint_a = uint(^0)      // error: -1 overflows uint
-const MaxUint_b uint = ^0       // error: -1 overflows uint
+<pre class="line-numbers"><code class="language-go">const a uint8 = 256             // error: 256溢出uint8
+const b = uint8(255) + uint8(1) // error: 256溢出uint8
+const c = int8(-128) / int8(-1) // error: 128溢出int8
+const MaxUint_a = uint(^0)      // error: -1溢出uint
+const MaxUint_b uint = ^0       // error: -1溢出uint
 </code></pre>
 
 <p>
+在上面的例子中，符号<code>^</code>是位取反运算符。
 </p>
 
-The following typed constant declaration is valid on 64-bit OSes,
-but invalid on 32-bit OSes.
-For each <code>uint</code> value has only 32 bits on 32-bit OSes.
-<code>(1 << 64) - 1</code> is not representable as 32-bit values.
+<p></p>
+
+下面这个类型确定常量声明在64位的操作系统上是合法的，但在32位的操作系统上是非法的。
+因为一个<code>uint</code>值在32位操作系统上的大小是32位，
+<code>(1 << 64) - 1</code>将溢出<code>uint</code>。
 
 <pre class="line-numbers"><code class="language-go">const MaxUint uint = (1 << 64) - 1
 </code></pre>
 
-Then, to declare a typed <code>uint</code> constant and bind
-the largest <code>uint</code> value to it,
+那么如何声明一个代表着最大<code>uint</code>值的常量呢？
+我们可以用下面这个常量声明来替换上面这个。下面这个声明在在64位和32位的操作系统上都是合法的。it,
 
 <pre class="line-numbers"><code class="language-go">const MaxUint = ^uint(0)
 </code></pre>
 
-Similarly, we can declare a typed <code>int</code> constant
-and bind the largest <code>int</code> value to it.
+类似地，我们可以使用下面这个常量声明来声明一个有名常量来表示最大的<code>int</code>值。
 
 <pre class="line-numbers"><code class="language-go">const MaxInt = int(^uint(0) >> 1)
 </code></pre>
 
-A similar method can be used to get the number of bits of a native word,
-and check the currrent OS is 32-bit or 64-bit.
+使用类似的方法，我们可以声明一个常量来表示当前操作系统的位数，
+或者检查当前操作系统是32位的还是64位的。
 
 <pre class="line-numbers"><code class="language-go">const NativeWordBits = 32 << (^uint(0) >> 63) // 64 or 32
 const Is64bitOS = ^uint(0) >> 63 != 0
@@ -397,30 +353,28 @@ const Is32bitOS = ^uint(0) >> 32 == 0
 </p>
 </div>
 
-<h4>Autocomplete In Constant Declarations</h4>
+<h4>常量声明中的自动补全</h4>
 
 <div>
 
-In a group-style constant declaration, except the first logic line,
-other logic lines can be incomplete.
-An incomplete logic line doesn't contain the <code>=</code> symbol.
-Compilers will autocomplete the incomplete lines for us by
-copying the missing part from the first preceding complete logic line.
-For example, at compile time, compilers will automatically
-complete the following code
+<p>
+在一个包含多个常量描述的常量声明中，除了第一个常量描述，其它后续的常量描述都可以只有标识符部分。
+Go编译器将通过照抄前面最紧挨的一个完整的常量描述来自动补全不完整的常量描述。
+比如，在编译阶段，编译器会将下面的代码
+</p>
 
 <pre class="line-numbers"><code class="language-go">const (
 	X float32 = 3.14
-	Y                // here must be one identifier
-	Z                // here must be one identifier
+	Y                // 这里必须只有一个标识符
+	Z                // 这里必须只有一个标识符
 
 	A, B = "Go", "language"
 	C, _
-	// In the above line, the blank identifier is required.
+	// 上一行中的空标识符是必需的（如果上一行是一个不完整的常量描述）。
 )
 </code></pre>
 
-as
+自动补全为
 
 <pre class="line-numbers"><code class="language-go">const (
 	X float32 = 3.14
@@ -437,55 +391,47 @@ as
 
 </div>
 
-<h4><code>iota</code> In Constant Declarations</h4>
+<h4>在常量声明中使用<code>iota</code></h4>
 
 <div>
 
-The autocomplete feature plus the <code>iota</code> constant generator
-feature brings much convenience to Go programming.
-<code>iota</code> is a predeclared constant
-which can only be used in other constant declarations.
-It is declared as
-<pre class="line-numbers"><code class="language-go">const iota = 0
-</code></pre>
-
 <p>
-But the value of an <code>iota</code> in code may be not always <code>0</code>.
-When the predeclared <code>iota</code> constant is used in
-a custom constant declaration, at compile time,
-within the custom constant declaration,
-its value will be reset to <code>0</code> at the first logic line
-and will increase <code>1</code> logic line by logic line.
-So <code>iota</code> is only useful in group-style constant declarations.
+<code>iota</code>是Go中预声明（内置）的一个特殊的有名常量。
+<code>iota</code>被预声明为<code>0</code>，但是它的值在编译阶段并非恒定。
+当此预声明的<code>iota</code>出现在一个常量声明中的时候，
+它的值在第n个常量说明中的值为<code>n</code>（从0开始）。
+所以<code>iota</code>只对含有多个常量说明的常量声明有意义。
 </p>
 
-Here is an example using both the autocomplete
-and the <code>iota</code> constant generator features.
-Please read the comments to get what will happen at compile time.
-The <code>+</code> symbol in this example is the addition operator.
+<p>
+<code>iota</code>和常量说明自动补全相结合有的时候能够给Go编程带来很大便利。
+比如，下面是一个使用了这两个特性的例子。
+请阅读代码注释以了解清楚各个常量被绑定的值。
+此例中的<code>+</code>为加法运算符。
+</p>
 
 <pre class="line-numbers"><code class="language-go">package main
 
 func main() {
 	const (
-		k = 3 // now, iota == 0
+		k = 3 // 在此处，iota == 0
 	
-		m float32 = iota + 0.1 // m float32 = 1 + 0.1
-		n                      // n float32 = 2 + 0.1
+		m float32 = iota + 0.1 // 等价于：m float32 = 1 + 0.1
+		n                      // 等价于：n float32 = 2 + 0.1
 	
-		p = 9             // now, iota == 3
-		q = iota * 2      // q = 4 * 2
-		_                 // _ = 5 * 2
-		r                 // r = 6 * 2
-		s, t = iota, iota // s, t = 7, 7
-		u, v              // u, v = 8, 8
-		_, w              // _, w = 9, 9
+		p = 9             // 在此处，iota == 3
+		q = iota * 2      // 等价于：q = 4 * 2
+		_                 // 等价于：_ = 5 * 2
+		r                 // 等价于：r = 6 * 2
+		s, t = iota, iota // 等价于：s, t = 7, 7
+		u, v              // 等价于：u, v = 8, 8
+		_, w              // 等价于：_, w = 9, 9
 	)
 
-	const x = iota // x = 0
+	const x = iota // 等价于：x = 0
 	const (
-		y = iota // y = 0
-		z        // z = 1
+		y = iota // 等价于：y = 0
+		z        // 等价于：z = 1
 	)
 
 	println(m, n)          // +1.100000e+000 +2.100000e+000
@@ -495,10 +441,10 @@ func main() {
 }
 </code></pre>
 
-The above example is just to demo the rules of
-the <code>iota</code> constant generator feature.
-Surely, in practice, we should use it in more meaningful ways.
-For example,
+<p>
+上面的例子只是展示一下如何使用<code>iota</code>。
+在实际编程中，我们应该用有意味的方式使用之。比如：
+</p>
 
 <pre class="line-numbers"><code class="language-go">const (
 	Failed = iota - 1 // == -1
@@ -514,109 +460,95 @@ const (
 </code></pre>
 
 <p>
-Here, the <code>-</code> symbol is the subtraction operator,
-and the <code>&lt;&lt;</code> symbol is the left-shift operator.
-Both of these operators will be introduced in the next article.
+在上面这段代码中，<code>-</code>是一个减法运算符，<code>&lt;&lt;</code>是一个左移位运算符。
+这两个运算符将在下一篇文章介绍。
 </p>
 
 </div>
 
 <p class="anchor" id="variable"></p>
-<h3>Variables, Variable Declarations And Value Assigments</h3>
+<h3>变量声明和赋值操作语句</h3>
 
 <div>
 <p>
-Variables are named values.
-Variables are stored in memory at run time.
-The value represented by a variable can be modified at run time.
+变量可以被看作为有名字，并且在运行时存储在内存中，可以在运行时更改的值。
 </p>
 
 <p>
-All variables are typed values.
-When declaring a variable, there must be sufficient information provided
-for compilers to deduce the type of the variable.
+所有的变量值都是类型确定值。当声明一个变量的时候，我们必须在代码中给编译器提供足够的信息来让编译器推断出此变量的确切类型。
 </p>
 
 <p>
-The variables declared within function bodies are called local variables.
-The variables declared out of any function body
-are called package-level variables.
-We also often call package-level variables as global variables.
+在一个函数体内声明的变量称为局部变量。
+在任何函数体内声明的变量称为包级或者全局变量。
 </p>
 
 <p>
-There are two basic variable declaration forms,
-the standard one and the short one.
-The short form can only be used to declare local variables.
+Go语言有两种变量声明形式。一种称为标准形式，另一种称为短声明形式。
+短声明形式只能用来声明局部变量。
 </p>
 
-<h4>Standard Variable Declaration Forms</h4>
+<h4>标准变量声明形式</h4>
 
 <p>
-Each standard declaration starts with the <code>var</code> keyword,
-which is followed by the declared variable name.
-Variable names must be <a href="keywords-and-identifiers.html#identifier">identifiers</a>.
+每条标准变量声明形式语句起始于一个<code>var</code>关键字。
+每个<code>var</code>关键字跟随着一个变量名（必须为一个<a href="keywords-and-identifiers.html#identifier">标识符</a>）。
 </p>
 
-The following are some full standard declaration forms.
-In these declarations,
-the types and initial values of the declared variables are all specified.
+<p>
+下面是几条完准形式的标准变量声明语句。
+这些声明确地指定了被声明的变量的类型和初始值。
+</p>
+
 <pre class="line-numbers"><code class="language-go">var lang, website string = "Go", "https://golang.org"
 var compiled, dynamic bool = true, false
 var announceYear int = 2008
 </code></pre>
 
 <p>
-As we have found, multiple variables can be declared together
-in one variable declaration.
-Please note, there can be just one type specified in a variable declaration.
-So the types of the multiple variables declared in the same declaration line must be identical.
+我们可以看到，和常量声明一样，多个同类型的变量可以在一条语句中被声明。
 </p>
 
 <p>
-Full standard variable declaration forms are seldom used in practice, since they are verbose.
-In practice, the two standard variable declaration variant forms introduced
-below are used more often.
-In the two variants, either the types or the initial values of
-the declared variables are absent.
+完整形式的标准变量声明使用起来有些罗嗦，因此很少在日常Go编程中使用。
+在日常Go编程中，另外两种变种形式用得更广泛一些。
+一种变种形式省略了变量类型（但仍指定了变量的初始值），这时编译器将更具初始值的字面形式来推断出变量的类型。
+另一种变种形式省略了初始值（但仍指定了变量类型），这时编译器将使用变量类型的零值作为变量的初始值。
 </p>
 
-The following are some standard variable declarations without specifying variable types.
-Compilers will deduce the types of the decalred variables as the types
-(or default types) of their respective initial values.
-The following declarations are equivalent to the above ones in fact.
-Please note, in the following declarations, the types of the multiple variables
-declared in the same declaration line can be different.
-<pre class="line-numbers"><code class="language-go">// The types of the lang and dynamic variables will be
-// deduced as "string" and "bool" by compilers, respectively.
+<p>
+下面是一些第一种变种形式的用例。在这些用例中，如果一个初始值是一个类型确定值，则对应声明的变量的类型将被推断为此初始值的类型；
+如果一个初始值是一个类型不确定值，则对应声明的变量的类型将被推断为此初始值的默认类型。
+注意在这种变种中，同时声明的多个变量的类型可以不一样。
+</p>
+
+<pre class="line-numbers"><code class="language-go">// 变量lang和dynamic的类型将被推断为内置类型string和bool。
 var lang, dynamic = "Go", false
 
-// The types of the compiled and announceYear variables will
-// be deduced as "bool" and "int" by compilers, respectively.
+// 变量compiled和announceYear的类型将被推断为内置类型bool和int。
 var compiled, announceYear = true, 2009
 
-// The types of the website variable will be deduced
-// as "string" by compilers.
+// 变量website的类型将被推断为内置类型string。
 var website = "https://golang.org"
 </code></pre>
 
 <p>
-The type deductions in the above example can be viewed as implicit conversions.
+上例中的类型推断可以被视为隐式类型转换。
 </p>
 
-The following are some standard declarations without specifying variable initial values.
-In these declarations, all declared variables are initialized
-as the zero values of their respective types.
-<pre class="line-numbers"><code class="language-go">var lang, website string      // both are initialized as blank strings.
-var interpreted, dynamic bool // both are initialized as false.
-var n int                     // is initialized as 0.
+<p>
+下例展示了几个省略了初始值的标准变量声明。每个声明的变量的初始值为它们各自的类型的零值。
+</p>
+
+<pre class="line-numbers"><code class="language-go">var lang, website string      // 两者都被初始化为空字符串。
+var interpreted, dynamic bool // 两者都被初始化为false。
+var n int                     // 被初始化为0。
 </code></pre>
 
 <p>
+和常量声明一样，多个变量可以用一对小括号组团在一起被声明。
 </p>
 
-Multiple variables can be grouped into one standard form declaration
-by using <code>()</code>. For example:
 <pre class="line-numbers"><code class="language-go">var (
 	lang, bornYear, compiled     = "Go", 2007, true
 	announceAt, releaseAt    int = 2009, 2012
@@ -625,77 +557,75 @@ by using <code>()</code>. For example:
 </code></pre>
 
 <p>
-The above example is formatted by using the <code>go fmt</code> command
-in the official Go SDK.
-In the above example, each of the three lines are enclosed in <code>()</code>
-this is known as variable specification.
+上面这个变量声明语句已经被<code>go fmt</code>命令格式化过了。
+这个变量声明语句包含三个变量描述（variable specification）。
 </p>
 
 <p>
-Generally, declaring related variables together will
-make code more readable.
+一般来说，将多个有联系的变量声明为一组将增强代码的可读性。
 </p>
 
 </div>
 
 <p class="anchor" id="assignment"></p>
-<h4>Pure Value Assignments</h4>
+<h4>纯赋值语句</h4>
 
 <div>
 <p>
-In the above variable declarations, the sign <Code>=</code> means assignment.
-Once a variable is declared, we can modify its value by using pure value assignments.
-Like variable declarations, multiple values can be assigned in a pure assignment.
+在上面展示的变量声明的例子中，等号<code>=</code>表示赋值。
+一旦一个变量被声明之后，它的值可以被通过纯赋值语句来修改。
+多个变量可以同时在一条赋值语句中被修改。
 <p>
 
+以后，当我们说<b><i><code>x</code>可以被赋值给<code>y</code></i></b>，其中隐含了
+<ul>
+<li>
+    值<code>y</code>是可修改的，并且值<code>x</code>和<code>y</code>的类型相同或者<code>x</code>可以被隐式转换为值<code>y</code>的类型。
+</li>
+<li>
+    或者<code>y</code>是一个空标识符。
+</li>
+</ul>
+
 <p>
-Later, if we say <b><i><code>x</code> is assignable to <code>y</code></i></b>,
-what we mean is <code>x</code> is mutable, and the types of <code>x</code> and
-<code>y</code> are identical, <code>y</code> can be implicitly converted to
-the type of <code>x</code>, or <code>y</code> is
-the blank identifier <code>_</code>.
-If <code>y</code> is not the blank identifier <code>_</code>,
-it must be either addressable, or a map index syntax.
-(Map types will introduced later.)
+在Go中，一个可被修改的值必须为一个可以被取地址的值或者是一个映射表（map）元素索引语法。
+地址（以及指针）和映射表将在以后的文章中详述。
 </p>
 
 <p>
-Constants (immutable values) are all unaddressable, so they can't appear
-at the left sides of pure value assignments.
-Variables are all addressable, so they can appear
-at the left sides of pure value assignments.
+所有常量都属于不可变量（在运行时），它们是不能被取地址的，
+所以它们不能出现在一个纯赋值语句中等号的左边。
+所有变量都可以被取地址，因此所有变量都可以出现在纯赋值语句中等号的左边。
 </p>
 
-Example:
+一个包含了很多（合法或者不合法的）纯赋值语句的例子：
 <pre class="line-numbers"><code class="language-go">const N = 123
 var x int
 var y, z float32
 
-N = 789 // error: constant N is not modifiable
-y = N   // okay: N is implicitly converted to (deduced as a) float32
-x = y   // error: type mismatch
-x = N   // okay: N is implicitly converted to (deduced as an) int
-y = x   // error: type mismatch
+N = 789 // error: N是一个不可变量
+y = N   // okay: N被隐式转换为类型float32（或者N的类型被推断为float32）
+x = y   // error: 类型不匹配
+x = N   // okay: N被隐式转换为类型int（或者N的类型被推断为int）
+y = x   // error: 类型不匹配
 z = y   // okay
 _ = y   // okay
 
-x, y = 69, 1.23           // okay
-x, y = y, x               // error: type mismatch
-x, y = int(y), float32(x) // okay
 z, y = y, z               // okay
 _, y = y, z               // okay
 z, _ = y, z               // okay
 _, _ = y, z               // okay
+x, y = 69, 1.23           // okay
+x, y = y, x               // error: 类型不匹配
+x, y = int(y), float32(x) // okay
 </code></pre>
 
 <p>
-The last line in the above example uses explicit conversions to
-make the corresponding destination and source values matched.
-The explicit conversion rules for non-constant numeric values
-are introduced below.
+上例中的最后一行使用了显式类型转换，否则此赋值（见倒数第二行）将不合法。
+数字可变值的类型转换规则将在后边的章节介绍。
 </p>
 
-Go doesn't support assignment chain. For example, the following code is illegal.
+Go不支持某些其它语言中的连等语法。下面的赋值语句在Go中是不合法的。
 <pre class="line-numbers"><code class="language-go">var a, b int
 a = b = 123 // syntax error
 </code></pre>
@@ -704,91 +634,74 @@ a = b = 123 // syntax error
 </p>
 </div>
 
-<h4>Short Variable Declaration Forms</h4>
+<h4>短变量声明形式</h4>
 
 <div>
-We can also use short variable declaration forms to declare variables.
-Short variable declarations can only be used to declare local variables.
-Let's view an example which uses some short variable declarations.
+我们也可以用短变量声明形式来声明一些局部变量。比如下例：
 
 <pre class="line-numbers"><code class="language-go">package main
 
 func main() {
-	// Both lang and year are two new declared variables.
-	lang, year := "Go langauge", 2007
+	// 变量lang和year都为新声明的变量。
+	lang, year := "Go language", 2007
 
-	// Only createdBy is a new declared variable.
-	// The year variable has already been declared before,
-	// so here its value is just modified.
+	// 这里，只有变量createdBy是新声明的变量。
+	// 变量year已经在上面声明过了，所以这里仅仅改变了它的值。
 	year, createdBy := 2009, "Google Research"
 
-	// This is a pure assignment.
+	// 这是一个纯赋值语句。
 	lang, year = "Go", 2012
 
-	print(lang, " is created by ", createdBy)
-	println(", and released at year", year)
+	print(lang, "由", createdBy, "发明")
+	print("并发布于", year, "年。")
+    println()
 }
 </code></pre>
 
-<p>
-</p>
+<p>每个短声明语句中必须至少有一个新声明的变量。</p>
 
-There are several differences between short and standard variable declarations.
+从上面的例子中，我们可以看到短变量声明形式和标准变量声明形式有几个显著的区别：
 <ol>
 <li>
-	In the short declaration form, the "var" keyword and
-	variable types must be omitted. And the assignment sign
-	must be <code>:=</code> instead of <code>=</code>.
+	短声明形式不包含<code>var</code>关键字，并且不能指定变量的类型。
 </li>
 <li>
-	In the short variable declaration, old variables and new
-	variables can mix at the left of <code>:=</code>. But there must be
-	at least one new variable at the left.
+	短变量声明中的赋值符号必须为<code>:=</code>。
+</li>
+<li>
+	在一个短声明语句的左侧，已经声明过的变量和新声明的变量可以共存。
+	但在一个标准声明语句中，所有左侧出现在的变量必须都为新声明的变量。
 </li>
 </ol>
 
 <p>
-Please note, there is a limition for short variable delcarations.
-<b>In a short variable delcaration, all items at the left of the
-<code>:=</code> sign must pure identifiers.</b>
-This means some other assignable items,
-which will be introduced in other articles,
-can't appear at the left of <code>:=</code>.
-These items include qualified identifiers, container elements,
-pointer dereferences and struct field selectors.
-Pure assignments have no such limition.
+注意，相对于纯赋值语句，目前短声明语句有一个限制：出现在一个短声明左侧的项必须都为纯标识符。
+以后我们将学习到在纯赋值语句的左边可以出现结构体值的字段，指针的解引用和容器类型值的元素索引项等。
+但是这些项不能出现在一个短变量声明语句的左边。
 </p>
 
 </div>
 
-<h4>About The Terminology "Assignment"</h4>
+<h4>关于“赋值”这个术语</h4>
 
 <p>
-Later, when the word "assignment" is mentioned,
-it means a pure assignment, a short variable declaration,
-or a variable specification with initial values
-in a standard variable declaration.
+以后，当“赋值”这个术语被提到的时候，它可以指一个纯赋值、一个短变量声明或者是一个初始值未省略的标准变量声明语句。
 </p>
 
-<h4>Each Local Declared Variable Must Be Used At Least Once</h4>
+<h4>每个局部声明的变量至少要被有效使用一次</h4>
 
 <div>
 <p>
-Please note, for the standard Go compiler,
-local variables are not allowed to be declared and be unused.
-Package-level variables have no such limit.
+注意，在Go中，一个局部变量被声明之后至少要被有效使用一次，否则编译器将报错。
+包级变量无此限制。
+如果一个变量总是被当作赋值语句中的目标值，那么我们认为这个变量没有被有效使用过。
 </p>
 
-<p>
-If a local variable is only ever used as destination values,
-it will also be viewed as unused.
-</p>
-
-For example, compiling the following program,
+下面这个例子编译不通过。
 
 <pre class="line-numbers"><code class="language-go">package main
 
-var x, y, z = 123, true, "foo" // package-level variables.
+var x, y, z = 123, true, "foo" // 包级变量
 
 func main() {
 	var q, r = 789, false
@@ -798,8 +711,7 @@ func main() {
 }
 </code></pre>
 
-will result to the following compilation errors
-(assume the source file is name <code>example-unused.go</code>):
+当编译上面这个程序的时候，编译器将报错（这个程序代码存在一个名为<code>example-unused.go</code>的文件中）：
 
 <pre class="output"><code>./example-unused.go:6:6: r declared and not used
 ./example-unused.go:7:16: s declared and not used
@@ -808,8 +720,7 @@ will result to the following compilation errors
 <p>
 </p>
 
-The fix is easy, we can assign <code>r</code> and <code>s</code>
-to blank identifiers to avoid compilation errors.
+避免编译器报错的方法很简单，要么删除相关的变量声明，要么像下面这样，将未曾有效使用过的变量（这里是<code>r</code>和<code>s</code>）赋给空标识符。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -821,192 +732,222 @@ func main() {
 	r = y
 	x = q
 
-	_, _ = r, s // make r and s used.
+	_, _ = r, s // 将r和s做为源值使用一次。
 }
 </code></pre>
 
 </div>
 
-<h4>Dependency Relations Of Package-Level Variables Affect Their Initialization Order</h4>
+<h4>包级变量之间的在声明时刻的依赖关系将影响它们的初始化顺序</h4>
 
 <div>
 
-For the following example,
+下面这个例子中的声明的变量的初始化顺序为<code>y = 5</code>，<code>c = y</code>，<code>b = c+1</code>，<code>a = b+1</code>，<code>x = a+1</code>。
 
 <pre class="line-numbers"><code class="language-go">var x, y = a+1, 5         // 8 5
 var a, b, c = b+1, c+1, y // 7 6 5 8
 </code></pre>
 
 <p>
-the initialization order of the package-level variables are <code>y = 5</code>,
-<code>c = y</code>, <code>b = c+1</code>, <code>a = b+1</code>,
-and <code>x = a+1</code>.
 </p>
 
-<p>
-Here, the <code>+</code> symbol is the addition operator,
-which will be introduced in the next article. 
-</p>
-
-Package-level variables can't be depended circularly in their declaration.
-The following code fails to compile.
+包级变量在初始化的时候不能相互依赖。比如，下面这个变量声明语句编译不通过。
 
 <pre class="line-numbers"><code class="language-go">var x, y = y, x
 </code></pre>
 
 </div>
 
-<h3>Value Addressability</h3>
+<h3>值的可取地址性</h3>
 
 <p>
-In Go, some values are addressable.
-Addressable values can be taken addresses.
-All variables are addressable and all constants are unaddressable.
-We can learn more about addresses and pointers from the article
-<a href="pointer.html">pointers in Go</a>
-and learn other adressable and unadressable values from other articles later.
+在Go中，有些值是可以被取地址的。上面已经提到所有变量都是可以被取地址的，所有常量都是不可被取地址的。
+我们可以从后面的<a href="pointer.html">指针</a>一文了解更多关于内存地址和指针的知识。
 </p>
 
-<h3>Explicit Conversions On Non-Constant Numeric Values</h3>
+<h3>非常量数字值相关的显式类型转换规则</h3>
 
 <div>
-As above has mentioned, non-constant integer values can be converted to strings.
-Here we introduce two more legal non-constant numeric values
-related conversion cases.
+
+<p>
+在Go中，两个类型不一样的<a href="basic-types-and-value-literals.html">基本类型</a>值是不能相互赋值的。
+我们必须使用显式类型转换将一个值转换为另一个值的类型之后才能进行赋值。
+</p>
+
+前面某节已经提到了整数（不论常量和是非常量）都可以被显式转换为字符串类型。
+这里再介绍两个不同类型数字值之间的转换规则。
+
 <ul>
 <li>
-	Non-constant floating-point and integer values can be explicitly
-	converted to any other floating-point and integer types.
+	一个非常量浮点数和整数可以显式转换到其它任何一个浮点数和整数类型。
 </li>
 <li>
-	Non-constant complex values can be explicitly
-	converted to any other complex types.
+	一个非常量复数可以显式转换到其它任何一个复数类型。
 </li>
 </ul>
 
-<p>
-Unlike constant number conversions,
-overflows are allowed in non-constant number conversions.
-And when converting a non-constant floating-point value to an integer,
-rounding is also allowed.
-If a non-constant floating-point value doesn't overflow an interger type
-the fraction part of the floating-point value will be discarded
-(towards zero) when it is converted to the integer type.
-</p>
+上面已经提到，常量数字值的类型转换不能溢出。此规则不适用于非常量数字值的类型转换。
+非常量数字值的类型转换中，溢出是允许的。
+另外当将一个浮点数非常量值（比如一个变量）转换为一个整数类型的时候，舍入（或者精度丢失）也是是允许的。
+具体规则如下：
 
-<p>
-In Go, two typed values of two different basic types
-can't be assigned to each other.
-In other words, the types of the destination and source values in an
-assignment must be identical if the two values are both basic values.
-If the type of the source basic value is not same as the type of
-the destination basic value, then the source value must be explicitly
-converted to the type of the destination value.
-</p>
+<ul>
+<li>
+	当从一个bit位数多的整数类型的非常量整数值向一个bit位数少的整数类型转换的时候，低位的bits将被保留。
+</li>
+<li>
+	当从一个非常量的浮点数向一个整数类型转换的时候，浮点数的小数部分将被舍弃（向0靠拢）。
+</li>
+<li>
+	当一个非常量整数或者浮点数向一个浮点数类型转换的时候，精度丢失是可以发生的。
+</li>
+<li>
+	当一个非常量复数向另一个复数类型转换的时候，精度丢失也是可以发生的。
+</li>
+<li>
+	当一个非常量复数向另一个复数类型转换的时候，精度丢失也是可以发生的。
+</li>
+<li>
+	当一个显式转换涉及到非常量浮点数或者复数数字值时，如果源值溢出了目标类型的表示范围，则转换结果取决于具体编译器实现（即行为未定义）。
+</li>
+</ul>
+
+在下面的例子中，第4行和第11行的隐式转换是不允许的，第3行和第10行的显式转换也是不允许的。
 
 In the following example, the intended implicit conversions
 at line <i>4</i> and line <i>11</i> both don't work.
 <pre class="line-numbers"><code class="language-go">const a = -1.23
-var b = a        // the type of b is deduced as float64.
-var x = int32(a) // error: constant 1.23 truncated to integer.
-var y int32 = b  // error: cannot assign float64 to int32.
-var z = int32(b) // okay: z == -1, and the type of z is int32.
-                 //       The fraction part of -1.23 is discarded.
+var b = a        // 变量b的类型被推断为内置类型float64。
+var x = int32(a) // error: 常量1.23不能被截断舍入到一个整数。
+var y int32 = b  // error: float64类型值不能被隐式转换到int32。
+var z = int32(b) // okay: z == -1，变量z的类型被推断为int32。
+                 //       z的小数部分将被舍弃。
 
 const k int16 = 255
-var n = k            // the type of n is deduced as int16.
-var f = uint8(k + 1) // error: constant 256 overflows uint8.
-var g uint8 = n + 1  // error: cannot assign int16 to uint8.
-var h = uint8(n + 1) // okay: h == 0, and the type of h is uint8.
-                     //       (n+1) overflows uint8 and is truncated.
+var n = k            // 变量n的类型将被推断为int16。
+var f = uint8(k + 1) // error: 常量256溢出了uint8。
+var g uint8 = n + 1  // error: int16值不能隐式转换为uint8。
+var h = uint8(n + 1) // okay: h == 0，变量h的类型为uint8。
+                     // (n+1)溢出uint8，所以只有低8位bits（都为0）被保留。
 </code></pre>
 
 <p>
-We can view the type deductions happen at line <i>2</i>
-and line <i>9</i> are two implicit conversions,
-where <code>a</code> and <code>k</code> are both converted to
-their respective default type.
-More implicit conversion rules will be introduced in other articles later.
+第<i>2</i>行和第<i>9</i>行的隐式转换中，<code>a</code>和<code>k</code>被转换为它们各自的默认类型。
 </p>
 
 </div>
 
-<h3>Scopes Of Variables And Named Constants</h3>
+<h3>变量和常量的作用域</h3>
 
 <div>
-
-In Go, we can use a pair of <code>{</code> and <code>}</code> to form a code block.
-A code block can nest other code blocks.
-A variable or a named constant declared in an inner code block will shadow
-the variables and constants declared with the same name in outer code blocks.
-For examples, the following program declares three distinct variables,
-all of them are called <code>x</code>.
-An inner <code>x</code> shadows an outer one.
+在Go中，我们可以使用一对大括号来显式形成一个（局部）代码块。一个代码块可以内嵌另一个代码块。
+最外层的代码块成为包级代码块。
+一个声明在一个内层代码块中的常量或者变量将遮挡另一个外层代码块中声明的同名变量或者常量。
+比如，下面的代码中声明了3个名为<code>x</code>的变量。
+内层的<code>x</code>将遮挡外层的<code>x</code>，
+从而外层的<code>x</code>在内层的<code>x</code>声明之后在内层中将不可见。
 
 <pre class="line-numbers"><code class="language-go">package main
 
-const y = 789
-var x int = 123
+const y = 70
+var x int = 123 // 包级变量
 
 func main() {
 	// The x variable shadows the package-level variable x.
 	var x = true
 
-	// A nested code block.
+	// 一个内嵌代码块。
 	{
-		x, y := x, y // Here, the left x and y are both
-		             // new declared variable. The right
-		             // ones are declared in outer blocks.
-		// In this code block, the just new declared x and y
-		// shadow the outer declared same-name identifiers.
-		x, z := !x, y/10 // only z is new declared.
-		y /= 100
-		println(x, y, z) // false 7 78
+		x, y := x, y-10 // 这里，左边的x和y均为新声明的变量。
+		                // 右边的x为外层声明的bool变量。
+		                // 右边的y为包级变量。
+
+		// 在此内层代码块中，从此开始，刚声明的x和y将遮挡外层声明x和y。
+
+		x, z := !x, y/10 // z是一个新声明的变量。
+		                 // x和y是上一句中声明的变量。
+		println(x, y, z) // false 60 6
 	}
 	println(x) // true
-	println(z) // error: z is undefined.
+	println(y) // 70 （包级变量y从未修改）
+	/*
+	println(z) // error: z未定义。z的作用域仅限于上面的最内层代码块。
+	*/
 }
 </code></pre>
 
 <p>
-Declared types and functions can also be shadowed.
 </p>
 
 <p>
-The scope (visibility range in code) of a package-level variable
-(or a named constant) is the whole package of the variable
-(or the named constant) is declared in.
-The scope of a local variable (or a named constant) begins at the end of
-its declaration and ends at the end of its innermost containing code block.
-This is why the last line in the <code>main</code> function
-of the above example doesn't compile.
+刚提到的作用域是指一个标识符的可见范围。
+一个包级变量或者常量的作用域为其所处于的整个代码包（import语句之后的部分）。
+一个局部变量或者常量的俄作用域开始于此变量或者常量的声明的下一行，结束语最内层包含此变量或者常量的声明语句的代码块的结尾。
+这是为什么上例中的<code>println(z)</code>将编译不通过。
 </p>
 
 <p>
-Code blocks and identifier scopes will be explained in detail in
-<a href="blocks-and-scopes.html">blocks and scopes</a> later.
+后面的<a href="blocks-and-scopes.html">代码块和作用域</a>一文将详述代码块和标识符的作用域。
 </p>
 
 </div>
 
-<h3>More About Constant Declarations</h3>
+<h3>更多关于常量声明</h3>
+
+<h4>一个类型不确定常量所表示的值在可以溢出其默认类型</h4>
+
+<div>
+
+比如，下例中的三个类型不确定常量均溢出了它们各自的默认类型，但是此程序编译和运行都没问题。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+// 3 untyped named constants
+const n = 1 << 64          // 默认类型为int
+const r = 'a' + 0x7FFFFFFF // 默认类型为rune
+const x = 2e+308           // 默认类型为float64
+
+func main() {
+	_ = n >> 2
+	_ = r - 0x7FFFFFFF
+	_ = x / 2
+}
+</code></pre>
 
 <p>
-Constant declarations can be viewed as enhanced <code>#define</code> macros in C.
-A constant declaration defines a named constant which represents a literal.
-All the occurances of a named constant will be replaced with the literal
-it represents at compile time.
+</p>
+
+但是下面这个程序编译不通过，因为三个声明的常量为类型确定常量。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+// 3 typed named constants
+const n int = 1 << 64           // error: 溢出int
+const r rune = 'a' + 0x7FFFFFFF // error: 溢出rune
+const x float64 = 2e+308        // error: 溢出float64
+
+func main() {}
+</code></pre>
+
+<p>
+</p>
+
+</div>
+
+<h4>每个常量标识符将在编译的时候被其绑定的字面值所替代</h4>
+
+<p>
+常量声明可以看作是增强型的C语言中的<code>#define</code>宏。
+在编译阶段，所有的标识符将被它们各自绑定的字面值所替代。
 </p>
 
 <p>
-If the two operands of an operator operation are both constants,
-then the operation will be evaluated at compile time.
-(Please read the next article
-<a href="operators.html">common operators</a> for details.)
+如果一个运算的所有运算数（见下一篇文章<a href="operators.html">常见运算符</a>）都为常量，
+则此运算的结果也为常量。或者说，此运算将在编译阶段就被估值。
 </p>
 
 <div>
-For example, at compile time, the following code
+一个例子：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1020,7 +961,7 @@ func main() {
 }
 </code></pre>
 
-will be viewed as
+上面这段程序代码将在编译阶段被重写为下面这样：
 
 <pre class="line-numbers"><code class="language-go">package main
 
