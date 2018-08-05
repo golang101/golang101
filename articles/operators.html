@@ -1,66 +1,40 @@
 ﻿
-<h1>Common Operators</h1>
+<h1>运算操作符</h1>
 
 <p>
-Operator operations are the operations using all kinds of operators.
-This article will introduce common operators in Go.
-More operators will be introduced in other articles later.
+本文将介绍适用于基本类型值的各种运算操作符。
 </p>
 
-<h3>About Some Descriptions In Operator Explanations</h3>
+<h3>关于本文中的内容和一些解释</h3>
 
 <p>
-This article will only introduce arithmetic operators, bitwise operators,
-comparison operators, boolean operators and string concatenation operator.
-These operators are either binary operators or unary operators.
-A binary operator operation takes two operands and
-a unary operator operation takes only one operand.
-</p>
-
-<p>
-All the operator operations introduced in this articles each returns one result.
+本文只介绍算术运算符、位运算符、比较运算符、布尔运算符和字符串衔接运算符。
+这些运算符要么是二元的（需要两个操作数），要么是一元的（需要一个操作数）。
+所有这些运算符运算都只返回一个结果。操作数常常也称为操作值。
 </p>
 
 <div>
-
-This article doesn't pursue the accuracy of some descriptions.
-For example, when it says that a binary operator requires
-the types of its two operands must be the same,
-what it means is
+本文中的解释不追求描述的完全准确性。
+比如，当我们说一个二元运算符运算需要其涉及的两个操作数类型必须一样的时，这指：
 <ul>
 <li>
-	if both of the two operands are typed values,
-	then their types must be the same one,
-	or one operand can be implicitly converted to the type of the other.
+	如果这两个操作数都是类型确定值，则它们的类型必须相同，或者其中一个操作数可以被隐式转换到另一个操作数的类型。
 </li>
 <li>
-	if only one of the two operands is typed,
-	then the other (untyped) operand must be representable as
-	a value of the typed of the typed operand,
-	or the values of the default type of the other (untyped) operand
-	can be implicitly converted to the typed of the typed operand.
+	如果其中只有一个操作数是类型确定的，则要么另外一个类型不确定操作数可以表示为此类型确定操作数的类型的值，要么此类型不确定操作数的默认类型的任何值可以被隐式转换到此类型确定操作数的类型。
 </li>
 <li>
-	if both of the two operands are untyped values,
-	then they must be both boolean values,
-	both string values or both basic numeric values.
+	如果这两个操作数都是类型不确定的，则它们必须同时都为两个布尔值，同时都为两个字符串值，或者同时都为两个基本数字值。
 </li>
 </ul>
 
-Slimilarly, when it says an operator,
-either a binary operator or a unary operator,
-requires the type of one of its operands must be of a certain type,
-what it means is
+类似的，当我们说一个运算符（一元或者二元）运算要求其涉及的某个操作数的类型必须为某个特定类型时，这指：
 <ul>
 <li>
-	if the operand is typed, then its type must be,
-	or can be implicitly converted to, that certain type.
+	如果这个操作数是类型确定的，则它的类型必须为所要求的特定类型，或者此操作数可以被隐式转换为所要求的特定类型。
 </li>
 <li>
-	if the operand is untyped, then the untyped value must be
-	representable as a value of that certain type,
-	or the values of the default type of the operand
-	can be implicitly converted to that certain type.
+	如果一个操作数是类型不确定的，则要么此操作数可以表示为所要求的特定类型值，要么此操作数的默认类型的任何值可以被隐式转换为所要求的特定类型。
 </li>
 </ul>
 
@@ -69,107 +43,116 @@ what it means is
 
 </div>
 
-<h3>Arithmetic Operators</h3>
+<p class="anchor" id="constant-expression"></p>
+<h3>常量表达式</h3>
+
+<p>
+在继续下面的章节之前，我们需要知道什么叫常量表达式和关于常量表达式估值的一个常识。
+表达式的概念将在<a href="expressions-and-statements.html">表达式和语句</a>一文中得到解释。
+目前我们只需知道本文中所提及的大多数运算都属于表达式。
+但一个表达式中涉及到的所有操作数都是常量时，此表达式称为一个常量表达式。
+一个常量表达式的估值是在编译阶段进行的。一个常量表达式的估值结果依然是一个常量。
+</p>
+
+<p>
+只要一个表达式中所涉及到的所有操作数任何一个不为常量，则此表达式称为一个非常量表达式。
+</p>
+
+<h3>算术运算符</h3>
 
 <div>
 <p>
-Go supports five basic binary arithmetic operators:
+Go支持5个基本二元算术运算符：
 </p>
 
 <table class="table table-bordered text-center" style="width:100%;">
 <thead>
 	<tr class="active">
-	<th class="text-center" style="white-space: nowrap;">Operator</th>
-	<th class="text-center">Name</th>
-	<th class="text-center">Requirements For The Two Operands</th>
+	<th class="text-center" style="white-space: nowrap;">字面形式</th>
+	<th class="text-center" style="white-space: nowrap;">名称</th>
+	<th class="text-center">对两个运算数的要求</th>
 	</tr>
 </thead>
 <tbody>
 	<tr>
 		<th scope="row" style="vertical-align: middle; white-space: nowrap;" class="text-center">+</th>
 		<td style="vertical-align: middle; white-space: nowrap;" class="text-center">
-			addition
+			加法
 		</td>
 		<td style="vertical-align: middle;" class="text-left" rowspan="4">
-			The two operands must be both values of the same basic numeric type.
+			两个运算数的类型必须相同并且为基本数值类型。
 		</td>
 	</tr>
 	<tr>
 		<th scope="row" style="vertical-align: middle; white-space: nowrap;" class="text-center">-</th>
 		<td style="vertical-align: middle; white-space: nowrap;" class="text-center">
-			subtraction
+			减法
 		</td>
 	</tr>
 	<tr>
 		<th scope="row" style="vertical-align: middle; white-space: nowrap;" class="text-center">*</th>
 		<td style="vertical-align: middle; white-space: nowrap;" class="text-center">
-			multiplication
+			乘法
 		</td>
 	</tr>
 	<tr>
 		<th scope="row" style="vertical-align: middle; white-space: nowrap;" class="text-center">/</th>
 		<td style="vertical-align: middle; white-space: nowrap;" class="text-center">
-			division
+			除法
 		</td>
 	</tr>
 	<tr>
 		<th scope="row" style="vertical-align: middle; white-space: nowrap;" class="text-center">%</th>
 		<td style="vertical-align: middle; white-space: nowrap;" class="text-center">
-			remainder
+			余数
 		</td>
 		<td style="vertical-align: middle;" class="text-left">
-			The two operands must be both values of the same basic integer type.
+			两个运算数的类型必须相同并且为基本整数数值类型。
 		</td>
 	</tr>
 </tbody>
 </table>
 
 <p>
-The five operators are also often called <b>sum</b>, <b>difference</b>,
-<b>product</b>, <b>quotient</b> and <b>modulo</b> operators.
-Go 101 will not explain how these operator operations work in detail.
-</p>
-
-<p>
-Go supports six bitwise binary arithmetic operators:
+Go支持六种位运算符（也属于算术运算）：
 </p>
 
 <table class="table table-bordered text-center" style="width:100%;">
 <thead>
 	<tr class="active">
-	<th class="text-center" style="white-space: nowrap;">Operator</th>
-	<th class="text-center">Name</th>
-	<th class="text-center">Requirements For The Two Operands And Mechanism Explanations</th>
+	<th class="text-center" style="white-space: nowrap;">字面形式</th>
+	<th class="text-center" style="white-space: nowrap;">名称</th>
+	<th class="text-center">对两个操作数的要求以及机制解释</th>
 	</tr>
 </thead>
 <tbody>
 	<tr>
 		<th scope="row" style="vertical-align: middle; white-space: nowrap;" class="text-center">&amp;</th>
 		<td style="vertical-align: middle; white-space: nowrap;" class="text-center">
-			bitwise and
+			位与
 		</td>
 		<td style="vertical-align: middle;" class="text-left" rowspan="4">
 			<p>
-			The two operands must be both values of the same integer type.
+			两个操作数的类型必须相同并且为基本整数数值类型。
 			</p>
 			
-			Mechanism explanations (a value with the subscript <code>2</code> is the binary literal form of the value):
+			机制解释（下标<code>2</code>表明一个字面形式为二进制）：
 			<ul>
 			<li>
 				<code>1100<sub>2</sub> &amp; 1010<sub>2</sub></code>
-				results <code>1000<sub>2</sub></code>
+				得到 <code>1000<sub>2</sub></code>
 			</li>
 			<li>
 				<code>1100<sub>2</sub> | 1010<sub>2</sub></code>
-				results <code>1110<sub>2</sub></code>
+				得到 <code>1110<sub>2</sub></code>
 			</li>
 			<li>
 				<code>1100<sub>2</sub> ^ 1010<sub>2</sub></code>
-				results <code>0110<sub>2</sub></code>
+				得到 <code>0110<sub>2</sub></code>
 			</li>
 			<li>
 				<code>1100<sub>2</sub> &^ 1010<sub>2</sub></code>
-				results <code>0100<sub>2</sub></code>
+				得到 <code>0100<sub>2</sub></code>
 			</li>
 			</ul>
 		</td>
@@ -177,65 +160,68 @@ Go supports six bitwise binary arithmetic operators:
 	<tr>
 		<th scope="row" style="vertical-align: middle; white-space: nowrap;" class="text-center">|</th>
 		<td style="vertical-align: middle; white-space: nowrap;" class="text-center">
-			bitwise or
+			位或
 		</td>
 	</tr>
 	<tr>
 		<th scope="row" style="vertical-align: middle; white-space: nowrap;" class="text-center">^</th>
 		<td style="vertical-align: middle; white-space: nowrap;" class="text-center">
-			bitwise xor
+			（位）异或
 		</td>
 	</tr>
 	<tr>
 		<th scope="row" style="vertical-align: middle; white-space: nowrap;" class="text-center">&amp;^</th>
 		<td style="vertical-align: middle; white-space: nowrap;" class="text-center">
-			bitwise clear
+			清位
 		</td>
 	</tr>
 	<tr>
 		<th scope="row" style="vertical-align: middle; white-space: nowrap;" class="text-center">&lt;&lt;</th>
 		<td style="vertical-align: middle; white-space: nowrap;">
-			bitwise left shift
+			左移位
 		</td>
 		<td style="vertical-align: middle;" class="text-left" rowspan="2">
 			<p>
-			The left operand must be an integer
-			and the right operand must be an unsigned integer
-			(or an <a href="type-system-overview.html#typed-and-untyped-values">untyped</a>
-			integer constant which is representable as an <code>uint</code> value).
+			左操作数必须为一个整数，右操作数的类型必须为一个无符号整数类型或者右操作数可以表示为<code>uint</code>值。
 			</p>
 			
-			Mechanism explanations:
+			机制解释：
 			<ul>
 			<li>
 				<code>1100<sub>2</sub> &lt;&lt; 3</code>
-				results <code>1100000<sub>2</sub></code>
+				得到 <code>1100000<sub>2</sub></code>（低位补零）
 			</li>
 			<li>
 				<code>1100<sub>2</sub> &gt;&gt; 3</code>
-				results <code>1<sub>2</sub></code>
+				得到 <code>1<sub>2</sub></code>（低位被舍弃）
 			</li>
 			</ul>
+			
+			<p>
+			如果左操作数的类型为一个有符号整数，则在右移位运算中，左操作数的符号位（即最高位）将总是保留在结果中。
+			比如如果左操作数<code>-128</code>的类型为<code>int8</code>（二进制表示为<code>10000000<sub>2</sub></code>），
+			则<code>10000000<sub>2</sub> &gt;&gt; 1</code>的结果为<code>11000000<sub>2</sub></code>（即<code>-64</code>）。
+			</p>
 		</td>
 	</tr>
 	<tr>
 		<th scope="row" style="vertical-align: middle; white-space: nowrap;" class="text-center">&gt;&gt;</th>
 		<td style="vertical-align: middle; white-space: nowrap;" class="text-center">
-			bitwise right shift
+			右移位
 		</td>
 	</tr>
 </tbody>
 </table>
 
 <p>
-Go also supports three unary arithmetic operators:
+Go也支持3个一元算术运算符：
 </p>
 
 <table class="table table-bordered text-center" style="width:100%;">
 <thead>
 	<tr class="active">
-	<th class="text-center" style="white-space: nowrap;">Operator</th>
-	<th class="text-center">Name</th>
+	<th class="text-center" style="white-space: nowrap;">字面形式</th>
+	<th class="text-center" style="white-space: nowrap;">名称</th>
 	<th class="text-center">Explanations</th>
 	</tr>
 </thead>
@@ -243,88 +229,77 @@ Go also supports three unary arithmetic operators:
 	<tr>
 		<th scope="row" style="vertical-align: middle; white-space: nowrap;" class="text-center">+</th>
 		<td style="vertical-align: middle; white-space: nowrap;" class="text-center">
-			positive
+			取正数
 		</td>
 		<td style="vertical-align: middle;" class="text-left">
-			<code>+n</code> is equivalent to <code>0 + n</code>.
+			<code>+n</code>等价于<code>0 + n</code>.
 		</td>
 	</tr>
 	<tr>
 		<th scope="row" style="vertical-align: middle; white-space: nowrap;" class="text-center">-</th>
 		<td style="vertical-align: middle; white-space: nowrap;" class="text-center">
-			negative
+			取负数
 		</td>
 		<td style="vertical-align: middle;" class="text-left">
-			<code>-n</code> is equivalent to <code>0 - n</code>.
+			<code>-n</code>等价于<code>0 - n</code>.
 		</td>
 	</tr>
 	<tr>
 		<th scope="row" style="vertical-align: middle; white-space: nowrap;" class="text-center">^</th>
 		<td style="vertical-align: middle; white-space: nowrap;" class="text-center">
-			bitwise complement<br/>
-			(bitwise not)
+			位反（或位补）
 		</td>
 		<td style="vertical-align: middle;" class="text-left">
-			<code>^n</code> is equivalent to <code>m ^ n</code>,
-			where <code>m</code> is a value all of which bits are 1.
-			For example,
-			if the type of <code>n</code> is <code>int8</code>,
-			then <code>m</code> is <Code>-1</code>,
-			and if the type of <code>n</code> is <code>uint8</code>,
-			then <code>m</code> is <code>0xFF</code>.
+			<code>^n</code>等价于<code>m ^ n</code>，其中<code>m</code>和<code>n</code>同类型并且它的二进制表示中所有位均为1。
+			比如如果<code>n</code>的类型为<code>int8</code>，则<code>m</code>的值为<code>-1</code>；如果<code>n</code>的类型为<code>uint8</code>，则<code>m</code>的值为<code>255</code>。
 		</td>
 	</tr>
 </tbody>
 </table>
 
-Note,
+注意：
 <ul>
 <li>
-	in many other languages,
-	bitwise-complement operator is denoted as <code>~</code>.
+	在很多其它流行语言中，位反运算符是用<code>~</code>表示的。
 </li>
 <li>
-	like many other languages,
-	the addition binary operator <code>+</code> can also be used as <b>string concatenation</b> operator,
-	which will be introduced below.
+	和一些其它流行语言一样，加号运算符<code>+</code>也可用作字符串衔接运算符（见下）。
 </li>
 <li>
-	like C and C++ languages,
-	the multiplication binary operator <code>*</code> can also be used as <b>pointer dereference</b> operator,
-	and the bitwise-and operator <code>&amp;</code> can also be used as <b>pointer address</b> operator.
-	Please read <a href="pointer.html">pointers in Go</a> for details later.
+	和C及C++语言一样，<code>*</code>除了可以当作乘号运算符，它也可以用做指针解引用运算符；
+	<code>&amp;</code>除了可以当作位与运算符，它也可以用做取地址运算符。
+	后面的<a href="pointer.html">指针</a>一文将详解内存地址和指针类型。
 </li>
 <li>
-	unlike Java language, Go supports unsigned integer types,
-	so the unsigned shift operator <code>&gt;&gt;&gt;</code> doesn't exist in Go.
+	和Java不一样，Go支持无符号数，所以Go不需要无符号右移运算符<code>&gt;&gt;&gt;</code>。
 </li>
 <li>
-	there is no power operator in Go, please use <code>Pow</code> funtion
-	in the <code>math</code> standard package instead.
-	Code package and package import will be introduced in the next article
-	<a href="packages-and-imports.html">packages and imports</a>.
+	Go不支持幂运算符，
+	我们必须使用<code>math</code>标准库包中的<code>Pow</code>函数来进行幂运算。
+	下一篇文章将详解<a href="packages-and-imports.html">包和包引入</a>。
 </li>
 <li>
-	the bitwise-clear operator <code>&amp;^</code> is a unique operator in Go.
-	<code>m &amp;^ n</code> is equivalent to <code>m &amp; (^n)</code>.
+	清位运算符<code>&amp;^</code>是Go中特有的一个运算符。
+	<code>m &amp;^ n</code>等价于<code>m &amp; (^n)</code>。
 </li>
 </ul>
 
 <p>
 </p>
 
-Example:
+一些运算符的使用示例：
+
 <pre class="line-numbers"><code class="language-go">func main() {
 	var (
 		a, b float32 = 12.0, 3.14
 		c, d int16   = 15, -6
-		e    uint8   = 7
+		e	uint8   = 7
 	)
 
-	// The ones compile okay.
-	_ = 12 + 'A' // two untyped operands (both are numeric)
-	_ = 12 - a   // one untyped operand and one typed operand
-	_ = a * b    // two typed operands
+	// 这些行编译没问题。
+	_ = 12 + 'A' // 两个类型不确定操作数（都为数值类型）
+	_ = 12 - a   // 类型不确定值12将被当做a的类型（float32）使用。
+	_ = a * b	// 两个同类型的类型确定操作数。
 	_ = c % d
 	_, _ = c + int16(e), uint8(c) + e
 	_, _, _, _ = a / b, c / d, -100 / -9, 1.23 / 1.2
@@ -332,13 +307,13 @@ Example:
 	_, _, _, _ = d << e, 123 >> e, e >> 3, 0xF << 0
 	_, _, _, _ = -b, +c, ^e, ^-1
 
-	// The following ones fail to compile.
-	_ = a % b   // error: a and b are not integers
-	_ = a | b   // error: a and b are not integers
-	_ = c + e   // error: type mismathing
-	_ = b >> 5  // error: b is not an integer
-	_ = c >> -5 // error: -5 is not representable as uint
-	_ = e << c  // error: c is not an unsigned integer
+	// 这些行编译将失败。
+	_ = a % b   // error: a和b都不是整数
+	_ = a | b   // error: a和b都不是整数
+	_ = c + e   // error: c和e的类型不匹配
+	_ = b >> 5  // error: b不是一个整数
+	_ = c >> -5 // error: -5不能用做无符号整数
+	_ = e << c  // error: c不是一个无符号整数
 }
 </code></pre>
 
@@ -347,73 +322,59 @@ Example:
 
 </div>
 
-<h4>About The Results Of Arithmetic Operator Operations</h4>
+<h4>关于算术运算的结果</h4>
 
 <div>
 
-The result of a binary arithmetic operator operation
-(except bitwise shift operations)
+除了移位运算，对于一个二元算术运算，
 <ul>
 <li>
-	is a typed value of the same type of the two operands
-	if the two operands are both typed values of the same type.
+	如果它的两个操作数都为类型确定值，则此运算的结果也是一个和这两个操作数类型相同的类型确定值。
 </li>
 <li>
-	is a typed value of the same type of the typed operand
-	if only one of the two operands is a typed value.
-	In the computation, the other (untyped) value will be deduced
-	as a value of the type of the typed operand.
-	In other words, the untyped operand will be implicitly
-	converted to the type of the typed operand.
+	如果只有一个操作数是类型确定的，则此运算的结果也是一个和此类型确定操作数类型相同的类型确定值。
+	另一个类型不确定操作数的类型将被推断为（或隐式转换为）此类型确定操作数的类型。
 </li>
 <li>
-	is still an untyped value if both of the two operands are untyped.
-	The default type of the result value is one of the two default
-	types and it is the one appears latter in this list: <code>int</code>,
-	<code>rune</code>, <code>float64</code>, <code>complex128</code>.
-	For example, if the default type of one untyped operand is <code>int</code>,
-	and the other one is <code>rune</code>, then the default type of
-	the result untyped value is <code>rune</code>.
+	如果它的两个操作数均为类型不确定值，则此运算的结果也是一个类型不确定值。
+	在运算中，两个操作数的类型将被设想为它们的默认类型中一个（按照此优先级来选择：<code>complex128</code>高于<code>float64</code>高于<code>rune</code>高于<code>int</code>）。
+	结果的默认类型同样为此设想类型。
+	比如，如果一个类型不确定操作数的默认类型为<code>int</code>，另一个类型不确定操作数的默认类型为<code>rune</code>，
+	则前者的类型在运算中也被视为<code>rune</code>，运算结果为一个默认类型为<code>rune</code>的类型不确定值。
 </li>
 </ul>
 
-The rules for the result of a bitwise shift operator operation
-is a little complex. Firstly, the result value is always an integer value.
-Whether it is typed or untype depends on specific scenarios.
+对于移位运算，结果规则有点小复杂。首先移位运算的结果肯定都是整数。
 <ul>
 <li>
-	If the left operand is a typed value,
-	then the type of the left operand must be an integer type.
-	The result type is the same as the type of the left operand.
+	如果左操作数是一个类型确定值（必定为整数），则此移位运算的结果也是一个和左操作数类型相同的类型性确定值。
 </li>
 <li>
-	If the left operand is an untyped constant and the right operand
-	is also a constant, the left operand will be always treated as an
-	integer value. If its default type is not an integer type,
-	it must be representable as an untyped integer, and its default
-	type will be viewed as <code>int</code>.
+	如果左操作数是一个类型不确定值<b>并且右操作数是一个常量</b>，则左操作数将总是被视为一个整数。
+	如果它的默认类型不是一个整数（<code>rune</code>或<code>int</code>），则它的默认类型将被视为<code>int</code>。
+	此移位运算的结果也是一个类型不确定值并且它的的默认类型和左操作数的默认类型一致。
 </li>
 <li>
-	If the left operand is an untyped constant but the right operand
-	is a non-constant (unsigned) integer, the left operand will be first
-	converted to the type it would assume if the bitwise shift operator
-	operation were replaced by its left operand alone.
+	如果左操作数是一个类型不确定值<b>并且右操作数不是一个常量</b>，则左操作数将被首先转化为运算结果的期待设想类型。
+	如果期待设想类型并没有被指定，则左操作数的默认类型将被是为它的期待设想类型。
+	如果此期待设想类型不是一个基本整数类型，则编译报错。
+	当然最终运算结果是一个类型为此期待设想类型的类型确定值。
 </li>
 </ul>
 
-Example:
+一些非移位算术运算的例子：
 <pre class="line-numbers"><code class="language-go">func main() {
-	const X, Y, Z = 2, 'A', 3i // three untyped values. 
-	                           // Default types: int, rune, complex64.
+	const X, Y, Z = 2, 'A', 3i // 三个类型不确定常量。它们的默认类型
+							   // 分别为：int、rune和complex64.
 	
-	var a, b int = X, Y // two typed values.
+	var a, b int = X, Y // 两个类型确定值
 
-	d := X + Y // the type of d is the default type of Y: rune (int32).
-	e := Y - a // the type of e is the type of a: int.
-	f := a * b // the type of f is the types of a and b: int.
-	g := Z * Y // the type of g is the default type of Z: complex64.
+	d := X + Y // 变量d的类型被推断为Y的默认类型：rune（亦即int32）。
+	e := Y - a // 变量e的类型被推断为a的类型：int。
+	f := a * b // 变量f的类型和a及b的类型一样：int。
+	g := Z * Y // 变量g的类型被推断为Z的默认类型：complex64。
 
-	println(X, Y, Z)    // 2 65 (+0.000000e+000+3.000000e+000i)
+	println(X, Y, Z)	// 2 65 (+0.000000e+000+3.000000e+000i)
 	println(d, e, f, g) // 67 63 130 (+0.000000e+000+1.950000e+002i)
 }
 </code></pre>
@@ -421,60 +382,76 @@ Example:
 <p>
 </p>
 
-Another example (bitwise shift operations):
+一个移位算术运算的例子：
 <pre class="line-numbers"><code class="language-go">const N = 2
-const A = 3.0 << N       // A == 6, its default type is int.
-const B = int8(3.0) << N // B == 6, it is typed and its type is int8.
+const A = 3.0 << N	     // A == 6，它是一个默认类型为int的类型不确定值。
+const B = int8(3.0) << N // B == 6，它是一个类型为int8的类型确定值。
 
 var m = uint(32)
-// The following three lines are equivalent to each other.
-var x int64 = 1 << m  // the type of 1 is deduced as int64, not int.
-var y = int64(1 << m) // the type of 1 is deduced as int64, not int.
+// 下面的三行是相互等价的。
+var x int64 = 1 << m  // 1的类型将被设想为int64，而不是int。
+var y = int64(1 << m) // 同上，1的类型将被设想为int64，而不是int。
 var z = int64(1) << m
 
-// The following lines fail to compile.
+// 下面这几行编译不通过。
 /*
-var _ = 3.0 << m // error: shift of type float64
-const _ = 1 << B // error: the right operand must be unsigned.
+// error: 3.0的类型被视为期待设想类型为float64。左操作数不能为float64值。
+var _ = 3.0 << m
+// error: 1的类型被视为期待设想类型为float32。左操作数不能为float64值。
+var _ float32 = 1 << m
 */
 </code></pre>
 
 <p>
-The rules for bitwise shift operator operations are to avoid some operations
-returning different results on different architectures.
-For exampe the bitwise operation at line <i>8</i> will return different results
-between 32-bit OSes and 64-bit OSes if the operand <code>1</code> is deduced as
-<code>int</code> instead of <code>int64</code>, which may produce some bugs
-hard to detect.
+上面提到的移位运算的最后一点类型推断规则有点反常。
+这条规则的主要原因是防止一些移位运算在32位架构和64位架构的机器上的运算结果出乎意外得不一致。
+比如如果上面一段代码中第<i>7</i>行和第<i>8</i>行的<code>1</code>的类型被推断为它的默认类型<code>int</code>，
+则在32位架构的机器上，<code>x</code>的取值将被截断为<i>0</i>，而在64位构架的机器上，<code>x</code>的取值将为<i>2<sup>32</sup></i>。
+因为<code>m</code>是一个变量，在32位架构的机器上，第<i>7</i>行和第<i>8</i>行并不会编译报错。
+这将导致Go程序员在不经意间写出没有料到的和难以觉察的bug。
+因此，第<i>7</i>行和第<i>8</i>行中的<code>1</code>的类型被推断为<code>int64</code>（最终的设想结果类型），而不是它的默认类型<code>int</code>。
 </p>
 
 </div>
 
-<h4>About Overflows</h4>
+<h4>关于溢出</h4>
 
 <div>
 
+上一篇文章提到了
+<ul>
+<li>
+	一个类型确定数字型常量所表示的值是不能溢出它的类型的表示范围的。
+</li>
+<li>
+	一个类型不确定数字型常量所表示的值是可以溢出它的默认类型的表示范围的。
+	当一个类型不确定数字常量值溢出它的默认类型的表示范围时，此数值不会被截断或者回绕（truncated or wrapped around）。
+</li>
+<li>
+	将一个非常量数字值转换为其它数字类型时，此非常量数字值可以溢出转化结果的类型。
+	在此转换中，当溢出发生时，转化结果为此非常量数字值的截断（亦即回绕）表示。
+</li>
+</ul>
+
 <p>
-Overflows are not allowed for typed constant values
-but are allowed for non-constant and untyped constant values,
-either the values are intermediate or final results.
-Overflows will be truncated (or wrapped around) for non-constant values,
-but overflows (for default types) on untyped constant value
-will not be truncated (or wrapped around).
+对于一个算数运算的结果，上述规则同样适用。
 </p>
 
-Example:
-<pre class="line-numbers"><code class="language-go">var a, b uint8 = 255, 1
-var c = a + b  // okay: higher overflowed bits are truncated. c == 0
-var d = a << b // okay: higher overflowed bits are truncated. d == 254
-const X = 0x1FFFFFFFF * 0x1FFFFFFFF // okay, though X overflows int.
-const R = 'a' + 0x7FFFFFFF          // okay, though R overflows rune.
+示例：
+<pre class="line-numbers"><code class="language-go">// 结果为非常量
+var a, b uint8 = 255, 1
+var c = a + b  // c==0。a+b是一个非常量表达式，结果中溢出的高位bits将被截断舍弃。
+var d = a << b // d == 254。同样，结果中溢出的高位bits将被截断舍弃。
 
-// These lines fail to compile.
-var e = X                // error: untyped constant X overflows int.
-var h = R                // error: constant 2147483744 overflows rune.
-const Y = 128 - int8(1)  // error: 128 overflows int8
-const Z = uint8(255) + 1 // error: the result 256 overflow uint8.
+// 结果为类型不确定常量
+const X = 0x1FFFFFFFF * 0x1FFFFFFFF // 编译没问题，尽管X溢出它的默认类型int。
+const R = 'a' + 0x7FFFFFFF		    // 编译没问题，尽管R溢出它的默认类型rune。
+
+// 运算结果或者转换结果为类型确定常量
+var e = X				 // error: X溢出int。
+var h = R				 // error: R溢出rune。
+const Y = 128 - int8(1)  // error: 128溢出 int8。
+const Z = uint8(255) + 1 // error: 256溢出uint8。
 </code></pre>
 
 <p>
@@ -482,48 +459,40 @@ const Z = uint8(255) + 1 // error: the result 256 overflow uint8.
 
 </div>
 
-<h4>About Divisions</h4>
+<h4>关于除法和余数运算</h4>
 
 <div>
 
 <p>
-The two operands in a division operator operation
-can be both of any basic numeric type.
-If their types is an integer type,
-assume the two operands are <code>x</code> and <code>y</code>,
-the integer quotient <code>q</code> (<code>= x / y</code>)
-and remainder <code>r</code> (<code>= x % y</code>)
-satisfy <code>x == q*y + r</code>, where <code>|r| < |y|</code>.
-If <code>r</code> is not zero, its sign is the same as <code>x</code>
-(the dividend).
-The result of <code>x / y</code> is truncated towards zero.
+假设两个操作数<code>x</code>和<code>y</code>的类型为同一个整数类型，
+则它们通过除法和余数运算得到的商<code>q</code>（<code>= x / y</code>）和余数<code>r</code>（<code>= x % y</code>）满足<code>x == q*y + r</code>（<code>|r| < |y|</code>）。如果余数<code>r</code>不为零，则它的符号和被除数<code>x</code>相同。商<code>q</code>的结果为<code>x / y</code>向0截断。
 </p>
 
 <p>
-If the divisor <code>y</code> is a constant, it must not be zero.
-If the divisor is zero at run time and it is an integer,
-a run-time panic occurs.
-Panics is like exceptions in some other languages.
-We can learn more about panics in <a href="control-flows-more.html">this article</a>.
+如果除数<code>y</code>是一个常量，则它必须不为0，否则编译不通过。
+如果它是一个整数型非常量，则在运行时将抛出一个恐慌（panic）。
+恐慌类似与某些其它语言中的异常（exception）。
+我们将在以后的文章中了解到Go中的恐慌和恐慌恢复机制。
+如果除数<code>y</code>非整数型非常量，则运算结果为一个无穷大（Inf，当被除数不为0时）或者NaN（not a number，当被除数为0时）。
 </p>
 
-Example:
+示例：
 <pre class="line-numbers"><code class="language-go">println( 5/3,   5%3)  // 1 2
 println( 5/-3,  5%-3) // -1 2
 println(-5/3,  -5%3)  // -1 -2
 println(-5/-3, -5%-3) // 1 -2
 
-println(5.0 / 3.0)     // 1.666667
+println(5.0 / 3.0)	 // 1.666667
 println((1-1i)/(1+1i)) // -1i
 
 var a, b = 1.0, 0.0
 println(a/b, b/b) // +Inf NaN
 
-_ = int(a)/int(b) // compile okay but panic at run time.
+_ = int(a)/int(b) // 编译没问题，但运行时造成恐慌。
 
-// The following two lines fail to compile.
-println(1.0/0.0) // error: division by zero
-println(0.0/0.0) // error: division by zero
+// 这两行编译不通过。
+println(1.0/0.0) // error: 除数为0
+println(0.0/0.0) // error: 除数为0
 </code></pre>
 
 <p>
@@ -531,17 +500,16 @@ println(0.0/0.0) // error: division by zero
 
 </div>
 
-<h4>Using <code>op=</code> For Binary Arithmetic Operators</h4>
+<h4><code>op=</code>运算符</h4>
 
 <div>
 
 <p>
-For a binary arithmetic operator <code>op</code>, <code>x = x op y</code>
-can be shortened to <code>x op= y</code>.
-In the short form, <code>x</code> will be only evaluated once.
+对于一个二元算数运算符<code>op</code>，语句<code>x = x op y</code>可以被简写为<code>x op= y</code>。
+在这个简写的语句中，<code>x</code>只会被估值一次。
 </p>
 
-Example:
+示例：
 <pre class="line-numbers"><code class="language-go">var a, b int8 = 3, 5
 a += b
 println(a) // 8
@@ -557,18 +525,14 @@ println(b) // 20
 
 </div>
 
-<h4>The Increment <code>++</code> And Decrement <code>--</code> Operators</h4>
+<h4>递增和递减操作符</h4>
 
 <div>
 <p>
-Like many other popular languages, Go also supports
-the increment <code>++</code> and decrement <code>--</code> operators.
-However, operations using the two operators don't return any results,
-so such operations can be used as
-<a href="expressions-and-statements.html">expressions</a>.
-The only operand involved in such an operation must be a numeric value,
-the numeric value must not be a constant, and the <code>++</code> or
-<code>--</code> operator must follow the operand.
+和很多其它流行语言一样，Go也支持递增（<code>++</code>）和递减（<code>--</code>）操作符。
+不过和其它语言不一样的是，递增（<code>aNumber++</code>）和递减（<code>aNumber--</code>）操作操作没有返回值，
+所以它们不能当做<a href="expressions-and-statements.html">表达式</a>来使用。
+另一个显著区别是，在Go中，递增（<code>++</code>）和递减（<code>--</code>）操作符只能后置，不能前置。
 </p>
 
 Example:
@@ -580,7 +544,7 @@ func main() {
 	b-- // okay
 	c++ // oaky
 	
-	// The following three lines fail to compile.
+	// 下面这些行编译不通过。
 	/*
 	_ = a++
 	_ = b--
@@ -594,39 +558,38 @@ func main() {
 
 </div>
 
-<h3>String Concatenation Operator</h3>
+<h3>字符串衔接运算符</h3>
 
 <div>
 
-As above has mentioned, the addition operator can also be used as
-string concatenation.
+上面已经提到了，加法运算符也可用做字符串衔接运算符。
 
 <table class="table table-bordered text-center" style="width:100%;">
 <thead>
 	<tr class="active">
-	<th class="text-center" style="white-space: nowrap;">Operator</th>
-	<th class="text-center">Name</th>
-	<th class="text-center">Requirements For The Two Operands</th>
+	<th class="text-center" style="white-space: nowrap;">字面形式</th>
+	<th class="text-center" style="white-space: nowrap;">名称</th>
+	<th class="text-center">对两个操作数的要求</th>
 	</tr>
 </thead>
 <tbody>
 	<tr>
 		<th scope="row" style="vertical-align: middle; white-space: nowrap;" class="text-center">+</th>
 		<td style="vertical-align: middle; white-space: nowrap;" class="text-center">
-			string concatenation
+			字符串衔接
 		</td>
 		<td style="vertical-align: middle;" class="text-left">
-			The two operands must be both values of the same string type.
+			两个操作数必须为同一类型的字符串值。
 		</td>
 	</tr>
 </tbody>
 </table>
 
 <p>
-The <code>op=</code> form also applies for the string concatenation operator.
+<code>+=</code>运算符也适用于字符串衔接。
 </p>
 
-Example:
+示例：
 <pre class="line-numbers"><code class="language-go">println("Go" + "lang") // Golang
 var a = "Go"
 a += "lang"
@@ -637,179 +600,173 @@ println(a) // Golang
 </p>
 
 <p>
-If one of the two operands of a string concatenation operation
-is a typed string, then the type of the result
-string is the same as the type of the typed string.
-If both the of the two operands are untyped (constant) strings,
-the result is also an untyped string value.
+如果一个字符串衔接运算中的一个操作值为类型确定的，则结果字符串是一个类型和此操作数类型相同的类型确定值。
+否则，结果字符串是一个类型不确定值（肯定是一个常量）。
 </p>
 
 </div>
 
-<h3>Boolean Operators</h3>
+<h3>布尔运算符</h3>
 
 <div>
 <p>
-Go supports two boolean binary operators and one boolean unary operator:
+Go支持两种布尔二元运算符和一种布尔一元运算符。
 </p>
 
 <table class="table table-bordered text-center" style="width:100%;">
 <thead>
 	<tr class="active">
-	<th class="text-center" style="white-space: nowrap;">Operator</th>
-	<th class="text-center">Name</th>
-	<th class="text-center">Requirements For Operand(s) And Mechanism Explanations</th>
+	<th class="text-center" style="white-space: nowrap;">字面形式</th>
+	<th class="text-center" style="white-space: nowrap;">名称</th>
+	<th class="text-center">对操作值的要求</th>
 	</tr>
 </thead>
 <tbody>
 	<tr>
 		<th scope="row" style="vertical-align: middle;" class="text-center" style="white-space: nowrap;">&amp;&amp;</th>
 		<td style="vertical-align: middle;" class="text-center">
-			boolean and (binary)
+			布尔与（二元）
 		</td>
 		<td style="vertical-align: middle;" class="text-left" rowspan="2">
-			The two operands must be both values of the same boolean type.
+			两个操作值的类型必须为同一布尔类型。
 		</td>
 	</tr>
 	<tr>
 		<th scope="row" style="vertical-align: middle;" class="text-center" style="white-space: nowrap;">||</th>
 		<td style="vertical-align: middle;" class="text-center">
-			boolean or (binary)
+			布尔或（二元）
 		</td>
 	</tr>
 	<tr>
 		<th scope="row" style="vertical-align: middle;" class="text-center" style="white-space: nowrap;">!</th>
 		<td style="vertical-align: middle;" class="text-center">
-			boolean not (unary)
+			布尔否（一元）
 		</td>
 		<td style="vertical-align: middle;" class="text-left">
-			The type of the only operand must be a boolean type.
+			唯一的一个操作值的类型必须为一个布尔类型。
 		</td>
 	</tr>
 </tbody>
 </table>
 
 <p>
-We can use the <code>!=</code> operator introduced above as the <b>boolean xor</b> operator.
+我们可以用下一小节介绍的不等于操作符<code>!=</code>来做为布尔异或操作符。
 </p>
 
-Mechanism explanations:
-<pre><code class="language-go">// x      y     x && y     x || y    !x     !y
-true    true    true       true     false  false
-true    false   false      true     false  true
-false   true    false      true     true   false
-false   false   false      false    true   true
+机理解释：
+<pre><code class="language-go">// x	  y	 x && y	 x || y	!x	 !y
+true	true	true	   true	 false  false
+true	false   false	  true	 false  true
+false   true	false	  true	 true   false
+false   false   false	  false	true   true
 </code></pre>
 
 <p>
-If one of the two operands is a typed boolean, then the type of the result
-boolean is the same as the type of the typed boolean.
-If both the of the two operands are untyped booleans,
-the result is also an untyped boolean value.
+一个布尔运算中的一个操作值为类型确定的，则结果为一个和此操作值类型相同的类型确定值。
+否则，结果为一个类型不确定布尔值。
 </p>
 
 </div>
 
-<h3>Comparison Operators</h3>
+<h3>比较运算符</h3>
 
 <div>
 <p>
-Go supports six comparison binary operators:
+Go支持6种比较运算符：
 </p>
 
 <table class="table table-bordered text-center" style="width:100%;">
 <thead>
 	<tr class="active">
-	<th class="text-center" style="white-space: nowrap;">Operator</th>
-	<th class="text-center">Name</th>
-	<th class="text-center">Requirements For The Two Operands</th>
+	<th class="text-center" style="white-space: nowrap;">字面形式</th>
+	<th class="text-center" style="white-space: nowrap;">名称</th>
+	<th class="text-center">对两个操作值的要求</th>
 	</tr>
 </thead>
 <tbody>
 	<tr>
 		<th scope="row" style="vertical-align: middle; white-space: nowrap;" class="text-center">==</th>
 		<td style="vertical-align: middle; white-space: nowrap;">
-			equal to
+			等于
 		</td>
 		<td style="vertical-align: middle;" class="text-left" rowspan="2">
-			If at least one operand is typed,
-			then one operand must be able to be implicitly
-			converted to the type of the other operand.
-			Otherwise, the two operands must be both untyped booleans,
-			both untyped strings or both untyped numeric values.
+			<p>
+			如果两个操作数都为类型确定的，则它们的类型必须一样，或者其中一个操作数可以隐式转换为另一个操作数的类型。
+			两者的类型必须都为可比较类型（将在以后的文章中介绍）。
+			</p>
+
+			<p>
+			如果只有一个操作数是类型确定的，则另一个类型不确定操作数必须可以隐式转换到类型确定操作数的类型。
+			</p>
+
+			<p>
+			如果两个操作数都是类型不确定的，则它们必须同时为两个类型不确定布尔值、两个类型不确定字符串值或者另个类型不确定数字值。
+			</p>
 		</td>
 	</tr>
 	<tr>
 		<th scope="row" style="vertical-align: middle;" class="text-center">!=</th>
 		<td style="vertical-align: middle; white-space: nowrap;" class="text-center">
-			not equal to
+			不等于
 		</td>
 	</tr>
 	<tr>
 		<th scope="row" style="vertical-align: middle; white-space: nowrap;" class="text-center">&lt;</th>
 		<td style="vertical-align: middle; white-space: nowrap;" class="text-center">
-			less than
+			小于
 		</td>
 		<td style="vertical-align: middle;" class="text-left" rowspan="4">
-			The two operands must be both values of the same integer type,
-			floating-point type or string type.
+			两个操作值的类型必须相同并且它们的类型必须为整数类型、浮点数类型或者字符串类型。
 		</td>
 	</tr>
 	<tr>
 		<th scope="row" style="vertical-align: middle; white-space: nowrap;" class="text-center">&lt;=</th>
 		<td style="vertical-align: middle; white-space: nowrap;" class="text-center">
-			less than or equal to
+			小于或等于
 		</td>
 	</tr>
 	<tr>
 		<th scope="row" style="vertical-align: middle; white-space: nowrap;" class="text-center">&gt;</th>
 		<td style="vertical-align: middle; white-space: nowrap;" class="text-center">
-			larger than
+			大于
 		</td>
 	</tr>
 	<tr>
 		<th scope="row" style="vertical-align: middle; white-space: nowrap;" class="text-center">&gt;=</th>
 		<td style="vertical-align: middle; white-space: nowrap;" class="text-center">
-			larger than or equal to
+			大于或等于
 		</td>
 	</tr>
 </tbody>
 </table>
 
 <p>
-The type of the result of any comparison operation is always an
-untype boolean value.
-If both of the two operands of a comparison operation are constant,
-the result is also a constant (boolean) value.
+比较运算的结果总是一个类型不确定布尔值。
+如果一个比较运算中的两个操作数都为常量，则结果布尔值也为一个常量。
 </p>
 
 <p>
-Later, if we say two values are comparable, we mean they can be compared
-with the <code>==</code> and <code>!=</code> operators.
-We will learn that values of which types are not comparable later.
-Values of basic types are all comparable.
+以后，如果我们说两个值可以比较，我们的意思是说这两个值可以用<code>==</code>或者<code>!=</code>运算符来比较。
+我们将在以后的文章中，我们将了解到某些类型的值是不能比较的。
 </p>
 
 <p>
-Please note that, not all real numbers can be accurately represented
-in memory, so comparing two floating-point (or complex) values may
-be not reliable. We should check whether or not the absolution of
-the difference of two floating-point values is smaller than a small threshold
-to judge whether or not the two floating-point values are equal.
+注意，并非所有的实数在内存中都可以被精确地表示，所以比较两个浮点数或者复数的结果并不是很可靠。
+在编程中，我们常常比较两个浮点数的差值是否小于一个阙值来检查两个浮点数是否相等。
 </p>
 
 </div>
 
-<h3>Operator Precedences</h3>
+<h3>操作符运算的优先级</h3>
 
 <div>
 
 <p>
-The operator precedences may be also some different to other languages.
-Here are the operator precedences in Go. Top ones have higher precedences.
-The precedences of operators in the same line are same.
-Like many other languages, <code>()</code> can be used to promote precedences.
-</p>
+Go中的操作符运算的优先级和其它流行语言有一些差别。
+下面列出了本文介绍的操作符的优先级。
+每行中的操作符的优先级是一样的。
+优先级逐行递减。
+<p>
 
 <pre class="line-numbers"><code class="language-go">*   /   %   <<  >>  &   &^
 +   -   |   ^
@@ -822,35 +779,31 @@ Like many other languages, <code>()</code> can be used to promote precedences.
 </p>
 
 <p>
-One abvious difference to some other popular languages
-is that the precedences of <code>&lt;&lt;</code> and
-<code>&gt;&gt;</code> are higher than <code>+</code> and <code>-</code> in Go.
+一个和其它流行语言明显的差别是，移位运算<code>&lt;&lt;</code>和<code>&gt;&gt;</code>的优先级比加减法<code>+</code>和<code>-</code>的优先级要高。
+</p>
+
+<p>
+一个表达式（做为一个子表达式）可以出现在另一个表达式中。
+这个子表达式的估值结果将成为另一个表达式的一个操作数。
+在这样的复杂表达式中，对于相同优先级的运算，它们将从左到右进行估值。
+和很多其它语言一样，我们也可用一对小括号<code>()</code>来提升一个子运算的优先级。
 </p>
 
 </div>
 
-<p class="anchor" id="constant-expression"></p>
-<h3>Constant Expressions</h3>
+<p class="anchor" id="constant-expression-more"></p>
+<h3>更多关于常量表达式</h3>
 
 <div>
-<p>
-If every operand in an operator operation introduced above
-are constants, then the operator operation is called a constant
-<a href="expressions-and-statements.html">expression</a>.
-All constant expressions are evaluated at compile time.
-Each constant expression is also viewed as a constant.
-</p>
 
 <p>
-A constant expression, in fact any expression, can be used as
-an operand (as a sub-expression) of another operator operation.
+常量子表达式的顺序有可能影响到最终的估值结果。
 </p>
 
-The following declared variable will be initialized as <code>2.2</code>
-instead of <code>2.7</code>.
-The reason is the division operation has a higher precedence than
-the addition operation, and in the division operation,
-both <code>3</code> and <code>2</code> are viewed as integers.
+下面这个声明的变量将被初始化为<code>2.2</code>，而不是<code>2.7</code>。
+优先级更高的子表达式<code>3/2</code>是一个常量表达式，所以它将在编译阶段被估值。
+根据上面介绍的规则，在运算中，<code>3</code>和<code>2</code>都被视为<code>int</code>，所以<code>3/2</code>的估值结果为<code>1</code>。
+在常量表达式<code>1.2 + 1</code>的运算中，两个操作数的类型被视为<code>float64</code>，所以最终的估值结果为<code>2.2</code>。
 
 <pre class="line-numbers"><code class="language-go">var x = 1.2 + 3/2
 </code></pre>
@@ -858,10 +811,8 @@ both <code>3</code> and <code>2</code> are viewed as integers.
 <p>
 </p>
 
-The two named constants declared in the following program are not equal.
-In the first declaration, both <code>3</code> and <code>2</code> are
-viewed as integers, however, they are both viewed as floating-point numbers
-in the second declaration.
+再比如下例，在一个常量声明中，<code>3/2</code>先被估值，其结果为<code>1</code>，所以最终的估值结果为<code>0.1</code>。
+在第二个常量声明中，<code>0.1*3</code>先被估值，其结果为<code>0.3</code>，所以最终的估值结果为<code>0.15</code>。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -869,7 +820,8 @@ const x = 3/2*0.1
 const y = 0.1*3/2
 
 func main() {
-	println(x, y) // +1.000000e-001 +1.500000e-001
+	println(x) // +1.000000e-001
+	println(y) // +1.500000e-001
 }
 </code></pre>
 
@@ -878,22 +830,10 @@ func main() {
 
 </div>
 
-<h3>More Operators</h3>
-
-<div>
-<p>
-Same as C/C++,
-there are two pointer related operators, <code>*</code> and <code>&amp;</code>.
-Yes the same operator symbols as the multiplication and bitwise-and operators.
-<code>&amp;</code> is used to take the address of an addressable value,
-and <code>*</code> is used to deference a pointer value.
-Unlike C/C++, in Go, values of pointer types don't support arithmetic operations.
-For more details, please read <a href="pointer.html">pointers in Go</a> later.
-</p>
+<h3>更多其它操作符</h3>
 
 <p>
-There are some other operators in Go.
-They will be introduced and explained in other Go 101 articles.
+Go中还有一些其它操作符。它们将在后续其它适当的文章中介绍。
 </p>
 
-</div>
+

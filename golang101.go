@@ -348,7 +348,7 @@ func openBrowser(url string) error {
 }
 
 func findGo101ProjectRoot() string {
-	if _, err := os.Stat(filepath.Join(".", "go101.go")); err == nil {
+	if _, err := os.Stat(filepath.Join(".", "golang101.go")); err == nil {
 		return "."
 	}
 
