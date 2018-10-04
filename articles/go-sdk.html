@@ -20,7 +20,7 @@ Go 101所有中所有的实例代码都使用标准编译器编译验证过。
 
 <p>
 Go SDK的版本和其所支持的最高Go语言版本是一致的。
-比如，Go SDK 1.10.x支持从1.0到1.10的所有Go语言版本。
+比如，Go SDK 1.11.x支持从1.0到1.11的所有Go语言版本。
 </p>
 
 <p>
@@ -28,6 +28,14 @@ Go SDK的版本和其所支持的最高Go语言版本是一致的。
 Go SDK安装目录下的<code>bin</code>子目录路径必须配置在<code>PATH</code>环境变量中。
 </p>
 
+<p>
+一些老的Go SDK版本可能需要配置<code>GOROOT</code>和<code>GOPATH</code>环境变量。
+当前最新的Go SDK版本对这些没有没有做强制要求。
+<code>GOPATH</code>环境变量的默认值为当前用户的HOME目录下的<code>go</code>文件夹对应的目录。
+<code>GOPATH</code>环境变量中可以指定多个目录。
+</p>
+
+<!--
 <p><i>
 在Go SDK 1.9之前，<code>GOROOT</code>环境变量必须被配置为Go SDK的安装目录。
 自从Go SDK 1.9，此环境变量变为可选的，并且不推荐配置之。
@@ -51,6 +59,7 @@ Go SDK安装目录下的<code>bin</code>子目录路径必须配置在<code>PATH
 的某个路径下的<code>src</code>子目录中。
 Go 101中的所有代码示例都非常简单，所以可与不遵从此规则。
 </p>
+-->
 
 <h3>最简单的Go程序</h3>
 
@@ -139,13 +148,21 @@ Go SDK工具要求所有的Go源代码文件必须以<code>.go</code>后缀结�
 </p>
 
 <p>
+我们可以运行<code>go help aSubCommand</code>来查看一个子命令的帮助信息。
+</p>
+
+<p>
+从Go SDK 1.11版本开始，我们可以运行不带参数的<code>go mod</code>子命令来管理包依赖。
+</p>
+
+<p>
 运行不带参数的<code>go</code>命令将会列出所有支持的<code>go</code>子命令。
 </p>
 
 <p>
 Go 101系列文章将不再对各种<code>go</code>子命令做更多的解释。
 请阅读<a href="https://golang.org/cmd/go/">官方文档</a>
-（<a href="https://golang.google.cn/cmd/go/">国内版</a>）以获取更多信息。
+（墙内版：<a href="https://golang.google.cn/cmd/go/">golang.google.cn/cmd/go/</a>）以获取更多信息。
 </p>
 
 <h3>关于<code>vgo</code>命令</h3>
@@ -166,7 +183,7 @@ Go 101系列文章将不再对各种<code>go</code>子命令做更多的解释�
 
 <p>
 我们可以在Go官网<a href="https://golang.org">golang.org</a>
-（国内版：<a href="https://golang.google.cn">golang.google.com</a>）阅读各种Go文档。
+（墙内版：<a href="https://golang.google.cn">golang.google.com</a>）阅读各种Go文档。
 </p>
 
 <p>
@@ -174,17 +191,17 @@ Go 101系列文章将不再对各种<code>go</code>子命令做更多的解释�
 </p>
 
 <p>
-请注意对于1.09和1.1版本的Go SDK,如果<code>GOROOT</code>环境变量没有设置，
+请注意对于1.10版本的Go SDK,如果<code>GOROOT</code>环境变量没有设置，
 那么我们需要在开启本地镜像的时候指定一个<code>goroot</code>选项：
 <code>godoc -http=:9999 -goroot path/to/go/sdk</code>。
-这个不便可能是<code>godoc</code>的一个bug造成的。
-这个bug将在Go SDK 1.11中修复。
+这个不便可能是<code>godoc</code>的一个bug造成的。这个bug已经在Go SDK 1.11中修复了。
 </p>
 
 <p>
 <code>godoc</code>默认将会为所有本地已经下载的Go第三方库包生成文档。
 有时这需要很长的时间。如果你只想查看标准库的文档，你可以在<code>godoc</code>命令
-运行之前在终端中将<code>GOPATH</code>环境变量暂时设为一个不存在的路径。
+运行之前在终端中将<code>GOPATH</code>环境变量暂时设为一个不存在的路径，
+比如：<code>GOPATH=nonexist godoc -http=:9999</code>。
 </p>
 
 <!--

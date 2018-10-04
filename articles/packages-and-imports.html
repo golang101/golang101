@@ -1,18 +1,17 @@
-﻿<h1>Code Packages And Package Imports</h1>
+﻿<h1>代码包和包引入</h1>
 
 <p>
-Like many modern programming languages,
-Go code is also organized as code packages.
-To use the exported resources (functions, types, variables and named constants,
-etc) in a specified package, the package must first be imported,
-except the <code>builtin</code> standard code package.
-This article will explain code packages and package imports in Go.
+和很多现代编程语言一样，Go代码包（package）来组织管理代码。
+我们必须先引入一个代码包（除了<code>builtin</code>标准库包）才能使用其中导出的资源（比如函数、类型、变量和有名常量等）。
+此篇文章将讲解Go代码包和代码包引入（import）。
 </p>
 
-<h3>Introduction Of Package Import</h3>
+<p class="anchor" id="import"></p>
+<h3>包引入</h3>
 
 <div>
-Let's view a small program which imports a standard code package.
+
+下面这个简短的程序（假如它存在一个名为<code>simple-import-demo.go</code>的源文件中）引入了一个标准库包。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -23,75 +22,64 @@ func main() {
 }
 </code></pre>
 
-Some Explanations:
+对此程序的一些解释：
 <ul>
 <li>
-	The third line imports the <code>fmt</code> standard package.
-	There are many format functions declared in this package for other packages to use.
-	The <code>Println</code> function is one of them.
-	It will print the string representations of
-	an arbitrary number of arguments to the standard output.
-	For each <code>fmt.Println</code> call,
-	a space character will be inserted between
-	each two consecutive string representations
-	and a newline character is printed at the end.
+	第一行指定了源文件<code>simple-import-demo.go</code>所处的包名为<code>main</code>。
+	程序入口<code>main</code>函数必须处于一个名为<code>main</code>的代码包中。
 </li>
 <li>
-	The sixth line calls the <code>Println</code> function.
-	Note that the function name is prefixed a <code>fmt.</code> in the call,
-	where <code>fmt</code> is the name of the package which contains the called function.
-	The form <code>fmt.Println</code> is called a
-	<a href="https://golang.org/ref/spec#Qualified_identifiers">qualified identifier</a>.
+	第三行通过使用<code>import</code>关键字引入了<code>fmt</code>标准库包。
+	在此源文件中，<code>fmt</code>标准库包将用<code>fmt</code>标识符来表示。
+	标识符<code>fmt</code>称为<code>fmt</code>标准库包的引入名称。（后续某节将详述代码包的引入名称）
 </li>
 <li>
-	A <code>fmt.Println</code> function call has no requirements
-	for its arguments, so in this program, its three arguments
-	will be deduced as values of their respective default types,
-	<code>string</code>, <code>int</code> and <code>string</code>.
+	<code>fmt</code>标准库包中声明了很多终端打印函数供其它代码包使用。
+	<code>Println</code>函数是其中之一。
+	它可以将不定数量参数的字符串表示形式输出到标准输出中。
+	第六行调用了此<code>Println</code>函数。
+	注意在此调用中，函数名之前需要带上前缀<code>fmt.</code>，其中<code>fmt</code>是<code>Println</code>函数所处的代码包的引入名称。
+	<code>aImportName.AnExportedIdentifier</code>这种形式称为一个限定标识符（<a href="https://golang.org/ref/spec#Qualified_identifiers">qualified identifier</a>）。
+</li>
+<li>
+	<code>fmt.Println</code>函数调用接受任意数量的实参并且对实参的类型没有任何限制。
+	所以此程序中的此函数调用的三个实参的类型将被推断为它们各自的默认类型：<code>string</code>, <code>int</code>和<code>string</code>。
+</li>
+<li>
+	对于一个<code>fmt.Println</code>函数调用，任何两个相邻的实参的输出之间将被插入一个空格字符，并且在最后将输出一个空行字符。
 </li>
 </ul>
 
-Assume the solo source file of this program is <code>simple-import-demo.go</code>,
-run this program will get the following output:
+下面是上面这个程序的运行结果：
+
 <pre class="output"><code>$ go run simple-import-demo.go
 Go has 25 keywords.
 </code></pre>
 
 <p>
-Please note, only exported resources in a package can be used
-in the source file which imports the package.
-Exported resources are the resources whose names are
-<a href="keywords-and-identifiers.html#identifier">exported identifiers</a>.
-For example, the first character of the identifier <code>Println</code>
-is an upper case letter (so the <code>Println</code> function is exported),
-which is why the <code>Println</code> function
-declared in the <code>fmt</code> standard package can be used
-in the above example program.
+当一个代码包被引入Go一个源文件时，只有此代码包中的<a href="keywords-and-identifiers.html#identifier">导出</a>资源（名称为大写字母的变量、常量、函数和类型等）可以在此源文件被使用。
+比如上例中的<code>Println</code>函数即为一个导出资源，所以它可以在上面的程序文件中使用。
 </p>
 
 <p>
-The built-in functions, <code>print</code> and <code>println</code>,
-have similar functionalites as the corresponding functions in the
-<code>fmt</code> standard package.
-Built-in functions can be used without importing any packages.
-However, the two built-in functions are not recommended
-to be used in production enviroments,
-for they are not guaranteed to stay in the future Go versions.
+前面几篇文章中使用的内置函数<code>print</code>和<code>println</code>提供了和<code>fmt</code>标准库包中的对应函数相似的功能。
+内置函数可以不用引入任何代码包而直接使用。
 </p>
 
 <p>
-All standard packages are listed <a href="https://golang.org/pkg/">here</a>.
-We can also <a href="go-sdk.html#doc">run a local server</a>
-to view Go documentations.
+注意，<code>print</code>和<code>println</code>这两个内置函数不推荐使用在生产环境，因为它们不保证一定会出现在以后的Go版本中。
 </p>
 
 <p>
-A package import is also called an import declaration formally in Go.
-An import declaraton is only visible to the source file which contains the import declaration.
-It is not visible to other source files in the same package.
+我们可以访问<a href="https://golang.org/pkg/">Go官网</a>（墙内版：<a href="https://golang.google.cn">golang.google.com/pkg/</a>）来查看各个标准库包的文档，
+我们也可以<a href="go-sdk.html#doc">开启一个本地文档服务器</a>来查看这些文档。
 </p>
 
-Let's view another example:
+<p>
+一个包引入也可称为一个包声明。一个包声明只在当前包含此声明的源文件内可见。
+</p>
+
+另外一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -103,55 +91,41 @@ func main() {
 </code></pre>
 
 <p>
-This example imports one more standard package, the <code>math/rand</code> package,
-which is a sub-package of the <code>math</code> standard package.
-This package provides some functions to produce pseudo-random numbers.
+这个例子多引入了一个<code>math/rand</code>标准库包。
+此包是<code>math</code>标准库包中的一个子包。
+此包提供了一些函数来产生伪随机数序列。
 </p>
 
-Some explanations:
+一些解释：
 <ul>
 <li>
-	the last token in an import path will be used as the first part in a qualified identifier.
-	In this example, <code>rand.</code> instead of <code>math/rand.</code> is used
-	as the prefix of the <code>Uint32</code> function call.
-	A <code>rand.Uint32()</code> call will return
-	a random <code>uint32</code> integer number.
+	在此例中，<code>math/rand</code>标准库包的引入名是<code>rand</code>。
+	<code>rand.Uint32()</code>函数调用将返回一个<code>uint32</code>类型的随机数。
 </li>
 <li>
-	<code>Printf</code> is another common used function
-	in the <code>fmt</code> standard package.
-	A call to the <code>Printf</code> function must take at least one arguments.
-	The first argument of a <code>Printf</code> function call must be a <code>string</code> value,
-	which specifies the format of the printed result.
-	The <code>%v</code> in the first argument is called a format verb,
-	it will be replaced with the string representation of the second argument.
-	As we have learned in the article
-	<a href="basic-types-and-value-literals.html">basic types and their
-	literals</a>, the <code>\n</code> in a double-quoted
-	string literal will be escaped as a newline character.
+	<code>Printf</code>函数是<code>fmt</code>标准库包中提供的另外一个常用终端打印函数。
+	一个<code>Printf</code>函数调用必须带有至少一个实参，并且第一个实参的类型必须为<code>string</code>。
+	此第一个实参指定了此调用的打印格式。此格式中的<code>%v</code>在打印结果将被对应的后续实参的字符串表示形式所取代。
+	比如上列中的<code>%v</code>在打印结果中将被<code>rand.Uint32()</code>函数调用所返回的随机数所取代。
+	打印格式中的<code>\n</code>表示一个换行符，这在<a href="basic-types-and-value-literals.html">基本类型和它们的文字表示形式</a>一文中已经解释过。
 </li>
 </ul>
 
-The above program will always output:
+上面这个程序的输出如下：
 <pre class="output"><code>Next pseudo-random number is always 2596996162.
 </code></pre>
 
 <p>
-If we expect the above program to produce a different random number at each run,
-we should set a different seed by calling the <code>rand.Seed</code> function
-when the program just starts.
+如果我们希望上面的程序每次运行的时候输出一个不同的随机数，我们需要在程序启动的时候使用调用<code>rand.Seed</code>函数来设置一个不同的随机数种子。
 </p>
 
 <p>
-If multiple packages are imported into a source file,
-we can group them in one import declaration by enclosing
-them in a <code>()</code>.
+多个包引入语句可以用一对小括号来合并成一个包引入语句。比如下面这例。
 </p>
 
-Example:
 <pre class="line-numbers"><code class="language-go">package main
 
-// Multiple packages can be imported together.
+// 一条包引入语句引入了三个代码包。
 import (
 	"fmt"
 	"math/rand"
@@ -159,221 +133,266 @@ import (
 )
 
 func main() {
-	rand.Seed(time.Now().UnixNano()) // set the random seed.
+	rand.Seed(time.Now().UnixNano()) // 设置随机数种子
 	fmt.Printf("Next pseudo-random number is %v.\n", rand.Uint32())
 }
 </code></pre>
 
-Some explanations:
+一些解释：
 <ul>
 <li>
-	this example imports one more package,
-	the <code>time</code> standard package,
-	which provides many time realated utilities.
+	此例多引入了一个<code>time</code>标准库包。
+	此包提供了很多和时间相关的函数和类型。
+	其中<code>time.Time</code>和<code>time.Duration</code>是两个最常用的类型。
 </li>
 <li>
-	function <code>time.Now()</code> returns the current time,
-	as a value of type <code>time.Time</code>.
+	函数调用<code>time.Now()</code>将返回一个类型为<code>time.Time</code>的表示当前时间的时间值。
 <li>
-	<code>UnixNano</code> is a method of the <code>time.Time</code> type.
-	The method call <code>aTime.UnixNano()</code> returns the number of nanoseconds
-	elapsed since January 1, 1970 UTC to the time denoted by <code>aTime</code>.
-	The return result is a value of type <code>int64</code>,
-	which is the parameter type of the <code>rand.Seed</code> function.
-	(Methods are special functions. We can learn methods in the article
-	<a href="method.html">methods in Go</a> for details later.)
+	<code>UnixNano</code>是类型<code>time.Time</code>的一个方法。
+	我们可以把方法看作是特殊的函数。方法将在<a href="method.html">Go中的方法</a>一文中详述。
+	方法调用<code>aTime.UnixNano()</code>将返回从UTC时间的1970年一月一日到<code>aTime</code>所表示的时间之间的纳秒数。
+	返回结果的类型为<code>int64</code>。
+	在上例中，此方法调用的结果用来设置随机数种子。
 </li>
 </ul>
 
 </div>
 
-<h3>More About <code>fmt.Printf</code> Format Verbs</h3>
-
-<p>
-As the above has mentioned, if there is one format verb in the first argument
-of a <code>fmt.Printf</code> call, it will be replaced with the string
-representation of the second argument.
-In fact, there can be mulitple format verbs in the first <code>string</code>
-argument. The second format verb will be replaced with the string representation
-of the third argument, and so on.
-</p>
+<h3>更多关于<code>fmt.Printf</code>函数调用的输出格式</h3>
 
 <div>
-In Go 101, only the following listed format verbs will be used.
+从上面的例子中，我们已经了解到<code>fmt.Printf</code>函数调用的第一个实参中的<code>%v</code>在输出中将替换为后续的实参的字符串表示形式。
+实际上，这种百分号开头的占位字符组合还用很多。下面是一些常用的占位字符组合：
+
 <ul>
 <li>
-	<code>%v</code>, which will be replaced with the general string representation of the corresponding argument.
+	<code>%v</code>：将被替换为对应实参字符串表示形式。
 </li>
 <li>
-	<code>%T</code>, which will be replaced with the type name or type literal of the corresponding argument.
+	<code>%T</code>：将替换为对应实参的类型的字符串表示形式。
 </li>
 <li>
-	<code>%x</code>, which will be replaced with the hex string representation of the corresponding argument.
-	Note, the hex string representations for values of some kinds of types are not defined.
-	Generally, the corresponding arguments of <code>%x</code> should be integers,
-	interger arrays or interger slices (arrays and slices will be explained in a later article).
+	<code>%x</code>：将替换为对应实参的十六进制表示。实参的类型必须为整数，整数数组（array）或者整数切片（slice）等。
+	（数组和切片将在以后的文章中讲解。）
 </li>
 <li>
-	<code>%s</code>, which will be replaced with the string representation of the corresponding argument.
-	The corresponding argument should be a string or byte slice.
-</li>
-</ul>
-</div>
-
-<p>
-Format verb <code>%%</code> represent a percent sign.
-</p>
-
-<p>
-For more <code>Printf</code> format verbs, please read
-the online <a href="https://golang.org/pkg/fmt/"><code>fmt</code> package documentation</a>,
-or view the same documentation by running a local documentation server.
-We can also run <code>go doc fmt</code> to view the documentation of the <code>fmt</code> standard package,
-and run <code>go doc fmt.Printf</code> to view the documentation of the <code>fmt.Printf</code> function,
-in a terminal.
-</p>
-
-<h3>About Package Folder Names</h3>
-
-<p>
-A code package may be composed of several source files.
-These source files are located in the same folder.
-Generally, a folder corresponds to one code package, and vice versa.
-</p>
-
-<p>
-The <a href="go-sdk.html">official Go tools</a> recommend,
-and often require, the folder
-containing a third-party package to be put in the <code>src</code>
-folder under any path specified in the <code>GOPATH</code> environment variable.
-The import path of the third-party package is the relative path of
-the package folder to the <code>src</code> folder.
-The seperators in the path must be always <code>/</code> and can't be <code>\</code>.
-For example, if the path of a package is <code>OneGoPath/src/a/b/pkg</code>
-(or <code>OneGoPath\src\a\b\pkg</code> on Windows),
-then its import path is <code>/a/b/pkg</code>.
-</p>
-
-<p>
-A standard package has a higher import priority than a third-party package
-if their import paths are identical.
-So please try to avoid using the import path of a standard package
-as the import path of a third-party package.
-</p>
-
-<p>
-Later, we will call the packages each of which contains
-the <code>main</code> entry functions as <b>program packages</b>,
-and call other packages as <b>library packages</b>.
-The names of program packages must be all <code>main</code>.
-</p>
-
-<p>
-The name of folder containing a package
-is not required to be the same as the package name.
-However, for library packages, it will make package users confused if the name
-of a package is different from the name of the package folder.
-For example, if the name of a package is <code>foo</code> but its import path is
-<code>x/y/bar</code>, then to call a function <code>F</code> in the package,
-people may expect to use the qualified identifier <code>bar.F</code>.
-However, in fact the correct qualified identifier is <code>foo.F</code>.
-Package users must open the package source files to check what
-the real name of the imported package is.
-So please try to make the two names identical for every library package.
-</p>
-
-<p>
-<code>main</code> packages are not recommended to be imported as library packages.
-Although Go specification doesn't forbid importing <code>main</code> packages,
-the official Go tools do (at least for Go SDK 1.10).
-In practice, to avoid confusing,
-it is best never to use <code>main</code> packages as library packages.
-One the other hand, it is recommended to give each program package folder
-a meaningful name other than its package name, <code>main</code>.
-</p>
-
-<div>
-The official Go SDK will view package folders named as <code>internal</code>
-and <code>vendor</code> as special package folders.
-<ul>
-<li>
-	An <code>internal</code> package can only be imported by the packages
-	which folders contains (either directly or indirectly) the
-	<code>internal</code> package folder.
-	In other words, a package can't import an <code>internal</code> package
-	which is not located in the subtree of the folder of the package.
+	<code>%s</code>：将被替换为对应实参的字符串表示形式。实参的类型必须为字符串或者字节切片（byte slice）类型。
 </li>
 <li>
-	The <code>vendor</code> folder under a package folder is used to
-	store the dependency packages of the package.
-	Please view the <a href="https://golang.org/cmd/go/#hdr-Vendor_Directories">
-	official documentation</a> for details.
+	<code>%%</code>：将被替换为一个百分号。
 </li>
 </ul>
 
+一个例子：
+<pre class="line-numbers"><code class="language-go">package main
+
+import "fmt"
+
+func main() {
+	a, b := 123, "Go"
+	fmt.Printf("a == %v == 0x%x, b == %s\n", a, a, b)
+	fmt.Printf("type of a: %T, type of b: %T\n", a, b)
+}
+</code></pre>
+
+输出：
+<pre class="output"><code>a == 123 == 0x7b, b == Go
+type of a: int, type of b: string
+1% 50% 99%
+</code></pre>
+
+<p>
+</p>
+
+<p>
+请阅读<a href="https://golang.org/pkg/fmt/"><code>fmt</code>标准库包的文档</a>（墙内版：<a href="https://golang.google.cn/pkg/fmt/">golang.google.cn/pkg/fmt/</a>）以了解更多的占位字符组合。
+我们也可以运行<code>go doc fmt</code>命令来在终端中查看<code>fmt</code>标准库包的文档。
+运行<code>go doc fmt.Printf</code>命令可以查看<code>fmt.Printf</code>的文档。
+</p>
 </div>
 
-<h3>Package Load Order</h3>
+<h3>代码包文件夹、代码包引入路径代码包依赖关系</h3>
 
+<div>
 <p>
-Go doesn't support circular dependency.
-If package <code>a</code> imports package <code>b</code>
-and package <code>b</code> imports package <code>c</code>,
-then package <code>c</code> can't import package <code>a</code> and <code>b</code>,
-package <code>b</code> also can't import package <code>a</code>.
+一个代码包可以由若干Go源文件组成。一个代码包的源文件须都处于同一个文件夹下。
+一个文件夹（不包含子文件夹）下的所有源文件必须都处于同一个代码包中，亦即这些源文件开头的<code>package pkgname</code>语句必须一致。
+所以，一个代码包对应着一个文件夹（不包含子文件夹），反之亦然。
+对应着一个代码包的文件夹称为此代码包的文件夹。
+一个代码包文件夹下的每个子文件夹对应的都是另外一个独立的代码包。
 </p>
 
 <p>
-A package also can't import itself.
+根据不同的情形，名称为<code>vendor</code>的文件夹可能被视为特殊的文件夹。下面的段落将会解释其特殊性。
+</p>
+
+目前最新的Go SDK版本为1.11。此版本引入了包模块（module）的概念。
+此概念对代码包的引入路径产生了一些影响。
+目前一个Go代码包可以选择是否支持模块模式。
+Go SDK 1.11引入了一个环境变量<code>GO111MODULE</code>。这个环境变量的默认值是<code>auto</code>，它的其它两个可能取值为<code>on</code>和<code>off</code>。
+如果此环境变量取值为<code>on</code>，则所有的代码包都支持模块模式；
+如果此环境变量取值为<code>off</code>，则所有的代码包都不支持模块模式；
+如果此环境变量取值为<code>auto</code>，则只有同时满足下面两个条件的代码包才支持模块模式：
+<ol>
+<li>
+	代码包文件夹必须处于<code>GOPATH</code>环境变量指定的所有路径的<code>src</code>子目录以外。
+</li>
+<li>
+	代码包文件夹或者它的某个上级目录文件夹中含有一个名为<code>go.mod</code>文件。
+</li>
+</ol>
+
+<p>
+对于一个不支持模块模式的代码包，通常它应该处于某个<code>GOPATH/src</code>路径之下。
+它的包引入路径为此包的文件夹相对于<code>GOPATH/src</code>或者某个<code>vendor</code>目录的相对路径。
+</p>
+
+在不支持模块模式的情形下，假设有一个如下的包层级结构，则：
+<ul>
+<li>
+	两个<code>foo</code>包的引入路径均为<code>w/foo</code>。
+</li>
+<li>
+	<code>x</code>包、<code>y</code>包和<code>z</code>包的引入路径均分别为<code>x</code>、<code>x/y</code>和<code>x/z</code>。
+</li>
+</ul>
+
+注意：
+<ul>
+<li>
+	当在<code>y.go</code>文件中引入一个引入路径均为<code>w/foo</code>的包的时候，被引入的包为<code>GOPATH/src/x/y/vendor/w/foo</code>文件夹中的包。
+</li>
+<li>
+	当在<code>x.go</code>或者<code>z.go</code>文件中引入一个引入路径均为<code>w/foo</code>的包的时候，被引入的包为<code>GOPATH/src/x/vendor/w/foo</code>文件夹中的包。
+</li>
+</ul>
+
+<pre><code class="language-go">_ GOPATH
+  |_ src
+     |_ x
+        |_ vendor
+        |  |_ w
+        |     |_ foo
+        |        |_ foo.go    // package foo
+        |_ y
+        |  |_ vendor
+        |  |  |_ w
+        |  |     |_ foo
+        |  |        |_ foo.go // package foo
+        |  |_ y.go            // package y
+        |_ z
+        |  |_ z.go            // package z
+        |_ x.go               // package x
+</code></pre>
+
+<p>
 </p>
 
 <p>
-At run time, packages are loaded by their dependency orders.
-A package will be loaded before all the packages which import it.
-Each Go program contains only one program package,
-which is the last package being loaded at run time.
+对于一个支持模块模式的代码包，其对应的<code>go.mod</code>文件中必须指定此<code>go.mod</code>文件所处的最内层文件夹对应的代码包的引入路径。
+指定引入路径的格式为<code>module ImportPath</code>。在这种模式下，只有和与此<code>go.mod</code>文件处于同一文件夹下的<code>vendor</code>文件夹才被视为特殊的文件夹。
 </p>
 
-<h3>The <code>init</code> Functions</h3>
+在支持模块模式的情形下，假设有一个如下的包层级结构，则：
+
+<ul>
+<li>
+	第一个<code>foo</code>包的引入路径均为<code>w/foo</code>。
+	此包的父目录<code>vendor</code>文件夹被视为一个特殊的文件夹。
+</li>
+<li>
+	另外一个<code>foo</code>包的引入路径均为<code>example.com/mypkg/x/y/vendor/w/foo</code>。
+	注意这里的<code>vendor</code>文件夹被视为一个普通的包文件夹。
+</li>
+<li>
+	<code>x</code>包、<code>y</code>包和<code>z</code>包的引入路径均分别为<code>example.com/mypkg/x</code>、<code>example.com/mypkg/x/y</code>和<code>example.com/mypkg/x/z</code>。
+</li>
+</ul>
+
+注意：当在<code>x.go</code>、<code>y.go</code>或者<code>z.go</code>文件中引入一个引入路径均为<code>w/foo</code>的包的时候，被引入的包均为<code>MyProject/vendor/w/foo</code>文件夹中的包。
+
+<pre><code class="language-go">_ MyProject
+     |_ go.mod                // module example.com/mypkg
+     |_ vendor
+     |  |_ w
+     |     |_ foo
+     |        |_ foo.go       // package foo
+     |_ x
+        |_ y
+        |  |_ vendor
+        |  |  |_ w
+        |  |     |_ foo
+        |  |        |_ foo.go // package foo
+        |  |_ y.go            // package y
+        |_ z
+        |  |_ z.go            // package z
+        |_ x.go               // package x
+</code></pre>
 
 <p>
-There can be multiple functions named as <code>init</code> declared in one package,
-even in one source code file.
-The functions named as <code>init</code> must have no any
-input parameters and return results.
 </p>
 
 <p>
-The <code>init</code> functions in a package will be called
-once and only once sequentially when the package is loaded.
-However, the invocation order of these <code>init</code> functions
-is not specified in Go specification.
-So there shouldn't be dependency relations between the
-<code>init</code> functions in one package.
+当一个代码包中的某个文件引入了另外一个代码包，则我们说前者代码包依赖于后者代码包。
 </p>
 
 <p>
-For the standard Go compiler, the <code>init</code> functions in a source file
-will be called from top to down.
+Go不支持循环引用（依赖）。
+如果一个代码包<code>a</code>依赖于代码包<code>b</code>，同时代码包<code>b</code>依赖于代码包<code>c</code>，则代码包<code>c</code>中的源文件不能引入代码包<code>a</code>和代码包<code>b</code>，代码包<code>b</code>中的源文件也不能引入代码包<code>a</code>。
 </p>
 
 <p>
-All <code>init</code> functions in all involved packages in a program
-will be called sequentially.
-An <code>init</code> function in an importing package
-will be called after all the <code>init</code> functions
-declared in the dependency packages of the importing package for sure.
-All <code>init</code> functions will be called
-before invoking the <code>main</code> entry function.
+当然，一个代码包中的源文件不能也没必要引入此代码包本身。
 </p>
 
 <p>
-All package-level variables in a package are initialized before
-any <code>init</code> function is invoked.
+今后，我们称一个程序中含有<code>main</code>入口函数的代码包为程序代码包，称其它代码包为库代码包。
+一个程序只能有一个程序代码包，并且此程序代码包的名称必须为<code>main</code>。
+程序代码包不能被其它代码包引入。
+</p>
+
+<p>
+代码包文件夹的名称并不要求要和其对应的代码包的名称相同。
+但是，库代码包文件夹的名称最好设为和其对应的代码包的名称相同。
+因为一个代码包的引入路径中包含的是此包的文件夹名，但是此包的默认引入名为此包的名称。
+如果两者不一致，会使人感到困惑。
+<p>
+
+<p>
+另一方面，最好给每个程序代码包指定一个有意义的名字，而不是它的包名<code>main</code>。
+</p>
+</div>
+
+<h3><code>init</code>函数</h3>
+
+<p>
+在一个代码包中，甚至一个源文件中，可以声明若干名为<code>init</code>的函数。
+这些<code>init</code>函数必须不带任何输入参数和返回结果。
+</p>
+
+<p>
+注意，我们不能声明名为<code>init</code>的包级变量、常量或者类型。
+</p>
+
+<p>
+一个代码包中声明的<code>init</code>函数在此包加载的时候将被执行并且只执行一遍。
+但是Go白皮书并没有指定这些<code>init</code>函数的执行顺序。
+所以一个代码包中声明的<code>init</code>函数之间最好没有依赖关系。
+</p>
+
+<p>
+在加载一个代码包的时候，此代码包中声明的所有包级变量都将在此包中的任何一个<code>init</code>函数执行之前初始化完毕。
+</p>
+
+<p>
+一个程序中所涉及到的所有的代码包的加载是串行执行的。
+在一个程序启动时，每个包中总是在它所有依赖的包都加载完成之后才开始加载。
+程序代码包总是最后一个被加载的代码包。
+每个包只会被加载一次。
 </p>
 
 <div>
-Here is a simple example which contains two <code>init</code> functions:
+下面这个简单的程序中有两个<code>init</code>函数：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -398,45 +417,39 @@ func respectfulName(who string) string {
 var bob, smith = respectfulName("Bob"), respectfulName("Smith")
 </code></pre>
 
-The output of this program:
+此程序的运行结果：
 <pre class="output"><code>hi, Mr. Bob
 hello, Mr. Smith
 bye
 </code></pre>
 
 <p>
-All package-level variables declared in a pacakge are initialized before
-any <code>init</code> function declared in the same pacakge is called.
 </p>
 
 </div>
 
-<h3>Full Package Import Form</h3>
+<h3>完整的引入声明语句形式</h3>
 
 <div>
 
-
-In fact, the full form of an import declaration is
+事实上，一个引入声明语句的完整形式为：
 
 <pre><code class="language-go">import importname "path/to/package"
 </code></pre>
 
 <p>
-where <code>importname</code> is optional,
-its default value is the real name of the imported package.
-In fact, the prefix token used in qualified identifiers is
-the <code>importname</code>.
+其中引入名<code>importname</code>是可选的，它的默认值为被引入的包的包名（不是文件夹名）。
+如果一个包引入声明中的<code>importname</code>没有省略，则限定标识符使用的前缀为<code>importname</code>。
 </p>
 
 <p>
-The full import declaration form is not used widely.
-However, sometimes we must use it.
-For example, if a source file imports two packages with the same name,
-to avoid making compiler confused, we must use the full import form
-to set a custom <code>importname</code> for at least one package in the two.
+引入声明语句的完整形式在日常编程中使用的频率不是很高。
+但是在某些情况下，完整形式必须被使用。
+比如，如果一个源文件引入的两个代码包的包名一样，为了防止使编译器产生困惑，我们至少需要用完整形式指定一个不同的引入名以区分这两个包。
 </p>
 
-Here is an example of using full import declaration forms.
+下面是一个使用了完整引入声明语句形式的例子。
+
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
@@ -446,42 +459,35 @@ import (
 )
 
 func main() {
-	random.Seed(time.Now().UnixNano()) // set the random seed
+	random.Seed(time.Now().UnixNano())
 	format.Print("A pseudo-random number: ", random.Uint32(), "\n")
 	
-	// The following two lines fail to compile.
+	// 下面这两行编译不通过。
 	/*
-	rand.Seed(time.Now().UnixNano()) // set the random seed
+	rand.Seed(time.Now().UnixNano())
 	fmt.Print("A pseudo-random number: ", rand.Uint32(), "\n")
 	*/
 }
 </code></pre>
 
-Some explanations:
+一些解释：
 <ul>
 <li>
-	we must use <code>format</code> and <code>random</code> as the
-	prefix token in qualified identifiers, instead of the real package names
-	<code>fmt</code> and <code>rand</code>.
+	我们必须使用<code>format</code>和<code>random</code>，而不是<code>fmt</code>和<code>rand</code>，做为限定标识符的前缀。
 </li>
 <li>
-	<code>Print</code> is another function in the <code>fmt</code> standard package.
-	Like <code>Println</code> function calls,
-	a <code>Print</code> function call can take arbitrary number of arguments.
-	It will print the string representations of the passed arguments, one by one.
-	If two consecutive arguments are both string values,
-	then a space will be automatically inserted between them in the print result.
+	<code>Print</code>是<code>fmt</code>标准库包中的另外一个函数。
+	和<code>Println</code>函数调用一样，一个<code>Print</code>函数调用也接受任意数量实参。
+	它将逐个打印出每个实参的字符串表示形式。如果相邻的的两个实参都是字符串类型，则在它们中间会打印一个空格字符。
 </li>
 </ul>
 
 <p>
-The <code>importname</code> in the full form import declaration can be a dot
-(<code>.</code>). Such imports are called dot imports.
-To use the exported elements in the packages being dot imported,
-the prefix part in qualified identifiers must be omitted.
+一个完整引入声明语句形式的引入名<code>importname</code>可以是一个句点(<code>.</code>)。
+这样的引入称为句点引入。使用被句点引入的包中的导出资源时，限定标识符的前缀必须省略。
 </p>
 
-Example:
+例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
@@ -495,53 +501,50 @@ func main() {
 </code></pre>
 
 <p>
-In the above example, <code>Println</code> instead of <code>fmt.Println</code>,
-and <code>Now</code> instead of <code>time.Now</code> must be used.
+在上面这个例子中，<code>Println</code>和<code>Now</code>函数调用不需要带任何前缀。
 </p>
 
 <p>
-Generally, dot imports are not recommended to be used in formal projects.
+一般来说，句点引入不推荐使用。
 </p>
 
 <p>
-The <code>importname</code> in the full form import declaration can be blank identifier
-(<code>_</code>). Such imports are called anonymous imports.
-The importing source files can't use the exported resources in anonymously imported packages.
-The purpose of anonymous imports is to initialize the imported packages
-(each of <code>init</code> functions in the anonymously imported packages will be called once).
+一个完整引入声明语句形式的引入名<code>importname</code>可以是一个空标识符(<code>_</code>)。
+这样的引入称为匿名引入。一个包被匿名引入的目的主要是为了加载这个包，从而使得这个包中的资源得以初始化。
+被匿名引入的包中的<code>init</code>函数将被执行并且仅执行一遍。
 </p>
 
-In the following example, all <code>init</code> functions declared in
-<a href="https://golang.org/pkg/net/http/pprof/">the
-<code>net/http/pprof</code> standard package</a> will be called before the
-<code>main</code> entry function is called.
+在下面这个例子中，<a href="https://golang.org/pkg/net/http/pprof/"><code>net/http/pprof</code>标准库包</a>中的所有<code>init</code>函数将在<code>main</code>入口函数开始执行之前全部执行一遍。
 
 <pre class="line-numbers"><code class="language-go">package main
 
 import _ "net/http/pprof"
 
 func main() {
-	... // do somethings
+	... // 做一些事情
 }
 </code></pre>
 </div>
 
-<h3>Each Non-anonymous Import Must Be Used Once</h3>
+<h3>每个非匿名引入必须至少被使用一次</h3>
 
 <div>
-Except anonymous imports, at least one exported elements in
-other imports must be used at once.
-For example, the following example fails to compile.
+除了匿名引入，其它引入必须在代码中被使用一次。
+比如，下面的程序编译不通过。
+
 <pre class="line-numbers"><code class="language-go">package main
 
-import "net/http"    // error: imported and not used
-import . "time"      // error: imported and not used
-import format "fmt"  // okay: used once below
-import _ "math/rand" // okay: anonymous packages are not required to be used
+import "net/http"    // error: 引入未被使用
+import . "time"      // error: 引入未被使用
+import format "fmt"  // okay: 下面被使用了一次
+import _ "math/rand" // okay: 匿名引入
 
 func main() {
-	format.Println() // use the imported "fmt" package
+	format.Println() // 使用"fmt"包
 }
 </code></pre>
+
+<p>
+</p>
 
 </div>
