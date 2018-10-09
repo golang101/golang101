@@ -1,178 +1,153 @@
-<h1>Expressions, Statements And Simple Statements</h1>
+<h1>表达式、语句和简单语句</h1>
 
 <p>
-This article will introduce expressions and statements in Go.
+此篇文章将简单介绍一下Go语言中的表达式和语句，为后面的（特别是下一篇）文章做一个铺垫。
 </p>
 
 <p>
-Simply speaking, expressions represent values and statements represent operations.
-However, in fact, some special expressions each may be composed of and represent several values,
-and some statements may be composed of several sub operations/statements.
-And some expressions can also be used as statements.
+简单说来，一个表达式表示一个值，而一条语句表示一个操作。
+但是在实际中，有些个表达式可能同时表示多个值，有些语句可能是由很多更基本的语句组成的。
+另外，根据场合不同，某些语句也可以被视为表达式。
 </p>
 
 <p>
-Simple statements are some special statements.
-In Go, some portions of all kinds of control flows must be
-simple statements, and some portions must be expressions.
-Control flows will be introduced in the next Go 101 article.
+Go中，某些语句被称为简单语句。Go中各种流程控制语句的某些部分可能会被要求必须为简单语句或者表达式。
+详见下一篇文章对Go中基本流程控制语句的介绍和解释。
 </p>
 
 <p>
-This article will not make accurate definitions for expressions and statements.
-It is hard to achieve this.
-This article will only list some expression and statement cases.
-Not all kinds of expressions and statements will be covered in this article,
-but all kinds of simple statements will be listed.
+本片文章将不对表达式和语句作出详尽的解释。
+详尽的解释需要大量的篇幅。
+本文只是列出一些表达式和语句的例子，并非所有的表达式和语句的种类都包括，但是简单语句的所有种类都会被列出来。
 </p>
 
 <p class="anchor" id="expressions"></p>
-<h3>Some Expression Cases</h3>
+<h3>一些表达式的例子</h3>
 
 <p>
-Value literals, named constants and variables are all expressions.
-They also called elementary values.
+Go中大多数的表达式都是单值表达式。一个单值表达式只表示一个值。
+某些表达式可以表示多个值，它们被称为多值表达式。
 </p>
 
 <p>
-The operations (without the assignment parts) using the operators introduced in
-the article <a href="operators.html">common operators</a> are all expressions.
-There are more operator operations which will be introduced in other articles
-are also expressions.
+以后（不包括本文），如果没有特殊说明，当表达式这个词被提及的时候，它表示一个单值表达式。
 </p>
 
 <p>
-If a function returns exact one result,
-then its calls (without the assignment parts) are expressions.
-Calls of functions without results are not expressions.
-We have learned that a function call may return multiple results in the article
-<a href="function-declarations-and-calls.html">function declarations and calls</a>.
-Such function calls are called multi-valued expressions.
-Multi-value expressions can only be be used at some specific senarios.
-<p>
-
-<p>
-Most expressions in Go a single-valued expression.
-Later, out of the currrent article, unless otherwise specified,
-when an expression is mentioned, we mean it is a single-valued expression.
+前面的几篇文章介绍的字面值、变量和有名常量等均属于单值表达式。它们可称为基本表达式。
 </p>
 
 <p>
-Methods can be viewed as special functions.
-So the above mentioned function cases also apply to methods.
-Methods will be explained detailedly in the article
-<a href="method.html">method in Go</a> later.
+前面的<a href="operators.html">运算操作符</a>一文中介绍的运算符操作（不包括赋值部分）也都属于单值表达式。
 </p>
 
 <p>
-In fact, later we will learn that custom functions, including methods,
-are all function values, so they are also expressions.
-We can learn more about <a href="function.html">function types and values</a> later.
+如果一个函数至少返回一个值，则对它的调用属于表达式。
+特别的，如果此函数返回两个或两个以上的值，则对它的调用称为多值表达式。
+对不返回任何结果的函数的调用不属于表达式。
+<p>
+
+<p>
+以后的某篇文章中介绍的<a href="method.html">方法</a>可以看做是特殊的函数。
+所以上述对函数的解释同样适用于方法。
 </p>
 
 <p>
-Channel receive operations (without the assignment parts)
-are also expressions.
-Channel operations will be explained in the article
-<a href="channel.html">channels in Go</a> later.
+事实上，以后我们将会了解到自定义函数（包括方法）本身都属于函数类型的值，所以它们都是单值表达式。
 </p>
 
 <p>
-Some expressions may have optional results in Go.
-We can learn such expressions in other Go 101 articles later.
+数据通道的接收数据操作（不包括赋值部分）也属于表达式。数据通道以后将在<a href="channel.html">此文中</a>详解。
+</p>
+
+<p>
+Go中的一些表达式，包括刚提及的数据通道的接收数据操作，可能会表示可变数量的值。
+根据不同的场景，这样的表达式可能呈现为单值表达式，也可能呈现为多值表达式。
+我们将以后的文章中了解到这样的表达式。
 </p>
 
 <p class="anchor" id="simple-statements"></p>
-<h3>Simple Statement Cases</h3>
+<h3>简单语句类型列表</h3>
 
 <div>
-There are six kinds of simple statements.
+Go中有六种简单语句类型：
 
 <ol>
 <li>
-	short variable declaration forms
+	短变量声明语句。
 </li>
 <li>
-	pure value assignments (not mixing with variable declarations),
-	including <code>x op= y</code> operations.
+	纯赋值语句，包括<code>x op= y</code>这种运算形式。
 </li>
 <li>
-	function/method calls and channel receive operations without the assignment parts.
-	Some of these simple statements can also be used as expressions.
+	函数或方法调用，以及数据通道的接收数据操作。
+	上一节已经提到了，这些语句也可以用做表达式。
 </li>
 <li>
-	channel send operations.
+	数据通道的发送数据操作。上面已经提到过一次，数据通道以后将在<a href="channel.html">此文中</a>详解。
 </li>
 <li>
-	nothing (a.k.a., blank statements).
+	空语句。在下一篇文章我们将看到一些空语句的应用。
 </li>
 <li>
-	<code>x++</code> and <code>x--</code>.
+	自增（<code>x++</code>）和自减（<code>x--</code>）语句。
 </li>
 </ol>
 
 <p>
-Again. channel receive and sent operations will be incroduced in the article
-<a href="channel.html">channels in Go</a>.
+注意：自增和自减语句不能被当作表达式使用。
 </p>
 
 <p>
-Note, <code>x++</code> and <code>x--</code> can't be used as expressions.
-And Go doesn't support the <code>++x</code> and <code>--x</code> syntax forms.
+简单语句这个概念在Go中比较重要，所以请牢记这六种简单语句类型。
 </p>
 
 </div>
 
-<h3>Some Non-Simple Statement Cases</h3>
+<h3>一些非简单语句</h3>
 
 <div>
-An incomplete non-simple statements list:
+下面是一个非简单语句的不完整列表：
 
 <ul>
 <li>
-	standard variable declaration forms.
-	Yes, short variable declarations are simple statements,
-	but standard ones are not.
+	标准变量声明语句。是的，短声明语句属于简单语句，但是标准变量声明语句不属于。
 </li>
 <li>
-	named constant declarations.
+	（有名）常量声明语句。
 </li>
 <li>
-	custom type declarations.
+	类型声明语句。
 </li>
 <li>
-	package import declarations.
+	（代码）包引入语句。
 </li>
 <li>
-	explicit code blocks.
-	An explicit code block starts with a <code>{</code> and ends with a <code>}</code>.
-	A code block may contain many sub statements.
+	显式代码块。一个显式代码块起始于一个左大括号<code>{</code>，终止于一个右大括号<code>}</code>。
+	一个显式代码块中可以包含若干子声明语句。
 </li>
 <li>
-	function declarations.
-	A function declaration may contains many sub statements.
+	函数声明。
+	一个函数声明中可以包含若干子声明语句。
 </li>
 <li>
-	control flows and code execution jumps.
-	Each control flow is composed of many sub-statements.
-	The next article <a href="control-flows.html">basic control flows</a>
-	will introduce the basic control flows in Go.
+	流程控制跳转语句。详见下一章。
 </li>
 <li>
-	<code>return</code> lines in function declarations.
+	函数返回（<code>return</code>）语句。
 </li>
 <li>
-	deferred function calls and goroutine creations.
+	延迟函数调用和协程创建语句。下下篇文章将会介绍。
 </li>
 </ul>
 
 </div>
 
-<h3>Examples Of Expressions And Statements</h3>
+<h3>一些表达式和语句的例子</h3>
 
 <div>
 
-<pre class="line-numbers"><code class="language-go">// Some non-simple statements.
+<pre class="line-numbers"><code class="language-go">// 一些非简单语句：
 import "time"
 var a = 123
 const B = "Go"
@@ -182,35 +157,38 @@ func f() int {
 		break
 	}
 
-	// This is a solo explicit code block.
+	// 这是一个显式代码块。
 	{
 		// ...
 	}
 	return 567
 }
 
-// Some simple statements.
-c := make(chan bool) // c is a channel value of type "chan bool".
+// 一些简单语句的例子：
+c := make(chan bool) // c是一个类型为“chan bool”的数据通道值。
 a = 789
 a += 5
-f()     // here f() is a simple statement.
-a = f() // here f() is used as the source value of a pure assignment.
+f()     // 函数调用f()是一个简单语句
+a = f() // 这是一个纯赋值语句
 a++
 a--
-c <- true // a channel send operation (a simple statement).
-<-c       // a channel receive operation (used as a simple statement).
-z := <-c  // a channel receive operation (used as an expression).
+c <- true // 这是一个数据通道数据发送操作
+<-c       // 这是一个数据通道数据接受操作
+z := <-c  // 这是一个变量短声明语句
 
-// Some expressions.
+// 一些表达式的例子：
 123
 true
 B
 B + " language"
 a - 789
-a > 0 // an untyped boolean value
-f()   // an expression which can be viewed as an int value.
-f     // a function value of type "func ()".
-<-c   // an expression which can be viewed as a bool value.
+a > 0 // 一个类型未确定布尔值
+f()   // 一个类型为int的表达式
+f     // 一个类型为“func ()”的表达式
+<-c   // 一个类型为bool的表达式。（也可用作一个表达式）
 </code></pre>
+
+<p>
+</p>
 
 </div>

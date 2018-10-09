@@ -182,7 +182,7 @@ Go支持六种位运算符（也属于算术运算）：
 		</td>
 		<td style="vertical-align: middle;" class="text-left" rowspan="2">
 			<p>
-			左操作数必须为一个整数，右操作数的类型必须为一个无符号整数类型或者右操作数可以表示为<code>uint</code>值。
+			左操作数必须为一个整数，右操作数必须为一个无符号整数类型的类型确定值或者可以表示成<code>uint</code>值的类型不确定（常数）值。
 			</p>
 			
 			机制解释：
@@ -347,7 +347,7 @@ Go也支持3个一元算术运算符：
 对于移位运算，结果规则有点小复杂。首先移位运算的结果肯定都是整数。
 <ul>
 <li>
-	如果左操作数是一个类型确定值（必定为整数），则此移位运算的结果也是一个和左操作数类型相同的类型性确定值。
+	如果左操作数是一个类型确定值，则它的类型（必定为整数），则此移位运算的结果也是一个和左操作数类型相同的类型性确定值。
 </li>
 <li>
 	如果左操作数是一个类型不确定值<b>并且右操作数是一个常量</b>，则左操作数将总是被视为一个整数。
@@ -356,7 +356,7 @@ Go也支持3个一元算术运算符：
 </li>
 <li>
 	如果左操作数是一个类型不确定值<b>并且右操作数不是一个常量</b>，则左操作数将被首先转化为运算结果的期待设想类型。
-	如果期待设想类型并没有被指定，则左操作数的默认类型将被是为它的期待设想类型。
+	如果期待设想类型并没有被指定，则左操作数的默认类型将被视为它的期待设想类型。
 	如果此期待设想类型不是一个基本整数类型，则编译报错。
 	当然最终运算结果是一个类型为此期待设想类型的类型确定值。
 </li>
@@ -365,7 +365,7 @@ Go也支持3个一元算术运算符：
 一些非移位算术运算的例子：
 <pre class="line-numbers"><code class="language-go">func main() {
 	const X, Y, Z = 2, 'A', 3i // 三个类型不确定常量。它们的默认类型
-							   // 分别为：int、rune和complex64.
+	                           // 分别为：int、rune和complex64.
 	
 	var a, b int = X, Y // 两个类型确定值
 
@@ -374,7 +374,7 @@ Go也支持3个一元算术运算符：
 	f := a * b // 变量f的类型和a及b的类型一样：int。
 	g := Z * Y // 变量g的类型被推断为Z的默认类型：complex64。
 
-	println(X, Y, Z)	// 2 65 (+0.000000e+000+3.000000e+000i)
+	println(X, Y, Z)    // 2 65 (+0.000000e+000+3.000000e+000i)
 	println(d, e, f, g) // 67 63 130 (+0.000000e+000+1.950000e+002i)
 }
 </code></pre>
@@ -384,32 +384,53 @@ Go也支持3个一元算术运算符：
 
 一个移位算术运算的例子：
 <pre class="line-numbers"><code class="language-go">const N = 2
-const A = 3.0 << N	     // A == 6，它是一个默认类型为int的类型不确定值。
+const A = 3.0 << N       // A == 6，它是一个默认类型为int的类型不确定值。
 const B = int8(3.0) << N // B == 6，它是一个类型为int8的类型确定值。
 
 var m = uint(32)
 // 下面的三行是相互等价的。
 var x int64 = 1 << m  // 1的类型将被设想为int64，而不是int。
 var y = int64(1 << m) // 同上，1的类型将被设想为int64，而不是int。
-var z = int64(1) << m
+var z = int64(1) << m // 同上
 
-// 下面这几行编译不通过。
+// 下面这两行编译不通过。
 /*
-// error: 3.0的类型被视为期待设想类型为float64。左操作数不能为float64值。
-var _ = 3.0 << m
-// error: 1的类型被视为期待设想类型为float32。左操作数不能为float64值。
-var _ float32 = 1 << m
+var _ = 1.23 << m // error: shift of type float64
+const _ = 1 << B  // error: the right operand must be unsigned.
 */
 </code></pre>
 
 <p>
-上面提到的移位运算的最后一点类型推断规则有点反常。
-这条规则的主要原因是防止一些移位运算在32位架构和64位架构的机器上的运算结果出乎意外得不一致。
-比如如果上面一段代码中第<i>7</i>行和第<i>8</i>行的<code>1</code>的类型被推断为它的默认类型<code>int</code>，
+上面提到的移位运算结果的最后一点类型推断规则有点反常。
+这条规则的主要目的是为了防止一些移位运算在32位架构和64位架构的机器上的运算结果出现不一致的情况。
+比如如果上面一段代码中第<i>8</i>行（或第<i>7</i>行）的<code>1</code>的类型被推断为它的默认类型<code>int</code>，
 则在32位架构的机器上，<code>x</code>的取值将被截断为<i>0</i>，而在64位构架的机器上，<code>x</code>的取值将为<i>2<sup>32</sup></i>。
 因为<code>m</code>是一个变量，在32位架构的机器上，第<i>7</i>行和第<i>8</i>行并不会编译报错。
 这将导致Go程序员在不经意间写出没有料到的和难以觉察的bug。
-因此，第<i>7</i>行和第<i>8</i>行中的<code>1</code>的类型被推断为<code>int64</code>（最终的设想结果类型），而不是它的默认类型<code>int</code>。
+因此，第<i>7</i>行和第<i>8</i>行中的<code>1</code>的类型被推断为<code>int64</code>（最终的设想结果类型），而不是它们的默认类型<code>int</code>。
+</p>
+
+下面这段代码展示了对于左操作数为类型不确定值的移位运算，编译结果因右操作数是否为常量而带来的不同结果：
+
+<pre class="line-numbers"><code class="language-go">const n = uint(2)
+var m = uint(2)
+
+// 这两行编译没问题。
+var _ float64 = 1 << n
+var _ = float64(1 << n)
+
+// 这两行编译失败。
+var _ float64 = 1 << m  // error
+var _ = float64(1 << m) // error
+</code></pre>
+
+上面这段代码最后两行编译失败是因为它们都等价于下面这两行：
+
+<pre class="line-numbers"><code class="language-go">var _ = float64(1) << m
+var _ = 1.0 << m // error: shift of type float64
+</code></pre>
+
+<p>
 </p>
 
 </div>
@@ -529,10 +550,10 @@ println(b) // 20
 
 <div>
 <p>
-和很多其它流行语言一样，Go也支持递增（<code>++</code>）和递减（<code>--</code>）操作符。
-不过和其它语言不一样的是，递增（<code>aNumber++</code>）和递减（<code>aNumber--</code>）操作操作没有返回值，
+和很多其它流行语言一样，Go也支持自增（<code>++</code>）和自减（<code>--</code>）操作符。
+不过和其它语言不一样的是，自增（<code>aNumber++</code>）和自减（<code>aNumber--</code>）操作操作没有返回值，
 所以它们不能当做<a href="expressions-and-statements.html">表达式</a>来使用。
-另一个显著区别是，在Go中，递增（<code>++</code>）和递减（<code>--</code>）操作符只能后置，不能前置。
+另一个显著区别是，在Go中，自增（<code>++</code>）和自减（<code>--</code>）操作符只能后置，不能前置。
 </p>
 
 Example:
@@ -654,11 +675,11 @@ Go支持两种布尔二元运算符和一种布尔一元运算符。
 </p>
 
 机理解释：
-<pre><code class="language-go">// x	  y	 x && y	 x || y	!x	 !y
-true	true	true	   true	 false  false
-true	false   false	  true	 false  true
-false   true	false	  true	 true   false
-false   false   false	  false	true   true
+<pre><code class="language-go">// x    y       x && y   x || y   !x      !y
+true    true    true     true     false   false
+true    false   false    true     false   true
+false   true    false    true     true    false
+false   false   false    false    true    true
 </code></pre>
 
 <p>

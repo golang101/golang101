@@ -73,8 +73,20 @@
 	{{- else -}}
 	<div class="col-xs-6 col-sm-3 nav-item-inactive"><a href="/article/unofficial-faq.html">Go问答101</a></div>
 	{{- end -}}
-	
-	<div class="col-xs-6 col-sm-3 nav-item-inactive" style="color: #ccc;">Go技巧101</div>
+
+	{{- if $is_tips -}}
+	<div class="col-xs-6 col-sm-3 nav-item-active">Go Tips 101</div>
+	{{- else -}}
+	<div class="col-xs-6 col-sm-3 nav-item-inactive"><a href="/article/tips.html">Go技巧101</a></div>
+	{{- end -}}
+
+	<div class="col-xs-6 col-sm-3 nav-item-inactive" style="color: #ccc;">Go实战101</div>
+
+	<div class="col-xs-6 col-sm-3 nav-item-inactive" style="color: #ccc;">Go链接101</div>
+
+	<div class="col-xs-6 col-sm-3 nav-item-inactive" style="color: #ccc;">Go工具101</div>
+
+	<div class="col-xs-6 col-sm-3 nav-item-inactive" style="color: #ccc;">Go测验101</div>
 </div>
 {{ end }}
 

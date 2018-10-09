@@ -290,7 +290,9 @@ Go SDK 1.11引入了一个环境变量<code>GO111MODULE</code>。这个环境变
 
 <p>
 对于一个支持模块模式的代码包，其对应的<code>go.mod</code>文件中必须指定此<code>go.mod</code>文件所处的最内层文件夹对应的代码包的引入路径。
-指定引入路径的格式为<code>module ImportPath</code>。在这种模式下，只有和与此<code>go.mod</code>文件处于同一文件夹下的<code>vendor</code>文件夹才被视为特殊的文件夹。
+指定引入路径的格式为<code>module ImportPath</code>。
+在这种模式下，只有和与此<code>go.mod</code>文件处于同一文件夹下的<code>vendor</code>文件夹才被视为特殊的文件夹。
+并且请注意，如果<code>go</code>命令的选项<code>-mod=vendor</code>未提供，则此<code>vendor</code>文件夹的包将被忽略。
 </p>
 
 在支持模块模式的情形下，假设有一个如下的包层级结构，则：
