@@ -312,7 +312,7 @@ func main() {
 		*T // invalid recursive type alias T
 	}
 	*/
-	
+
 	// Following type definitions are all valid.
 	type T struct {
 		*T
@@ -324,16 +324,16 @@ func main() {
 	type F func(F) F
 	type Ch chan Ch
 	type P *P
-	
+
 	// ...
 	var s = make(S, 3)
 	s[0] = s
 	s = s[0][0][0][0][0][0][0][0]
-	
+
 	var m = M{}
 	m[1] = m
 	m = m[1][1][1][1][1][1][1][1]
-	
+
 	var p P
 	p = &p
 	p = ***********************p
@@ -359,7 +359,7 @@ func main() {
 	const iota = iota // ok
 	var true = true   // ok
 	_ = true
-	
+
 	// The following lines fail to compile.
 	/*
 	var c = d // can't reference variables declared later
@@ -413,7 +413,7 @@ func main() {
 			p5 = &x
 		}
 	}
-	
+
 	fmt.Println(*p0, *p1, *p2, *p3, *p4, *p5) // 9999 888 77 6 3 -3
 }
 </code></pre>
@@ -492,7 +492,7 @@ func int(){}       // shadows the built-in type identifier "int"
 func main() {
 	fmt.Println("a weird program")
 	var print = fmt.Println
-	
+
 	var fmt = [len]nil{{}, {}, {}} // shadows the package import "fmt".
 	// var n = len(fmt) // sorry, "len" is a constant.
 	var n = cap(fmt)    // use built-in cap function instead, :(

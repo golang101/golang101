@@ -135,7 +135,7 @@ Go支持六种位运算符（也属于算术运算）：
 			<p>
 			两个操作数的类型必须相同并且为基本整数数值类型。
 			</p>
-			
+
 			机制解释（下标<code>2</code>表明一个字面形式为二进制）：
 			<ul>
 			<li>
@@ -184,7 +184,7 @@ Go支持六种位运算符（也属于算术运算）：
 			<p>
 			左操作数必须为一个整数，右操作数必须为一个无符号整数类型的类型确定值或者可以表示成<code>uint</code>值的类型不确定（常数）值。
 			</p>
-			
+
 			机制解释：
 			<ul>
 			<li>
@@ -196,7 +196,7 @@ Go支持六种位运算符（也属于算术运算）：
 				得到 <code>1<sub>2</sub></code>（低位被舍弃）
 			</li>
 			</ul>
-			
+
 			<p>
 			如果左操作数的类型为一个有符号整数，则在右移位运算中，左操作数的符号位（即最高位）将总是保留在结果中。
 			比如如果左操作数<code>-128</code>的类型为<code>int8</code>（二进制表示为<code>10000000<sub>2</sub></code>），
@@ -366,7 +366,7 @@ Go也支持3个一元算术运算符：
 <pre class="line-numbers"><code class="language-go">func main() {
 	const X, Y, Z = 2, 'A', 3i // 三个类型不确定常量。它们的默认类型
 	                           // 分别为：int、rune和complex64.
-	
+
 	var a, b int = X, Y // 两个类型确定值
 
 	d := X + Y // 变量d的类型被推断为Y的默认类型：rune（亦即int32）。
@@ -466,11 +466,11 @@ var d = a << b // d == 254。同样，结果中溢出的高位bits将被截断�
 
 // 结果为类型不确定常量
 const X = 0x1FFFFFFFF * 0x1FFFFFFFF // 编译没问题，尽管X溢出它的默认类型int。
-const R = 'a' + 0x7FFFFFFF		    // 编译没问题，尽管R溢出它的默认类型rune。
+const R = 'a' + 0x7FFFFFFF          // 编译没问题，尽管R溢出它的默认类型rune。
 
 // 运算结果或者转换结果为类型确定常量
-var e = X				 // error: X溢出int。
-var h = R				 // error: R溢出rune。
+var e = X                // error: X溢出int。
+var h = R                // error: R溢出rune。
 const Y = 128 - int8(1)  // error: 128溢出 int8。
 const Z = uint8(255) + 1 // error: 256溢出uint8。
 </code></pre>
@@ -564,7 +564,7 @@ func main() {
 	a++ // okay
 	b-- // okay
 	c++ // oaky
-	
+
 	// 下面这些行编译不通过。
 	/*
 	_ = a++

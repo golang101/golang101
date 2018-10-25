@@ -1,88 +1,74 @@
-﻿<h1>Basic Control Flows</h1>
+﻿<h1>基本流程控制语法</h1>
 
 <p>
-The control flow code blocks in Go are much like other popular programming languages,
-but there are also many differences.
-This article will show these similarities and differences.
+Go中的流程控制语句和其它很多流行语言很类似，但是也有不少区别。
+本篇文章将列出所有这些相似点和不同点。
 </p>
 
-<h3>An Introduction Of Control Flows In Go</h3>
+<h3>Go中的流程控制语句简单介绍</h3>
 
 <div>
-There are three kinds of basic control flow code blocks in Go:
+Go语言中有三种基本的流程控制代码块：
 <ul>
 <li>
-	<code>if-else</code> two-way conditional execution block.
+	<code>if-else</code>条件分支代码块；
 </li>
 <li>
-	<code>for</code> loop block.
+	<code>for</code>循环代码块；
 </li>
 <li>
-	<code>switch-case</code> multi-way conditional execution block.
+	<code>switch-case</code>多条件分支代码块。
 </li>
 </ul>
 
-There are also some control flow code blocks which are related to some certain kinds of types in Go.
+Go中另外还有几种和特定种类的类型相关的流程控制代码块：
 <ul>
 <li>
-	<code>for-range</code> loop block for
-	<a href="container.html#iteration">container</a> types.
+	<a href="container.html#iteration">容器类型</a>相关的<code>for-range</code>循环代码块。
 </li>
 <li>
-	<code>type-switch</code> multi-way conditional execution block for
-	<a href="interface.html#type-switch">interface</a> types.
+	<a href="interface.html#type-switch">接口类型</a>相关的<code>type-switch</code>多条件分支代码块。
 </li>
 <li>
-	<code>select-case</code> block for
-	<a href="channel.html#select">channel</a> types.
+	<a href="channel.html#select">数据通道类型</a>相关的<code>select-case</code>多分支代码块。
 </li>
 </ul>
 
 <p>
-Like many other popular languages, Go also supports <code>break</code>,
-<code>continue</code> and <code>goto</code> code execution jump statements.
-Besides these, there is a special code jump statement in Go, <code>fallthrough</code>.
+和很多其它流行语言一样，Go也支持<code>break</code>、<code>continue</code>和<code>goto</code>等跳转语句。
+另外，Go还支持一个特有的<code>fallthrough</code>跳转语句。
 </p>
 
 <p>
-Among the six kinds of control flow blocks,
-execept the <code>if-else</code> control flow,
-the other five are call <b>breakable control flow blocks</b>.
-We can use <code>break</code> statements to make executions
-jump out of breakable control flow blocks.
+Go所支持的六种流程控制代码快中，除了<code>if-else</code>条件分支代码块，其它五种称为可跳出代码块。
+我们可以在一个可跳出代码块中使用<code>break</code>语句以跳出此代码块。
 </p>
 
 <p>
-<code>for</code> and <code>for-range</code> loop blocks are called
-<b>loop control flow blocks</b>.
-The other four kinds of control flow blocks can all be called as
-<b>conditional execution control flow blocks</b>.
-We can use <code>continue</code> statements to end a loop step in advance
-in a loop control flow block.
+我们可以在<code>for</code>和<code>for-range</code>两种循环代码块中使用<code>continue</code>语句提前结束一个循环步。
+除了这两种循环代码块，其它四种代码块成为分支代码块。
 </p>
 
 <p>
-Above mentioned control flow statements are all the ones in narrow sense.
-The mechanisms introduced in the next article
-(<a href="control-flows-more.html">goroutines, deferred function calls and
-panic/recover</a>) and the concurrency synchronization techniques introduced
-in the later article
-<a href="concurrent-synchronization-overview.html">concurrency synchronization overview</a>
-can be viewed as control flow statements in broad sense.
+请注意，上面所提及的每种流程控制的一个都属于一条语句。这样的语句常常会包含很多子语句。
 </p>
 
 <p>
-Only the basic control flow code blocks and code jump statements will be explained
-in the current article, other ones will be explained in
-many other Go 101 articles later.
+上面所提及的流程控制语句都属于狭义上的流程控制语句。
+下一篇文章中将要介绍的<a href="control-flows-more.html">协程、延迟调用和恐慌/恢复</a>，以及今后要介绍的<a href="concurrent-synchronization-overview.html">并发同步技术</a>属于广义上的流程控制语句。
+</p>
+
+<p>
+本文余下的部分将只解释三种基本的流程控制语句和各种代码跳转语句。其它上面提及的语句将在后面其它文章中逐渐介绍。
 </p>
 </div>
 
 <p class="anchor" id="if-else"></p>
-<h3><code>if-else</code> Control Flow Blocks</h3>
+<h3><code>if-else</code>条件分支控制代码块</h3>
 
 <div>
-The full form of a <code>if-else</code> code block is like
+一个<code>if-else</code>条件分支控制代码块的完整形式如下：
+
 <pre class="line-numbers"><code class="language-go">if InitSimpleStatement; Condition {
 	// do something
 } else {
@@ -91,29 +77,39 @@ The full form of a <code>if-else</code> code block is like
 </code></pre>
 
 <p>
-<code>if</code> and <code>else</code> are keywords.
-Like many other programming languages, the else-branch part is optional.
+<code>if</code>和<code>else</code>是两个关键字。
+和很多其它编程语言一样，<code>else</code>分支是可选的。
+</p>
+
+在一个<code>if-else</code>条件分支控制代码块中，
+<ul>
+<li>
+	<code>InitSimpleStatement</code>部分是可选的，如果它没被省略掉，则它必须为一条<a href="expressions-and-statements.html#simple-statements">简单语句</a>。
+	如果它被省略掉，它可以被视为一条空语句（简单语句的一种）。
+	在实际编程中，<code>InitSimpleStatement</code>常常为一条变量短声明语句。
+</li>
+<li>
+	<code>Condition</code>必须为一个结果为布尔值的<a href="expressions-and-statements.html#expressions">表达式</a>（它被称为条件表达式）。
+	<code>Condition</code>部分可以用一对小括号括起来，但大多数情况下不需要。
+</li>
+</ul>
+
+<p>
+注意，我们不能用一对小括号将<code>InitSimpleStatement</code>和<code>Condition</code>两部分括在一起。
 </p>
 
 <p>
-The <code>InitSimpleStatement</code> portion is also optional.
-It must a simple statement.
-If it is absent, we can view it as a blank statement.
-In practice, <code>InitSimpleStatement</code> is often
-a short variable declaration or a pure assignment.
-<code>Condition</code> must be an expression which result is a boolean value.
-The <code>Condition</code> portion can be enclosed in a pair of <code>()</code> or not,
-but it can't be enclosed together with the <code>InitSimpleStatement</code> portion.
+在执行一个<code>if-else</code>条件分支控制代码块中，如果<code>InitSimpleStatement</code>这条语句没有被省略，则此条语句将被率先执行。
+如果<code>InitSimpleStatement</code>被省略掉，则其后跟随的的分号<code>;</code>也可一块儿被省略。
 </p>
 
 <p>
-If the <code>InitSimpleStatement</code> in a <code>if-else</code> block is present,
-it will be executed before executing other statements in the <code>if-else</code> block.
-If the <code>InitSimpleStatement</code> is absent,
-then the semicolon following it is optional.
+每个<code>if-else</code>流程控制包含一个隐式代码块，一个<code>if</code>分支显式代码块和一个可选的<code>else</code>分支代码块。
+这两个分支代码块内嵌在这个隐式代码块中。
+在程序运行中，如果<code>Condition</code>条件表达式的估值结果为<code>true</code>，则<code>if</code>分支式代码块将被执行；否则，<code>else</code>分支代码块将被执行。
 </p>
 
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
@@ -131,7 +127,7 @@ func main() {
 		fmt.Println(n, "is an odd number.")
 	}
 	
-	n := rand.Int() % 2 // this n is not the above n.
+	n := rand.Int() % 2 // 此n不是上面声明的n
 	if n % 2 == 0 {
 		fmt.Println("An even number.")
 	}
@@ -145,19 +141,15 @@ func main() {
 <p>
 </p>
 
-
-
 <p>
-Each <code>if-else</code> control flow forms
-one implicit code block, one if-branch explicit code block and one optional else-branch code block.
-The else-branch code block can be implicit if the corresponding <code>else</code>
-is followed by another <code>if-else</code> code block.
-The two branch code blocks are both nested in the implicit code block.
-If the <code>InitSimpleStatement</code> in a <code>if-else</code> code block is a short variable declaration,
-then the declared variables will be viewed as declared in the nesting implicit code block.
+如果<code>InitSimpleStatement</code>语句是一个变量短声明语句，则在此语句中声明的变量被声明在外层的隐式代码块中。
 </p>
 
-Example:
+<p>
+可选的<code>else</code>分支代码块一般情况下必须为显式的，但是如果此分支为另外一个<code>if-else</code>块，则此分支代码块可以是隐式的。
+</p>
+
+另一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
@@ -172,57 +164,67 @@ func main() {
 		fmt.Println("Now is evening time.")
 	} else {
 		fmt.Println("Now is afternoon time.")
-		h := h // a new "h" variable shadows the above one.
+		h := h // 左h是一个新声明的变量，右h已经在上面声明了
 		_ = h
 	}
 	
-	// h is not visible here.
+	// 上面声明的两个h在此处都不可见。
 }
 </code></pre>
+
+<p>
+</p>
 
 </div>
 
 <p class="anchor" id="for"></p>
-<h3><code>for</code> Loop Control Flow Blocks</h3>
+<h3><code>for</code>循环代码块</h3>
 
 <div>
-The full form of a <code>for</code> loop block is
+<code>for</code>循环代码块的完整形式如下：
 <pre class="line-numbers"><code class="language-go">for InitSimpleStatement; Condition; PostSimpleStatement {
 	// do something
 }
 </code></pre>
 
 <p>
-<code>for</code> is a keyword.
-The <code>InitSimpleStatement</code> and <code>PostSimpleStatement</code> portions
-must be both simple statements, and the <code>PostSimpleStatement</code> portion
-must not be a short variable declaration.
-<code>Condition</code> must be an expression which result is a boolean value.
-The three portions are all optional.
+其中<code>for</code>是一个关键字。
+</p>
+
+在一个<code>for</code>循环代码块中，
+<ul>
+<li>
+	<code>InitSimpleStatement</code>（初始化语句）和<code>PostSimpleStatement</code>（步尾语句）两个部分必须均为简单语句，并且<code>PostSimpleStatement</code>不能为一个变量短声明语句。
+</li>
+<li>
+	<code>Condition</code>必须为一个结果为布尔值的表达式（它被称为条件表达式）。
+</li>
+</ul>
+
+<p>
+所有这三个刚提到的部分都是可选的。和很多其它流行语言不同，在Go中上述三部分不能用小括号括在一起。
 </p>
 
 <p>
-If the <code>InitSimpleStatement</code> in a <code>for</code> loop block is present,
-it will be executed only once before executing other statements in the <code>for</code> loop block.
+每个<code>for</code>流程控制包括至少两个子代码块。
+其中一个是隐式的，另一个是显式的（花括号起始和终止的部分，又称循环体）。
+此显式代码块内嵌在隐式代码块之中。
 </p>
 
 <p>
-The <code>Condition</code> expression will be evaluated at each loop step.
-If the evaluation result is <code>false</code>, then the loop will end.
-Otherwise the body of the loop will get executed.
+在一个<code>for</code>循环流程控制中，初始化语句（<code>InitSimpleStatement</code>）将被率先执行，并且只会被执行一次。
 </p>
 
 <p>
-The <code>PostSimpleStatement</code> will be executed at the end of each loop step.
+在每个循环步的开始，<code>Condition</code>条件表达式将被估值。如果估值结果为<code>false</code>，则循环立即结束；否则循环体（即显式代码块）将被执行。
 </p>
 
 <p>
-Unlike many other programming languages, the three parts following the <code>for</code>
-keyword can't be enclosed in a pair of <code>()</code>.
+在每个循环步的结尾，步尾语句（<code>PostSimpleStatement</code>）将被执行。
 </p>
 
-A <code>for</code> loop example. The example will print the integers from
-<code>0</code> to <code>9</code>.
+下面是一个使用<code>for</code>循环流程控制的例子。此程序将逐行打印出<code>0</code>到<code>9</code>十个数字。
+
 <pre class="line-numbers"><code class="language-go">for i := 0; i < 10; i++ {
 	fmt.Println(i)
 }
@@ -231,11 +233,9 @@ A <code>for</code> loop example. The example will print the integers from
 <p>
 </p>
 
-If the <code>InitSimpleStatement</code> and <code>PostSimpleStatement</code>
-portions are both absent (just view them as blank statements),
-their nearby two semicolons can be omitted.
-The form is called as condition-only <code>for</code> loop form.
-It is the same as the <code>while</code> loop in other languages.
+在一个<code>for</code>循环流程控制中，如果<code>InitSimpleStatement</code>和<code>PostSimpleStatement</code>两部分同时被省略（可将它们视为空语句），则和它们相邻的两个分号也可被省略。
+这样的形式被称为只有条件表达式的<code>for</code>循环。只有条件表达式的<code>for</code>循环和很多其它语言中的<code>while</code>循环类似。
+
 <pre class="line-numbers"><code class="language-go">var i = 0
 for ; i < 10; {
 	fmt.Println(i)
@@ -250,16 +250,16 @@ for i < 20 {
 <p>
 </p>
 
-If the <code>Condition</code> portion is absent,
-compilers will view it as <code>true</code>.
-<pre class="line-numbers"><code class="language-go">for i := 0; ; i++ { // same as: for i := 0; true; i++ {
+在一个<code>for</code>循环流程控制中，如果条件表达式部分被省略，则编译器视其为<code>true</code>。
+
+<pre class="line-numbers"><code class="language-go">for i := 0; ; i++ { // 等价于：for i := 0; true; i++ {
 	fmt.Println(i)
 	if i >= 10 {
 		break
 	}
 }
 
-// Following foure endless loops are equivalent to each other.
+// 下面这几个循环是等价的。
 for ; true; {
 }
 for true {
@@ -273,30 +273,23 @@ for {
 <p>
 </p>
 
-A <code>for</code> control flow forms two code blocks,
-one is implicit and one is explicit.
-The explicit one is nested in the implicit one.
-If the <code>InitSimpleStatement</code> in a <code>for</code> block is a short variable declaration,
-then the declared variables are only visible within the <code>for</code> block.
-For example,
-the following code snippet print <code>012</code> instead of <code>0</code>.
+在一个<code>for</code>循环流程控制中，如果初始化语句<code>InitSimpleStatement</code>是一个变量短声明语句，则在此语句中声明的变量被声明在外层的隐式代码块中。
+我们可以在内嵌的循环体（显式代码块）中声明同名变量来遮挡在<code>InitSimpleStatement</code>中声明的变量。
+比如下面的代码打印出<code>012</code>，而不是<code>0</code>。
+
 <pre class="line-numbers"><code class="language-go">for i := 0; i < 3; i++ {
 	fmt.Print(i)
-	i := i // The left i is a new declared variable,
-	       // and the right i is the loop variable.
-	i = 10 // The new delcared variable is modified,
-	       // but the old one (the loop variable) is not.
+	i := i // 这里声明的变量i遮挡了上面声明的i。
+	       // 右边的i为上面声明的i。
+	i = 10 // 新声明的i被更改了。
 }
 </code></pre>
 
 <p>
 </p>
 
-Like many other popular languages,
-a <code>break</code> statement can be used to make execution jump out of the
-<code>for</code> loop control flow block in advance,
-if the <code>for</code> loop control flow block is the innermost breakable
-control flow block containing the <code>break</code> statement.
+一条<code>break</code>语句可以用来提前跳出包含此<code>break</code>语句的最内层<code>for</code>循环。
+下面这段代码同样逐行打印出<code>0</code>到<code>9</code>十个数字。
 
 <pre class="line-numbers"><code class="language-go">i := 0
 for {
@@ -312,11 +305,8 @@ for {
 </p>
 
 
-Like many other popular languages,
-a <code>continue</code> statement can be used to end the current loop step
-in advance, if the <code>for</code> loop control flow block is the innermost
-loop control flow block containing the <code>continue</code> statement.
-For example, the following code snippet will print <code>13579</code>.
+一条<code>continue</code>语句可以被用来提前结束包含此<code>continue</code>语句的最内层<code>for</code>循环的当前循环步（步尾语句仍将得到执行）。
+比如下面这段代码将打印出<code>13579</code>。
 
 <pre class="line-numbers"><code class="language-go">for i := 0; i < 10; i++ {
 	if i % 2 == 0 {
@@ -329,16 +319,16 @@ For example, the following code snippet will print <code>13579</code>.
 </div>
 
 <p class="anchor" id="switch-case"></p>
-<h3><code>switch-case</code> Control Flow Blocks</h3>
+<h3><code>switch-case</code>流程控制代码块</h3>
 
 <div>
 
 <p>
-<code>switch-case</code> control flow block is
-another kind of conditional execution control flow block.
+<code>switch-case</code>流程控制代码块是另外一种多分支代码块。
 </p>
 
-The full form a <code>switch-case</code> block is
+一个<code>switch-case</code>流程控制代码块的完整形式为：
+
 <pre class="line-numbers"><code class="language-go">switch InitSimpleStatement; CompareOperand0 {
 case CompareOperandList1:
 	// do something
@@ -353,64 +343,58 @@ default:
 </code></pre>
 
 <p>
-<code>switch</code>, <code>case</code> and <code>default</code> are keywords.
-The <code>InitSimpleStatement</code> portion must be a simple statement.
-The <code>CompareOperand0</code> portion must be an expression which results
-a type value or an untyped value with a default type,
-so it can't be an untyped <code>nil</code>.
-Each of the <code>CompareOperandListX</code>
-(<code>X</code> may represent from <code>1</code> to <code>N</code>)
-portions must be a comma separated expression list.
-Each of these expressions must be comparable with <code>CompareOperand0</code>.
+其中<code>switch</code>、<code>case</code>和<code>default</code>是三个关键字。
+</p>
+
+在一个<code>switch-case</code>流程控制代码块中，
+<ul>
+<li>
+	<code>InitSimpleStatement</code>部分必须为一条简单语句，它是可选的。
+</li>
+<li>
+	<code>CompareOperand0</code>部分必须为一个表达式（如果它没被省略的话，见下）。
+	此表达式的估值结果总是被视为一个类型确定值。如果它是一个类型不确定值，则它被视为类型为它的默认类型的类型确定值。
+	因为这个原因，此表达式不能为类型不额定的<code>nil</code>值。
+	<code>CompareOperand0</code>常被称为switch表达式。
+</li>
+<li>
+	每个<code>CompareOperandListX</code>部分（<code>X</code>表示<code>1</code>到<code>N</code>）必须为一个用（英文）逗号分隔开来的表达式列表。
+	其中每个表达式都必须能和<code>CompareOperand0</code>表达式进行比较。
+	每个这样的表达式常被称为case表达式。
+	如果其中case表达式是一个类型不确定值，则它必须能够自动隐式转化为对应的switch表达式的类型，否则编译将失败。
+</li>
+</ul>
+
+<p>
+每个<code>case CompareOperandListX:</code>部分和<code>default:</code>之后形成了一个隐式代码块。
+每个这样的隐式代码块和它对应的<code>case CompareOperandListX:</code>或者<code>default:</code>形成了一个分支。
+每个分支都是可选的。
 </p>
 
 <p>
-Each <code>case CompareOperandListX:</code> or <code>default:</code>
-opens (and is followed by) an implicit code block.
-The implicit code block and that <code>case CompareOperandListX:</code> or <code>default:</code>
-forms a branch.
-Each such branch is optional to be present.
-We call an implicit code block in such a branch as a branch code block later.
+每个<code>switch-case</code>流程控制代码块中最多只能有一个<code>default</code>分支（默认分支）。
 </p>
 
 <p>
-There can be at most one <code>default</code> branch
-in a <code>switch-case</code> control flow block.
+除了刚提到的的分支代码块，每个<code>switch-case</code>流程控制至少包括其它两个代码块。
+其中一个是隐式的，另一个显式地。此显式的代码块内嵌在隐式的代码块之中。
+所有的分支代码块都内嵌在此显式代码块之中（因此也间接内嵌在刚提及的隐式代码块中）。
 </p>
 
 <p>
-Besides the branch code blocks,
-each <code>switch-case</code> control flow forms two code blocks,
-one is implicit and one is explicit.
-The explicit one is nested in the implicit one.
-All the branch code blocks are nested in the explicit one
-(and nested in the implicit one indirectly).
+<code>switch-case</code>代码块属于可跳出流程控制。
+<code>break</code>可以使用在一个<code>switch-case</code>流程控制的任何分支代码块之中以提前跳出此<code>switch-case</code>流程控制。
 </p>
 
 <p>
-<code>switch-case</code> control flow blocks are breakable,
-so <code>break</code> statements can also be used in any branch code block
-in a <code>switch-case</code> control flow block to make execution jump out of
-the <code>switch-case</code> control flow block in advance.
+当一个<code>switch-case</code>流程控制被执行到的时候，其中的简单语句<code>InitSimpleStatement</code>将率先被执行。
+随后switch表达式<code>CompareOperand0</code>将被估值（仅一次）。上面已经提到，此估值结果一定为一个类型确定值。
+然后此结果值将从上到下从左到右和各个<code>CompareOperandListX</code>表达式列表中的各个case表达式逐个依次比较（使用<code>==</code>运算符）。
+一旦发现某个表达式和<code>CompareOperand0</code>相等，比较过程停止并且此表达式对应的分支代码块将得到执行。
+如果没有任何一个表达式和<code>CompareOperand0</code>相等，则<code>default</code>默认分支将得到执行（如果此分支存在的话）。
 </p>
 
-<p>
-When a <code>switch-case</code> control flow gets executed,
-the <code>CompareOperand0</code> expression will be only evaluated once.
-The evaluation result is always a typed value.
-The evaluation result will be compared (by using the <code>==</code> operator)
-with the evaluation result of each expression in the
-<code>CompareOperandListX</code> expression lists,
-from top to down and from left to right.
-If an expression is found to be equal to <code>CompareOperand0</code>,
-the comparision process stops and the corresponding branch code block
-of the expression will be executed.
-If none expressions are found to be equal to <code>CompareOperand0</code>,
-the default branch code block
-(if it is present) will get executed.
-</p>
-
-A <code>switch-case</code> control flow example:
+一个<code>switch-case</code>流程控制的例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
@@ -425,15 +409,15 @@ func main() {
 	case 0:
 		fmt.Println(n, "is a multiple of 9.")
 
-		// Different from many other languages, in Go,
-		// the execution will automatically jumps out of the
-		// switch-case block at the end of each branch block.
-		// No "break" statement is needed here.
+		// 和很多其它语言不一样，程序不会自动从一个分支代码块跳到
+		// 下一个分支代码块去执行。所以，这里不需要一个break语句。
 	case 1, 2, 3:
 		fmt.Println(n, "mod 9 is 1, 2 or 3.")
-		break // here, this "break" statement is nonsense.
-	case 3, 4, 5, 6: // here, 3 is redundant.
+		break // 这里的break语句可有可无的，效果是一样的。
+		      // 执行不会跳到下一个分支。
+	case 4, 5, 6:
 		fmt.Println(n, "mod 9 is 4, 5 or 6.")
+	// case 6, 7, 8: // 此行可能编译不过，因为6和上一个case中的6重复了。
 	default:
 		fmt.Println(n, "mod 9 is 7 or 8.")
 	}
@@ -441,71 +425,81 @@ func main() {
 </code></pre>
 
 <p>
-The <code>rand.Intn</code> function returns a positive <code>int</code>
-random value which is smaller than the specified argument.
+在上例中，<code>rand.Intn</code>函数将返回一个从<code>0</code>到所传参数之间类型为<code>int</code>的随机数。
 </p>
 
-As the comments in the above example describes,
-unlike many other languages, in Go,
-at the end of each branch code block, the execution will automatically
-break out of the corresponding <code>switch-case</code> control block.
-Then how to let the execution slip into the next branch code block?
-Go provides a <code>fallthrough</code> keyword to do this task.
-For example, in the following example, every branch code block
-will get executed, by their orders, from top to down.
+<!--
+https://github.com/golang/go/issues/28357
+https://github.com/golang/go/blob/5a7cfbc0117bce314c3f079ece459173b9efc854/src/cmd/compile/internal/gc/swt.go#L637
+-->
+<p>
+注意，编译器可能会不允许一个<code>switch-case</code>流程控制中有任何两个case表达式可以在编译时刻确定相等的表达式。
+比如，当前的官方标准编译器（v1.11）认为上例中的<code>case 6, 7, 8</code>一行是不合法（如果此行未被注释掉）。但是其它编译器未必这么认为。
+事实上，当前的官方标准编译器<a href="https://github.com/golang/go/issues/28357">允许重复的布尔case表达式在同一个<code>switch-case</code>流程控制中出现</a>，
+而gccgo（v8.2）允许重复的布尔和字符串类型的case表达式在同一个<code>switch-case</code>流程控制中出现。
+</p>
+
+上面的例子中的前两个<code>case</code>分支中的注释已经解释了，和很多其它语言不一样，每个分支代码块的结尾不需要一条<code>break</code>语句就可以自动跳出当前的<code>switch-case</code>流程控制。
+那么如何让执行从一个<code>case</code>分支代码块的结尾跳入下一个分支代码块？Go提供了一个<code>fallthrough</code>关键字来完成这个任务。
+比如，在下面的例子中，所有的分支代码块都将得到执行（从上到下）。
 
 <pre class="line-numbers"><code class="language-go">rand.Seed(time.Now().UnixNano())
 switch n := rand.Intn(100) % 5; n {
 case 0, 1, 2, 3, 4:
 	fmt.Println("n =", n)
-	fallthrough // make the execution slip into the next branch.
+	fallthrough // 跳到下个代码块
 case 5, 6, 7, 8:
-	n := 99 // a new declared variable also called "n",
-	_ = n   // it is only visible in this branch code block.
+	n := 99 // 一个新声明的n，它只在当前分支代码快内可见。
+	fmt.Println("n =", n) // 99
 	fallthrough
 default:
-	fmt.Println(n) // this "n" is always smaller than 5.
+	// 下一行中的n和第一个分支中的n是同一个变量。
+	fmt.Println("n =", n)
 }
 </code></pre>
-
 
 <p>
 </p>
 
-Please note, a <code>fallthrough</code> statement
-must be the final statement in a branch.
-And a <code>fallthrough</code> statement can't show up
-in the final branch in a <code>switch-case</code> control flow block.
-For example, the following <code>fallthrough</code> usages are all illegal.
+请注意：
+<ul>
+<li>
+	一条<code>fallthrough</code>语句必须为一个分支代码块中的最后一条语句。
+</li>
+<li>
+	一条<code>fallthrough</code>语句不能出现在一个<code>switch-case</code>流程控制中的最后一个分支代码块中。
+</li>
+</ul>
+
+比如，下面代码的几个<code>fallthrough</code>使用是不合法的。
+
 <pre class="line-numbers"><code class="language-go">switch n := rand.Intn(100) % 5; n {
 case 0, 1, 2, 3, 4:
 	fmt.Println("n =", n)
+	// 此整个if代码块为当前分支中的最后一条语句
 	if true {
-		fallthrough // error: not the final statement in this branch.
+		fallthrough // error: 不是当前分支中的最后一条语句
 	}
 case 5, 6, 7, 8:
 	n := 99
-	fallthrough // error: not the final statement in this branch.
+	fallthrough // error: 不是当前分支中的最后一条语句
 	_ = n
 default:
 	fmt.Println(n)
-	fallthrough // error: shoud not show up in the final branch.
+	fallthrough // error: 不能出现在最后一个分支中
 }
 </code></pre>
 
 <p>
 </p>
 
-The <code>InitSimpleStatement</code> and <code>CompareOperand0</code> portions
-in a <code>switch-case</code> control flow are both optional.
-If the <code>CompareOperand0</code> portion is absent,
-it will be viewed as <code>true</code>,
-a typed value of the built-in type <code>bool</code>.
-If the <code>InitSimpleStatement</code> portion is absent,
-the semicolon following it can be omitted.
+<p>
+一个<code>switch-case</code>流程控制中的<code>InitSimpleStatement</code>语句和<code>CompareOperand0</code>表达式都是可选的。
+如果<code>CompareOperand0</code>表达式被省略，则它被认为类型为<code>bool</code>类型的<code>true</code>值。
+如果<code>InitSimpleStatement</code>语句被省略，其后的分号也可被一并省略。
+</p>
 
-And as above has mentioned, all branches are optional.
-So the following code blocks are all legal, all of them can be viewed as no-ops.
+上面已经它提到了一个<code>switch-case</code>流程控制中的的所有分支都可以被省略，所以下面的所有流程控制代码块都是合法的，它们都可以被视为空操作。
 
 <pre class="line-numbers"><code class="language-go">switch n := 5; n {
 }
@@ -523,11 +517,8 @@ switch {
 <p>
 </p>
 
-For the latter two <code>switch-case</code> control flow blocks in the last example,
-as above has mentioned, each of the absent <code>CompareOperand0</code>
-portions is viewed as a typed value <code>true</code>
-of the built-in type <code>bool</code>.
-So the following code snippet will print <code>hello</code>.
+上例中中的后两个<code>switch-case</code>流程控制中的<code>CompareOperand0</code>表达式都为<code>bool</code>类型的<code>true</code>值。
+同理，下例中的代码将打印出<code>hello</code>。
 
 <pre class="line-numbers"><code class="language-go">switch {
 case true: fmt.Println("hello")
@@ -541,11 +532,9 @@ default: fmt.Println("bye")
 
 <p class="anchor" id="default-branch-placement"></p>
 
-An obvious differences from many other languages is
-the order of the <code>default</code> branch
-in a <code>switch-case</code> control flow block can be arbitrary.
-For example, the following three <code>switch-case</code> control flow blocks
-are equivalent to each other.
+Go中另外一个和其它语言的显著不同点是<code>default</code>分支不必一定为最后一个分支。
+比如，下面的三个<code>switch-case</code>流程控制代码块是相互等价的。
+
 <pre class="line-numbers"><code class="language-go">switch n := rand.Intn(3); n {
 case 0: fmt.Println("n == 0")
 case 1: fmt.Println("n == 1")
@@ -570,31 +559,26 @@ case 1: fmt.Println("n == 1")
 
 </div>
 
-<h3><code>goto</code> Statement And Label Declaration</h3>
+<h3><code>goto</code>跳转语句和标签声明</h3>
 
 <div>
 
 <p>
-Like many other languages, Go also supports <code>goto</code> statement.
-A <code>goto</code> keyword must be followed a label to form a statement.
-A label is declared with the form <code>LabelName:</code>,
-where <code>LabelName</code> must be an identifier.
-A label which name is not the blank identifier must be used at least once.
+和很多其它语言一样，Go也支持<code>goto</code>跳转语句。
+在一个<code>goto</code>跳转语句中，<code>goto</code>关键字后必须跟随一个表明跳转到何处的标签。
+我们使用<code>LabelName:</code>这样的形式来声明一个名为<code>LabelName</code>的标签，
+其中<code>LabelName</code>必须为一个标识符。一个不为空标识符的标签声明后必须被使用至少一次。
 </p>
 
 <p>
-A <code>goto</code> statement will make the execution jump to the next statement
-following the declaration of the label used in the <code>goto</code> statement.
+一条标签声明之后必须立即跟随一条语句。如果此声明的标签使用在一条<code>goto</code>语句中，则当此条<code>goto</code>语句被执行的时候，执行将跳转到此标签声明后跟随的语句。
 </p>
 
 <p>
-A label must be declared within a function body.
-A use of a label can appear before or after the declaration of the label.
-But a label is not visiable (and can't appear) outside
-the code block the label is declared in.
+一个标签必须声明在一个函数体内，此标签的使用可以在此标签的声明之后或者之前，但是此标签的使用不能出现在此标签声明所处的最内层代码块之外。
 </p>
 
-An example using <code>goto</code> statement and label:
+下面这个例子使用标签声明和<code>goto</code>跳转语句来实现了一个循环：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -603,11 +587,11 @@ import "fmt"
 func main() {
 	i := 0
 	
-Next: // a label is declared.
+Next: // 标签声明
 	fmt.Println(i)
 	i++
 	if i < 5 {
-		goto Next // execution jumps
+		goto Next // 跳转
 	}
 }
 </code></pre>
@@ -615,9 +599,7 @@ Next: // a label is declared.
 <p>
 </p>
 
-As above has mentioned, a label is not visiable (and can't appear)
-outside the code block the label is declared in.
-So the following example fails to compile.
+上面刚提到了一个标签的使用不能出现在此标签声明所处的最内层代码块之外，所以下面的代码片段中的标签使用都是不合法的。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -637,13 +619,12 @@ goto Label1 // error
 </p>
 
 <p>
-Another note, if a label is declared within the scope of a variable,
-then the uses of the label can't appear before the declaration of the variable.
-(Identifier scopes will be explained in the article
-<a href="blocks-and-scopes.html">blocks and scopes in Go</a> later.)
+另外要注意的一点是，如果一个标签声明在某个变量的作用域内，则此标签的使用不能出现在此变量的声明之前。
+（关于变量的作用域，请阅读后面的文章<a href="blocks-and-scopes.html">代码块和作用域</a>）
 </p>
 
-The following example also fails to compile.
+下面这个程序编译不通过：
+
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -664,12 +645,11 @@ Exit: // this label is declared in the scope of k.
 </code></pre>
 
 <p>
-To make the above code compile okay,
-we must adjust the scope of the variable <code>k</code>.
-There are two ways to fix the problem in the last example.
+刚提到的这条规则<a href="https://github.com/golang/go/issues/26058">可能会在今后放宽</a>。
+目前，有两种途径可以对上面的程序略加修改以使之编译通过。
 </p>
 
-One way is to shrink the scope of the variable <code>k</code>.
+第一种途径是缩小变量<code>k</code>的作用域：
 <pre class="line-numbers"><code class="language-go">func main() func main() {
 	i := 0
 Next:
@@ -687,7 +667,7 @@ Exit:
 }
 </code></pre>
 
-The other way is to enlarge the scope of the variable <code>k</code>.
+第一种途径是放大变量<code>k</code>的作用域：
 <pre class="line-numbers"><code class="language-go">func main() {
 	var k int // move the declaration of k here.
 	i := 0
@@ -709,38 +689,29 @@ Exit:
 
 </div>
 
-<h3><code>break</code> And <code>continue</code> Statements With Labels</h3>
+<h3>跟随标签的<code>break</code>和<code>continue</code>跳转语句</h3>
 
 <p>
-A <code>goto</code> statement must contain a label.
-A <code>break</code> or <code>continue</code> statement can also
-contain a label, but the label is optional.
+一个<code>goto</code>语句必须包含一个标签名。
+一个<code>break</code>或者<code>continue</code>语句也可以包含一个标签名，但此标签名是可选的。
+包含标签名的<code>break</code>语句一般用于嵌套可跳出流程控制代码块中。
+包含标签名的<code>continue</code>语句一般用于嵌套循环流程控制代码块中。
 </p>
 
 <p>
-If a <code>break</code> statement contain a label,
-the label must be declared just before a breakable control flow block
-which contains the <code>break</code> statement.
-We can view the label name as the name of the breakable control flow block.
-The <code>break</code> statement will make execution jump out of
-the breakable control flow block, even if the breakable control flow block
-is not the innermost breakable control flow block containing
-<code>break</code> statement.
+如果一条<code>break</code>语句中包含一个标签名，则此标签必须刚好声明在一个包含此<code>break</code>语句的可跳出流程控制代码块之前。
+我们可以把此标签名看做是其后紧跟随的可跳出流程控制代码块的名称。
+此<code>break</code>语句将立即结束此可跳出流程控制代码块的执行。
 </p>
 
 <p>
-If a <code>continue</code> statement contain a label,
-the label must be declared just before a loop control flow block
-which contains the <code>continue</code> statement.
-We can view the label name as the name of the loop control flow block.
-The <code>continue</code> statement will end the current loop step of
-the loop control flow block in advance, even if the loop control flow block
-is not the innermost loop control flow block containing
-the <code>continue</code> statement.
+如果一条<code>continue</code>语句中包含一个标签名，则此标签必须刚好声明在一个包含此<code>continue</code>语句的循环流程控制代码块之前。
+我们可以把此标签名看做是其后紧跟随的循环流程控制代码块的名称。
+此<code>continue</code>语句将提前结束结束此循环流程控制代码块的执行。
 </p>
 
-The foloowing is an example of using <code>break</code>
-and <code>continue</code> statements with labels.
+下面是一个使用了包含标签名的<code>break</code>和<code>continue</code>语句的例子。
+
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -763,7 +734,8 @@ Outer:
 func main() {
 	for i := 90; i < 100; i++ {
 		n := FindSmallestPrimeLargerThan(i)
-		fmt.Println("The smallest prime number larger than", i, "is", n)
+		fmt.Print("最小的比", i, "大的素数为", n)
+		fmt.Println()
 	}
 }
 </code></pre>
