@@ -1,50 +1,33 @@
-﻿<h1>Goroutines, Deferred Function Calls And Panic/Recover</h1>
+﻿<h1>协程、延迟函数调用、以及恐慌和恢复</h1>
 
 <p>
-This article will introduce goroutines and deferred function calls.
-Goroutine and deferred function call are two unique features in Go.
-Panic and recover mechanism will also be simply explained in this article.
-Not all knowledge relating to the these features is covered in the
-current article, other ones will be introduced in other articles later.
+此篇文章将介绍协程和延迟函数调用。协程和延迟函数调用是Go中比较独特的两个特性。
+恐慌和恢复也将在此篇文章中简单介绍。本文并非全面得对这些特性进行介绍，后面的其它文章会陆续补全本文的未介绍的内容。
 </p>
 
-<h3>Goroutines</h3>
+<h3>协程（Goroutine）</h3>
 
 <p>
-Goroutines are also often called green threads.
-Green threads are maintained and scheduled by
-language runtime instead of operation systems.
-The cost, such as memory consumption and context switching,
-of a goroutine is much smaller than an OS thread.
-So it is not a problem for a Go program to maintain tons of thousand
-goroutines at the same time, as long as the system memory is sufficient.
+协程有时也被称为绿色线程。绿色线程是由程序的运行时维护的线程。一个绿色线程的开销，比如内存消耗和情景转换，比一个系统线程常常小得多。
+只要内存充足，一个程序可以轻松支持上万个并发协程。
 </p>
 
 <p>
-Go doesn't support creating system threads in user code.
-So using goroutines is the only way to do concurrent programing
-(program scope) in Go.
+Go不支持创建系统线程，所以协程是一个Go程序内部唯一的并发实现方式。
 </p>
 
 <p>
-Each Go program starts with only one goroutine,
-we call it the main goroutine, at the beginning.
-A goroutine can create new goroutines.
-It is super easy to create a new goroutine in Go,
-just make a function call follow a <code>go</code> keyword,
-then the function call will be executed in a new created goroutine.
-The new created goroutine will exit alongside the exit of the called function.
+每个Go程序启动个时候只有一个对用户可见的协程，我们称之为主协程。
+一个协程可以开启更多其它新的协程。在Go中，开启一个新的协程是非常轻松的。
+我们只需在一个函数调用之前使用一个<code>go</code>关键字，即可让此函数调用运行在一个新的协程之中。
+当此函数调用退出后，这个新的协程也随之结束了。我们可以称此函数调用为一个协程调用（或者为此协程的启动调用）。
+一个协程调用的所有返回值（如果存在的话）必须被全被舍弃。
 </p>
 
 <div>
-All the result values of a goroutine function call
-(if the called function has return results)
-must be discarded in the function call statement.
-The following is an example which creates two new goroutines
-in the main goroutine.
-In the example, <code>time.Duration</code> is a custom type defined
-in the <code>time</code> standard package.
-It is defined as the built-in type <code>int64</code>.
+下面的例子程序在主协程中创建了两个新的协程。在此例中，<code>time.Duration</code>是一个在<code>time</code>标准库包中定义的类型。
+此类型的底层类型（见<a href="type-system-overview.html#underlying-type">下一篇文章</a>）为内置类型<code>int64</code>。
+
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
@@ -54,10 +37,10 @@ import (
 )
 
 func SayGreetings(greeting string, times int) {
-	for i := 0; i < 10; i++ {
+	for i := 0; i < times; i++ {
 		log.Println(greeting)
 		d := time.Second * time.Duration(rand.Intn(5)) / 2
-		time.Sleep(d)
+		time.Sleep(d) // 睡眠片刻（随机0到2.5秒）
 	}
 }
 
@@ -70,10 +53,9 @@ func main() {
 }
 </code></pre>
 
-Quite easy. Right? We do concurrent programming now!
-The above program will have three user created goroutines running
-simultaneously at its peak at run time.
-Let's run it. One possible output result:
+非常简单！我们编写了一个并发（Concurrent）程序！
+此程序在运行时在某一时刻将很可能会有三个协程并存。
+运行之，可能会得到如下的结果（也可能是其它结果）：
 
 <pre class="output"><code>hi!
 hello!
@@ -87,54 +69,44 @@ hi!
 </p>
 
 <p>
-When the main goroutine exits, the whole program also exits.
+当一个程序的主协程退出后，此程序也就退出了，即使还有一些其它协程在运行。
 </p>
 
 <p>
-Unlike previous articles, this program uses the <code>Println</code>
-function in the <code>log</code> standard package instead of the
-corresponding function in the <code>fmt</code> standard package.
-The reason is the print functions in the <code>log</code> standard
-package are synchronized, so the texts printed by the two goroutines
-will not be messed up in one line (though the chance the printed texts
-being messed up by using the print functions in the <code>fmt</code>
-standard package is low for this specified program).
+和前面的几篇文章不同，上面的例子程序使用了<code>log</code>标准库而不是<code>fmt</code>标准库中的<code>Println</code>函数。
+原因是<code>log</code>标准库中的打印函数是经过了同步处理的，而<code>fmt</code>标准库中的打印函数却没有被同步。
+如果我们在上例中使用<code>fmt</code>标准库中的<code>Println</code>函数，则不同协程的打印可能会交织在一起（虽然对此例来说交织的概率很低）。
 </p>
 
 </div>
 
-<h3>Concurrency Synchronization</h3>
+<h3>并发同步（Concurrency Synchronization）</h3>
 
 <div>
 <p>
-The above program is not perfect.
-The two new goroutines are intended to print ten greetings each.
-However, the main goroutine will exit in two seconds,
-so many greatings have not a chance to get printed.
-How to let the main goroutine know when the two new goroutines
-have both finished their tasks?
-We must use some a concurrency synchronization technique.
+上面这个并发程序是有缺陷的。我们本期望每个新创建的协程打印出10条问候语，但是主协程（和程序）在这20条问候语还未都打印出来的时候就退出了。
+如何确保主协程在这20条问候语都打印完毕之后才退出呢？我们必须使用某种并发同步技术来达成这一目标。
 </p>
 
 <p>
-Go supports several
-<a href="concurrent-synchronization-overview.html">concurrency synchronization
-techniques</a>. Among these techniques,
-<a href="channel.html">channel</a> is the most unique and popularly used one.
-However, here will use one another technique,
-the <code>WaitGroup</code> type in the <code>sync</code> standard package,
-to do synchronizations between the two new goroutines and the main goroutine.
+Go支持几种<a href="concurrent-synchronization-overview.html">并发同步技术</a>。
+其中， <a href="channel.html">数据通道</a>是最独特和最常用的。
+但是，为了简单起见，这里我们将使用<code>sync</code>标准库包中的<code>WaitGroup</code>来同步上面这个程序中的主协程和两个新创建的协程。
 </p>
 
-<p>
-The <code>WaitGroup</code> type has three methods, <code>Add</code>,
-<code>Done</code> and <code>Wait</code>.
-This type will be explained detailedly later in another article.
-Here we can simply think the <code>Add</code> method is used to register
-number of new tasks, the <code>Done</code> method is used to notify
-that a task is finished, and the <code>Wait</code> method makes the caller
-goroutine become blocking until all registered tasks are finished.
-</p>
+<code>WaitGroup</code>类型有三个方法（特殊的函数，将在以后的文章中详解）：<code>Add</code>、<code>Done</code>和<code>Wait</code>。
+此类型将在后面的某篇文章中详细解释，目前我们可以简单地认为：
+<ul>
+<li>
+	<code>Add</code>方法用来注册新的需要完成的任务数。
+</li>
+<li>
+	<code>Done</code>方法用来通知某个任务已经完成了。
+</li>
+<li>
+	一个<code>Wait</code>方法调用将阻塞（等待）到所有任务都已经完成之后才继续执行其后的语句。
+</li>
+</ul>
 
 Example:
 <pre class="line-numbers"><code class="language-go">package main
@@ -149,74 +121,63 @@ import (
 var wg sync.WaitGroup
 
 func SayGreetings(greeting string, times int) {
-	for i := 0; i < 10; i++ {
+	for i := 0; i < times; i++ {
 		log.Println(greeting)
 		d := time.Second * time.Duration(rand.Intn(5)) / 2
 		time.Sleep(d)
 	}
-	wg.Done() // notify a task is finished.
+	wg.Done() // 通知当前任务已经完成。
 }
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
 	log.SetFlags(0)
-	wg.Add(2) // register two tasks.
+	wg.Add(2) // 注册两个新任务。
 	go SayGreetings("hi!", 10)
 	go SayGreetings("hello!", 10)
-	wg.Wait() // block until all tasks are finished.
+	wg.Wait() // 阻塞在这里，直到所有任务都已完成。
 }
 </code></pre>
 
 <p>
-Run it, we can find that, before the program exits,
-each of the two new goroutines prints ten greetings.
+运行这个修改后的程序，我们将会发现所有的20条问候语都将在程序退出之前打印出来。
 </p>
 
 </div>
 
 <p class="anchor" id="states-of-goroutine"></p>
-<h3>Goroutine States</h3>
+<h3>协程的状态</h3>
 
 <div>
 <p>
-The last example shows that a live goroutine may stay in (and switch between)
-two states, <b>running</b> and <b>blocking</b>.
-In that example, the main goroutine enters the blocking state when the
-<code>wg.Wait</code> method is called, and enter running state again
-when the other two goroutines both finish their respective tasks.
+从上面这个的例子，我们可以看到一个活动中的协程可以处于两个状态：<b>运行状态</b>和<b>阻塞状态</b>。一个协程可以在这两个状态之间切换。
+比如上例中的主协程在调用<code>wg.Wait</code>方法的时候，将从运行状态切换到阻塞状态；当两个新协程完成各自的任务后，主协程将从阻塞状态切换回运行状态。
 </p>
 
 <p>
-The following picuture depicts a possible lifecycle of a goroutine.
+下面的图片显示了一个协程的生命周期。
 <br/>
 <img src="res/goroutine-states.png">
 </p>
 
 <p>
-A goroutine in sleeping (by calling <code>time.Sleep</code> function)
-or waiting the response of a syscall or a netword connnection
-is viewed as staying in running state.
+注意，一个处于睡眠中的（通过调用<code>time.Sleep</code>）或者在等待系统调用返回的协程被认为是处于运行状态，而不是阻塞状态。
 </p>
 
 <p>
-When a new goroutine is created, it will enter running state automatically.
-Goroutines can only exit from running state, and never from blocking state.
-If, for any reason, a goroutine stays in blocking state for ever,
-then it will never exit.
-Such cases, except some rare ones, should be avoided in concurrent programming.
+当一个新协程被创建的时候，它将自动进入运行状态，一个协程只能从运行状态而不能从阻塞状态退出。
+如果因为某种原因而导致某个协程一直处于阻塞状态，则此协程将永远不会退出。
+除了极个别的应用场景，在编程时我们应该尽量避免出现这样的情形。
 </p>
 
 <p>
-A blocking goroutine can only be unblocked by
-an operation made in another goroutine.
-If all goroutines in a Go program are in blocking state,
-then all of they will stay in blocking state for ever.
-This can be viewed as an overall deadlock.
-When this happens in a program, the standard Go runtime
-will try to crash the program.
+一个处于阻塞状态的协程不会自发结束阻塞状态，它必须被另外一个协程通过各种并发同步方法来被动地结束阻塞状态。
+如果一个运行中的程序当前所有的协程都出于阻塞状态，则这些协程将永远阻塞下去，程序将视为死锁了。
+当一个程序死锁后，官方标准编译器的处理是让这个程序崩溃。
 </p>
 
-The following program will ctash, after two seconds:
+比如下面这个程序将在运行两秒钟后崩溃。
+
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
@@ -230,106 +191,76 @@ func main() {
 	wg.Add(1)
 	go func() {
 		time.Sleep(time.Second * 2)
-		wg.Wait()
+		wg.Wait() // 阻塞在此
 	}()
-	wg.Wait()
+	wg.Wait() // 阻塞在此
 }
 </code></pre>
 
-The output:
+它的输出：
 <pre class="output"><code>fatal error: all goroutines are asleep - deadlock!
 
 ...
 </code></pre>
 
 <p>
-Later, we will learn more operations which will make goroutines
-enter blocking state.
+以后我们将学习到更多可以让一个协程进入到阻塞状态的操作。
 </p>
 
 </div>
 
-<h3>Goroutine Schedule</h3>
+<h3>协程的调度</h3>
 
 <p>
-Not all goroutines in running state are being executed at a given time.
-At any given time, the maximum number of goroutines being executed will
-not exceed the number of the logical CPUs available for the current program.
-We can call the <a href="https://golang.org/pkg/runtime/#NumCPU"><code>runtime.NumCPU</code></a>
-function to get the number of logical CPUs avaliable for the current program.
-Each logical CPU can only execute one goroutine at any given time.
-Go runtime must frequently switches execution contexts between goroutines
-to let each running goroutine have chances to execute.
-This is similar to how operation systems switch execution contexts between OS threads.
+并非所有处于运行状态的协程都在执行。在任一时刻，只能最多有和逻辑CPU数目一样多的协程在同时执行。
+我们可以调用<a href="https://golang.org/pkg/runtime/#NumCPU"><code>runtime.NumCPU</code></a>函数来查询当前程序可利用的逻辑CPU数目。
+每个逻辑CPU在同一时刻只能最多执行一个协程。Go运行时必须让逻辑CPU频繁地在不同的处于运行状态的协程之间切换，从而每个处于运行状态的协程都有机会得到执行。
+这和操作系统执行系统线程的原理是一样的。
 </p>
 
 <p>
-The following picture depicts a more detailed possible lifecycle for a goroutine.
-In the picture, the running state is divided into several more sub-states.
-A goroutine in the queuing sub-state is waiting to be executed.
-A goroutine in the executing sub-state may enter the queuing sub-state
-again when it has been executed for a while (a very small piece of time).
+下面这张图显示了一个协程的更详细的生命周期。在此图中，运行状态被细分成了多个子状态。
+一个处于排队子状态的协程等待着进入执行子状态。一个处于执行子状态的协程在被执行一会儿（非常短的的时间片）之后将进入排队子状态。
 <br/>
 <img src="res/goroutine-schedule.png">
 </p>
 
 <p>
-Please notes, for explanation simplicity, the sub-states shown in the above
-picture will be not mentioned in other articles in Go 101.
-And, in Go 101, the sleeping and system calling sub-states are not viewed
-as sub-states of the blocking state.
+请注意，为了解释的简单性，在以后其它的Golang 101文章中，上图中所示的子状态将不会再提及。
+重申以下，睡眠和等待系统调用返回子状态被认为是运行状态，而不是阻塞状态。
 </p>
 
 <p>
-The standard Go runtime adopts the
-<a href="https://docs.google.com/document/d/1TTj4T2JO42uD5ID9e89oa0sLKhJYD0Y_kqxDv3I3XMw">M-P-G model</a>
-to do the goroutine schedule job,
-where <b>M</b> represents OS threads,
-<b>P</b> represents logical/virtual processors (not logical CPUs)
-and <b>G</b> represents goroutines.
-Most the schedule work is made by logical processors (<b>P</b>s),
-which act as brokers by attach goroutines (<b>G</b>s) to OS threads (<b>M</b>s).
-Each OS thread can only be attached to at most one goroutine at any given time,
-and each goroutine can only be attached to at most one OS thread at any given time.
-A goroutine can only get executed when it is attached to an OS thread.
-A goroutine which has been executed for a while will try to detach itself from the corresponding OS thread,
-so that other running goroutines can have chances to get attached and executed.
+官方标准Go编译器采纳了一种被称为<a href="https://docs.google.com/document/d/1TTj4T2JO42uD5ID9e89oa0sLKhJYD0Y_kqxDv3I3XMw">M-P-G模型</a>的算法来实现协程调度。
+其中，<b>M</b>表示系统线程，<b>P</b>表示逻辑处理器（并非上述的逻辑CPU），<b>G</b>表示协程。
+大多数的调度工作是通过逻辑处理器（<b>P</b>）来完成的。
+逻辑处理器像一个监工一样通过将不同的处于运行状态协程（<b>G</b>）交给不同的系统线程（<b>M</b>）来执行。
+一个协程在同一时刻只能在一个系统线程中执行。一个执行中的协程将自发地脱离让出一个系统线程，从而使得其它处于等待子状态的协程得到执行机会。
 </p>
 
 <p>
-At runtime. we can call the <a href="https://golang.org/pkg/runtime/#GOMAXPROCS"><code>runtime.GOMAXPROCS</code></a>
-function to get and set the number of logical processors (<b>P</b>s).
-For the standard Go runtime, before Go 1.5, the default initial value of this number is <code>1</code>,
-but since Go 1.5, the default initial value of this number is equal to
-the number of logical CPUs avaiable for the current running program.
-The default initial value (the number of logical CPUs) is the best choice for most programs.
-The default initial value can also be set through the <code>GOMAXPROCS</code> environment variable.
+在运行时，我们可以调用<a href="https://golang.org/pkg/runtime/#GOMAXPROCS"><code>runtime.GOMAXPROCS</code></a>函数来获取和设置逻辑处理器的的数量。
+对于官方标准编译器，在Go 1.5之前，默认初始逻辑处理器的数量为1；自从Go 1.5之后，默认初始逻辑处理器的数量和逻辑CPU的数量一致。
+此新的默认设置在大多数情况下是最佳选择。我们也可以通过设置<code>GOMAXPROCS</code>环境变量来设置一个Go程序的初始逻辑处理器数量。
 </p>
 
 <p class="anchor" id="defer"></p>
-<h3>Deferred Function Calls</h3>
+<h3>延迟函数调用（Deferred Function Calls）</h3>
 
 <div>
 <p>
-A deferred function call is a function call which follows a <code>defer</code> keyword.
-Like goroutine function calls,
-all the result values of the function call (if the called function has return results)
-must be discarded in the function call statement.
+在Go中，一个函数调用可以跟在一个<code>defer</code>关键字后面，形成一个延迟函数调用。
+和协程调用类似，被延迟的函数调用的所有返回值必须全部被舍弃。
 </p>
 
 <p>
-When a function call is deferred, it is not executed immediately.
-It will be push into a defer-call stack maintained by its caller goroutine.
-When a function call <code>fc</code> returns and enters its exiting phase,
-all the deferred function calls pushed in the function call (<code>fc</code>)
-(which has not exited yet) will be executed,
-by their inverse orders being pushed into the defer-call stack.
-Once all these deferred calls are executed,
-the function call <code>fc</code> exits.
+当一个函数调用被延迟后，它不会立即被执行。它将被推入由当前协程维护的一个延迟调用堆栈。
+当一个函数调用（可能是或者不是一个延迟调用）返回并进入它的<a href="function-declarations-and-calls.html#existing-phase">退出阶段</a>后，所有在此函数调用中已经被推入的延迟调用将被按照它们被推入堆栈的顺序逆序执行。
+当所有这些延迟调用执行完毕后，此函数调用也就真正退出了。
 </p>
 
-Here is a simple example to show how to use deferred function calls.
-In the example, <code>defer</code> are keywords.
+下面这个例子展示了如何使用延迟调用函数。
+
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -350,23 +281,19 @@ The third line.
 <p>
 </p>
 
-Each goroutine maintain two call stacks,
-the normal-call stack and defer-call stack.
+事实上，每个协程维护着两个调用堆栈。
 <ul>
 <li>
-	For two adjacent function calls in the normal-call stack of a goroutine,
-	The later pushed one is called by the earlier pushed one.
-	The bottom function call in the normal-call stack is the function call
-	following the <code>go</code> keyword.
+	一个是正常的函数调用堆栈。在此堆栈中，相邻的的两个调用存在着调用关系。晚进入堆栈的调用被早进入堆栈的调用所调用。
+	此堆栈的中最早被推入的调用是对应协程的启动调用。
 </li>
 <li>
-	The functions calls in the defer-call stack have no calling relations.
+	另一个堆栈是上面提到的延迟调用堆栈。处于延迟调用堆栈中的任意两个调用之间不存在调用关系。
 </li>
 </ul>
 
-Here is another example which is a little more complex.
-The example will print <code>0</code> to <code>9</code>,
-each per line, by their natural order.
+下面是另一个略微复杂一点的使用了延迟调用的例子程序。此程序将按照自然数的顺序打印出0到9十个数字。
+
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -398,18 +325,18 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="defer-modify-resutls"></p>
-<h3>Deferred Anonymous Functions Can Modify The Named Return Results Of Nesting Functions</h3>
+<p class="anchor" id="defer-modify-results"></p>
+<h3>一个延迟调用可以修改包含此延迟调用的最内层函数的返回值</h3>
 
 <div>
-For example,
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
 func Triple(n int) (r int) {
 	defer func() {
-		r += n // modify the return value
+		r += n // 修改返回值
 	}()
 	
 	return n + n // <=> r = n + n; return
@@ -421,45 +348,37 @@ func main() {
 </code></pre>
 </div>
 
-<h3>The Necessary And Benefits Of The Defered Function Feature</h3>
+<h3>延迟函数调用的必要性和好处</h3>
 
 <p>
-In the above examples, the deferred function calls are not absolutely necessary.
-However, the deferred function call feature is a necessary feature for the
-panic and recover mechanism which will be introduced below.
+事实上，上面的几个使用了延迟函数调用的例子中的延迟函数调用必非绝对必要。
+但是延迟调用对于下面将要介绍的恐慌/恢复特性是必要的。
 </p>
 
 <p>
-Deferred function calls can also help us write more clean and robust code.
-We can read more code examples by using deferred functtion calls
-and learn more details on deferred function cals in the article
-<a href="defer-more.html">more about deferred functions</a> later.
+延迟函数调用可以帮助我们写出更整洁和更鲁棒的代码。我们可以在后面的<a href="defer-more.html">更多关于延迟调用</a>一文中读到这样的例子。
 </p>
 
 <p class="anchor" id="argument-evaluation-moment"></p>
-<h3>The Evaluation Moment Of The Arguments Of Deferred And Goroutine Function Calls</h3>
+<h3>协程和延迟调用的实参的估值时刻</h3>
 
 <div>
-The arguments of a deferred function call or a goroutine function call are all
-evaluated at the moment when the function call is invoked.
+一个协程调用或者延迟调用的实参是在此调用发生时被估值的。更具体的说，
 <ul>
 <li>
-	For a deferred function call, the invocation moment is the moment
-	when it is pushed into the defer-call stack of its caller goroutine.
+	对于一个延迟函数调用，它的实参是在此调用被推入延迟调用堆栈的时候被估值的。
 </li>
 <li>
-	For a goroutine function call, the invocation moment is
-	the moment when the corresponding goroutine is created.
+	对于一个协程调用，它的实参是在此协程被创建的时候估值的。
 </li>
 </ul>
 
 <p>
-The arguments of each function call nested in a deferred function call
-or a goroutine function call are evaluated at the moment when that nested
-function call is invoked.
+一个匿名函数体内的表达式是在此函数被执行的时候才会被逐个估值的，不管此函数是被普通调用还是延迟/协程调用。
 </p>
 
-Here is an example.
+一个例子：
+
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -481,7 +400,7 @@ func main() {
 }
 </code></pre>
 
-Run it. The output:
+运行之，将得到如下结果：
 <pre class="output"><code>a: 2
 a: 1
 a: 0
@@ -492,18 +411,15 @@ b: 3
 </code></pre>
 
 <p>
-The first loop prints <code>i</code> as <code>2</code>, <code>1</code> and <code>0</code> as a sequence.
-The second loop always prints <code>i</code> as <code>3</code>,
-for when the three <code>fmt.Println</code> calls in the deferred anonymous calls are invoked,
-the value of the loop variable <code>i</code> has become to <code>3</code>.
+第一个匿名函数中的循环打印出<code>2</code>、<code>1</code>和<code>0</code>这个序列，但是第二个匿名函数中的循环打印出三个<code>3</code>。
+因为第一个循环中的<code>i</code>是在<code>fmt.Println</code>函数被延迟调用的时候估的值，而第二个循环中的<code>i</code>是在第二个匿名函数的退出阶段估的值。
 </p>
 
-To make the second loop print the same result as the first one,
-we can modify the second loop as 
+我们可以对第一个循环略加修改（使用两种方法），使得它和第一个循环打印出相同的结果。
 
 <pre class="line-numbers"><code class="language-go">		for i := 0; i < 3; i++ {
 			defer func(i int) {
-				fmt.Println("b:", i) // the "i" is an input parameter
+				fmt.Println("b:", i) // 此i为形参i，非实参循环变量i。
 			}(i)
 		}
 </code></pre>
@@ -511,9 +427,9 @@ we can modify the second loop as
 or
 
 <pre class="line-numbers"><code class="language-go">		for i := 0; i < 3; i++ {
-			i := i
+			i := i // 在下面的调用中，左i遮挡了右i。
 			defer func() {
-				fmt.Println("b:", i) // the "i" is not the loop variable
+				fmt.Println("b:", i) // 此i为上面的左i，非循环变量i。
 			}()
 		}
 </code></pre>
@@ -521,8 +437,7 @@ or
 <p>
 </p>
 
-The same argument valuation moment rules are for goroutine function calls.
-The following program will output <code>123 789</code>.
+同样的估值时刻规则也适用于协程调用。下面这个例子程序将打印出<code>123 789</code>。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -543,82 +458,64 @@ func main() {
 </code></pre>
 
 <p>
-By the way, it is not a good idea to do synchronizations by using
-<code>time.Sleep</code> calls.
-If the program runs on a computer which CPUs are occupied by many other
-programs running on the computer, the new created goroutine may never
-get chances to execute before the program exits.
-We should use the concurrency synchronization techniques introduced in the article
-<a href="concurrent-synchronization-overview.html">concurrency synchronization overview</a>
-to do synchronizations in formal projects.
+顺便说一句，使用<code>time.Sleep</code>调用来做并发同步不是一个好的方法。
+如果上面这个程序运行在一个满负荷运行的电脑上，此程序可能在新启动的协程可能还未得到执行机会的时候就已经退出了。
+在正式的项目中，我们应该使用<a href="concurrent-synchronization-overview.html">并发同步技术</a>一文中列出的方法来实现并发同步。
 </p>
 
 </div>
 
 <p class="anchor" id="panic-recover"></p>
-<h3>Panic And Recover</h3>
+<h3>恐慌（panic）和恢复（recover）</h3>
 
 <p>
-Go doesn't support exception throwing, instead,
-explicit error handling is preferred to use in Go programming.
-However, in fact, Go supports an exception throw/catch alike mechanism.
-The mechanism is called panic/recover.
+Go不支持异常抛出和捕获，而是推荐使用返回值显式返回错误。
+不过，事实上，Go直至一套和异常抛出/捕获类似的机制。此机制称为恐慌/恢复（panic/recover）机制。
 </p>
 
 <p>
-We can call the built-in <code>panic</code> function to create a panic
-to make the current goroutine enter panicking status.
-The panic is only alive within the current goroutine.
-There may be multiple panics coexisting in a goroutine.
+我们可以调用内置函数<code>panic</code>来产生一个恐慌以使当前协程进入恐慌状况。一个恐慌不会蔓延到其它协程。
 </p>
 
 <p>
-Panics can be recovered by using the built-in <code>recover</code> function.
-Once all panics in a goroutine are recovered,
-the goroutine will enter normal calm status again.
-<p>
-
-<p>
-Panicking is another way to make a function return.
-One a panic shows in a function call, the function call returns immediately
-and enter its exiting phase. The deferred function calls pushed in the
-function call will get executed, by their inverse orders being pushed.
-A <code>recover</code> function can only recover the panic
-if it is called in one of the deferred function call.
+进入恐慌状况是另一种使当前函数调用开始返回的方法。一旦一个函数调用产生一个恐慌，此函数调用将立即进入返回阶段。
+在此函数调用中被推入堆栈的延迟调用将按照它们被推入的顺序逆序执行。.
 </p>
 
 <p>
-If a panicking goroutine exits without being recovered,
-it will make the whole program crash.
+通过在一个延迟函数调用之中调用内置函数<code>recover</code>，当前协程中的一个恐慌可以被消除，从而使得当前协程重新进入正常状况。
+<p>
+
+<p>
+如果一个协程在恐慌状况下退出，它将使整个程序崩溃。
 </p>
 
-The built-in <code>panic</code> and <code>recover</code> functions are
-declared as
+内置函数<code>panic</code>和<code>recover</code>的声明原型如下：
+
 <pre class="line-numbers"><code class="language-go">func panic(v interface{})
 func recover() interface{}
 </code></pre>
 
 <p>
-Interface types and values will be explained in the article
-<a href="interface.html">interfaces in Go</a> later.
-Here, we just need to know that the blank interface type
-<code>interface{}</code> can be viewed as the <code>any</code> type
-or the <code>Object</code> type in many other languages. In other words,
-we can pass a value of any type to a <code>panic</code> function call.
+接口（interface）类型和接口值将在以后的文章<a href="interface.html">接口</a>中详解。
+目前，我们可以暂时将空接口类型<code>interface{}</code>视为很多其它语言中的<code>any</code>或者<code>Object</code>类型。
+换句话说，在一个<code>panic</code>函数调用中，我们可以传任何实参值。
 </p>
 
 <p>
-The value returned by a <code>recover</code> function call is the value
-a <code>panic</code> function call consumed.
+一个<code>recover</code>函数的返回值为其所恢复的恐慌在产生时被一个<code>panic</code>函数调用所消费的参数。
 </p>
 
-Here is an example shows how to create a panic and how to recover the panic.
+下面这个例子展示了如何产生一个恐慌和如何消除一个恐慌。
 
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
 func main() {
+	defer func() {
+		fmt.Println("exit nornally.")
+	}()
 	fmt.Println("hi!")
 	defer func() {
 		v := recover()
@@ -629,17 +526,17 @@ func main() {
 }
 </code></pre>
 
-The output:
+它的输出结果：
 
 <pre class="output"><code>hi!
 recovered: bye!
+exit nornally.
 </code></pre>
 
 <p>
 </p>
 
-Here is another example shows a panicking goroutine exits without being recovered.
-So the whole program crashes.
+下面的例子在一个新协程里面产生了一个恐慌，并且此协程在恐慌状况下退出，所以整个程序崩溃了。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -662,7 +559,7 @@ func main() {
 }
 </code></pre>
 
-The output:
+运行之，输出如下：
 
 <pre class="output"><code>hi!
 panic: 123
@@ -674,8 +571,7 @@ goroutine 5 [running]:
 <p>
 </p>
 
-Go runtime will create panics for many circumstances,
-such as dividing an integer by zero. For example,
+一个Go运行时会在若干情形下产生恐慌，比如一个整数被0除的时候。下面这个程序也将崩溃退出。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -685,7 +581,7 @@ func main() {
 }
 </code></pre>
 
-The output:
+它的输出：
 
 <pre class="output"><code>panic: runtime error: integer divide by zero
 
@@ -697,22 +593,17 @@ goroutine 1 [running]:
 </p>
 
 <p>
-More runtime panic circumstances will be mentioned
-in other later Go 101 articles.
+更多可能由Go运行时产生的恐慌将在以后其它文章中提及。
 </p>
 
 <p>
-We can learn <a href="panic-and-recover-use-cases.html">some panic/recover use cases</a>
-and <a href="panic-and-recover-more.html">more about panic and recover mechanism</a> later.
+以后，我们可以了解<a href="panic-and-recover-use-cases.html">一些恐慌/恢复用例</a>和<a href="panic-and-recover-more.html">更多关于恐慌/恢复机制的细节</a>。
 </p>
 
-<h3>Some Fatal Errors Are Not Panics And Unrecoverable</h3>
+<h3>一些致命性错误不属于恐慌</h3>
 
 <p>
-For the standard Go compiler, some fatal errors,
-such as stack overflow and out of memory, are not panics.
-They are not recoverable.
-Once they occur, program will crash.
+对于官方标准编译器来说，很多致命性错误，比如堆栈溢出和内存不足，不被认为是恐慌。因此它们不能被消除。它们一旦产生，程序将崩溃。
 </p>
 
 
