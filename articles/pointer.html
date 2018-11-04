@@ -1,190 +1,153 @@
-﻿<h1>Pointers In Go</h1>
+﻿<h1>指针</h1>
 
 <p>
-Although Go absorbs many features from all kinds of other languages,
-Go is mainly viewed as a C family language.
-One evidence is Go also supports pointers.
-Go pointers and C pointers are much similar in many aspects,
-but there are also some differences between Go pointers and C pointers.
-This artcile will list all kinds of concepts and details related to pointers in Go.
+虽然Go吸收融合了很多其语言中的各种特性，但是Go主要被归入C语言家族。其中一个重要的原因就是Go和C一样，也支持指针。
+当然Go中的指针相比C指针有很多限制。本篇文章将介绍指针相关的各种概念和Go指针相关的各种细节。
 </p>
 
-<h3>Memory Addresses</h3>
+<h3>内存地址</h3>
 
 <p>
-A memory address means an offset (number of bytes) from the start point of
-the whole memory managed by a system (generally, operation system).
+一个内存地址操作系统管理的整个内存的中一个偏移量（相对于从整个内存的起始，以字节byte计数）。
 </p>
 
 <p>
-Generally, a memory address is stored as an unsigned native (interger) word.
-The size of a native word is 4 (bytes) on 32-bit architectures and 8 (bytes)
-on 64-bit architectures.
-So the theoretical maximum memory space size is 2<sup>32</sup> bytes,
-a.k.a. 4GB (1GB == 2<sup>30</sup> bytes), on 32-bit architectures,
-and is 2<sup>34</sup>GB (16 exibytes) on 64-bit architectures.
+通常地，一个内存地址用一个操作系统原生字（native word）来存储。
+一个原生字在32位操作系统上占4个字节，在64位操作系统上占8个字节。
+所以，32位操作系统上的理论最大支持内存容量为4GB（1GB == 2<sup>30</sup>字节），64位操作系统上的理论最大支持内存容量为2<sup>34</sup>GB（16艾字节）。.
 </p>
 
 <p>
-Memory addresses are often represented with hex integer literals,
-such as <code>0x1234CDEF</code>.
+内存地址的字面形式常用整数的十六进制字面值来表示，比如<code>0x1234CDEF</code>。以后我们常简称内存地址为地址。
 </p>
 
-<h3>Value Addresses</h3>
+<h3>值的地址</h3>
 
 <p>
-The address of a value means the start address of the memory segment
-occupied by the <a href="type-system-overview.html#value-part">direct part</a>
-of the value.
+一个值的地址是指此值的直接部分占据的内存的其实地址。在Go中，每个值都包含一个直接部分，但有些值可能还包含一个或多个间接部分，<a href="type-system-overview.html#value-part">下下篇</a>文章将对此详述。
 </p>
 
-<p>
-The next article, <a href="value-part.html">value parts</a>,
-will introduce values of which kinds of types may
-have indirect underlying parts.
-</p>
-
-<h3>What Are Pointers?</h3>
+<h3>什么是指针？</h3>
 
 <p>
-A pointer is a special value, which can storage a memory address.
-In fact, we often call a memory address as a pointer, and vice versa.
+指针是Go中的一种类型分类（Kind）。一个指针是某个指针类型的一个值。一个指针可以存储一个内存地址。
+事实上，我们经常称一个指针为一个内存地址，或者称一个内存地址为一个指针。
 </p>
 
 <p>
-Generally, the stored memory address in a pointer
-is the address of another value.
-Unlike C language, for safety reason,
-there are some restrictions made for Go pointers.
-Please read the following sections for details.
+通常地，一个指针此中存储的内存地址为另外一个值的地址。和C指针不一样，为了安全起见，Go指针有很多限制，详见下面的章节。
 </p>
 
-<h3>Go Pointer Types And Values</h3>
+<h3>指针类型和值</h3>
 
 <div>
 <p>
-Same as C langauge, an unnamed pointer type can be represented with <code>*T</code>,
-where <code>T</code> can be an arbitrary type.
-Type <code>T</code> is called the base type of pointer type <code>*T</code>.
+和C语言类似，一个无名指针类型的字面形式为<code>*T</code>，其中<code>T</code>为一个任意类型。类型<code>T</code>称为指针类型<code>*T</code>的基类型（base type）。
+如果一个指针类型的基类型为<code>T</code>，则我们可以称此指针类型为一个<code>T</code>指针类型。
 </p>
 
 <p>
-We can declare named pointer types,
-but generally this is not recommended.
-Unnamed pointer types have better readabilities than named ones.
+虽然我们可以声明有名指针类型，但是一般不推荐这么做。无名指针类型的可读性更高。
 </p>
 
 <p>
-If the <a href="type-system-overview.html#underlying-type">underlying type</a>
-of a defined pointer type is <code>*T</code>,
-then the base type of the defined pointer type is <code>T</code>.
+如果一个有名指针类型的<a href="type-system-overview.html#underlying-type">底层类型</a>是<code>*T</code>，则它的基类型为<code>T</code>。
 </p>
 
 <p>
-Two non-defined pointer types with the same base type are the same type.
+如果两个无名指针类型的基类型为同一类型，则这两个无名指针类型亦为同一类型。
 </p>
 
-Example:
-<pre class="line-numbers"><code class="language-go">*int  // A unnamed pointer type whose base type is int.
-**int // A multi-level unnamed pointer type whose base type is *int.
+一些指针类型的例子：
+<pre class="line-numbers"><code class="language-go">*int  // 一个基类型为int的无名指针类型
+**int // 一个多级无名指针类型，它的基类型为*int。
 
-type Ptr *int // Ptr is a defined pointer type whose base type is int.
-type PP *Ptr  // PP is a defined pointer type whose base type is Ptr.
+type Ptr *int // Ptr是一个定义的指针类型，它的基类型为int。
+type PP *Ptr  // PP是一个定义的多级指针类型，它的基类型为Ptr。
 </code></pre>
 
 <p>
 </p>
 
 <p>
-Zero values of any pointer types are represented with the predeclared <code>nil</code>.
-No addresses are stored in nil pointer values.
+指针类型的零值的字面形式使用预定义的<code>nil</code>来表示。一个nil指针中不存储任何地址。
 </p>
 
 <p>
-A pointer value of a pointer type whose base type is <code>T</code>
-can be called a <code>T</code> pointer.
-The value located at (the address stored in) a non-nil
-<code>T</code> pointer will be always viewed as
-a value of type <code>T</code> by compilers.
+如果一个指针类型的基类型为<code>T</code>，则此指针类型的值只能存储类型为<code>T</code>的值的地址。
 </p>
 
 </div>
 
-<h3>How To Get A Pointer Value And What Are Addressable Values?</h3>
+<h3>关于引用（reference）这个术语</h3>
+
+<p>
+在Golang 101中，术语“引用”暗示着一个关系。比如，如果一个指针中存储着另外一个值的地址，则我们可以说此指针值引用着另外一个值；同时另外一个当前有至少一个引用。
+本书对此术语的使用和Go白皮书是一致的。
+</p>
+
+<p>
+当一个指针引用着另外一个值，我们也常说此指针指向另外一个值。
+</p>
+
+<h3>如何获取一个指针值？</h3>
 
 <div>
-There are two ways to get a non-nil pointer value.
+有两种方式来得到一个指针值：
 <ol>
 <li>
-	The built-in <code>new</code> function can be used to allocate memory for a value
-	of any type. <code>new(T)</code> will allocate memory for a <code>T</code> value
-	and return the address of the <code>T</code> value.
-	The allocated value is a zero value of type <code>T</code>.
-	The returned address is viewed as a pointer value of type <code>*T</code>.
+	我们可以用内置函数<code>new</code>来为任何类型的值开辟一块内存并将此内存块的起始地址做为此值的地址返回。
+	假设<code>T</code>是任一类型，则函数调用<code>new(T)</code>返回一个类型为<code>*T</code>的指针值。
+	存储在返回指针值所表示的地址处的值（可被看作是一个匿名变量）为<code>T</code>的零值。
 </li>
 <li>
-	We can also take the addresses of some values in Go.
-	Values can be taken addresses are called addressable values.
-	For an addressable value <code>t</code> of type <code>T</code>,
-	we can use the expression <code>&amp;t</code> to
-	take the address of <code>t</code>,
-	where <code>&amp;</code> is the operator to take value addresses.
-	The type of <code>&amp;t</code> is viewed as <code>*T</code>.
+	我们也可以使用前置取地址操作符<code>&amp;</code>来获取一个可被取地址的值的地址。
+	对于一个可被取地址的类型为<code>T</code>的值<code>t</code>，我们可以用<code>&amp;t</code>来取得它的地址。<code>&amp;t</code>的类型为<code>*T</code>。
 </li>
 </ol>
 </div>
 
 <p>
-All variables are addressable and all constants are unaddressable.
-Not all values stored in memory at run time are addressable in Go.
-We can learn other adressable and unadressable values from other articles later.
-If you have already been familar with Go, you can read
-<a href="summaries.html#not-addressable">this summary</a> to get
-the lists of adressable and unadressable values in Go.
+所有变量都是可以被取地址的。所有常量、函数返回值和强制转换结果都是不可被取地址的。更多可被（或不可被）取地址的值将在以后的文章中逐渐提及。
+如果你已经对Go比较熟悉，你可以阅读<a href="summaries.html#not-addressable">此条总结</a>来了解在Go中哪些值可以或不可以被取地址。
 </p>
 
 <p>
-Although addressable values can be modified,
-their addressess are immutable in their respective lifetime.
+下一节中的例子将展示如何获取一些值的地址。
+</p>
+
+<h3>指针（地址）解引用</h3>
+
+<p>
+我们可以使用前置解引用操作符<code>*</code>来访问存储在一个指针所表示的地址处的值。
+比如，对于一个类型为<code>T<sub>p</sub></code>的指针<code>p</code>，我们可以用<code>*p</code>来表示地址<code>p</code>处的值。
+此值的类型为类型<code>T<sub>p</sub></code>的基类型。<code>*p</code>称为的指针<code>p</code>的解引用。解引用是取地址的逆过程。
 </p>
 
 <p>
-The next section will show how to get pointer values.
-</p>
-
-<h3>Pointer Dereference</h3>
-
-<p>
-Given a pointer value <code>p</code> of type <code>T<sub>p</sub></code>,
-how to get the value at the address stored in the pointer?
-Just use the expression <code>*p</code>, where <code>*</code> is called dereference operator.
-<code>*p</code> is call the dereference of poiner <code>p</code>.
-Pointer dereference is the inverse process of address taking.
-The result of <code>*p</code> is a value of the base type of <code>T<sub>p</sub></code>.
-</p>
-
-<p>
-Dereferencing a nil pointer causes a runtime panic.
+解引用一个nil指针将产生一个<a href="control-flows-more.html#panic-recover">恐慌</a>。
 </p>
 
 <div>
-The following programm shows some address taking
-and pointer dereference examples:
+下面这个例子展示了如何取地址和解引用。
+
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
 func main() {
-	p0 := new(int)   // p0 points to a zero int value.
-	fmt.Println(p0)  // (a hex address string)
+	p0 := new(int)   // p0指向一个int类型的零值
+	fmt.Println(p0)  // （将打印出一个十六进制字符串形式的地址）
 	fmt.Println(*p0) // 0
 
-	// x is a copy of the value at the address stored in p0.
+	// x是p0所引用的值的一个复制。
 	x := *p0
-	p1, p2 := &x, &x      // both take address of x.
+	p1, p2 := &x, &x      // p1和p2中都存储着x的地址。
+	                      // x、*p1和*p2表示着同一个int值。
 	fmt.Println(p1 == p2) // true
 	fmt.Println(p0 == p1) // false
 	p3 := &*p0            // <=> p3 := &(*p0)
+	                      // p3和p0中存储的地址是一样的。
 	fmt.Println(p0 == p3) // true
 	*p0, *p1 = 123, 789
 	fmt.Println(*p2, x, *p3) // 789 789 123
@@ -198,35 +161,24 @@ func main() {
 <p>
 
 <p>
-The following picture depicts the relations of the values
-used in the above program.
+下面这张图描绘了上面这个例子中各个值之间的关系。
 <br/>
 <img src="res/pointer.png">
 <br/>
 </p>
 </div>
 
-<h3>About The Word "Reference"</h3>
-
-<p>
-In Go 101, the word "reference" means indicates a relation.
-For example, if a pointer value storages the address of another value,
-then we can say the pointer value (directly) references the other value,
-and the other value has at least one reference.
-The uses of the word "reference" in Go 101 are consistent with Go specification.
-</p>
-
-<h3>Why Do We Need Pointers?</h3>
+<h3>我们为什么需要指针？</h3>
 
 <div>
-Let's view an example firstly.
+让我们先看一个例子：
 
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
-func double(a int) {
-	a += a
+func double(x int) {
+	x += x
 }
 
 func main() {
@@ -237,26 +189,21 @@ func main() {
 </code></pre>
 
 <p>
-The <code>double</code> function is the above example is expected to modify
-the input argument by doubling it. However, it fails. Why?
-Because all value assignments, including function argument passing,
-are value copying in Go.
-What the <code>double</code> function modified is a copy of the input argument.
-Modifications on (the direct part of) a copy of an original value
-don't affect the original value.
+我们本期望上例中的<code>double</code>函数将变量<code>a</code>的值放大为原来的两倍，但是事实证明我们的期望没有得到实现。
+为什么呢？因为在Go中，所有的赋值（包括函数传参）过程是一个值复制过程。
+所以在上面的<code>double</code>函数体内修改的是变量<code>a</code>的一个副本，而没有修改变量<code>a</code>本身。
 </p>
 
-One solution to fix the above <code>double</code> function is let it return
-the modification result. This solution doesn't always work for all scenarios.
-The following example shows another solution, by using a pointer parameter.
+当然我们可以让<code>double</code>函数返回输入参数的两倍数，但是此方法并非适用于所有场合。
+下面这个例子通过将输入参数的类型改为一个指针类型来达到同样的目的。
 
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
-func double(a *int) {
-	*a += *a
-	a = nil // This line is just for education purpose.
+func double(x *int) {
+	*x += *x
+	x = nil // 此行仅为讲解目的
 }
 
 func main() {
@@ -270,33 +217,28 @@ func main() {
 </code></pre>
 
 <p>
-We can find that, by changing the parameter to a pointer type,
-the passed pointer argument and its copy reference the same same,
-so the modification on the referenced value, the local variable
-<code>a</code>, can be reflected out of the <code>double</code> function.
+从上例可以看出，通过将<code>double</code>函数的输入参数的类型改为<code>*int</code>，传入的实参<code>&amp;a</code>和它在此函数体内的一个副本<code>x</code>都引用着变量<code>a</code>。
+所以对<code>*x</code>的修改等价于对<code>*p</code>（也就是变量<code>a</code>）的修改。
+换句话说，新版本的<code>double</code>函数内的操作可以反映到此函数外了。
 </p>
 
 <p>
-Surely, the modification of the copy of the passed pointer argument itself
-still can't be reflected on the passed pointer argument.
-After the second <code>double</code> function call, the local pointer
-<code>p</code> doesn't get modified to <code>nil</code>.
+当然，在此函数体内对传入的指针实参的修改<code>x = nil</code>依旧不能反映到函数外，因为此修改发生在此指针的一个副本上。
+所以在<code>double</code>函数调用之后，局部变量<code>p</code>的值并没有被修改为<code>nil</code>。
 </p>
 
 <p>
-In short, pointers provide indirect ways to access some values
-so that these values can be avoided being copied.
-Many languages have not the pointer concept,
-however, pointers are just hidden under other concepts in those languages.
+简而言之，指针提供了一种简介的途径来访问一些值，从而避免了这些值被复制。
+虽然很多语言中没有指针这个概念，但是指针被隐藏其它概念之中。
 </p>
 
 </div>
 
-<h3>Return Pointers Of Local Variables Is Safe In Go</h3>
+<h3>在Go中返回一个局部变量的地址是安全的</h3>
 
 <div>
-Unlike C language, Go is a language supporting garbage collection,
-so return the address of a local variable is absolutely safe in Go.
+和C不一样，Go是支持垃圾回收的，所以一个函数返回其内声明的变量的地址是绝对安全的。比如：
+
 <pre class="line-numbers"><code class="language-go">func newInt() *int {
 	a := 3
 	return &a
@@ -305,26 +247,26 @@ so return the address of a local variable is absolutely safe in Go.
 </div>
 
 <p class="anchor" id="restrictions"></p>
-<h3>Restrictions On Pointers In Go</h3>
+<h3>Go指针的一些限制</h3>
 
 <p>
-For safety reasons,
-Go makes some restrictions to guarantee pointers in Go are always legal and safe.
-By applying these restrictions, Go keeps the benefits of pointers,
-and avoids the dangerousness of pointers at the same time.
+为了安全起见，Go指针在使用上相对于C指针有很多限制。
+通过施加这些限制，Go指针保留了C指针的好处，同时也避免了C指针的危险性。
 </p>
 
-<h4>Poiner Values Don't Support Arithmetic Operations</h4>
+<h4>Go指针不支持算术运算</h4>
 
 <div>
 <p>
-In Go, pointers can't do arithmetic operations.
-For a pointer value <code>p</code>, statement <code>p++</code> is illegal in Go.
-If <code>p</code> is a pointer to a numeric value,
-then <code>*v++</code> will be treated as <code>(*v)++</code> by Go compilers.
+在Go中，指针是不能参与算术运算的。比如，对于一个指针<code>p</code>， 运算<code>p++</code>和<code>p-2</code>都是非法的。
 </p>
 
-Example:
+<p>
+如果<code>p</code>为一个指向一个数值类型值的指针，<code>*p++</code>将被编译器认为是合法的并且等价于<code>(*p)++</code>。
+换句话说，取地址操作符<code>&amp;</code>和解引用操作符<code>*</code>的优先级都高于自增<code>++</code>和自减<code>--</code>操作符。
+</p>
+
+例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -333,7 +275,7 @@ func main() {
 	a := int64(5)
 	p := &a
 
-	// The following two lines don't compile.
+	// 下面这两行编译不通过。
 	/*
 	p++
 	p = (&a) + 8
@@ -342,87 +284,79 @@ func main() {
 	*p++
 	fmt.Println(*p, a)   // 6 6
 	fmt.Println(p == &a) // true
+
+	*&a++
+	*&*&a++
+	**&p++
+	*&*p++
+	fmt.Println(*p, a) // 10 10
 }
 </code></pre>
 </div>
 
-<h4>A Poiner Value Can't Be Converted To An Arbitrary Pointer Type</h4>
+<h4>一个指针值不能被随意转换为另一个指针类型</h4>
 
 <div>
-In Go, a pointer value of pointer type <code>T1</code> can be directly converted
-to another pointer type <code>T2</code> only if either of the following two conditions
-is get satisfied.
+在Go中，只有如下某个条件被满足的情况下，一个类型为<code>T1</code>的指针值才能被显式转换为另一个指针类型<code>T2</code>：
 <ol>
 <li>
-	The underlying types of type <code>T1</code> and <code>T2</code> are identical (ignoring struct tags),
-	in particular if either <code>T1</code> and <code>T2</code> is an unnamed type
-	and they underlying types are identical (considering struct tags),
-	then the conversion can be implicit.
-	(Struct types and values will be explained in
-	<a href="struct.html">the next article</a>.)
+	类型<code>T1</code>和<code>T2</code>的底层类型必须一致（忽略结构体字段的标签）。
+	特别得，如果类型<code>T1</code>中<code>T2</code>只要有一个是<a href="type-system-overview.html#non-defined-type">非定义类型</a>并且它们的底层类型一致（考虑结构体字段的标签），则此转换可以使隐式的。
+	（关于结构体，请参阅<a href="struct.html">下一篇文章</a>。）
 </li>
 <li>
-	Type <code>T1</code> and <code>T2</code> are both unnamed pointer types and
-	the underlying types of their base types are identical.
+	类型<code>T1</code>和<code>T2</code>都为非定义类型并且它们的底层类型的基类型一致（忽略结构体字段的标签）。
 </li>
 </ol>
 
-By example:
+比如，
+
 <pre class="line-numbers"><code class="language-go">type MyInt int64
 type Ta    *int64
 type Tb    *MyInt
 </code></pre>
 
-For the 4 pointer types shown above,
+对于上面所示的这些指针类型，下面的事实成立：
+
 <ol>
 <li>
-	values of type <code>*int64</code> can be implicitly converted to type <code>Ta</code>,
-	and vice versa, for their underlying types are both <code>*int64</code>.
+	类型<code>*int64</code>的值可以被隐式转换到类型<code>Ta</code>，反之亦然（因为它们的底层类型均为<code>*int64</code>）。
 </li>
 <li>
-	values of type <code>*MyInt</code> can be implicitly converted to type <code>Tb</code>,
-	and vice versa, for their underlying types are both <code>*MyInt</code>.
+	类型 <code>*MyInt</code>的值可以被隐式转换到类型<code>Tb</code>，反之亦然（因为它们的底层类型均为<code>*MyInt</code>）。
 </li>
 <li>
-	values of type <code>*MyInt</code> can be explicitly converted to type <code>Tb</code>,
-	and vice versa, for the underlying types of their base types are both <code>int64</code>
-	and they are both unnamed.
+	类型<code>*MyInt</code>的值可以被显式转换为类型<code>*int64</code>，反之亦然（因为它们都是非定义的并且它们的底层类型的基类型均为<code>int64</code>）。
 </li>
 <li>
-	values of type <code>Ta</code> can't be directly converted to type <code>Tb</code>,
-	even if explicitly.
-	However, by the just listed first three facts, a value <code>pa</code> of
-	type <code>Ta</code> can be indirectly converted to type <code>Tb</code>
-	by nesting three explicit conversions, <code>Tb((*MyInt)((*int64)(pa)))</code>.
+	类型<code>Ta</code>的值不能直接被转换为类型<code>Tb</code>，即使是显式转换也是不行的。
+	但是，通过上述三条事实，通过三层显式转换<code>Tb((*MyInt)((*int64)(pa)))</code>，一个<code>pa</code>的指针值可以被间接地转换为类型<code>Tb</code>。
 </li>
 </ol>
 
 <p>
-None of the 4 pointers can be converted to type <code>*uint64</code>, in any safe ways.
+这些指针类型的任何值都无法被转换到类型<code>*uint64</code>。
 </p>
 </div>
 
-<h4>A Poiner Value Can't Be Compared With Values Of An Arbitrary Pointer Type</h4>
+<h4>一个指针值不能和其它任一指针类型的值进行比较</h4>
 
 <div>
-In Go, pointers can be compared with <code>==</code> and <code>!=</code> operators.
-Two Go pointer values can only be compared if either of the following three conditions
-are satisified.
+Go指针值是支持（使用比较运算符<code>==</code>和<code>!=</code>）比较的。
+但是，两个指针只有在下列任一条件被满足的时候才可以比较：
 <ol>
 <li>
-	The types of the two Go pointers are identical.
+	这两个指针的类型相同。
 </li>
 <li>
-	One pointer value can be implicitly converted to the pointer type of the other.
-	In other words, the underlying types of the two types must be identical
-	and either of the two types of the two Go pointers must be an unnamed type.
+	其中一个指针可以被隐式转换为另一个指针的类型。换句话说，这两个指针的类型的底层类型必须一致并且其中一个指针类型为非定义的。
 </li>
 <li>
-	One and only one of the two pointers is represented with the bare <code>nil</code> identifier.
+	其中一个并且只有一个指针用类型不确定的<code>nil</code>标识符表示。
 </li>
 </ol>
 
-Example:
+例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 func main() {
@@ -430,14 +364,13 @@ func main() {
 	type Ta    *int64
 	type Tb    *MyInt
 
-	// 4 nil pointers of different types.
+	// 4个不同类型的指针：
 	var pa0 Ta
 	var pa1 *int64
 	var pb0 Tb
 	var pb1 *MyInt
 
-	// The following 6 lines compile okay.
-	// The comparison results are all true.
+	// 下面这6行编译没问题。它们的比较结果都为true。
 	_ = pa0 == pa1
 	_ = pb0 == pb1
 	_ = pa0 == nil
@@ -445,7 +378,7 @@ func main() {
 	_ = pb0 == nil
 	_ = pb1 == nil
 
-	// None of the following 3 lines compile.
+	// 下面这三行编译不通过。
 	/*
 	_ = pa0 == pb0
 	_ = pa1 == pb1
@@ -457,24 +390,18 @@ func main() {
 </p>
 </div>
 
-<h4>A Poiner Value Can't Be Assigned To Pointer Values Of Other Pointer Types</h4>
+<h4>一个指针值不能被赋值给其它任意类型的指针值</h4>
 
 <p>
-The conditions to assign a pointer value to another pointer value are the
-same as the conditions to compare a pointer value to another pointer value,
-which are listed above.
+一个指针值可以被赋值给另一个指针值的条件和这两个指针值可以比较的条件（见上一小节）是一致的。
 </p>
 
-<h3>It's Possible To Break The Go Pointer Restrictions</h3>
+<h3>上述Go指针的限制是可以被打破的</h3>
 
 <p>
-As the start of this article has mentioned,
-the mechanisms (specifically, the <code>unsafe.Pointer</code> type)
-provided by <a href="unsafe.html">the <code>unsafe</code> standard package</a>
-can be used to break the restrictions made for pointers in Go.
-The <code>unsafe.Pointer</code> type is like the <code>void*</code> in C.
-However, generally, the unsafe ways are not recommended to
-be used in general Go programming.
+<a href="unsafe.html"><code>unsafe</code>标准库包</a>中提供的非类型安全指针（<code>unsafe.Pointer</code>）机制可以被用来打破上述Go指针的安全限制。
+<code>unsafe.Pointer</code>类型类似于C语言中的<code>void*</code>。
+但是，通常得，非类型安全指针机制不推荐在Go日常编程中使用。
 </p>
 
 

@@ -1,84 +1,77 @@
-<h1>Overview Of Go Type System</h1>
+<h1>Go类型系统概述</h1>
 
 <p>
-This article will introduce all kinds of types in Go.
-All kinds of concepts in Go type system will also be introduced.
-Without knowing these concepts, it is hard to have a thorough understanding of Go.
+本文将介绍Go中的各个类型分类。Go类型系统中的各种概念也将被介绍。如果不熟知这些概念，则很难精通Go编程。
 </p>
 
-<h3>Concept: Basic Types</h3>
+<h3>概念：基本类型</h3>
 
 <div>
-Built-in basic types in Go has been introduced in
-<a href="basic-types-and-value-literals.html">built-in basic types
-and basic value literals</a>.
-For completeness of the current article, these buint-in basic types
-are re-listed here.
+内置基本类型已经在前面的文章<a href="basic-types-and-value-literals.html">基本类型和它们的值的字面表示形式</a>一文中介绍了。
+为了本文的完整性，这些内置类型重新被列在这里：
 <ul>
-<li>Built-in string type: <code>string</code>.</li>
-<li>Built-in boolean type: <code>bool</code>.</li>
-<li>Built-in numeric types:
+<li>内置字符串类型：<code>string</code>.</li>
+<li>内置布尔类型：<code>bool</code>.</li>
+<li>内置数值类型：
 	<ul>
-	<li><code>int8</code>, <code>uint8</code> (<code>byte</code>), <code>int16</code>, <code>uint16</code>, <code>int32</code> (<code>rune</code>), <code>uint32</code>, <code>int64</code>, <code>uint64</code>, <code>int</code>, <code>uint</code>, <code>uinptr</code>.</li>
-	<li><code>float32</code>, <code>float64</code>.</li>
-	<li><code>complex64</code>, <code>complex128</code>.</li>
+	<li><code>int8</code>、<code>uint8</code>（<code>byte</code>）、<code>int16</code>、<code>uint16</code>、<code>int32</code>（<code>rune</code>）、<code>uint32</code>、<code>int64</code>、<code>uint64</code>、<code>int</code>、<code>uint</code>、<code>uinptr</code>。</li>
+	<li><code>float32</code>、<code>float64</code>。</li>
+	<li><code>complex64</code>、<code>complex128</code>。</li>
 	</ul>
 </li>
 </ul>
 
 <p>
-Except <a href="string.html">string types</a>,
-Go 101 article series will not try to explain more on other basic types.
+除了<a href="string.html">字符串类型</a>，Go 101后续其它文章将不再做详细讲解。
 </p>
 </div>
 
-<h3>Concept: Composite Types</h3>
+<h3>概念：组合类型</h3>
 
 <div>
-Go supports following composite types:
+Go支持下列组合类型：
 <ul>
-<li><a href="pointer.html">pointer types</a> - C pointer alike.</li>
-<li><a href="struct.html">struct types</a> - C struct alike.</li>
-<li><a href="function.html">function types</a> - functions are first-class types in Go.</li>
-<li><a href="container.html">container types</a>:
+<li><a href="pointer.html">指针类型</a> - 类C指针</li>
+<li><a href="struct.html">结构体类型</a> - 类C结构体</li>
+<li><a href="function.html">函数类型</a> - 函数类型在Go中是一种一等公民类别</li>
+<li><a href="container.html">容器类型</a>，包括:
 	<ul>
-	<li>array types - fixed-length container types.</li>
-	<li>slice type - dynamic-length and dynamic-capacity container types.</li>
-	<li>map types - maps are associative arrays (or dictionaries). The standard Go compiler implements maps as hashtables.</li>
+	<li>数组类型 - 定长容器类型</li>
+	<li>切片类型 - 动态长度和容量容器类型</li>
+	<li>映射表类型（map）- 又称字典类型。在标准编译器中映射表使用哈希表实现的。</li>
 	</ul>
 </li>
-<li><a href="channel.html">channel types</a> - channels are used to synchronize data among goroutines (the green threads in Go).</li>
-<li><a href="interface.html">interface types</a> - interfaces play a key role in reflection and polymorphism.</li>
+<li><a href="channel.html">数据通道类型</a> - 数据通道用来同步不同的协程</li>
+<li><a href="interface.html">接口类型</a> - 接口在反射和多态中发挥着重要角色</li>
 </ul>
 </div>
 
 <div>
-Unlike basic types, composite types may be denoted as their respective type literals.
-Follwing are some literal representation examples of all kinds of composite types.
-<pre class="line-numbers"><code class="language-go">// Assume T is an arbitrary type and Tkey is
-// a type supporting comparison (== and !=).
+组合类型可以用它们各自的字面表示形式来表示。
+下面是一些各种不同类型的组合类型字面表示形式的例子：
+<pre class="line-numbers"><code class="language-go">// 将设T为任意一个类型，Tkey为一个支持比较的类型。
 
-*T         // a pointer type
-[5]T       // an array type
-[]T        // a slice type
-map[Tkey]T // a map type
+*T         // 一个指针类型
+[5]T       // 一个元素类型为T、元素个数为5的数组类型
+[]T        // 一个元素类型为T的切片类型
+map[Tkey]T // 一个键类型为Tkey、元素类型为T的映射表类型
 
-// a struct type
+// 一个结构体类型
 struct {
 	name string
 	age  int
 }
 
-// a function type
+// 一个函数类型
 func(int) (bool, string)
 
-// an interface type
+// 一个接口类型
 interface {
 	Method0(string) int
 	Method1() (int, bool)
 }
 
-// some channel types
+// 几个数据通道类型
 chan T
 chan<- T
 <-chan T
@@ -88,42 +81,36 @@ chan<- T
 </p>
 
 <p><i>
-(Below will explain <a href="#types-not-support-comparison">which types don't support comparisons</a>.)
+（<a href="#types-not-support-comparison">支持和不支持比较的类型</a>将在下面介绍。）
 </i></p>
 </div>
 
 <p class="anchor" id="type-kinds"></p>
-<h3>Fact: Kinds Of Types</h3>
+<h3>事实：类型的种类</h3>
 
 <p>
-Each of above mentioned basic and composite types corresponds to
-one kind of type. Besides these type kinds,
-the type-unsafe <code>unsafe.Pointer</code> types introduced in the
-<a href="https://golang.org/pkg/unsafe"><code>unsafe</code>
-standard package</a> are also one kind of types in Go.
+每种上面提到的基本类型和组合类型都对应着一个类型种类（kind）。除了这些种类，今后将要介绍的非类型安全指针类型<code>unsafe.Pointer</code>属于另外一个新的类别。
 </p>
 
 <p>
-So, up to now (Go 1.10), Go has 26 kinds of types.
+所以，目前（Go 1.11），Go有26个类型种类。
 </p>
 
 <p class="anchor" id="type-definition"></p>
-<h3>Syntax: Type Definitions</h3>
+<h3>语法：类型定义</h3>
 
 <p><i>
-(<b>Type definition</b>, or type definition declaration,
-is called <b>type declaration</b> before Go 1.9.
-Since Go 1.9, type definition has become one of two kinds of type declartions
-in Go.)
+（<b>类型定义</b>又称类型定义声明。在Go 1.9之前，类型定义被称为类型声明并且是唯一的一种类型声明形式。
+但是自从Go 1.9，类型定义变成了两种类型声明形式之一。另一种新的类型声明形式为下一节将要介绍的类型别名声明。）
 </i></p>
 
 <div>
-In Go, we can define new types by using the following syntaxes.
-In the following example, <code>type</code> is a keyword.
-<pre class="line-numbers"><code class="language-go">// Define a solo new type.
+在Go中，我们可以用如下形式来定义新的类型。在此语法中，<code>type</code>为一个关键字。
+
+<pre class="line-numbers"><code class="language-go">// 定义单个类型。
 type NewTypeName SourceType
 
-// Define multiple new types together.
+// 定义多个类型。
 type (
 	NewTypeName1 SourceType1
 	NewTypeName2 SourceType2
@@ -131,26 +118,23 @@ type (
 </code></pre>
 
 <p>
-New type names must be identifiers.
+新的类型名必须为标识符。
 </p>
 
 <div>
-Note,
+注意：
 <ul>
 <li>
-	a new defined type and its respective source type in type definitions
-	are two distinct types.
+	一个新定义的类型和它的源类型为两个不同的类型。
 </li>
 <li>
-	two different defined types are always two distinct types.
+	在两个不同的类型定义中的定义的两个类型肯定为两个不同的类型。
 </li>
 <li>
-	the new defined type and the source type will share the same
-	underlying type (see below for what are underlying types),
-	and their values can be converted to each other.
+	一个新定义的类型和它的源类型的底层类型（将在下面介绍）一致并且它们的值可以相互显式转换。
 </li>
 <li>
-	types can be defined within function bodies.
+	类型定义可以出现在函数体内。
 </li>
 </ul>
 </div>
@@ -189,15 +173,16 @@ In other words, the new defined type is not an alias of the source type.
 
 -->
 
-Some type definition examples:
-<pre class="line-numbers"><code class="language-go">// The following new defined and source types are all basic types.
+一些类型定义的例子：
+
+<pre class="line-numbers"><code class="language-go">// 下面这个新定义的类型和它们的源类型都是基本类型。
 type (
 	MyInt int
 	Age   int
 	Text  string
 )
 
-// The following new defined and source types are all composite types.
+// 下面这个新定义的类型和它们的源类型都是组合类型。
 type IntPtr *int
 type Book struct{author, title string; pages int}
 type Convert func(in0 int, in1 bool)(out0 int, out1 string)
@@ -205,7 +190,7 @@ type StringArray [5]string
 type StringSlice []string
 
 func f() {
-	// The three defined types can be only used within the function.
+	// 这三个新定义的类型名称只能在此函数内使用。
 	type PersonAge map[string]int
 	type MessageQueue chan string
 	type Reader interface{Read([]byte) int}
@@ -214,23 +199,20 @@ func f() {
 </div>
 
 <p class="anchor" id="type-alias"></p>
-<h3>Syntax: Type Alias Declarations</h3>
+<h3>语法：类型别名声明</h3>
 
 <p><i>
-(<b>Type alias declaration</b> is one new kind of type declartions added since Go 1.9.)
+（<b>类型别名声明</b>是一种在Go 1.9中新增的类型声明形式。）
 </i></p>
 
 <p>
-As above mentioned, there are only two built-in type aliases in Go,
-<code>byte</code> (alias of <code>uint8</code>) and
-<code>rune</code> (alias of <code>int32</code>).
-They are the only two type aliases before Go 1.9.
+上面已经提到了，Go中有两个内置类型别名：类型<code>byte</code>（类型<code>uint8</code>的别名）和类型<code>rune</code>（类型<code>int32</code>的别名）。
+在Go 1.9之前，它们是Go中仅有的两个别名类型。
 </p>
 
 <div>
-Since Go 1.9, we can declare custom type alias by using the following syntaxes.
-The syntax of alias declaration is much like type definition,
-but please note there is a <code>=</code> in each type alias declaratio
+从Go 1.9开始，我们可以使用下面的语法来声明自定义别名类型。此语法和类型定义类似，但是请注意其中多了一个等号<code>=</code>。
+
 <pre class="line-numbers"><code class="language-go">type (
 	Name = string
 	Age  = int
@@ -241,37 +223,31 @@ type Table = map[Name]Age
 </code></pre>
 
 <p>
-Type alias names must be identifers.
-Like type definitions, type aliases can also be declared within function bodies.
+类型别名名也必须为标识符。同样得，类型别名可以被声明在函数体内。
 <p>
 
 <div>
-By the above declarations, <code>Name</code> is an alias of <code>string</code>,
-they denote the same type.
-The same relation is for the other three pairs of type:
+在上面的类型别名声明的例子中，<code>Name</code>是内置类型<code>string</code>的一个别名（类型），它们表示同一个类型。
+同样的关系对下面的几对类型也成立：
 <ul>
 <li>
-	<code>Age</code> and <code>int</code>
+	别名类型<code>Age</code>和内置类型<code>int</code>。
 </li>
 <li>
-	<code>table</code> and <code>map[string]int</code>
+	别名类型<code>table</code>和映射表类型<code>map[string]int</code>。
 </li>
 <li>
-	<code>Table</code> and <code>map[Name]Age</code>
+	别名类型<code>Table</code>和映射表类型<code>map[Name]Age</code>。
 </li>
 </ul>
 </div>
 
 <p>
-In fact, type <code>map[string]int</code> and <code>map[Name]Age</code>
-also denote the same type. So the four types involved in the last two
-type alias declarations all denote the same type.
+事实上，类型<code>map[string]int</code>和<code>map[Name]Age</code>也表示同一类型。所以，上面的别名类型的例子中的后两行中的四个类型均表示同一类型。
 </p>
 
 <p>
-Note, although <code>table</code> and <code>Table</code> denote the same type,
-<code>Table</code> is an exported type so it can be used by other packages
-but <code>table</code> can't.
+注意，尽管两个别名类型<code>table</code>和<code>Table</code>表示同一个类型，类型<code>Table</code>是一个导出类型，所以它可以被其它包引入使用，但是类型<code>table</code>却不可以。
 </p>
 
 <!--
@@ -281,61 +257,22 @@ Type alias declarations are much useful in refactoring large Go projects.
 -->
 </div>
 
-<p class="anchor" id="named-type"></p>
-<h3>Concept: Named Types vs. Unnamed Types</h3>
-
-<div>
-In Go,
-<ul>
-<li>
-	if a type has a name, which must be an identifier, and its name is not
-	the blank identifier <code>_</code>, then this type is called a named type.
-	All basic types are named types.</li>
-</li>
-<li>
-	if a type can't be represented by a pure identifier,
-	then the type is an unnamed type.
-	The composite types denoted by their respective type literals
-	in the above example are all unnamed types.
-</li>
-</ul>
-
-<p>
-An unnamed type must be a composite type,
-It is not true vice versa,
-for composite types may be defined types and alias types.
-</p>
-</div>
-
 <p class="anchor" id="non-defined-type"></p>
-<h3>Concept: Defined Types vs. Non-Defined Types</h3>
+<h3>概念：定义类型和非定义类型</h3>
 
 <p>
-Before Go 1.9, there is only one kind of type declaration.
-It is the current type definition.
-So it is very clear that a named type must be a defined type,
-and defined type and named type are almost the same concept before Go 1.9.
-However, since Go 1.9, things become a little complicated
-by the introduction of type alias.
-Now a named type may also be a type alias
-and an alias type may be a defined type or not.
+一个定义类型是一个在某个类型定义声明中定义的类型，或者是另外一个定义类型的别名。
+不属于这两类情形的类型为非定义类型。
 </p>
 
 <p>
-To make many explanations easy and clear, Go 101 adopts a new
-terminology, <code>non-defined type</code>, to represent
-unnamed types and alias of unnamed types.
-This terminology doesn't show up in Go specification.
-</p>
-
-<p>
-All basic types are defined. A non-defined type must be a composite type.
+所有的基本类型都是定义类型。一个非定义类型一定是一个组合类型。
 </p>
 
 <div>
-In the following example. alias type <code>C</code> and type literal
-<code>[]string</code> are both non-defined types,
-but type <code>A</code> and alias type <code>B</code> are both defined types.
+在下面的例子中，别名类型<code>C</code>和类型字面表示<code>[]string</code>都是非定义类型。
+类型<code>A</code>和类型别名<code>B</code>均为定义类型。
+
 <pre class="line-numbers"><code class="language-go">type A []string
 type B = A
 type C = []string
@@ -343,45 +280,61 @@ type C = []string
 
 </div>
 
-<p class="anchor" id="underlying-type"></p>
-<h3>Concept: Underlying Types</h3>
+<p class="anchor" id="named-type"></p>
+<h3>概念：有名类型和无名类型</h3>
 
 <div>
-In Go, each type has an underlying type. Rules:
+在Go中，
 <ul>
-<li>for built-in basic types, the underlying types are themselves.</li>
-<li>the underlying type of <code>unsafe.Pointer</code> is itself.</li>
-<li>the underlying types of an unnamed type, which must be a composite type, is itself.</li>
-<li>in a type declaration, the new declared type and the source type have the same underlying type.</li>
+<li>
+	如果一个类型有一个名字为一个非空标识符，则此类型被称为一个有名类型。所有的基本类型都为有名类型。
+	只要一个声明的类型的标识符不是空标识符<code>_</code>，那么此声明的类型也是一个有名类型。
+</li>
+<li>
+	如果一个类型不能被表示为一个纯标识符，则此类型被称为一个无名类型。使用组合类型的字面表示形式表示的类型均为无名类型。
+</li>
 </ul>
 
-Examples:
-<pre class="line-numbers"><code class="language-go">// The underlying types of the following ones are both int.
+<p>
+一个无名类型肯定是一个组合类型，反之则未必，因为一个组合类型可能是一个声明的类型。
+</p>
+</div>
+
+<p class="anchor" id="underlying-type"></p>
+<h3>概念：底层类型（underlying type）</h3>
+
+<div>
+在Go中，每个类型都有一个底层类型。规则：
+<ul>
+<li>一个内置类型的底层类型为它自己。</li>
+<li>类型<code>unsafe.Pointer</code>的底层类型为它自己。</li>
+<li>一个无名类型（必为一个组合类型）的底层类型为它自己。</li>
+<li>在一个类型声明中，新声明的类型和源类型共享底层类型。</li>
+</ul>
+
+一个例子：
+<pre class="line-numbers"><code class="language-go">// 这四个类型的底层类型均为内置类型int。
 type (
 	MyInt int
 	Age   MyInt
 )
 
-// The following new types have different underlying types.
+// 下面这三个新声明的类型的底层类型各不相同。
 type (
-	IntSlice   []int   // underlying type is []int
-	MyIntSlice []MyInt // underlying type is []MyInt
-	AgeSlice   []Age   // underlying type is []Age
+	IntSlice = []int   // 底层类型为[]int
+	MyIntSlice []MyInt // 底层类型为[]MyInt
+	AgeSlice   []Age   // 底层类型为[]Age
 )
 
-// The underlying types of Ages and AgeSlice are both []Age.
+// 类型Ages和AgeSlice的底层类型均为[]Age。
 type Ages AgeSlice
 </code></pre>
 
 <p>
 </p>
 
-<p>
-How to trace to the underlying type for a given user defined type?
-The rule is, when a built-in basic type, <code>unsafe.Pointer</code>
-or an unnamed type is met, the tracing will be stopped.
-Take the type declarations above as examples, let's trace their underlying types.
-</p>
+如何溯源一个声明的类型的底层类型？规则很简单，在溯源过程中，但遇到一个内置类型、<code>unsafe.Pointer</code>或者无名类型，则溯源结束。
+以上面这几个声明的类型为例，下面是它们的底层类型的溯源过程：
 
 <pre>
 MyInt → int
@@ -396,183 +349,106 @@ Ages → AgeSlice → []Age <span style="color:#aaa">→ <strike>[]MyInt</strike
 
 </p>
 
-In Go,
+在Go中，
 <ul>
-<li>types whose underlying types are <code>bool</code> are called <b>boolean types</b>;</li>
-<li>types whose underlying types are any of built-in integer types are called <b>integer types</b>;</li>
-<li>types whose underlying types are either <code>float32</code> or <code>float64</code> are called <b>floating-point types</b>;</li>
-<li>types whose underlying types are either <code>complex64</code> or <code>complex128</code> are called <b>complex types</b>;</li>
-<li>integer, floating-point and complex types are also called <b>numeric types</b>;</li>
-<li>types whose underlying types are <code>string</code> are called <b>string types</b>.</li>
+<li>底层类型为内置类型<code>bool</code>的类型称为<b>布尔类型</b>；</li>
+<li>底层类型为任一内置整数类型的类型称为<b>整数类型</b>；</li>
+<li>底层类型为内置类型<code>float32</code>或者<code>float64</code>的类型称为<b>浮点数类型</b>；</li>
+<li>底层类型为内置类型<code>complex64</code>或<code>complex128</code>的类型称为<b>复数类型</b>；</li>
+<li>整数类型、浮点数类型和复数类型统称为<b>数值类型</b>；</li>
+<li>底层类型为内置类型<code>string</code>的类型称为<b>字符串类型</b>。</li>
 </ul>
 </div>
 
 <p>
-The concept of underlying type plays an important role in
-<a href="value-conversions-assignments-and-comparisons.html">value conversions, assignments and comparisions in Go</a>.
+底层类型这个概念在<a href="value-conversions-assignments-and-comparisons.html">类型转换、赋值和比较规则</a>中扮演者重要角色。
 </p>
 
-<h3>Concept: Values</h3>
+<h3>概念：值</h3>
 
 <p>
-An instance of a type is called a value, of the type.
-A type may have many values, but it has only one zero value.
-Values of the same type share some common properties.
-</p>
-
-<p>
-Each type has a zero value, which can be viewed as the defualt value of the type.
-The predeclared <code>nil</code> identifier can used to represent as
-zero values of slice, map, function, channel,
-pointer (including type-unsafe pointer) and interface types.
-About more on <code>nil</code>, please read <a href="nil.html">nil in Go</a> later.
+一个类型的一个实例称为此类型的一个值。一个类型可以有很多不同的值，其中一个为它的零值。
+同一类型的不同值共享很多相同的属性。
 </p>
 
 <p>
-There are several kinds of value representation forms in code, including
-<a href="basic-types-and-value-literals.html">literals</a>,
-<a href="constants-and-variables.html#constant">named constants</a>,
-<a href="constants-and-variables.html#variable">variables</a> and
-<a href="expressions-and-statements.html">expressions</a>,
-though the former three can be viewed as special cases of the latter one.
+每个类型有一个零值。一个类型的零值可以看作是此类型的默认值。
+预声明的标识符<code>nil</code>可以看作是切片、映射表、函数、数据通道、指针（包括非类型安全指针）和接口类型的零值的字面表示形式。
+我们以后可以在<a href="nil.html">Go中的nil</a>一文中了解到关于<code>nil</code>的各种事实。
 </p>
 
 <p>
-Value may be <a href="constants-and-variables.html#untyped-value">typed
-or untyped</a>.
-Except the predeclared <code>nil</code>,
-values of composite types are all typed.
-Untyped values are all basic values or the predeclared <code>nil</code>.
+在源代码中，值可以呈现为若干种形式，包括<a href="basic-types-and-value-literals.html">字面形式</a>、<a href="constants-and-variables.html#constant">有名常量</a>、<a href="constants-and-variables.html#variable">变量</a>和<a href="expressions-and-statements.html">表达式</a>。前三中形式可以看作是最后一种形式的特例。
 </p>
 
 <p>
-All kinds of basic value literals has been introduced in in the article
-<a href="basic-types-and-value-literals.html">basic Types and basic value literals</a>.
-There are two more kinds of literals in Go, composite literals and function literals.
+值分为<a href="constants-and-variables.html#untyped-value">类型确定的和类型不确定的</a>。
 </p>
 
 <p>
-Function literals, as the name implies, are used to represent function values.
-In fact, function literals are not unfamilar.
-A <a href="function-declarations-and-calls.html#declaration">function declaration
-</a> is composed of a function literal and a function identifier.
-In other words, a function declaration only has one more part,
-the function identifier part, than its corresponding function literal part.
-Each function literal is also an annoymous function.
-Function literals will be formally introduced
-in the article <a href="function.html">functions in Go</a>.
+各种基本类型的值的字面表示形式已经在<a href="basic-types-and-value-literals.html">基本类型和它们的值的字面表示形式</a>一文中介绍过了。
+另外，Go中还有另外两种值的字面表示形式：组合字面表示形式（composite literal）和函数字面表示形式。
 </p>
 
 <p>
-Composite literals are used to represent values of struct types
-and container types (arrays, slices and maps),
-Please read <a href="struct.html">structs in Go</a>
-and <a href="container.html">containers in Go</a> for details.
+函数字面表示形式用来表示函数值。事实上，一个<a href="function-declarations-and-calls.html#declaration">函数声明</a>是由一个标识符（函数名）和一个函数字面表示形式组成。
 </p>
 
 <p>
-There are no literals to represent
-values of pointer, channel and interface types.
+组合字面表示形式用来表示结构体类型值和容器类型（数组、切片和映射表）值。
+详见<a href="struct.html">结构体</a>和<a href="container.html">容器类型</a>两文。
+</p>
+
+<p>
+指针类型、数据通道类型和接口类型的值没有字面表示形式。
 </p>
 
 <p class="anchor" id="value-part"></p>
-<h3>Concept: Value Parts</h3>
+<h3>概念：值部</h3>
 
 <p>
-At run time, many values are stored somewhere in memory.
-In Go, each of such values has a direct part,
-however, some of them each has one or more indirect parts.
-Each value part occupies a continuous memory segment.
-The indirect underlying parts of a value are referenced
-by its direct part through pointers.
+在运行时刻，很多值是存储在内存的。每个这样的值都有一个直接部分，但是有一些值还可能有一个或多个间接部分。
+每个值部分在内存中都占据一段连续空间。通过<a href="pointer.html">指针</a>，一个值的间接部分被此值的直接部分所引用。
 </p>
 
 <p>
-The terminology <b>value part</b> is not defined in Go specification.
-It is just used in Go 101 to make some explanations simpler
-and help Go programmers understand Go types and values better.
-Please read the article <a href="value-part.html">value parts</a>
-for more information on value parts.
+<a href="value-part.html"><b>值部</b></a>这个属于并没有在Go白皮书中定义。它仅使用在Go 101这本书中，用来简化一些解释并帮助Go程序员更好地理解Go类型和值。
 </p>
 
 <p class="anchor" id="value-size"></p>
-<h3>Concept: Value Sizes</h3>
+<h3>概念：值尺寸</h3>
 
 <p>
-When a value is stored in memory, the number of bytes occupied
-by the direct part of the value is called the size of the value.
-All values of the same type have the same value size, so the size of values
-of a type is often called as the size, of value size, of the type.
-We can use the <code>Sizeof</code> function in the <code>unsafe</code>
-standard package to get the size of any value.
+一个值存储在在内存中是要占据一定的空间的。此空间的大小称为此值的尺寸。值尺寸是字节数来衡量的。
+在Go中，当我们谈及一个值的尺寸，如果没有特殊说明，我们一般是指此值的直接部分的尺寸。
+某个特定类别的所有类型的值的尺寸都是一样的。因为这个原因，我们也常将一个值的尺寸说成是它的类型的尺寸（值尺寸）。
 </p>
 
 <p>
-Go specification doesn't specify values size requirements for non-numeric types.
-The requirements for value sizes of all kinds of basic numeric types
-are listed in the article
-<a href="basic-types-and-value-literals.html">basic Types and basic value
-literals</a>.
-</p>
-
-<h3>Concept: Dynamic Type And Dynamic Value Of An Interface Value</h3>
-
-<p>
-Interface values are the values whose types are interface types.
+我们可以用<code>unsafe</code>标准库包中的<code>Sizeof</code>函数来取得任何一个值的尺寸。
 </p>
 
 <p>
-Each interface value can box a non-interface value in it.
-The value boxed in an interface value is called the dynamic value of the interface value.
-The type of the dynamic value is called the dynamic type of the interface value.
-An interface value boxing nothing is a nil interface value.
+Go白皮书没有规定非数值类型的值尺寸的大小。对数值类型的值尺寸的要求已经在<a href="basic-types-and-value-literals.html">基本类型和它们的值的字面表示形式</a>一文中提及了。
+</p>
+
+<p class="anchor" id="pointer-base-type"></p>
+<h3>概念：指针类型的基类型（base type）</h3>
+
+<p>
+如果一个指针类型的底层类型表示为<code>*T</code>，则此指针类型的基类型为<code>T</code>所表示的类型。
 </p>
 
 <p>
-For more about interface types and values,
-please read <a href="interface.html">this article</a>.
+<a href="pointer.html">指针类</a>一文详细解释了指针类类型和指针类值。
 </p>
 
-<h3>Concept: Signature Of Function Types</h3>
-
-<p>
-The signature of a function type is composed of
-the input parameter definition list and
-the output result definition list of the function.
-</p>
-
-<p>
-The function name and body are not parts of a function signature.
-Parameter and result types are important for a function signature,
-but parameter and result names are not important.
-</p>
-
-<p>
-Please read <a href="function.html">functions in Go</a> for more details
-about function type and function values.
-</p>
-
-<h3>Concept: Method And Method Set Of A Type</h3>
-
-<p>
-In Go, some types can have <a href="method.html">methods</a>.
-Methods can also be called member functions.
-</p>
-
-<p>
-The methed set of a type is composed of all the methods of the type.
-If the method set of a type is the super set of the method set
-of an interface type, we say the type
-<a href="interface.html#implementation">implements</a> the interface type.
-</p>
-
-<h3>Concept: Fields Of A Struct Type</h3>
+<h3>概念：结构体类型的字段（field）</h3>
 
 <div>
-A struct type is composed of a collection of member variables.
-Each of the member variables is called a field of the struct type.
-For example, the following struct type <code>Book</code> has
-three fields, <code>author</code>, <code>title</code> and <code>pages</code>.
+一个结构体类型由若干成员变量组成。每个这样的成员变量称为此结构体的一个字段。
+比如，下面这个结构体类型含有三个字段：<code>author</code>、<code>title</code>和<code>pages</code>。
+
 <pre class="line-numbers"><code class="language-go">struct {
 	author string
 	title  string
@@ -582,173 +458,156 @@ three fields, <code>author</code>, <code>title</code> and <code>pages</code>.
 </div>
 
 <p>
-For more about struct types and values,
-please read <a href="struct.html">structs in Go</a>.
+<a href="struct.html">结构体</a>一文详细解释了结构体类型和结构体值。
+</p>
+
+<h3>概念：函数类型的签名（signature）</h3>
+
+<p>
+一个函数和其类型的签名由此函数的输入参数和返回结果的类型列表组成。
+函数名称和函数体不属于函数签名的构成部分。
 </p>
 
 <p>
-In Go, we can extend a type which satisfies some conditions by
-<a href="type-embedding.html">embedding</a> this type in a struct type.
+<a href="function.html">函数</a>一文详细解释了函数类型和函数值。
 </p>
 
-<p class="anchor" id="pointer-base-type"></p>
-<h3>Concept: Base Type Of A Pointer Type</h3>
+<h3>概念：类型的方法（method）和方法集（method set）</h3>
 
 <p>
-For a pointer type, assume its underlying type can be denoted as <code>*T</code>
-in literal, then <code>T</code> is called the base type of the pointer type.
+在Go中，我们可以给满足某些条件的类型声明<a href="method.html">方法</a>。方法也常被称为成员函数。
+一个类型的所有方法组成了此类型的方法集。
 </p>
 
-<p>
-For more about pointer types and values,
-please read <a href="pointer.html">pointers in Go</a>.
-</p>
-
-<h3>Concept: Container Types</h3>
+<h3>概念：接口类型的动态类型和动态值</h3>
 
 <p>
-Array, slice and map can be viewed as formal built-in container types.
+接口类型类型的值称为接口值。一个接口值可以包裹装载一个非接口值。包裹在一个接口值中的非接口值称为此接口值的动态值。此动态值的类型称为此接口值的动态类型。
+一个什么也没包裹的接口值为一个零值接口值。
 </p>
 
 <p>
-Informally, string and channel types can also be viewed as container types.
+一个接口类型可以约定零个或者若干个方法，这些方法形成了此接口类型的方法集。
 </p>
 
 <p>
-Each value of a container type has a length,
-either the container type is a formal one or an informal one.
+如果一个类型的（可以使接口或者非接口类型）方法集是一个接口类型的方法集的超集，则我们说此类型<a href="interface.html#implementation">实现</a>了此接口类型。
 </p>
 
 <p>
-For more about container types and values,
-please read <a href="container.html">containers in Go</a>.
+<a href="interface.html">接口</a>一文详细解释了接口类型和接口值。
 </p>
 
-<h3>Concept: Key Type Of A Map Type</h3>
+<h3>概念：容器类型</h3>
 
 <p>
-If the underlying type of a map type can be denoted as <code>map[Tkey]T</code>,
-then <code>Tkey</code> is called the key type of the map type.
-<code>Tkey</code> must be a comparable type.
+数组、切片和映射表是Go中的三种正式意义上的内置容器类型。
 </p>
 
-<h3>Concept: Key Type And Element Type Of A Container Type</h3>
+<p>
+有时候，字符串和数据通道类型也可以被非正式地看作是容器类型。
+</p>
+
+<p>
+（正式和非正式的）容器类型的每个值都有一个长度属性。
+</p>
+
+<p>
+<a href="container.html">数组、切片和映射表</a>一文详细解释了各种正式容器类型和它们的值。
+</p>
+
+<h3>概念：映射表类型的键值（key）类型</h3>
+
+<p>
+如果一个映射表类型的底层类型表示为<code>map[Tkey]T</code>，则此映射表类型的键值类型为<code>Tkey</code>。
+<code>Tkey</code>必须为一个可比较类型（见下）。
+</p>
+
+<h3>概念：容器类型的元素（element）类型</h3>
 
 <div>
-The types of the elements stored in a container value must be identical.
-The identicial type of the elements is called the element type of
-the container type of the container value.
+存储在一个容器值中的所以元素的类型必须为同一个类型。此同一类型称为此容器值的（容器）类型的元素类型。
 <ul>
-<li>For an array type, if its underlying type is <code>[N]T</code>, then its element type is <code>T</code>.</li>
-<li>For a slice type, if its underlying type is <code>[]T</code>, then its element type is <code>T</code>.</li>
-<li>For a map type, if its underlying type is <code>map[Tkey]T</code>, then its element type is <code>T</code>.</li>
-<li>For a channel type, if its underlying type is <code>chan T</code>, <code>chan&lt;- T</code> or <code>&lt;-chan T</code>, then its element type is <code>T</code>.</li>
-<li>The element type of any string type is always <code>byte</code> (a.k.a. <code>uint8</code>).</li>
+<li>如果一个数组类型的底层类型表示为<code>[N]T</code>，则此数组类型的元素类型为<code>T</code>所表示的类型。</li>
+<li>如果一个切片类型的底层类型表示为<code>[]T</code>，则此切片类型的元素类型为<code>T</code>所表示的类型。</li>
+<li>如果一个映射表类型的底层类型表示为<code>map[Tkey]T</code>，则此映射表类型的元素类型为<code>T</code>所表示的类型。</li>
+<li>如果一个数据通道类型的底层类型表示为<code>chan T</code>、<code>chan&lt;- T</code>或者<code>&lt;-chan T</code>，则此数据通道类型的元素类型为<code>T</code>所表示的类型。</li>
+<li>一个字符串类型的元素类型总是内置类型<code>byte</code>（亦即<code>uint8</code>）。</li>
 </ul>
 </div>
 
-<h3>Concept: Directions Of Channel Types</h3>
+<h3>概念：数据通道类型的方向</h3>
 
 <div>
-Channel values can be viewed as synchronized first-in-first-out (FIFO) queues.
-Channel types and values have directions.
+一个数据通道值可以被看作是先入先出（first-in-first-out，FIFO）队列。一个数据通道值可能是可读可写的、只读的（receive-only）或者只写的（send-only）。
 <ul>
 <li>
-	A channel value which is both sendable and receivable is called
-	a bidirectional channel. Its type is called a bidirectional channel type.
-	Bidirectional channel types are denoted as <code>chan T</code> in literal.
+	一个可读可写的的数据通道值也称为一个双向通道。
+	一个双向通道类型的底层类型可以被表示为<code>chan T</code>。
 </li>
 <li>
-	A channel value which is only sendable is called
-	a send-only channel. Its type is called a send-only channel type.
-	Send-only channel types are denoted as <code>chan&lt;- T</code> in literal.
+	我们只能向一个只写的数据通道值发送数据，而不能从其中接收数据。
+	只写数据通道类型的底层类型可以被表示为<code>chan&lt;- T</code>。
 </li>
 <li>
-	A channel value which is only receivable is called
-	a receive-only channel. Its type is called a receive-only channel type.
-	Receive-only channel types are denoted as <code>&lt;-chan T</code> in literal.
+	我们只能从一个只读的数据通道值接受数据，而不能向其发送数据。
+	只读数据通道类型的底层类型可以被表示为<code>&lt;-chan T</code>。
 </li>
 </ul>
 </div>
 
 <p>
-For more about channel types and values,
-please read <a href="channel.html">channels in Go</a>.
+<a href="channel.html">数据通道</a>一文详细解释了数据通道类型和数据通道值。
 </p>
 
 <p class="anchor" id="types-not-support-comparison"></p>
-<h3>Fact: Types Which Support Or Don't Support Comparison</h3>
+<h3>事实：可比较类型和不可比较类型</h3>
 
 <div>
-Currently (Go 1.10), following types don't support comparisons
-(with the <code>==</code> and <code>!=</code> operators):
+目前（Go 1.11），下面这些类型的值不支持（使用<code>==</code>和<code>!=</code>运算标识符）比较。这些类型称为不可比较类型。
 <ul>
-<li>slice types</li>
-<li>map types</li>
-<li>function types</li>
+<li>切片类型</li>
+<li>映射表类型</li>
+<li>函数类型</li>
 <li>
-any struct type with a field whose type is uncomparable
-and any array type which element type is uncomparable.
+任何包含有不可比较类型的字段的结构体类型和任何元素类型为不可比较类型的数组类型。
 </li>
 </ul>
 
 <p>
-Above listed types are called uncomparable types.
-Compilers forbid comparing two values of uncomparable types.
+其它类型称为可比较类型。
 </p>
 
 <p>
-All basic types, pointer types, channel types and interface types are comparable.
-However, comparing two interface values may panic at run time
-if both the dynamic types of them are the same uncomparable type.
+映射表类型的键值类型必须为可比较类型。
 </p>
 
 <p>
-Values of uncomparable types are called uncomparable values.
-Some values of comprable types may also be uncomparable.
-For example, an interface value with a uncomparable dynamic type
-is an uncomparable value.
-Comparing an uncomparable value which type is comprable with itself
-will cause a panic at run time.
-</p>
-
-<p>
-We can learn more about the detailed rules of comparisons from the article
-<a href="value-conversions-assignments-and-comparisons.html#comparison-rules">value conversions,
-assignments and comparisons in Go</a>.
+我们可以在<a href="value-conversions-assignments-and-comparisons.html#comparison-rules">类型转换、赋值和值比较规则大全</a>一文中了解到更详细的比较规则。
 </p>
 </div>
 
-<p>
-The key type of any map type must be a comparable type.
-So the above listed types can't be used as map key types.
-</p>
-
-<h3>Fact: Object-Oriented Programming In Go</h3>
+<h3>事实：Go对面向对象编程（object-oriented programming）的支持</h3>
 
 <div>
-Go is not a full featured object-oriented programming language,
-but Go really supports some object-oriented programming styles.
-Please read the following listed articles for details:
+Go并不全面支持面向对象编程，但是Go确实支持一些面向对象编程的元素。请阅读以下几篇文章以获取详细信息：
 <ul>
 <li>
-	<a href="method.html">methods in Go</a>.
+	<a href="method.html">方法</a>.
 </li>
 <li>
-	<a href="interface.html#implementation">implementations in Go</a>.
+	<a href="interface.html#implementation">实现</a>.
 </li>
 <li>
-	<a href="type-embedding.html">type embedding in Go</a>.
+	<a href="type-embedding.html">类型内嵌</a>.
 </li>
 </ul>
 </div>
 
-<h3>Fact: Generic In Go</h3>
+<h3>事实：Go对范型（generic）的支持</h3>
 
 <p>
-The generic functionalities in Go are limited to built-in types and functions.
-Up to now (v1.10), Go doesn't support generic for custom types and custom functions.
-Please read <a href="generic.html">built-in generic in Go</a> for details.
+目前（Go 1.11），Go中范型支持只局限在内置类型和内置函数中。自定义范型还处于草案阶段。请阅读<a href="generic.html">内置范型</a>一文以了解更多。
 </p>
 
 
