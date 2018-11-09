@@ -1,17 +1,15 @@
-﻿<h1>Structs In Go</h1>
+﻿<h1>结构体</h1>
 
 <p>
-Same as C, Go also supports struct types.
-This article will introduce the basic kwowledges of struct types in Go.
+和C语言类似，Go也支持结构体类型。此篇文章将介绍Go中的结构体类型和结构体值做一个详细的解释。
 </p>
 
-<h3>Struct Types And Struct Type Literals</h3>
+<h3>结构体类型和结构体类型的字面表示形式</h3>
 
 <div>
-Each unnamed struct type literal starts with a <code>struct</code> keyword
-which is following by a sequence of field definitions enclosed in a <code>{}</code>.
-Each field definition is composed of a name and a type.
-The number of fields of a struct type can be zero.
+每个无名结构体类型的字面形式均由<code>struct</code>关键字开头，后面跟着用一对大括号<code>{}</code>包裹着的一系列字段（field）声明。
+每个字段声明由一个字段名和字段类型组成。一个结构体类型的字段数目可以为0。下面是一个无名结构体类型的字面形式：
+
 <pre class="line-numbers"><code class="language-go">struct {
 	title  string
 	author string
@@ -20,16 +18,15 @@ The number of fields of a struct type can be zero.
 </code></pre>
 
 <p>
-The above strict has three fields. The types of the two fields
-<code>title</code> and <code>author</code> are both <code>string</code>.
-The type of the <code>pages</code> field is <code>int</code>.
+上面这个结构体类型含有三个字段。前两个字段（<code>title</code>和<code>author</code>）的类型均为<code>string</code>。
+最后一个字段<code>pages</code>的类型为<code>int</code>。
 </p>
 
 <p>
-Some articles also call fields as member variables.
+有时字段也称为成员变量。
 </p>
 
-Consecutive fields with the same type can be declared together.
+相邻的同类型字段可以声明在一起。比如上面这个类型也可表示成下面这样：
 <pre class="line-numbers"><code class="language-go">struct {
 	title, author string
 	pages         int
@@ -37,13 +34,18 @@ Consecutive fields with the same type can be declared together.
 </code></pre>
 
 <p>
-The size of a struct type is the sum of the sizes of all its field types.
-The size of a zero-field struct type is zero.
+一个结构体类型的尺寸为它的所有字段的（类型）尺寸之和加上一些填充字节的数目。
+常常地，编译器（和运行时）会在一个结构体值的两个相邻字段之间填充一些字节来保证一些字段的地址总是某个整数的倍数。
+我们可以在后面的<a href="memory-layout.html">内存布局</a>一文中了解到字节填充（padding）和内存地址对齐（memory address alignments）。
 </p>
 
-Each struct field can be bound with a tag when it is declared.
-Field tags are optional, the default value of each field tag is a blank string.
-Here is an example showing non-default field tags.
+<p>
+一个零字段结构体的尺寸为0。
+</p>
+
+每个结构体字段在它的声明中可以被指定一个标签（tag）。字段标签可以是任意字符串，它们是可选的，默认为空字符串。
+下面这个结构体类型中的字段均被指定了标签。
+
 <pre class="line-numbers"><code class="language-go">struct {
 	Title  string `json:"title"`
 	Author string `json:"author,omitempty"`
@@ -52,114 +54,82 @@ Here is an example showing non-default field tags.
 </code></pre>
 
 <p>
-The purpose of each field tag is application dependent.
-In the above example, the field tags can help the functions in the
-<code>encoding/json</code> standard package to determine the field names in JSON texts,
-in the process of encoding struct values into JSON texts or decoding JSON texts into struct values.
-The functions in the <code>encoding/json</code> standard package will
-only encode and decode the exported struct fields, which is why
-the first letters of the field names in the above example are all upper cased.
-If the field tags are not specified, then the corresponding field names in JSON texts
-will be same as the field names in code.
-</p>
-
-<p><i>
-(BTW, the <code>omitempty</code> word in a field tag means the field can be absent
-from the JSON texts if the value of the field is a zero value or a blank container value.)
-</i></p>
-
-<p>
-It is not a good idea to use field tags as comments.
+每个字段标签的目的取决于具体应用。上面这个例子中的字段标签用来帮助<code>encoding/json</code标准库包来将上面这个结构体类型的某个值编码成JSON数据或者从一份JSON数据解码到上面这个结构体类型的某个值中。
+在编码和解码过程中，<code>encoding/json</code>标准库包中的函数将只考虑导出的结构体字段。这是为什么上面这个结构体的字段均为导出的。
 </p>
 
 <p>
-Raw string literals (<code>`...`</code>) are used more popular than
-interpreted string literals (<code>"..."</code>) for field tags in practice.
+把字段标签当成字段注释来使用不是一个好主意。
 </p>
 
 <p>
-Unlike C language, Go structs don't support unions.
+在实践中，在指定字段标签时，字符串直白字面表示（<code>`...`</code>）比解释型字面表示（<code>"..."</code>）用得更流行一些。
 </p>
 
 <p>
-All above shown struct types are unnamed, or called anonymous struct types.
-In practice, named (defined or alias) struct types are used more popularly.
+和C语言不一样，Go结构体不支持字段联合（union）。
 </p>
 
 <p>
-Only exported fields of exported struct types declared in a package
-can be used in other packages by importing the package.
+上面的例子中战士的结构体类型都是无名的。在实践中，有名（定义的或者别名）结构体用得更流行。
 </p>
 
 <p>
-The field tags and the orders of the field declaraions matter for a struct type.
-Two unnamed struct types are identical only if they have the same sequence of field declarations.
-Two field declarations are identical only of their respective names,
-their respective types and their respective tags are all identical.
-Please note, <b>two non-exported struct field names from
-different packages are always viewed as two different names</b>.
+只有导出字段可以被使用在其它代码包中。非导出字段类以于很多其它语言中的私有或者保护型的成员变量。
 </p>
 
+<p>
+一个结构体类型中的字段标签和字段的声明顺序对此结构体类型的身份识别很重要。
+如果两个无名结构体类型的各个对应字段声明都相同（按照它们的出现顺序），则此两个无名结构体类型是等同的。
+两个字段声明只有在它们的名称、类型和标签等等同的情况下才相同。
+注意：<b>两个声明在不同的代码包中的非导出字段肯定不相同。</b>
+</p>
 
+<p>
+一个结构体类型不能（直接或者间接）含有一个类型为此结构类型的字段。
+</p>
 <!--
-A struct type can't have a field of the struct type itself,
-either directly or recursively.
-
 https://github.com/golang/go/issues/18640
 -->
 
 </div>
 
-<h3>Struct Value Literals And Struct Value Manipulations</h3>
+<h3>结构体值的字面表示形式和结构体值的使用</h3>
 
 <p>
-In Go, the form <code>T{...}</code>,
-where <code>T</code> must be a type literal or a type name,
-is called as a <b>composite literal</b> and
-is used as the value literals of some kinds of types,
-including struct types and the container types introduced later.
+在Go中，语法形式<code>T{...}</code>称为一个组合字面形式（composite literal），其中<code>T</code>必须为一个类型名或者类型字面形式。
+组合字面形式用来表示一些类型（包括结构体类型和内置容器类型）的值。
 </p>
 
 <div>
-Given a struct type <code>S</code> and assume it has two fields,
-<code>x int</code> and <code>y bool</code> in order,
-then the zero value of <code>S</code> can be represented by the following
-two variants of struct composite literal forms:
+假设<code>S</code>是一个结构体类型并且它有两个字段：<code>x int</code>和<code>y bool</code>，则<code>S</code>的零值可以表示成下面所示的组合字面形式两种变种形式：
 <ol>
 <li>
-	<code>S{0, false}</code>.
-	In this form, none field names are present but all field values must be present
-	by the field declaration orders.
+	<code>S{0, false}</code>。在此变种形式中，所有的字段名称均不出现，但每个字段的值必须指定，并且每个字段的出现顺序和它们的声明顺序必须一致。
 </li>
 <li>
-	<code>S{x: 0, y: false}</code>, <code>S{y: false, x: 0}</code>,
-	<code>S{x: 0}</code>, <code>S{y: false}</code> and <code>S{}</code>.
-	In this form, each field item is optional to be present.
-	The values of the absent fields will be set as the zero values of their respective types.
-	But if a field item is present, it must be presented with the <code>FieldName: FieldValue</code> form.
-	The order of the field items in this form doesn't matter.
-	The zero value form <code>S{}</code> is used most often in practice.
+	<code>S{x: 0, y: false}</code>、<code>S{y: false, x: 0}</code>、<code>S{x: 0}</code>、<code>S{y: false}</code>和<code>S{}</code>。
+	在此变种形式中，字段的名称和值必须成对出现，但是每个字段的值都不是必须出现的，并且字段的出现顺序并不重要。
+	没有出现的字段的值被编译器认为是它们各自类型的零值。<code>S{}</code>是最常用的类型<code>S</code>的零值表示形式。
 </li>
 </ol>
 
 <p>
-If <code>S</code> is a struct type imported from library packages,
-it is recommended to use the second form,
-for the library maiatainers may add fields for the type <code>S</code> later,
-which will make the uses of first forms become invalid.
+如果<code>S</code>是声明在另一个代码包中的一个结构体类型，则推荐使用上面所示的第二种变种形式来表示它的值。
+因为另一个代码包的维护者今后可能会在此结构体中添加新的字段，从而导致当前使用的第一种变种形式在今后可能编译不通过。
 </p>
 
 <p>
-Surely, we can also use the struct composite literals to represent non-zero struct value.
+当然，上面所示的结构体值的组合字面形式也可以用来表示结构体类型的非零值。
 </p>
 
 <p>
-For a value <code>v</code> of type <code>S</code>, we can use
-<code>v.x</code> and <code>v.y</code>, which are called selectors,
-to access the field values of <code>v</code>.
+对于类型<code>S</code>的一个值<code>v</code>，我们可以用<code>v.x</code>和<code>v.y</code>来访问它的字段。
+<code>v.x</code>这种形式称为一个选择器（selector）。
+今后，我们称一个选择器中的逗点<code>.</code>为字段访问操作符。
 </p>
 
-An example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
@@ -173,36 +143,33 @@ type Book struct {
 
 func main() {
 	book := Book{"Go 101", "Tapir", 256}
-	fmt.Println(book.pages) // 256
+	fmt.Println(book) // {Go 101 Tapir 256}
 
-	// Create a book value with another form.
-	book = Book{} // title and author are both "", pages is 0
-	book = Book{author: "Tapir"} // title is "" and pages is 0
+	// 使用带字段名的组合字面形式来表示结构体值：
+	book = Book{} // title和author字段的值都为空字符串""，pages字段的值为0。
+	book = Book{author: "Tapir"} // title字段空字符串""，pages字段为0。
 	book = Book{author: "Tapir", pages: 256, title: "Go 101"}
 
-	// Initialize a struct value without
-	// using composite literals.
+	// 使用选择器来访问和修改字段值。
 	var book2 Book // <=> book2 := Book{}
-	book2.title = "Go 202"
+	book2.author = "Tapir Liu"
+	book2.pages = 300
+	fmt.Println(book.pages) // 300
 }
 </code></pre>
 
 <p></p>
 
-The last <code>,</code> in a compoiste literal is optional
-if the last item in the literal and the closing <code>}</code>
-are at the same line.
-Otherwise, the last <code>,</code> is required.
-(For more details, please read
-<a href="line-break-rules.html">line break rules in Go</a>.)
+如果一个组合字面形式中最后一项和结尾的<code>}</code>处于同一行，则此项后的逗号<code>,</code>是可选的；否则此逗号不可省略。
+（我们可以阅读后面的<a href="line-break-rules.html">Go代码断行规则</a>一文了解更多断行规则。）
 
 <pre class="line-numbers"><code class="language-go">var _ = Book {
 	author: "Go 101",
 	pages: 256,
-	title: "Go 101", // here, the "," can not be ommitted.
+	title: "Go 101", // 这里行尾的逗号不可省略
 }
 
-// The last "," in the following line can be ommitted.
+// 下行}前的逗号可以省略。
 var _ = Book{author: "Go 101", pages: 256, title: "Go 101",}
 </code></pre>
 
@@ -211,17 +178,17 @@ var _ = Book{author: "Go 101", pages: 256, title: "Go 101",}
 
 </div>
 
-<h3>About Struct Value Assignments</h3>
+<h3>关于结构体值的赋值</h3>
 
 <div>
-When a struct value is assigned to another sturct value,
-the effect is the same as assigning each field one by one.
+当一个结构体值被赋值给另外一个结构体值，其效果和逐个将源结构体值的各个字段赋值给目标结构体值的各个对应字段的效果是一样的。
+
 <pre class="line-numbers"><code class="language-go">func f() {
 	book1 := Book{pages: 300}
 	book2 := Book{"Go 101", "Tapir", 256}
 
 	book2 = book1
-	// The above line is equivalent to the following three lines.
+	// 上面这行和下面这三行是等价的。
 	book2.title = book1.title
 	book2.author = book1.author
 	book2.pages = book1.pages
@@ -229,26 +196,20 @@ the effect is the same as assigning each field one by one.
 </code></pre>
 
 <p>
-Two struct values can be assigned to each other only if
-their types are identical or the types of the two struct values
-have the identical underlying type (considering field tags)
-and at least one of the two types is an
-<a href="type-system-overview.html#non-defined-type">non-defined type</a>.
+两个结构体值只有在它们的类型的底层类型一样（要考虑字段标签）并且其中至少有其中一个结构体值的类型为<a href="type-system-overview.html#non-defined-type">非定义类型</a>时才可以互相赋值。
 </p>
 </div>
 
 <p class="anchor" id="field-addressability"></p>
-<h3>Struct Field Addressability</h3>
+<h3>结构体字段的可寻址性</h3>
 
 <div>
 <p>
-The fields of an addressable struct value are also addressable.
-The fields of an unaddressable struct value are also unaddressable.
-The fields of unaddressable struct values can't be modified.
-All composite Literals, including struct composite literal are unaddressable.
+如果一个结构体值是可寻址的，则它的字段也是可寻址的；反之一个不可寻址的结构的字段也是不可寻址的。
+不可寻址的字段的值是不可更改的。所有的组合字面值都是不可寻址的。
 <p>
 
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -257,73 +218,64 @@ func main() {
 	type Book struct {
 		Pages int
 	}
-	var book = Book{} // book is addressable
-	p := &book.Pages  // take the address of the "Pages" field
+	var book = Book{} // 变量值book是可寻址的
+	p := &book.Pages
 	*p = 123
 	fmt.Println(book) // {123}
 
+	// 下面这两行编译不通过，因为Book{}.Pages是不可寻址的。
 	/*
-	Book{}.Pages = 123 // This line doesn't compile,
-	                   // for "Book{}" is unaddressable.
+	Book{}.Pages = 123
+	p = &Book{}.Pages // <=> p = &(Book{}.Pages)
 	*/
 }
 </code></pre>
 
 <p>
+注意：选择器中的字段访问操作符<code>.</code>的优先级比取地址操作符<code>&amp;</code>的优先级要高。
 </p>
 </div>
 
 <p class="anchor" id="take-composite-literal-address"></p>
-<h3>Composite Literals Are Unaddressable But Can Be Taken Addresses</h3>
+<h3>组合字面值不可寻址但可被取地址</h3>
 
 <div>
 <p>
-Generally, only addressable values can be taken addresses.
-But there is a syntactic sugar in Go, which allows us to
-take addesses on composite literals.
-A syntactic sugar is an exception in syntax to make programming convenient.
+一般来说，只有可被寻址的值才能被取地址，但是Go中有一个语法糖（语法例外）：虽然所有的组合字面值都是不可寻址的，但是它们都可被取地址。
 </p>
 
-For example,
+例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 func main() {
 	type Book struct {
 		Pages int
 	}
-	// Book{100} is unaddressable but can be taken address.
+	// Book{100}是不可寻址的，但是它可以被取地址。
 	p := &Book{100} // <=> tmp := Book{100}; p := &tmp
 	p.Pages = 200
-	// The following line fails to compile.
-	// The reason is Book{100} is not addressable,
-	// so its field, Pages, is also not addressable,
-	/*
-	_ = &Book{100}.Pages
-	*/
 }
 </code></pre>
 </div>
 
-<h3>Use Struct Pointers Like Struct Values</h3>
+<h3>在选择器中，结构体值的指针可以当作结构值来使用</h3>
 
 <div>
 <p>
-Unlike C, in Go, there is not the <code>-&gt;</code> operator for accessing
-struct fields through struct pointers.
-In Go, the struct field acceessment operator for struct fields is also
-the dot sign <code>.</code>.
+和C语言不同，Go中没有<code>-&gt;</code>操作符用来通过一个结构体值的指针来访为此结构体值的字段。
+在Go中，<code>-&gt;</code>操作符也是用逗点<code>.</code>来表示的。
 </p>
 
-For example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 func main() {
 	type Book struct {
 		pages int
 	}
-	book1 := &Book{100} // book1 is a poiner.
-	book2 := new(Book)  // book2 is another pointer.
-	book2.pages = book1.pages
+	book1 := &Book{100} // book1是一个指针
+	book2 := new(Book)  // book2是另外一个指针
+	book2.pages = book1.pages // 像使用结构值一样来使用结构体值的指针
 }
 </code></pre>
 
@@ -333,69 +285,56 @@ func main() {
 </div>
 
 <p class="anchor" id="comparison"></p>
-<h3>About Struct Value Comparisons</h3>
+<h3>关于结构体值的比较</h3>
 
 <p>
-Most struct types are comparable types, except the ones who have fields of
-<a href="type-system-overview.html#types-not-support-comparison">uncomparable types</a>.
-When comparing two struct values of the same type,
-each pair of their corresponding fields will be compared.
-The two struct values are equal only if all of their corresponding fields are equal.
+大多数的结构体类型都是可比较类型，除了<a href="type-system-overview.html#types-not-support-comparison">少数含有不可比较字段的结构体类型</a>。
 </p>
 
 <p>
-Two struct values are comparable only if they can be assigned to each other.
+和结构体值的赋值规则类似，如果两个结构体值的类型均为可比较类型，则它们仅在它们的类型的底层类型一样（要考虑字段标签）并且其中至少有其中一个结构体值的类型为非定义类型时才可以互相比较。 
 </p>
 
-<h3>About Struct Value Conversions</h3>
+<p>
+如果两个结构体值可以相互比较，则它们的比较结果等同于逐个比较它们的相应字段。
+两个结构体值只有在它们的相应字段都相等的情况下才相等。
+</p>
+
+<h3>关于结构体值的类型转换</h3>
 
 <div>
 <p>
-Values of two struct types <code>S1</code> and <code>S2</code> can be converted
-to each other's types, if <code>S1</code> and <code>S2</code> share
-the identical underlying type (by ignoring field tags).
-In particular if either <code>S1</code> or <code>S2</code> is a
-<a href="type-system-overview.html#non-defined-type">non-defined type</a>
-and their underlying types are identical (considering field tags),
-then the conversions between the values of them can be implicit.
+两个类型分别为<code>S1</code>和<code>S2</code>的结构体值只有在<code>S1</code>和<code>S2</code>的底层类型相同（忽略掉字段标签）的情况下才能相互转换为对方的类型。
+特别地，如果<code>S1</code>和<code>S2</code>的底层类型相同（要考虑字段标签）并且只要它们其中有一个为非定义类型，则此转换可以是隐式的。
 </p>
 
-Given struct types <code>S0</code>, <code>S1</code>, <code>S2</code>
-<code>S3</code> and <code>S4</code> in the following code snippet,
+比如，对于下面的代码片段中所示的五个结构体类型：<code>S0</code>、<code>S1</code>、<code>S2</code>、<code>S3</code>和<code>S4</code>：
 <ul>
 <li>
-	values of type <code>S0</code> can't be converted to
-	the other four types, and vice versa,
-	for the corresponding field names are different.
+	类型<code>S0</code>的值不能被转换为其它四个类型中的任意一个，原因是它与另外四个类型的对应字段名不同（因此底层类型不同）。
 </li>
 <li>
-	two values of two different types among <code>S1</code>,
-	<code>S2</code>, <code>S3</code> and <code>S4</code>
-	can be converted to each other's type.
+	类型<code>S1</code>、<code>S2</code>、<code>S3</code>和<code>S4</code>的任意两个值可以转换为对方的类型。
 </li>
 </ul>
 
-In particular,
+铁别地，
 <ul>
 <li>
-	values of type <code>S2</code> can be implicitly converted
-	to type <code>S3</code>, and vice versa.
+	类型<code>S2</code>的值可以被隐式转化为类型<code>S3</code>，反之亦然。
 </li>
 <li>
-	values of type <code>S2</code> can be implicitly converted
-	to type <code>S4</code>, and vice versa.
+	类型<code>S2</code>的值可以被隐式转换为类型<code>S4</code>，反之亦然。
 </li>
 </ul>
 
-But,
+但是，
 <ul>
 <li>
-	values of type <code>S1</code> must be explicitly converted
-	to type <code>S2</code>, and vice versa.
+	类型<code>S1</code>的值必须被显式转换为类型<code>S2</code>，反之亦然。
 </li>
 <li>
-	values of type <code>S3</code> can be explicitly converted
-	to type <code>S4</code>, and vice versa.
+	类型<code>S3</code>的值必须被显式转换为类型<code>S4</code>，反之亦然。
 </li>
 </ul>
 
@@ -406,25 +345,28 @@ type S0 struct {
 	x bool
 }
 
-type S1 = struct { // S1 is a (non-defined) alias type
+type S1 = struct { // S1是一个非定义类型
 	x int "foo"
 	y bool
 }
 
-type S2 = struct { // S2 is a (non-defined) alias type
+type S2 = struct { // S2也是一个非定义类型
 	x int "bar"
 	y bool
 }
-type S3 S2 // S3 is a defined type
-type S4 S3 // S4 is a defined type
+
+type S3 S2 // S3是一个定义类型。
+type S4 S3 // S4是一个定义类型。
+// 如果不考虑字段标签，S3（S4）和S1的底层类型一样。
+// 如果考虑字段标签，S3（S4）和S1的底层类型不一样。
 
 var v0, v1, v2, v3, v4 = S0{}, S1{}, S2{}, S3{}, S4{}
 func f() {
 	v1 = S1(v2); v2 = S2(v1)
 	v1 = S1(v3); v3 = S3(v1)
 	v1 = S1(v4); v4 = S4(v1)
-	v2 = v3; v3 = v2 // the conversions can be implicit
-	v2 = v4; v4 = v2 // the conversions can be implicit
+	v2 = v3; v3 = v2 // 这两个转换可以是隐式的
+	v2 = v4; v4 = v2 // 这两个转换也可以是隐式的
 	v3 = S3(v4); v4 = S4(v3)
 }
 </code></pre>
@@ -433,25 +375,21 @@ func f() {
 </p>
 
 <p>
-In fact, two struct values can be assigned (or compared) to each other
-only if one of them can implicitly converted to the type of the other.
+事实上，两个结构体值只有在它们可以相互隐式转换为对方的类型的时候才能相互赋值和比较。
 </p>
 
 </div>
 
-<h3>Annoymous Structs</h3>
+<h3>匿名结构体类型可以使用在结构体字段声明中</h3>
 
 <div>
 <p>
-Annoymous struct type are allowed used as the types of the fields
-of another struct type.
-Annoymous struct type literals are also allowed to be used
-in compisite literals.
+匿名结构体类型允许出现在结构体字段声明中。匿名结构体类型也允许出现在组合字面形式中。
 </p>
 
-An example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">var aBook = struct {
-	author struct {
+	author struct { // 此字段的类型为一个匿名结构体类型
 		firstName, lastName string
 		gender              bool
 	}
@@ -464,25 +402,22 @@ An example:
 	}{
 		firstName: "Mark",
 		lastName: "Twain",
-	},
+	}, // 此组合字面形式中的类型为一个匿名结构体类型
 	title: "The Million Pound Note",
 	pages: 96,
 }
 </code></pre>
 
 <p>
-Generally, it is not recommended to
-use annoymous struct type literals in compisite literals.
+通常来说，为了代码可读性，最好少使用匿名结构体类型。
 </p>
 
 </div>
 
-<h3>More About Struct Types</h3>
+<h3>更多关于结构体类型</h3>
 
 <p>
-There are some advanced topics which are related to struct types.
-They will be explained in <a href="type-embedding.html">type embedding</a>
-and <a href="memory-layout.html#size-and-padding">memory layouts</a> later.
+Go中有一些和结构体类型相关的进阶知识点。这些知识点将后面的<a href="type-embedding.html">类型内嵌</a>和<a href="memory-layout.html#size-and-padding">内存布局</a>两篇文章中介绍。
 </p>
 
 
