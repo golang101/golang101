@@ -1,334 +1,238 @@
-﻿<h1>Value Parts</h1>
+﻿<h1>值部</h1>
 
 <p>
-The articles following the currrent one will introduce more kinds of Go types.
-To easily and deeply understand those articles,
-it is best to read the following content in the currrent article firstly
-before reading those articles.
-In other words, we should know there are two categories of Go types.
+此篇文章后续的若干文章将介绍Go中更多的类型。为了更容易和更深刻地理解那些类型，最好先阅读一下本文的剩余部分。
 </p>
 
-<h3>Two Categories Of Go Types</h3>
+<h3>Go类型分为两大类别（category）</h3>
 
+<div>
 <p>
-Go is a C-family language, which can be confirmed from
-the two previous articles <a href="struct.html">structs in Go</a>
-and <a href="pointer.html">pointers in Go</a>.
-Struct types and pointer types in Go and C are much alike.
-The main characteristic of C types is the memory layouts of their values
-are transparent.
-Each C value in memory occupies one continuous memory segment.
-Below, such a continuous memory segment will be called a value part.
+Go可以被看作是一门C语言血统的语言，这可以通过此前的两篇文章（<a href="pointer.html">指针</a>和<a href="struct.html">结构体</a>）得以验证。
+Go中的指针和结构体类型和C语言很类似。
 </p>
 
 <p>
-One the other hand, Go can also be viewed as C language framework.
-This is mainly reflected in the fact that Go supports several kinds of types
-whose value memory layouts are not totally transparent.
-Each values of the these kinds of types is often composed of one direct part
-and one or several underlying indirect parts, and the underlying value part
-is referenced by the direct value part.
-The following picture dipicts a mult-part value.
+另一方面，Go也可以被看作是C语言的一个扩展框架。这可以从C中的值的内存结构都是很透明的，但Go中一些种类的类型的值的内存结构不是很透明这一事实体现出来。
+在C中，每个值在内存中只占据一段连续内存（这样的一段连续内存今后将被称为一个<code>值部</code>）。
+但是，Go中一些类型的值常常由一个直接部分和一个或多个被此直接部分所引用的间接部分组成。
+</p>
+
+<p>
+下面这张图描绘了一个含有两个值部的值。
 <br/>
 <img src="res/value-parts.png">
 <br/>
 </p>
 
 <p>
-The above two paragraphs describe two categories of Go types.
-Types in the two categories are listed in the following two paragraphs.
+上面的段落描述了两个类别的Go类型。下面将列出这两个类别（category）中的类型（type）种类（kind）。
 </p>
 
 <p>
-Up to now, except string types,
-all other kinds of types introduced in the previous artciles are C alike.
-These types include boolean types, numeric types, struct types and pointer types.
-The other two kinds of C alike types are
-array types and unsafe pointer types.
-Array types will be explained in the next article
-and unsafe pointer types will be explained in the article
-<a href="unsafe.html">the <code>unsafe</code> standard package</a> later.
-Each C alike value is only composed of one direct value part.
+第一个类别中的类型种类包括：布尔类型、各种数值类型、结构体类型、指针类型、以及后面将要详细解释的数组类型和非类型安全指针类型。
+数组类型将在下一片文章中详述。非类型安全指针类型将在<a href="unsafe.html">此篇文章</a>中详述。
+此类别中的类型的值和C值类似，在内存中都只有一个透明的直接部分。
 </p>
 
-<div>
-Values of all other kinds of types not mentioned in the last paragraph
-may contain underlying parts.
-Specifically speaking, these kinds of types include
+其它种类的类型均属于第二个类别。此类别中的值在内存中可以包含若干间接部分，并且它们的直接部分是不透明的。
+具体说来，这些类型的种类包括：
 <ul>
-<li>slice types,</li>
-<li>map types,</li>
-<li>channel types,</li>
-<li>function types,</li>
-<li>interface types,</li>
-<li>string types.</li>
+<li>切片类型</li>
+<li>映射表类型</li>
+<li>数据通道类型</li>
+<li>函数类型</li>
+<li>接口类型</li>
+<li>字符串类型</li>
 </ul>
 
 <p>
-These kinds of types bring much convenience to Go programming
-by encapsulating many implementation details.
-Different Go compilers may adopt different internal implementations
-for these types, but the external behaviors of values of these types
-must satisfy the requirements specified in Go specification.
-These types will be explained detailedly in the following articles.
+通过封装了很多具体的实现细节，第二个类别中的类型给Go编程带来了很大的便利。
+不同的编译器实现会采用不同的内部结构来实现这些类型，但是这些类型的值的外在表现必须满足Go白皮书中的要求。
+</p>
+
+<p>
+第二个类别中的类型将在后续文章中得到详细的解释。
+</p>
+
+<p>
+（请注意：接口类型和字符串类型值是包含间接部分取决于具体编译器实现。
+如果不使用今后将介绍的非类型安全途径，我们无法从这两类类型的值的外在表现来判定它们的值是否含有间接部分。）
+</p>
+
+<p>
+上面所列出的第二个分类中的类型对于编程来说并非是很基础的类型。
+我们可以使用第一个分类中的类型来实现第二个分类中的类型。
+但是，通过将一些常用或者很独特的功能封装到第二个分类中的类型里，Go编程的效率将得到大大提升，体验将得到大大增强。
+</p>
+
+<p>
+另一方面，这些封装同时也隐藏了这些类型的值的内部结构，使得Go程序员不能对这些类型有一个更全局的认识。有时候这会对更好地理解Go带来了一些障碍。
+</p>
+
+<p>
+为了帮助Go程序员更好的理解第二个分类中的类型和它们的值，本文余下的内容将对这些类型的内在实现做一个简单介绍。
+这些实现的细节将不会在本文中谈及。本文的介绍主要基于（但并不完全符合）标准编译器的实现。
 </p>
 </div>
 
-<!---
-<p>
-Note, whether or not interface and string values may contain underlying parts
-is compiler dependent. For the standard Go compiler implementation,
-interface and string values may contain underlying parts.
-</p>
--->
-
-<p>
-The types in the second category are not fundamental types for a langauge,
-we can implement them from scratch by using the types in the first category.
-However, the implementations would be quite verbose and sometimes boring.
-By encapsulating some common or unique functionalities and
-supporting these types as the first-level citizens in Go,
-the experiences of Go programming become enjoyable and productive.
-</p>
-
-<p>
-On the other hand, these encapsulations of implementations of the types
-in the second category hide many internal definitions of these types.
-This prevents Go programmers from viewing the whole pictures of these types,
-and sometimes makes some obstacles to understanding Go better.
-</p>
-
-<p>
-To help gophers better understand the types in the second category
-and their values, the following content of this article will introduce
-the internal structure definitions of these kinds of types.
-The detailed implementations of these types will not be explained here.
-The explanations in this article are based on, but not exactly the same as,
-the implementations used by the standard Go compiler.
-</p>
-
-<h3>Two Kinds Of Pointer Types In Go</h3>
-
-<p>
-Before showing the internal structure definitions of the kinds of types
-in the second category, let's clarify more on pointers and references.
-</p>
-
-<p>
-We have learned <a href="pointer.html">Go pointers</a> in the last article.
-The pointer types in that article are type-safe pointer types.
-In fact, Go also supports type-unsafe pointer types.
-The <code>unsafe.Pointer</code> type provided in the <code>unsafe</code>
-standard package is like <code>void*</code> in C language.
-Types whose underlying types are <code>unsafe.Pointer</code>
-are called unsafe pointer types in Go 101.
-</p>
-
-<p>
-In other articles in Go 101, if not special specified,
-when a pointer type is mentioned, it means a type-safe pointer type.
-However, iIn the following parts of the current article,
-when a pointer type is mentioned,
-it may be either a type-safe pointer type or a type-unsafe pointer type.
-</p>
+<h3>Go中的两种指针类型</h3>
 
 <div>
-A pointer value stores a memory address of another value,
-unless the pointer value is a nil pointer.
-We can say the pointer value references the other value,
-or the other value is referenced by the pointer value.
-Values can also be referenced indirectly.
+<p>
+在继续下面的内容之前，我们先了解一下Go中的两种指针类型并明确一下“引用”这个词的含义。
+</p>
+
+<p>
+我们已经在<a href="pointer.html">上上篇文章</a>中了解了Go中的指针。
+那篇文章中所介绍的指针属于类型安全的指针。事实上，Go还支持另一类称为非类型安全的指针类型。
+非类型安全的指针类型提供在<code>unsafe</code>标准库包中。
+非类型安全指针类型通常使用<code>unsafe.Pointer</code>来表示。
+<code>unsafe.Pointer</code>类似于C语言中的<code>void*</code>。
+底层类型为<code>unsafe.Pointer</code>类型都是非类型安全指针类型。
+</p>
+
+<p>
+在Golang 101中的大多数文章中，如果没有特别说明，当一个指针类型被谈及，它表示一个类型安全指针。
+但是在本文的余下内容中，当一个指针被谈及，它表示一个任意指针类型，包括安全的和非安全的。
+</p>
+
+一个指针值存储着另一个值的地址，除非此指针值是一个nil空指针。
+我们可以说此指针引用着另外一个值，或者另外一个值被此指针所引用。
+一个值可能被间接引用，比如
 <ul>
 <li>
-	If a struct value <code>a</code> has a pointer field <code>b</code>
-	which references a value <code>c</code>, then we can say the struct
-	value <code>a</code> also (indirectly) references value <code>c</code>.
+	如果一个结构体值<code>a</code>含有一个指针字段<code>b</code>并且这个指针地段引用着另外一个值<code>c</code>，那么我们可以说结构体值<code>a</code>间接地引用着值<code>c</code>。
 </li>
 <li>
-	If a value <code>x</code> references (either directly or indirectly)
-	a value <code>y</code>, and the value <code>y</code> references
-	(either directly or indirectly) a value <code>z</code>,
-	then we can also say the value <code>x</code> (indirectly)
-	references value <code>z</code>.
+	如果一个值<code>x</code>（直接或者间接地）引用着另一个值<code>y</code>，并且值<code>y</code>（直接或者间接地）引用着第三个值<code>z</code>，则我们可以说值<code>x</code>间接地引用着值<code>z</code>。
 </li>
 </ul>
+
+<p>
+一个含有指针字段的结构体类型可以被称为一个<b>指针包裹类型</b>。一个含有指针包裹类型字段的结构体类型也可称为一个指针包裹类型。
+</p>
 </div>
 
-<p>
-A struct type with fields of pointer types
-can be called a <b>pointer wrapper type</b>.
-A struct type with fields of pointer wrapper type
-call also be called a pointer wrapper type.
-</p>
-
-<h3>Internal Definitions Of The Types In The Second Category</h3>
+<h3>第二个分类中的类型的（可能的）内部实现结构定义</h3>
 
 <p>
-The internal definitions of the types in the second category are shown below.
+下面是第二个分类中的类型的可能的内部定义。
 </p>
 
-<h4>Internal Definitions Of Map, Channel And Function Types</h4>
+<h4>映射表、数据通道和函数类型的内部定义</h4>
 
 <div>
-The internal definitions of map, channel and function types are similar:
-<pre class="line-numbers"><code class="language-go">// map types
+映射表、数据通道和函数类型的内部定义很相似：
+
+<pre class="line-numbers"><code class="language-go">// 映射表类型
 type _map *hashtableImpl // currently, for the standard Go compiler,
                          // Go maps are hashtables actually.
 
-// channel types
+// 数据通道类型
 type _channel *channelImpl
 
-// function types
+// 函数类型
 type _function *functionImpl
 </code></pre>
-<p>
-So, internally, types of the three families are just pointer types.
-The zero values of these types are all represented
-by the predeclared <code>nil</code> identifier.
-For any non-nil value of these types,
-its direct part (a pointer) references
-its indirect underlying implementation part.
-</p>
 
 <p>
-In fact, the indirect underlying part of a value of the three kinds of types
-may also reference deeper indirect underlying parts.
-But the current article will ignore the deeper ones
-and first level indirect ones.
+从这些定义，我们可以看出来，这三个种类的类型的内部结构其实是一个指针类型。
+或者说，这些类型的值的直接部分在内部是一个指针。
+这些类型的每个值的直接部分引用着的承载着它的具体实现的底层间接部分。
 </p>
 
 </div>
 
-<h4>Internal Definition Of Slice Types</h4>
+<h4>切片类型的内部定义</h4>
 
 <div>
-The internal definition of slice types is like:
-<pre class="line-numbers"><code class="language-go">// slice types
-type _slice struct {
-	elements unsafe.Pointer // underlying elements
-	len      int            // number of elements
-	cap      int            // capacity
+切片类型的内部定义：
+
+<pre class="line-numbers"><code class="language-go">type _slice struct {
+	elements unsafe.Pointer // 引用着底层的元素
+	len      int            // 当前的元素个数
+	cap      int            // 切片的容量（最大可容纳的元素个数）
 }
 </code></pre>
 
 <p>
-So, internally, slice types are pointer wrapper struct types.
-The zero values of slice types are also represented
-by the predeclared <code>nil</code> identifier.
-Each non-nil slice value has an indirect underlying part
-which stores the element values of the slice value.
-The <code>elements</code> field of the direct part references
-the indirect underlying part of the slice value.
+从这个定义可以看出来，一个切片类型在内部可以看作是一个指针包裹类型。
+每个非零切片值包含着一个底层间接部分用来存储此切片的元素。
+一个切片值的底层元素（间接部分）由此切片值的<code>elements</code>字段所引用。
 </p>
 </div>
 
-<h4>Internal Definition Of String Types</h4>
+<h4>字符串类型的内部结构</h4>
 
 <div>
-Below is the internal definition for string types:
-<pre class="line-numbers"><code class="language-go">// string types
-type _string struct {
-	elements *byte // underlying bytes
-	len      int   // number of bytes
+<pre class="line-numbers"><code class="language-go">type _string struct {
+	elements *byte // 引用着底层的byte元素
+	len      int   // 字符串的长度
 }
 </code></pre>
+
 <p>
-So string types are also pointer wrapper struct types internally.
-The zero values of string types are blank strings, which are represented by
-<code>""</code> or <code>``</code> in literal.
-Each string value has an indirect underlying part storing
-the bytes of the string value, the indirect part is referenced
-by the <code>elements</code> field of that string value.
+从此定义可以看出，每个字符串类型在内部也可以看作是一个指针包裹类型。
+每个非零字符串值含有一个指针字段 <code>elements</code>。
+这个指针字段引用着此字符串值的底层字节元素。
 </p>
 </div>
 
 <p class="anchor" id="interface-structure"></p>
-<h4>Internal Definition Of Interface Types</h4>
+<h4>接口类型的内部定义</h4>
 
 <div>
-Below is the internal definition for general interface types:
-<pre class="line-numbers"><code class="language-go">// general interface types
-type _interface struct {
-	dynamicType  *_type         // the dynamic type
-	dynamicValue unsafe.Pointer // the dynamic value
+我们可以认为接口类型在内部是如下定义的：
+
+<pre class="line-numbers"><code class="language-go">type _interface struct {
+	dynamicType  *_type         // 引用着接口值的动态类型
+	dynamicValue unsafe.Pointer // 引用着接口值的动态值
 }
 </code></pre>
 
 <p>
-Internally, interface types are also pointer wrapper struct types.
-The internal definition of an interface type has two pointer fields.
-The zero values of interface types are also represented
-by the predeclared <code>nil</code> identifier.
-Each non-nil interface value has two indirect underlying parts
-which store the dynamic type and dynamic value of that interface value.
-The two indirect parts are referenced by the <code>dynamicType</code>
-and <code>dynamicValue</code> fields of that interface value.
+从这个定义来看，接口类型也可以看作是一个指针包裹类型。一个接口类型含有两个指针字段。
+每个非零接口值的（两个）间接部分分别存储着此接口值的动态类型和动态值。
+这两个间接部分被此接口值的直接字段<code>dynamicType</code>和<code>dynamicValue</code>所引用。
 </p>
 
-In fact, for the standard Go compiler, the above definition is only used
-for blank interface types.
-Blank interface types are the interface types which don't specify any methods.
-We can learn more about interfaces in the article
-<a href="interface.html">interfaces in Go</a> later.
-For non-blank interface types, a definition like the following one is used.
+事实上，上面这个内部定义只用于表示空接口类型的值。空接口类型没有指定任何方法。
+后面的<a href="interface.html">接口</a>一文详细解释了接口类型和值。
+非空接口类型的内部定义如下：
 
-<pre class="line-numbers"><code class="language-go">// general interface types
+<pre class="line-numbers"><code class="language-go">// non-blank interface types
 type _interface struct {
 	dynamicTypeInfo *struct {
-		dynamicType *_type       // the dynamic type
-		methods     []*_function // implemented methods
+		dynamicType *_type       // 引用着接口值的动态类型
+		methods     []*_function // 引用着动态类型的对应方法列表
 	}
-	dynamicValue unsafe.Pointer // the dynamic value
+	dynamicValue unsafe.Pointer // 引用着动态值
 }
 </code></pre>
 
 <p>
-The <code>methods</code> field of the <code>dynamicTypeInfo</code> field
-of an interface value stores the implemented methods of the dynamic type
-of the interface value for the (interface) type of the interface value.
-</p>
-
-<p>
-Go runtime will create at most one dynamic type information struct for
-each interface type and dynamic type pair
-and store the struct value in the global zone.
-For the standard Go runtime, a dynamic type information struct value
-will be never garbaged collected once it is created.
-All <code>_type</code> values are also stored in the global zone.
-In other words, the <code>_type</code> values and dynamic type information
-struct values are shared by many interface values,
-they don't belong to any specified interface value.
-For this reason, the current article will view each interface value may
-has at most one underlying value,
-which is referenced by the <code>dynamicValue</code> field.
+一个非空接口类型的值的<code>dynamicTypeInfo</code>字段的<code>methods</code>字段引用着一个方法（特殊的函数）列表。
+此列表中的每一项为此接口值的动态类型上定义的一个方法，此方法对应着此接口类型所指定的一个的同原型的方法。
 </p>
 
 </div>
 
 <p class="anchor" id="about-value-copy"></p>
-<h3>Underlying Value Parts Are Not Copied In Value Assignments</h3>
+<h3>在赋值中，底层间接值部将不会被复制</h3>
 
 <p>
-Now we have learned that the internal definitions of the types
-in the second category are either pointer types or struct types.
-Certainly, Go compilers will never view the types in the second category
-as pointer types or struct types in user programs.
-These definitions are just used internally by Go runtimes.
+现在我们了解了第二个分类中的类型的内部结构是一个指针或者指针包裹类型。
+当然，Go编译器不会把用户代码中的这些类型的值视为指针或者结构体值。
+这些定义只用于Go运行时（runtime）的实现。
 </p>
 
 <p>
-In Go, each value assignment (including parameter passing, etc) is
-a shallow value copy if the involved destination and source values
-have the same type (if their types are different, we can think that
-the source value will be implicitly converted to the destination type
-before doing that assignment).
-In other words, only the direct part of the source value is copied
-to the destination value in an value assignment.
-If the source value has underlying value part(s),
-then the direct parts of the destination and source values
-will reference the same underlying value part(s),
-in other words, the destination and source values will
-share the same underlying value part(s).
+在Go中，每个赋值操作（包括函数调用传参等）都是一个值的浅复制过程（假设源值和目标值的类型相同）。
+换句话说，在一个赋值操作中，只有源值的直接部分被复制给了目标值。
+如果源值含有间接部分，则在此赋值操作完成之后，目标值和源值的直接部分将引用着相同的间接部分。
+换句话说，两个值将共享底层的间接值部，如下图所示：
+
 <br/>
 <img src="res/value-parts-copy.png">
 <br/>
@@ -336,25 +240,17 @@ share the same underlying value part(s).
 </p>
 
 <p>
-In fact, the above descriptions are not 100% correct in theory, for strings and interfaces.
-The <a href="https://golang.org/doc/faq#pass_by_value">official Go FAQ</a> says
-the underlying dynamic value part of an interface value should be copied
-as well when the interface value is copied.
-However, as the dynamic value of an interface value is read only,
-the standard Go compiler/runtime doesn't copy the underlying
-dynamic value parts in copying interface values.
-This can be viewed as a compiler optimization.
-The same situation is for string values and the same optimization
-(made by the standard Go compiler/runtime) is made for copying string values.
-So, for the standard Go compiler/runtime, the descriptions in the last section
-are 100% correct, for values of any type.
+事实上，对于字符串值和接口值的赋值，上述描述在理论上并非百分百正确。
+<a href="https://golang.org/doc/faq#pass_by_value">官方FAQ</a>明确说明了在一个接口值的赋值中，接口的底层动态值将被复制到目标值。
+但是，因为一个接口值的动态值是只读的，所以在接口值的赋值中，官方标准编译器并没有赋值底层的动态值。者可以被视为是一个编译器优化。
+对于字符串值的赋值，道理是一样的。所以对于官方标准编译器来说，上一段的描述是100%正确的。
 </p>
 
 <p>
-Since an indirect underlying part may not belong to any value exclusively,
-it doesn't contribute to the size returned by the <code>unsafe.Sizeof</code> function.
+因为一个间接值部可能并不专属于任何一个值，所以在使用<code>unsafe.Sizeof</code>函数计算一个值的尺寸的时候，此值的间接部分所占内存空间未被计算在内。
 </p>
 
+<!--
 <p>
 As above mentioned, Go map values are hashtables internally.
 When an interface or a string value is used as a map key, its underlying part(s)
@@ -363,47 +259,32 @@ When a channel is used as a map key, its underlying part(s) are not counted
 in calculating its hash.
 Slice, map and function values can't be used as map keys.
 </p>
+-->
 
 <p class="anchor" id="more=about-reference"></p>
-<h3>About The "Reference Type" And "Reference Value" Terminologies</h3>
+<h3>关于术语“引用类型”和“引用值”</h3>
 
 <div>
-The word <b><i>reference</i></b> in Go world is a big mess.
-It brings many confusions to Go community.
-Some articles, including some <a href="https://golang.org/doc/faq#references">official ones</a>,
-use <b><i>reference</i></b> as qualifiers of types and values,
-or treat <b><i>reference</i></b> as the opposite of <b><i>value</i></b>.
-This is strongly not recommended in Go 101.
-I really don't want to dispute on this point.
-Here I just list some absolutely misuses of <b><i>reference</i></b>:
+“引用”这个术语在Go社区中使用得有些混乱。很多Go程序员在Go编程中可能由此产生了一些困惑。
+一些文档或者网络文章，包括一些<a href="https://golang.org/doc/faq#references">官方文档</a>，把“引用”看作是“值”的一个对立面。
+Go 101强烈的反对这种定义。在这一点上，本人不想争论什么。这里仅仅列出一些可肯定错误的使用了“引用”这个术语的例子：
+
 <ul>
 <li>
-	only slice, map, channel and function types are reference types in Go.
-	(If we do need the <b><i>reference type</i></b> terminology in Go,
-	then we shouldn't exclude any custom pointer and pointer wrapper types
-	from reference types).
+	在Go中，只有切片、映射表、数据通道和函数类型属于<b><i>引用类型</i></b>。
+	（如果我们确实需要<b><i>引用类型</i></b>这个术语，那么我们不应把指针类型和指针包裹类型排除在引用类型之外。）
 </li>
 <li>
-	references are opposites of values.
-	(If we do need the <b><i>reference value</i></b> terminology in Go,
-	then please view reference values as special values, instead of
-	opposites of values.)
-</li>
-<li>
-	some parameters are passed by reference.
-	(Sorry, all parameters are passed by copy in Go.)
+	一些函数调用的参数是通过引用来传递的。
+	（对不起，在Go中，所有的函数调用的参数都是通过值复制的方式传递的。）
 </li>
 </ul>
 
 <p>
-I don't mean the <b><i>reference type</i></b> or <b><i>reference value</i></b>
-terminologies are totally useless for Go,
-I just think they are not very essential.
-If we do need these terminologies, I prefer to define them as
-pointers and pointer wrappers.
-However, my personal opinion is it is best to limit the <b><i>reference</i></b>
-word to only representing relations, and never use it as qualifiers.
-This will avoid many confusions in leaning, teaching and using Go.
+我并不是想说<b><i>引用类型</i></b>这个术语在Go中是完全没有价值的，
+我只是想表达这个术语是完全没有必要的，并且它常常在Go的使用中导致一些困惑。我推荐使用指针和指针包裹类型来代替这个术语。
+另外，我个人的观点是最好将<b><i>引用</i></b>这个词限定到只表示值之间的关系，把它当作一个动词或者名词来使用，永远不要把它当作一个形容词来使用。
+这样将在使用Go的过程中避免很多困惑。
 </p>
 </div>
 
