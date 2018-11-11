@@ -120,18 +120,18 @@ import (
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
-	
+
 	if n := rand.Int(); n%2 == 0 {
 		fmt.Println(n, "is an even number.")
 	} else {
 		fmt.Println(n, "is an odd number.")
 	}
-	
+
 	n := rand.Int() % 2 // 此n不是上面声明的n
 	if n % 2 == 0 {
 		fmt.Println("An even number.")
 	}
-	
+
 	if ; n % 2 != 0 {
 		fmt.Println("An odd number.")
 	}
@@ -167,7 +167,7 @@ func main() {
 		h := h // 左h是一个新声明的变量，右h已经在上面声明了
 		_ = h
 	}
-	
+
 	// 上面声明的两个h在此处都不可见。
 }
 </code></pre>
@@ -586,7 +586,7 @@ import "fmt"
 
 func main() {
 	i := 0
-	
+
 Next: // 标签声明
 	fmt.Println(i)
 	i++
@@ -635,7 +635,7 @@ Next:
 	if i >= 5 {
 		goto Exit // error: goto Exit jumps over declaration of k
 	}
-	
+
 	k := i + i
 	fmt.Println(k)
 	i++
@@ -675,7 +675,7 @@ Next:
 	if i >= 5 {
 		goto Exit
 	}
-	
+
 	k = i + i
 	fmt.Println(k)
 	i++
@@ -689,7 +689,7 @@ Exit:
 
 </div>
 
-<h3>跟随标签的<code>break</code>和<code>continue</code>跳转语句</h3>
+<h3>跟随着标签的<code>break</code>和<code>continue</code>跳转语句</h3>
 
 <p>
 一个<code>goto</code>语句必须包含一个标签名。
@@ -700,13 +700,13 @@ Exit:
 
 <p>
 如果一条<code>break</code>语句中包含一个标签名，则此标签必须刚好声明在一个包含此<code>break</code>语句的可跳出流程控制代码块之前。
-我们可以把此标签名看做是其后紧跟随的可跳出流程控制代码块的名称。
+我们可以把此标签名看作是其后紧跟随的可跳出流程控制代码块的名称。
 此<code>break</code>语句将立即结束此可跳出流程控制代码块的执行。
 </p>
 
 <p>
 如果一条<code>continue</code>语句中包含一个标签名，则此标签必须刚好声明在一个包含此<code>continue</code>语句的循环流程控制代码块之前。
-我们可以把此标签名看做是其后紧跟随的循环流程控制代码块的名称。
+我们可以把此标签名看作是其后紧跟随的循环流程控制代码块的名称。
 此<code>continue</code>语句将提前结束结束此循环流程控制代码块的执行。
 </p>
 

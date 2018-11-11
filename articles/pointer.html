@@ -70,7 +70,7 @@ type PP *Ptr  // PP是一个定义的多级指针类型，它的基类型为Ptr�
 </p>
 
 <p>
-指针类型的零值的字面形式使用预定义的<code>nil</code>来表示。一个nil指针中不存储任何地址。
+指针类型的零值的字面形式使用预定义的<code>nil</code>来表示。一个nil指针（常称为空指针）中不存储任何地址。
 </p>
 
 <p>
@@ -102,7 +102,7 @@ type PP *Ptr  // PP是一个定义的多级指针类型，它的基类型为Ptr�
 </li>
 <li>
 	我们也可以使用前置取地址操作符<code>&amp;</code>来获取一个可被取地址的值的地址。
-	对于一个可被取地址的类型为<code>T</code>的值<code>t</code>，我们可以用<code>&amp;t</code>来取得它的地址。<code>&amp;t</code>的类型为<code>*T</code>。
+	对于一个类型为<code>T</code>的可被取地址的值<code>t</code>，我们可以用<code>&amp;t</code>来取得它的地址。<code>&amp;t</code>的类型为<code>*T</code>。
 </li>
 </ol>
 </div>

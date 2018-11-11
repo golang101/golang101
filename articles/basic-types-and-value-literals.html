@@ -15,7 +15,7 @@ Go支持如下内置基本类型：
 	一种内置布尔类型：<code>bool</code>。
 </li>
 <li>
-	11种内置整数类型：	<code>int8</code>、<code>uint8</code>、<code>int16</code>、<code>uint16</code>、<code>int32</code>、<code>uint32</code>、<code>int64</code>、<code>uint64</code>、<code>int</code>、<code>uint</code>和<code>uinptr</code>。
+	11种内置整数类型： <code>int8</code>、<code>uint8</code>、<code>int16</code>、<code>uint16</code>、<code>int32</code>、<code>uint32</code>、<code>int64</code>、<code>uint64</code>、<code>int</code>、<code>uint</code>和<code>uinptr</code>。
 </li>
 <li>
 	两种内置浮点数类型：<code>float32</code>和<code>float64</code>。
@@ -305,10 +305,10 @@ rune字面形式有几个变种，其中最常用的一种变种是将一个rune
 </code></pre>
 
 <p>
-注意：<code>\</code>之后必须跟随三个八进制数字字符（0-7），
-<code>\x</code>之后必须跟随两个十六进制数字字符（0-9，a-f和A-F），
-<code>\u</code>之后必须跟随四个十六进制数字字符，
-<code>\U</code>之后必须跟随八个十六进制数字字符。
+注意：<code>\</code>之后必须跟随三个八进制数字字符（0-7）表示一个byte值，
+<code>\x</code>之后必须跟随两个十六进制数字字符（0-9，a-f和A-F）表示一个byte值，
+<code>\u</code>之后必须跟随四个十六进制数字字符表示一个rune值（此rune值的高四位都为0），
+<code>\U</code>之后必须跟随八个十六进制数字字符表示一个rune值。
 这些八进制和十六进制的数字字符序列表示的整数必须是一个合法的Unicode码点值，
 否则编译将失败。
 </p>
@@ -409,8 +409,11 @@ rune字面形式（不包括两个单引号）也可以出现在双引号风格�
 "abc"
 
 // 这几个字符串字面形式是等价的。
-"\xe4\xbc\x97\u4eba"
-"\u4f17\xe4\xba\xba"
+"\u4f17\xe4\xba\xba" // “众”的Unicode编码值为4f17，它的
+                     // UTF-8编码为三个字节：0xe4 0xbc 0x97。
+"\xe4\xbc\x97\u4eba" // “人”的Unicode编码值为4eba，它的
+                     // UTF-8编码为三个字节：0xe4 0xba 0xba。
+"\xe4\xbc\x97\xe4\xba\xba"
 "众人"
 </code></pre>
 
@@ -428,7 +431,7 @@ rune字面形式（不包括两个单引号）也可以出现在双引号风格�
 </p>
 
 <p>
-字符串类型的零值用 <code>""</code>或<code>``</code>表示。
+字符串类型的零值在代码里用 <code>""</code>或<code>``</code>表示。
 </p>
 
 </div>
@@ -441,13 +444,12 @@ rune字面形式（不包括两个单引号）也可以出现在双引号风格�
 </p>
 
 <p>
-任何字符串的字面形式都可以表示任何了字符串类型的值。
+任何字符串的字面形式都可以表示任何字符串类型的值。
 </p>
 
 <p>
-预定义的两个常量<code>false</code>和<code>true</code>都可以表示
-任何布尔类型的值。（再次提醒，<code>false</code>和<code>true</code>不
-属于严格意义上的字面值。）
+预定义的两个常量<code>false</code>和<code>true</code>都可以表示任何布尔类型的值。
+（再次提醒，<code>false</code>和<code>true</code>不属于严格意义上的字面值。）
 </p>
 
 <p>

@@ -241,7 +241,11 @@ func main() {
 <p>
 在运行时，我们可以调用<a href="https://golang.org/pkg/runtime/#GOMAXPROCS"><code>runtime.GOMAXPROCS</code></a>函数来获取和设置逻辑处理器的的数量。
 对于官方标准编译器，在Go 1.5之前，默认初始逻辑处理器的数量为1；自从Go 1.5之后，默认初始逻辑处理器的数量和逻辑CPU的数量一致。
-此新的默认设置在大多数情况下是最佳选择。我们也可以通过设置<code>GOMAXPROCS</code>环境变量来设置一个Go程序的初始逻辑处理器数量。
+此新的默认设置在大多数情况下是最佳选择。但是对于某些文件操作十分频繁的程序，设置一个大于<code>runtime.NumCPU()</code>的<code>GOMAXPROCS</code>值可能是有好处的。
+</p>
+
+<p>
+我们也可以通过设置<code>GOMAXPROCS</code>环境变量来设置一个Go程序的初始逻辑处理器数量。
 </p>
 
 <p class="anchor" id="defer"></p>
@@ -470,7 +474,7 @@ func main() {
 
 <p>
 Go不支持异常抛出和捕获，而是推荐使用返回值显式返回错误。
-不过，事实上，Go直至一套和异常抛出/捕获类似的机制。此机制称为恐慌/恢复（panic/recover）机制。
+不过，Go支持一套和异常抛出/捕获类似的机制。此机制称为恐慌/恢复（panic/recover）机制。
 </p>
 
 <p>
