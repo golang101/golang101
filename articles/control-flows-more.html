@@ -276,7 +276,7 @@ func main() {
 }
 </code></pre>
 
-The output:
+输出结果：
 <pre class="output"><code>The first line.
 The second line.
 The third line.
@@ -355,12 +355,12 @@ func main() {
 <h3>延迟函数调用的必要性和好处</h3>
 
 <p>
-事实上，上面的几个使用了延迟函数调用的例子中的延迟函数调用必非绝对必要。
+事实上，上面的几个使用了延迟函数调用的例子中的延迟函数调用并非绝对必要。
 但是延迟调用对于下面将要介绍的恐慌/恢复特性是必要的。
 </p>
 
 <p>
-延迟函数调用可以帮助我们写出更整洁和更鲁棒的代码。我们可以在后面的<a href="defer-more.html">更多关于延迟调用</a>一文中读到这样的例子。
+另外延迟函数调用可以帮助我们写出更整洁和更鲁棒的代码。我们可以在后面的<a href="defer-more.html">更多关于延迟调用</a>一文中读到这样的例子。
 </p>
 
 <p class="anchor" id="argument-evaluation-moment"></p>
@@ -428,7 +428,7 @@ b: 3
 		}
 </code></pre>
 
-or
+或者
 
 <pre class="line-numbers"><code class="language-go">		for i := 0; i < 3; i++ {
 			i := i // 在下面的调用中，左i遮挡了右i。
@@ -518,7 +518,7 @@ import "fmt"
 
 func main() {
 	defer func() {
-		fmt.Println("exit nornally.")
+		fmt.Println("exit normally.")
 	}()
 	fmt.Println("hi!")
 	defer func() {

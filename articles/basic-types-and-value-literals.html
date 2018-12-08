@@ -86,8 +86,7 @@ Go中有两种内置别名类型（alias type）：
 <p>
 一个布尔值表示一个真假。在内存中，一个布尔值只有两种可能的状态。
 这两种状态使用两个预声明的（或称为内置）常量（<code>false</code>和<code>true</code>）来表示。
-关于常量声明，下一篇文章<a href="">/basic-types-and-value-literals.html</a>将
-做详细解释。
+关于常量声明，<a href="basic-types-and-value-literals.html">下一篇文章</a>将做详细解释。
 </p>
 
 <p>
@@ -296,7 +295,7 @@ rune字面形式有几个变种，其中最常用的一种变种是将一个rune
 </code></pre>
 
 下面这些rune字面形式的变种和<code>'a'</code>是等价的
-（字符<code>a</code>的Unicode编码值是97）。
+（字符<code>a</code>的Unicode值是97）。
 
 <pre><code class="language-go">'\141'   // 141是97的八进制表示
 '\x61'   // 61是97的十六进制表示
@@ -409,10 +408,10 @@ rune字面形式（不包括两个单引号）也可以出现在双引号风格�
 "abc"
 
 // 这几个字符串字面形式是等价的。
-"\u4f17\xe4\xba\xba" // “众”的Unicode编码值为4f17，它的
-                     // UTF-8编码为三个字节：0xe4 0xbc 0x97。
-"\xe4\xbc\x97\u4eba" // “人”的Unicode编码值为4eba，它的
-                     // UTF-8编码为三个字节：0xe4 0xba 0xba。
+"\u4f17\xe4\xba\xba" // “众”的Unicode值为4f17，它的UTF-8编码
+                     // 为三个字节：0xe4 0xbc 0x97。
+"\xe4\xbc\x97\u4eba" // “人”的Unicode值为4eba，它的UTF-8编码
+                     // 为三个字节：0xe4 0xba 0xba。
 "\xe4\xbc\x97\xe4\xba\xba"
 "众人"
 </code></pre>

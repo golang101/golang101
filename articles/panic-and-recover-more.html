@@ -130,8 +130,8 @@ func main() { // depth 0
 	go func() { // depth 0
 		func() { // depth 1
 		}()
-	
-		defer func() { // depth 1		
+
+		defer func() { // depth 1
 			defer func() { // depth 2
 			}()
 		}()
@@ -142,7 +142,7 @@ func main() { // depth 0
 			go func() { // depth 0
 			}()
 		}()
-	
+
 		go func() { // depth 0
 		}()
 	}()
@@ -265,7 +265,7 @@ func main() { // call depth 0
 		defer func() { // call depth 2
 			fmt.Println( recover() ) // 6
 		}()
-	
+
 		// The depth of panic 3 is 0, and the depth of panic 6 is 1.
 		defer fmt.Println("now, there are two active panics: 3 and 6")
 		defer panic(6) // will suppress panic 5

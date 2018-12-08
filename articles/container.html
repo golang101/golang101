@@ -1,136 +1,85 @@
-﻿<h1>Arrays, Slices And Maps In Go</h1>
+﻿<h1>数组、切片和映射表</h1>
 
 <p>
-Strictly speaking, there are three kinds of first-level citizen
-container types in Go, array, slice and map.
-Sometimes, strings and channels can also be viewed as container types,
-but this article will not touch the two kinds of types.
-All container types talked about in the current article are
-arrays, slices and maps.
+在严格意义上，Go中有三种一等公民容器类型：数组、切片和映射表。
+有时候，我们可以认为字符串类型和数据通道类型也属于容器类型。
+但是，此篇文章只谈及数组、切片和映射表类型。
 </p>
 
 <p>
-There are many container related details in Go.
-This article will list them one by one.
+Go中有很多和容器类型相关的细节，本文将逐一列出这些细节。
 </p>
 
-<h3>Simple Overview Of Container Types And Values</h3>
+<h3>容器类型和容器值概述</h3>
 
 <div>
 <p>
-Each value of the three kinds of types is used to
-store a collection of element values.
-The types of all the elements stored in a container value are identical.
-The identical type is called the element type of
-(the container type of) the container value.
+每个容器（值）用来表示和存储一个元素（element）集合。一个容器中的所有元素的类型是相同的。此相同的类型称为此容器（的类型）的元素类型。
 </p>
 
 <p>
-Each element in a container has an associated key.
-An element value can be accessed through its associated key.
-The key types of map types must be
-<a href="type-system-overview.html#types-not-support-comparison">comparable types</a>.
-The key types of array and slice types are all the built-in type <code>int</code>.
-The keys of the elements of an array or slice are non-negative integers
-which mark the positions of these elements in the array or slice.
-The non-negative integer keys are often called indexes.
+存储在一个容器中的每个元素值都关联着着一个键值（key）。每个元素可以通过它的键值而被访问。
+一个映射表类型的键值类型必须为一个<a href="type-system-overview.html#types-not-support-comparison">可比较类型</a>。
+数组和切片类型的键值类型均为内置类型<code>int</code>。
+一个数组或切片的一个元素对应的键值总是一个非负整数下标，此非负整数表示该元素在该数组或切片所有元素中的顺序位置。此非负整数下标亦常称为一个元素索引（index）。
 </p>
 
 <p>
-Each container value has a length,
-which indicates how many elements are stored in that container.
-The valid range of the integer keys of an array or slice value is
-from zero (inclusive) to the length (exclusive) of the array or slice.
-For each value of a map type, the key values of that map value can be
-an arbitrary value of the key type of the map type.
+每个容器值有一个长度属性，用来表明此容器中当前存储了多少个元素。
+一个数组或切片中的每个元素所关联的非负整数索引键值的取值范围为左闭右开区间<code>[0, 此数组或切片的长度)</code>。
+一个映射表值类型的容器值中的元素关联的键值可以是任何此映射表类型的键值类型的任何值。
 </p>
 
 <p>
-There are also many differences between the three kinds of container types.
-Most of the differences originate from the differences between
-the value memory layouts of the three kinds of types.
-From the last article, <a href="value-part.html">value parts</a>,
-we learned that an array value is composed of only one direct part,
-however a slice or map value may have an underlying part,
-which is referenced by the direct part of the slice or map value.
+这三种严格意义的容器类型的值在使用上有很多的差别。这些差别多源于它们的值的内存布局的差异。
+通过上一篇文章<a href="value-part.html">值部</a>，我们知道每个数组值仅有一个直接部分组成，而一个切片或者映射表由一个直接部分和一个可能的被此直接部分引用着的间接部分组成。
 </p>
 
 <p>
-Elements of an array and a slice are both stored
-contiguously in a continuous memory segment.
-For an array, the continuous memory segment
-hosts the direct part of the array.
-For a slice, the continuous memory segment
-hosts the underlying part of the slice.
-The map implementaion of the standard Go compiler/runtime
-adopts the hashtable algorithm.
-So all elements of a map are also stored in an underlying
-continuous memory segment, but they may be not contiguous.
-There may be many holes (gaps) within the continuous memory segment.
+一个数组或者切片的所有元素紧挨着存放在一块连续的内存中。一个数组中的所有元素均存放在此数组值的直接部分，一个切片中的所元素均存放在此切片值的间接部分。
+在官方标准编译器和运行时中，映射表是使用哈希表算法来实现的，所以一个映射表中的所有元素也均存放在一块连续的内存（位于此哈希表值的间接部分）中，但是哈希表元素并不一定紧挨着存放。
+另外一种常用的映射表实现算法是二叉树算法。无论使用何种算法，一个哈希表中的所有元素的键值也存放在此哈希表（的间接部分）中。
 </p>
 
 <p>
-Another common map implementation algorithm is the binary tree algorithm,
-but the following desciptions assume that
-the underlying structures of all maps are hashtables.
-Whatever algorithm is used,
-the keys associated with the elements of a map are also stored in the map.
+对于每一个容器值，我们可以通过一个元素的键值来访问此元素。
+对于这三种容器，元素访问的时间复杂度均为<code><i>O</i>(1)</code>。
+但是一般来说，映射表元素访问消耗的时长要数倍于数组和切片元素访问消耗的时长。
 </p>
 
 <p>
-We can access an element through its key.
-The time complexities of element accessments on all container values
-are all <code><i>O</i>(1)</code>,
-though, generally map element accessments are several times
-slower than array and slice element accessments.
-</p>
-
-<p>
-Remember, the underlying parts of a value will not get copied
-when the value is copied. In other words, if a value has underlying parts,
-a copy of the value will share the the underlying parts with the value.
-This is the root reason of many behavior differences
-between array and slice/map values.
-These behavior differences will be introduced below.
+从上一篇文章中，我们已经了解到，在任何赋值中，源值的底层间接部分不会被复制。
+换句话说，当一个赋值结束后，一个含有间接部分的源值将和目标值共享底层间接部分。
+这是为什么数组和切片/映射表值会有很多行为差异（将在下面逐一介绍）的原因。
 </p>
 
 </div>
 
-<h3>Literal Representations Of Unnamed Container Types</h3>
+<h3>无名容器类型的文字表示形式</h3>
 
 <div>
-The literal representations of the three kinds of unnamed container types:
+无名容器类型的文字表示形式如下：
 <ul>
-<li>array types: <code>[N]T</code></li>
-<li>slice types: <code>[]T</code></li>
-<li>map types: <code>map[K]T</code></li>
+<li>数组类型：<code>[N]T</code></li>
+<li>切片类型：<code>[]T</code></li>
+<li>映射表类型：<code>map[K]T</code></li>
 </ul>
 
-where
+其中，
 <ul>
 <li>
-	<code>T</code> is an arbitrary type.
-	It specifies the element type of a container type.
-	Only values of the specified element type can be stored
-	as element values of values of the container type.
+	<code>T</code>可为任意类型。它表示一个容器类型的元素类型。某个特定容器类型的值中只能存储此容器类型的元素类型的值。
 </li>
 <li>
-	<code>N</code> must be a non-negative integer constant.
-	It specifies the number of elements stored in any value of an array type,
-	and it can be called the length of the array type.
-	This means the length of an array type is the inherent part of the array type.
-	For example, <code>[5]int</code> and <code>[8]int</code>
-	are two distinct array types.
+	<code>N</code>必须为一个非负整数常量。它值定了一个数组类型的长度，或者说它指定了此数组类型的任何一个值中存储了多少个元素。
+	一个数组类型的长度是此数组类型的一部分。比如<code>[5]int</code>和<code>[8]int</code>是两个不同的类型。
 </li>
 <li>
-	<code>K</code> is an arbitrary comparable type.
-	It specifies the key type of a map type.
-	Most types in Go are comparable, uncomparable types are
-	<a href="type-system-overview.html#types-not-support-comparison">listed here</a>.
+	<code>K</code>必须为一个<a href="type-system-overview.html#types-not-support-comparison">可比较类型</a>。它指定了一个映射表类型的键值类型。
 </li>
 </ul>
 
-Here are some container type literal representation examples:
+下面列出了一些无名容器类型的字面表示：
 <pre class="line-numbers"><code class="language-go">const Size = 32
 
 type Person struct {
@@ -138,73 +87,68 @@ type Person struct {
 	age  int
 }
 
-// Array types.
+// 数组类型
 [5]string
 [Size]int
-[16][]byte  // element type is a slice type: []byte
-[100]Person // element type is a struct type: Person
+[16][]byte  // 此数组类型的元素类型为一个切片类型：[]byte
+[100]Person // 此数组类型的元素类型为一个结构体类型：Person
 
-// Slice types.
+// 切片类型
 []bool
 []int64
-[]map[int]bool // element type is a map type: map[int]bool
-[]*int         // element type is a pointer type: *int
+[]map[int]bool // 此切片类型的元素类型为一个映射表类型：map[int]bool
+[]*int         // 此切片类型的元素类型为一个指针类型：*int
 
-// Map types.
+// 映射表类型
 map[string]int
 map[int]bool
-map[int16][6]string     // element type is an array type: [6]string
-map[bool][]string       // element type is a slice type: []string
-map[struct{x int}]*int8 // element type is a pointer type: *int8,
-                        // and key type is a struct type.
+map[int16][6]string     // 此映射表类型的元素类型为一个数组类型：[6]string
+map[bool][]string       // 此映射表类型的元素类型为一个切片类型：[]string
+map[struct{x int}]*int8 // 此映射表类型的元素类型为一个指针类型：*int8，
+                        // 它的键值类型为一个结构体类型。
 </code></pre>
 
 <p>
 </p>
 
 <p>
-We should try to avoid using large-size types as map key types.
-For it needs more time to compare (and calculate hashes of) keys of such types.
-</p>
-
-<p>
-The sizes of all slice types are the same.
-The sizes of all map types are also the same.
-The size of an array type depends on its length and the size of its element type.
-The size of a zero-length array type or an array type
-with a zero-size element type is zero.
+所有切片类型的<a href="type-system-overview.html#value-size">尺寸</a>都是一致的，所有映射表类型的尺寸也都是一致的。
+一个数组类型的尺寸取决于它的长度和元素类型的尺寸。长度为零的数组的尺寸为零；元素类型尺寸为零的任意长度的数组类型的尺寸也为零。
 </p>
 
 </div>
 
 <p class="anchor" id="value-literals"></p>
-<h3>Container Value Literals</h3>
+<h3>容器类型值的文字表示形式</h3>
 
 <div>
-Like struct values, container values can also be represented
-with composite literals, <code>T{...}</code>, where <code>T</code> is a type.
-Here are some examples:
-<pre class="line-numbers"><code class="language-go">// An array value which contains four bool values.
+和结构体值类似，容器值的文字表示也可以用组合字面形式（composite literal）来表示。
+比如对于一个容器类型<code>T</code>，它的值可以用形式<code>T{...}</code>来表示（除了切片和映射表的零值外）。
+下面是一些结构体值的文字表示形式：
+
+<pre class="line-numbers"><code class="language-go">// 一个含有4个布尔元素的数组值。
 [4]bool{false, true, true, false}
 
-// A slice value which contains three words.
+// 一个含有三个字符串值的切片值。
 []string{"break", "continue", "fallthrough"}
 
-// A map value which contains some key-value pairs.
+// 一个映射表值。
 map[string]int{"C": 1972, "Python": 1991, "Java", 1995, "Go": 2009}
 </code></pre>
 
 <p>
+映射表值的组合字面形式中大括号中的每一项称为一个键值对（key-value pair），或者称为一个条目（entry）。
 </p>
 
-There are some variants for array and slice composite literals:
-<pre class="line-numbers"><code class="language-go">// The followings slice composite literals are all equivalent.
+数组和切片值的组合字面形式有一些微小的变种：
+
+<pre class="line-numbers"><code class="language-go">// 下面这些切片的文字表示形式都是等价的。
 []string{"break", "continue", "fallthrough"}
 []string{0: "break", 1: "continue", 2: "fallthrough"}
 []string{2: "fallthrough", 1: "continue", 0: "break"}
 []string{2: "fallthrough", 0: "break", "continue"}
 
-// The followings array composite literals are all equivalent.
+// 下面这些数组的文字表示形式都是等价的。
 [4]bool{false, true, true, false}
 [4]bool{0: false, 1: true, 2: true, 3: false}
 [4]bool{1: true, true}
@@ -214,31 +158,35 @@ There are some variants for array and slice composite literals:
 </code></pre>
 
 <p>
-In the last two literals, the <code>...</code>s mean we want to let compilers
-deduce the lengths of array values represented by the literals.
+上例中最后两行中的<code>...</code>表示让编译器推断出相应数组值的类型的长度。
 </p>
 
+<!--
 <p>
 The element values in a container composite literal must
 be assignable to the corresponding container element type.
 The key values in a map composite literal must
 be assignable to the corresponding map key type.
 </p>
+-->
+
+从上面的例子，我们可以看出数组和切片组合字面形式中的索引下标（即数组和切片的键值）是可选的。
+在一个数组或者切片组合字面形式中：
+<ul>
+<li>
+	如果一个索引下标出现，它的类型不必是数组和切片类型的键值类型<code>int</code>，但它必须是是一个可以表示为int值的非负常量；
+	如果它是一个类型确定值，则它的类型必须为一个基本整数类型。
+</li>
+<li>
+	<b>在一个数组和切片组合字面形式中，如果一个元素的索引下标缺失，则编译器认为它的索引下标为出现在它之前的元素的索引下标加一。</b>
+</li>
+<li>
+	如果出现的第一个元素的索引下标缺失，则它的索引下标缺失被认为是0。
+</li>
+</ul>
 
 <p>
-From above examples, we know that element indexes (keys)
-are optional in array and slice composite literals.
-If an index is present,
-it is not needed to be typed value of the key type <code>int</code>.
-But it must be a non-negative constant representable
-by a value of type <code>int</code>.
-And if it is typed, its type must be a basic integer type.
-An element which index is absent uses the previous element's index plus one.
-If the index of the first element is absent, its index is zero.
-</p>
-
-<p>
-The keys in a map literal can be non-constants.
+映射表组合字面形式中元素对应的键值不可缺失，并且它们可以为非常量。
 <p>
 
 <pre class="line-numbers"><code class="language-go">var a uint = 1
@@ -251,60 +199,47 @@ var _ = [5]int{a: 100} // error: index must be non-negative integer constant
 </p>
 
 <p>
-Constant keys in one specific composite literal can't be duplicated.
+一个容器值组合字面形式中的<a href="details.html#constant-keys-in-composite-literals">常量键值（包括索引下标）不可重复</a>。
 </p>
 
 </div>
 
-<h3>Literal Representations Of Zero Values Of Container Types</h3>
+<h3>容器类型零值的字面表示形式</h3>
 
 <p>
-Like structs, the zero value of an array type <code>A</code> can be represented
-with the composite literal <code>A{}</code>.
-For example, the zero value of type <code>[100]int</code>
-can be denoted as <code>[100]int{}</code>.
-All elements stored in the zero value of an array type
-are zero values of the element type of the array type.
+和结构体类似，一个数组类型<code>A</code>的零值可以表示为<code>A{}</code>。
+比如，数组类型<code>[100]int</code>的零值可以表示为<code>[100]int{}</code>。
+一个数组零值中的所有元素均为对应数组元素类型的零值。
 </p>
 
 <p>
-Like pointer types, zero values of all slice and map types are represented
-with the predeclared <code>nil</code>.
+和指针一样，所有切片和映射表类型的零值均用预定义的标识符<code>nil</code>来表示。
 </p>
 
 <p>
-BTW, there are some other kinds of types whose zero values
-are also represented by <code>nil</code>,
-including pointer, function, channel and interface types.
-Pointer types have been explained in <a href="pointer.html">pointers in Go</a>.
-Other kinds of types will be explained in the following articles.
+顺便说一句，除了刚提到的三种类型，以后将介绍的函数、数据通道和接口类型的零值也用预定义的标识符<code>nil</code>来表示。
 </p>
 
 <p>
-When an array variable is declared without being specified an initial value,
-memory has been allocated for the elements of the zero array value.
-The memory for the elements of a nil slice or map value has not been allocated yet.
+在运行时刻，即使一个数组变量在声明的时候未指定初始值，它的元素所占的内存空间也已经被开辟出来。
+但是一个nil切片或者映射表值的元素的内存空间尚未开辟出来。
 </p>
 
 <p>
-Please note, <code>[]T{}</code> represents a blank slice value (with zero elements)
-of slice type <code>[]T</code>, it is different with <code>[]T(nil)</code>.
-The same situation is for <code>map[K]T{}</code> and <code>map[K]T(nil)</code>.
+至于，<code>[]T{}</code>表示类型<code>[]T</code>的一个空切片值，它和<code>[]T(nil)</code>是不等价的。
+同样，<code>map[K]T{}</code>和<code>map[K]T(nil)</code>也是不等价的。
 </p>
 
 <p class="anchor" id="take-composite-literal-address"></p>
-<h3>Compisite Literals Are Unaddressable But Can Be Taken Addresses</h3>
+<h3>容器字面值是不可寻址的但可以被取地址</h3>
 
 <div>
 <p>
-Compisite Literals are unaddressable values.
-We have learned that
-<a href="struct.html#take-composite-literal-address">struct composite literals
-can be taken addresses directly</a> before.
-Container composite literals have no exceptions here.
+我们已经了解<a href="struct.html#take-composite-literal-address">结构体（组合）字面值是不可寻址但是可以被取地址</a>。
+容器字面值也不例外。
 </p>
 
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -323,19 +258,19 @@ func main() {
 </div>
 
 <p class="anchor" id="composite-literal-simplification"></p>
-<h3>Nested Composite Literals Can Be Simplified</h3>
+<h3>内嵌组合字面形式可以被简化</h3>
 
 <div>
 <p>
-If a composite literal nested many other composite literals, then those nested
-composited literals can simplified to the form <code>{...}</code>.
+在某些情形下，内嵌在其它组合字面值中的组合字面形式可以简化为<code>{...}</code>（类型部分被省略掉了）。
+内嵌组合字面值前的取地址操作符<code>&amp;</code>有时也可以被省略。
 </p>
 
-For example, the slice value literal
+比如，下面的组合字面形式
 
-<pre class="line-numbers"><code class="language-go">// A slcie value of a type whose element type is *[4]byte.
-// The element type is a pointer type whose base type is [4]byte.
-// The pointer base type is an array type whose element type is byte.
+<pre class="line-numbers"><code class="language-go">// heads为一个切片值。它的类型的元素类型为*[4]byte。
+// 此元素类型为一个基类型为[4]byte的指针类型。
+// 此指针基类型为一个元素类型为byte的数组类型。
 var heads = []*[4]byte{
 	&[4]byte{'P', 'N', 'G', ' '},
 	&[4]byte{'G', 'I', 'F', ' '},
@@ -343,7 +278,7 @@ var heads = []*[4]byte{
 }
 </code></pre>
 
-can be simplified to
+可以简化为
 
 <pre class="line-numbers"><code class="language-go">var heads = []*[4]byte{
 	{'P', 'N', 'G', ' '},
@@ -355,7 +290,8 @@ can be simplified to
 <p>
 </p>
 
-The array value literal in the following example
+下面这个数组组合字面值
+
 <pre class="line-numbers"><code class="language-go">type language struct {
 	name string
 	year int
@@ -368,7 +304,7 @@ var _ = [...]language{
 }
 </code></pre>
 
-can be simplified to
+可以被简化为
 
 <pre class="line-numbers"><code class="language-go">var _ = [...]language{
 	{"C", 1972},
@@ -380,7 +316,8 @@ can be simplified to
 <p>
 </p>
 
-And the map value literal in the following example
+下面这个映射表组合字面值
+
 <pre class="line-numbers"><code class="language-go">type LangCategory struct {
 	dynamic bool
 	strong  bool
@@ -406,7 +343,7 @@ var _ = map[LangCategory]map[string]int{
 }
 </code></pre>
 
-can be simplified to
+可以被简化为
 
 <pre class="line-numbers"><code class="language-go">var _ = map[LangCategory]map[string]int{
 	{true, true}: {
@@ -427,43 +364,33 @@ can be simplified to
 </code></pre>
 
 <p>
-Pleae notes, in the above several examples, the comma following the last item
-in each composite literal can't be omitted.
-Please read <a href="line-break-rules.html">the line break rules in Go</a>
-for more information later.
+注意，在上面的几个例子中，最后一个元素后的逗号不能被省略。原因详见后面的<a href="line-break-rules.html">断行规则</a>一文。
 </p>
 
 </div>
 
 <p class="anchor" id="comparison"></p>
-<h3>Compare Container Values</h3>
+<h3>容器值的比较</h3>
 
 <p>
-As which has mentioned in the article
-<a href="type-system-overview.html#types-not-support-comparison">overview of
-Go type system</a>, map and slice types are uncomparable types.
-So map and slice types can't be used as map key types.
+在<a href="type-system-overview.html#types-not-support-comparison">Go类型系统概述</a>一文中，我们已经了解到映射和切片类型都属于不可比较类型。
+所以任意两个映射表值（或切片值）是不能相互比较的。
 </p>
 
 <p>
-Although a slice or map value can't be compared with another slice or map value
-(or itself), it can be compared to the bare untyped <code>nil</code> identifier
-to check whether or not the slice or map value is a zero value.
+尽管个映射表值和切片值是不能比较的，但是一个映射表值或者切片值可以和预定义的<code>nil</code>标识符进行比较以检查此映射表值或者切片值是否为一个零值。
 </p>
 
 <p>
-Most array types are comparable,
-except the ones whose element types are uncomparable types.
+大多数数组类型都是可比较类型，除了元素类型为不可比较类型的数组类型。
 </p>
 
 <p>
-When comparing two values of the same array type,
-each of their elements will be compared.
-The two array values are equal only if all of their corresponding elements are equal.
+当比较类型相同的两个数组值时，它么的对应元素将逐一被比较。这两个数组只有在它们的对应元素都相等的情况下才相等。
 </p>
 
 <div>
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -472,14 +399,14 @@ func main() {
 	var a [16]byte
 	var s []int
 	var m map[string]int
-	
+
 	fmt.Println(a == a)   // true
 	fmt.Println(m == nil) // true
 	fmt.Println(s == nil) // true
 	fmt.Println(nil == map[string]int{}) // false
 	fmt.Println(nil == []int{})          // false
-	
-	// The following lines fail to compile.
+
+	// 下面这些行编译不通过。
 	/*
 	_ = m == m
 	_ = s == s
@@ -496,184 +423,29 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="element-accessment"></p>
-<h3>Access And Modify Container Elements</h3>
-
-<div>
-<p>
-The element associated to key <code>k</code> stored in a container value
-<code>v</code> can be represented with the syntax form <code>v[k]</code>.
-
-</p>
-
-For a use of <code>v[k]</code>, assume <code>v</code> is an array or slice,
-<ul>
-<li>
-	if <code>k</code> is a constant, then it must satisfy
-	<a href="#value-literals">the requirements described above</a>
-	for the indexes in container composite literals.
-	In particular, if <code>v</code> is an array, the
-	<code>k</code> must be smaller than the length of the array.
-</li>
-<li>
-	if <code>k</code> is a non-constant value,
-	it must be an integer and it must be larger than zero
-	and smaller than <code>len(v)</code>,
-	otherwise, a run-time panic will occur.
-</li>
-<li>
-	if <code>v</code> is a nil slice,
-	a run-time panic will occur.
-</li>
-</ul>
-
-For a use of <code>v[k]</code>, assume <code>v</code> is a map,
-then the type of <code>k</code> must be a comparable type.
-<ul>
-<li>
-	If <code>k</code> is an uncomparable value (of a comparable type),
-	a run-time panic will occur.
-</li>
-<li>
-	If <code>k</code> is a comparable value, <code>v[k]</code> will
-	cause a panic only if <code>v</code> is a nil map
-	and <code>v[k]</code> is used as the destination value in an assignment.
-</li>
-<li>
-	If <code>v[k]</code> is used as the source value in an assignment,
-	no panics will occur, even if <code>v</code> is a nil map.
-	(Assume the evaluation of <code>k</code> will not panic.)
-</li>
-<li>
-	If <code>v[k]</code> is used as the source value
-	and the map <code>v</code> doesn't contain an entry with
-	key <code>k</code>, <code>v[k]</code> results a zero value of
-	the element type of the corresponding map type of <code>v</code>.
-	For most scenarios, <code>v[k]</code> is viewed as a single-valued
-	expression. However, when <code>v[k]</code> is used as the only source
-	value expression in an assignment, it can be viewed as a multi-valued
-	expression and result a second optional untype boolean value,
-	which indicates whether or not the map <code>v</code> contains an entry
-	with key <code>k</code>.
-</li>
-</ul>
-
-An example of container element accessments:
-<pre class="line-numbers"><code class="language-go">package main
-
-import "fmt"
-
-func main() {
-	a := [3]int{-1, 0, 1}
-	s := []bool{true, false}
-	m := map[string]int{"abc": 123, "xyz": 789}
-	fmt.Println (a[2], s[1], m["abc"])    // access
-	a[2], s[1], m["abc"] = 999, true, 567 // modify
-	fmt.Println (a[2], s[1], m["abc"])    // access
-	
-	n, present := m["hello"]
-	fmt.Println(n, present, m["hello"]) // 0 false 0
-	n, present = m["abc"]
-	fmt.Println(n, present, m["abc"]) // 567 true 567
-	m = nil
-	fmt.Println(m["abc"]) // 0
-	
-	// The two lines fail to compile.
-	/*
-	_ = a[3]  // invalid array index 3 (out of bounds)
-	_ = s[-1] // invalid slice index -1 (index must be non-negative)
-	*/	
-
-	// Each of the following lines causes a panic.
-	_ = a[n]         // panic: runtime error: index out of range
-	_ = s[n]         // panic: runtime error: index out of range
-	m["hello"] = 555 // panic: assignment to entry in nil map
-}
-</code></pre>
-
-<p>
-</p>
-</div>
-
-<p class="anchor" id="assignment"></p>
-<h3>Container Assignments</h3>
-
-<div>
-
-<p>
-If a map is assigned to another map, then the two maps will
-share all (underlying) elements.
-</p>
-
-<p>
-Like map assignments, if a slice is assigned to another slice,
-they will share all (underlying) elements.
-</p>
-
-<p>
-When an array is assigned to another array,
-all the elements are copied from the source one to the destination one.
-The two arrays don't share any elements.
-</p>
-
-Example:
-<pre class="line-numbers"><code class="language-go">package main
-
-import "fmt"
-
-func main() {
-	m0 := map[int]int{0:7, 1:8, 2:9}
-	m1 := m0
-	m1[0] = 2
-	fmt.Println(m0, m1) // map[0:2 1:8 2:9] map[0:2 1:8 2:9]
-	
-	s0 := []int{7, 8, 9}
-	s1 := s0
-	s1[0] = 2
-	fmt.Println(s0, s1) // [2 8 9] [2 8 9]
-	
-	a0 := [...]int{7, 8, 9}
-	a1 := a0
-	a1[0] = 2
-	fmt.Println(a0, a1) // [7 8 9] [2 8 9]
-}
-</code></pre>
-
-<p>
-</p>
-</div>
-
 <p class="anchor" id="cap-len"></p>
-<h3>Check Lengths And Capacities Of Container Values</h3>
+<h3>查看容器值的长度和容量</h3>
 
 <p>
-Besides the length property, each container value also has a capactiy property.
-The capacity of an array is always equal to the length of the array.
-The capacity of a map is unlimited.
-So, in practice, only capacities of slice values are meaningful.
-The capacity of a slice is always equal to or larger than the length of the slice.
-The meaning of slice capacities will be explained in the next section.
+除了上面已提到每个容器值有一个长度属性（此容器中含有有多少个元素），每个容器值还有一个容量属性。
+一个数组值的容量总是和它的长度相等；一个非零映射表值的容量可以被认为是无限大的。切片值的容量的含义将在后续章节介绍。
+一个切片值的容量总是不小于此切片值的长度。在编程中，只有切片值的容量有实际意义。
 </p>
 
 <p>
-We can use the built-in <code>len</code> function to get the length of
-a container value, and use the built-in <code>cap</code> function to
-get the capacity of a container value.
-Each of the two functions returns an <code>int</code> result.
-As the capacity of any map value is unlimited,
-the built-in <code>cap</code> function doesn't apply to map values.
+我们可以调用内置函数<code>len</code>来获取一个容器值的长度，或者调用内置函数<code>cap</code>来获取一个容器值的容量。
+这两个函数都返回一个<code>int</code>结果值。
+因为非零映射表值的容量是无限大，所以<code>cap</code>并不适用于映射表值。
 </p>
 
 <p>
-The length and capacity of an array value can never change.
-The length and capacity of a slice value may change at run time.
-So slices can be viewed as dynamic arrays.
-Slices are much more flexible than arrays
-and are used more popularly than arrays in practice.
+一个数组值的长度和容量永不改变。同一个数组类型的所有值的长度和容量都总是和此数组类型的长度相等。
+切片值的长度和容量可在运行时刻改变。因为此原因，切片可被认为是动态数组。
+切片在使用上相比数组更为灵活，所以切片在编程用得更为广泛。
 </p>
 
 <div>
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -693,159 +465,242 @@ func main() {
 </code></pre>
 
 <p>
-In the above example, the length and capacity of each slice value are equal.
-This is not true for every slice values.
-We will use some slices whose respective lengths and capacities are not equal
-in the following sections.
+上面这个特定的例子中的每个切片值的长度和容量都相等，但这并不是一个普遍定律。
+我们将在后面的章节展示一些长度和容量不相等的切片值。
 </p>
 </div>
 
-<h3>Recall The Internal Structure Definition Of Slice Types</h3>
+<p class="anchor" id="element-accessment"></p>
+<h3>取出和修改容器的元素</h3>
 
 <div>
-To understand slice types and values better and explain slices easier,
-we need to have an impression on the internal structure of slice types.
-From the last article, <a href="value-part.html">value parts</a>,
-we learned that the internal structure of slice types
-defined by the standard Go compiler/runtime is like
-<pre class="line-numbers"><code class="language-go">type _slice struct {
-	elements unsafe.Pointer // referencing underlying elements
-	len      int            // length
-	cap      int            // capacity
+<p>
+一个容器值<code>v</code>中存储的对应着键值<code>k</code>的元素用语法形式<code>v[k]</code>来表示。
+</p>
+
+假设<code>v</code>是一个数组或者切片，在<code>v[k]</code>中，
+<ul>
+<li>
+	如果<code>k</code>是一个常量，则它必须满足上面列出的<a href="#value-literals">对在组合字面值中出现的索引下面的要求</a>。
+	另外，如果<code>v</code>是一个数组，则<code>k</code>必须小于此数组的长度。
+</li>
+<li>
+	如果<code>k</code>不是一个常量，则它必须为一个整数。
+	另外它必须为一个非负数并且小于<code>len(v)</code>，否则，在运行时刻将产生一个<a href="control-flows-more.html#panic-recover">恐慌</a>。
+</li>
+<li>
+	如果<code>v</code>是一个零值切片，则在运行时刻将产生一个恐慌。
+</li>
+</ul>
+
+假设<code>v</code>是一个映射表值，在<code>v[k]</code>中，<code>k</code>的类型必须为（或者可以隐式转换为）<code>v</code>的类型的元素类型。另外，
+<ul>
+<li>
+	如果<code>k</code>的<a href="type-system-overview.html#concrete-type">具体类型</a>是一个不可比较类型，则在运行时刻将产生一个恐慌。
+</li>
+<li>
+	如果<code>k</code>的具体类型是不是一个不可比较类型，则<code>v[k]</code>仅在它被用做一个赋值中的目标值并且<code>v</code>是一个零值映射表时才会产生一个恐慌。
+</li>
+<li>
+	如果<code>v[k]</code>用来表示取出映射表值<code>v</code>中键值<code>k</code>对应的元素，则它无论如何都不会产生一个恐慌，即使<code>v</code>是一个零值映射表（假设<code>k</code>的估值没有造成恐慌）。
+</li>
+<li>
+	如果<code>v[k]</code>用来表示取出映射表值<code>v</code>中键值<code>k</code>对应的元素，并且映射表值<code>v</code>中并不含有此元素，则<code>v[k]</code>返回一个此映射表值的类型的元素类型的零值。
+	一般情况下，<code>v[k]</code>被认为是一个单值表达式。但是在一个<code>v[k]</code>被用为唯一源值的赋值语句中，<code>v[k]</code>可以返回一个可选的第二个返回值。
+	此第二个返回值是一个类型不确定布尔值，用来表示键值<code>k</code>是否有对应的元素存储在映射表值<code>v</code>中。
+</li>
+</ul>
+
+一个展示了容器元素访问的例子：
+<pre class="line-numbers"><code class="language-go">package main
+
+import "fmt"
+
+func main() {
+	a := [3]int{-1, 0, 1}
+	s := []bool{true, false}
+	m := map[string]int{"abc": 123, "xyz": 789}
+	fmt.Println (a[2], s[1], m["abc"])    // 取出
+	a[2], s[1], m["abc"] = 999, true, 567 // 修改
+	fmt.Println (a[2], s[1], m["abc"])    // 取出
+
+	n, present := m["hello"]
+	fmt.Println(n, present, m["hello"]) // 0 false 0
+	n, present = m["abc"]
+	fmt.Println(n, present, m["abc"]) // 567 true 567
+	m = nil
+	fmt.Println(m["abc"]) // 0
+
+	// 下面这两行编译不同过。
+	/*
+	_ = a[3]  // 下标越界
+	_ = s[-1] // 下标越界
+	*/
+
+	// 下面这几行每行都会造成一个恐慌。
+	_ = a[n]         // panic: 下标越界
+	_ = s[n]         // panic: 下标越界
+	m["hello"] = 555 // panic: m为一个零值映射表
 }
 </code></pre>
 
 <p>
-The internal structure definitions used by other compilers/runtimes
-implementations may be not the exact same but would be similar.
-The following explanations are based on the official slice implementation.
+</p>
+</div>
+
+<h3>重温一下切片的内部结构</h3>
+
+<div>
+为了更好的理解和解释切片类型和切片值，我们最好对切片的内部结构有一个基本的印象。
+在上一篇文章<a href="value-part.html">值部</a>中，我们已经了解到官方标准编译器对切片类型的内部定义大致如下：
+<pre class="line-numbers"><code class="language-go">type _slice struct {
+	elements unsafe.Pointer // 引用着底层存储在间接部分上的元素
+	len      int            // 长度
+	cap      int            // 容量
+}
+</code></pre>
+
+<p>
+虽然其它编译器中切片类型的内部结构可能并不完全和官方标准编译器一致，但应该大体上是相似的。
+下面的解释均基于官方标准编译器对切片类型的内部定义。
 </p>
 
 <p>
-The above shown internal structure explains the memory layouts of
-the direct parts of slice values.
-The <code>len</code> field of the direct part of a slice indicates
-the length of the slice, and the <code>cap</code> field indicates
-the capacity of the slice.
-The following picture depicts the memory layout of a slice value.
+上面展示的切片的内部定义为切片的直接部分的定义。直接部分的<code>len</code>字段表示一个切片当前存储了多少个元素；直接部分的<code>cap</code>表示一个切片的可能的容量。
+下面这张图描绘了一个切片值的内存布局。
 <br/>
 <img src="res/slice-internal.png">
 <br/>
 </p>
 
 <p>
-Although the underlying memory segment which hosts the elements of a slice
-may be very large, the slice may be only aware of a sub-segment of the
-memory segment. For example, in the above picture, the slice is only
-aware of the middle grey sub-segment of the whole memory segment.
+尽管一个切片值的底层元素部分可能位于一个表较大的内存片段上，但是此切片值只能感知到此内存片段上的一个子片段。
+比如，上图中的切片值只能感知到灰色的子片段。
 </p>
 
 <p>
-The next section will explain how to append elements to a base slice and yield
-a new slice by using the built-in <code>append</code> function.
-The result slice of an <code>append</code> function call may share starting
-elements with the base slice or not, depending on the capacity (and length)
-of the base slice and how many elements are appended.
+在上图中，从下标<code>len</code>（包含）到下标<code>cap</code>（不包含）对应的元素并不属于图中所示的切片值。
+它们只是此切片之中的一些冗余元素槽位，但是它们可能是其它切片（或者数组）值中的有效元素。
 </p>
 
 <p>
-For the slice depicted in the above picture, the elements from
-index <code>len</code> to index <code>cap</code> (exclusive)
-don't belong to the elements of the slice.
-They are just some redundant element slots (for the depicted slice,
-but they may be effective elements of other slices or another array).
+下一节将要介绍如何通过调用内置<code>append</code>函数来向一个基础切片添加元素而得到一个新的切片。
+这个新的结果切片可能和这个基础切片共享起始元素，也可能不共享，具体取决于基础切片的容量（以及长度）和添加的元素数量。
 </p>
 
-When the slice is used as the base slice in an <code>append</code> function call,
+当一个切片被用做一个<code>append</code>函数调用中的基础切片，
 <ul>
 <li>
-	if the number of appended elements is larger than the number of
-	the redundant element slots of the base slice,
-	a new underlying memory segment will be allocated for the result slice,
-	thus the result slice and the base slice will not share any elements.
+	如果添加的元素数量大于此（基础）切片的冗余元素槽位的数量，则一个新的底层内存片段将被开辟出来并用来存放结果切片的元素。
+	这时，基础切片和结果切片不共享任何底层元素。
 </li>
 <li>
-	otherwise, no new underlying memory segments will be allocated
-	for the result slice, and the elements of the base slice also
-	belong to the elements of the result slice.
-	In other words, the two slices share some elements and all of
-	their elements are hosted on the same underlying memory segment.
+	否则，不会有底层内存片段被开辟出来。这时，基础切片中的所有元素也同时属于结果切片。两个切片的元素都存放于同一个内存片段上。
 </li>
 </ul>
 
 <p>
-The next section will show a picture which describes both of
-the two possible cases in appending slice elements.
+下一节将展示一张包含了上述两种情况的图片。
 </p>
 
 <p>
-There are more routes which lead to the elements of two slices
-are hosted on the same underlying memory segment.
-Such as assignments and the below to be introduced subslice operations.
+一些其它切片操作也可能会造成两个切片共享底层内存片段的情况。这些操作将在后续章节逐一介绍。
 </p>
 
 <p>
-Note, generally, we can't modify the three fields of a slice value individually,
-except through the <a href="#modify-slice-length-and-capacity">reflection</a>
-and <a href="unsafe.html">unsafe</a> ways.
-In other words, generally, to modify a slice value,
-its three fields must be modified together.
-Generally, this is achieved by copying/assigning another slice value
-(of the same slice type) to the slice which needs to be modified.
+注意，一般我们不能单独单独修改一个切片值的某个内部字段，除非使用<a href="#modify-slice-length-and-capacity">反射</a>或者<a href="unsafe.html">非类型安全指针</a>。
+换句话说，一般我们只能通过将其它切片赋值给一个切片来同时修改这个切片的三个字段。
 </p>
 
 </div>
 
-<p class="anchor" id="element-addition-deletion"></p>
-<h3>Append And Delete Container Elements</h3>
+<p class="anchor" id="assignment"></p>
+<h3>容器赋值</h3>
 
 <div>
-The syntax of appending a key-element pair (also called an entry)
-to a map is the same as the syntax of modifying a map element.
-For example, for a non-nil map value <code>m</code>,
-the following line
+
+<p>
+当一个映射表赋值完成之后，目标映射表值和源映射表值将共享底层的元素。
+向其中一个映射表中添加（或从一个映射表中删除）元素将体现在另一个映射表中。
+</p>
+
+<p>
+和映射表一样，当一个切片赋值给另一个切片后，它们将共享底层的元素。
+它们的长度和容量也相等。但是如果以后其中一个切片改变了长度或者容量，此变化不会影响到另一个切片。
+</p>
+
+<p>
+当一个数组被赋值给另一个数组，所有的元素都将被从源数组复制到目标数组。赋值完成之后，这两个数组不共享任何元素。
+</p>
+
+一个例子：
+<pre class="line-numbers"><code class="language-go">package main
+
+import "fmt"
+
+func main() {
+	m0 := map[int]int{0:7, 1:8, 2:9}
+	m1 := m0
+	m1[0] = 2
+	fmt.Println(m0, m1) // map[0:2 1:8 2:9] map[0:2 1:8 2:9]
+
+	s0 := []int{7, 8, 9}
+	s1 := s0
+	s1[0] = 2
+	fmt.Println(s0, s1) // [2 8 9] [2 8 9]
+
+	a0 := [...]int{7, 8, 9}
+	a1 := a0
+	a1[0] = 2
+	fmt.Println(a0, a1) // [7 8 9] [2 8 9]
+}
+</code></pre>
+
+<p>
+</p>
+</div>
+
+<p class="anchor" id="element-addition-deletion"></p>
+<h3>添加和删除容器元素</h3>
+
+<div>
+向一个映射表中添加一个键值对（条目）的语法和修改一个映射表元素的语法是一样的。
+比如，对于一个非零映射表值<code>m</code>，如果当前<code>m</code>中尚未存储键值对<code>(k, e)</code>，则下面的语法形式将把此键值对存入<code>m</code>；否则，下面的语法形式将把键值<code>k</code>对应的元素值更新为<code>e</code>。
+
 <pre><code class="language-go">m[k] = e
 </code></pre>
 
 <p>
-put the key-element pair <code>(k, e)</code> into the map <code>m</code>
-if <code>m</code> doesn't contain an entry with key <code>k</code>,
-or modify the element value associated with <code>k</code>
-if <code>m</code> contains an entry with key <code>k</code>.
-<p>
-
-<p>
-The underlying continuous memory segment of a map may need reallocated
-to hold more and more elements.
 </p>
 
-There is a built-in <code>delete</code> function
-which is used to delete an entry from a map.
-For example, the following line will delete the entry with key
-<code>k</code> from the map <code>m</code>.
-If the map <code>m</code> doesn't contain an entry with key <code>k</code>,
-it is a no-op, no panics will occur,
-even if <code>m</code> is a nil map.
+<!--
+<p>
+当一个新的条目被添加入一个映射表时，此映射表的底层的内存片段可能需要重新开辟以容纳更多的条目。
+</p>
+-->
+
+内置函数<code>delete</code>用来从一个映射表中删除一个条目。比如，下面的<code>delete</code>调用将把键值<code>k</code>对应的条目从映射表<code>m</code>中删除。
+如果映射表<code>m</code>中未存储键值为<code>k</code>的条目，则此调用为一个空操作，它不会产生一个恐慌，即使<code>m</code>是一个零值映射表。
+
 <pre><code class="language-go">delete(m, k)
 </code></pre>
 
 <p>
-The entries stored in a map are not ordered by their orders of being appended.
-Their orders are non-determinstic, we can think them are kind-of randomized.
 </p>
 
-An example shows how to append (put) elements to and delete elements from maps:
+下面的例子展示了如何向一个映射表添加和从一个映射表删除条目。
+
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
 func main() {
 	m := map[string]int{"Go": 2007}
-	m["C"] = 1972     // append
-	m["Java"] = 1995  // append
+	m["C"] = 1972     // 添加
+	m["Java"] = 1995  // 添加
 	fmt.Println(m)    // map[C:1972 Python:1991 Go:2007]
-	m["Go"] = 2009    // modify
-	delete(m, "Java") // delete
+	m["Go"] = 2009    // 修改
+	delete(m, "Java") // 删除
 	fmt.Println(m)    // map[Go:2009 C:1972]
 }
 </code></pre>
@@ -854,44 +709,38 @@ func main() {
 </p>
 
 <p>
-Array elements can neither be appended nor deleted,
-though elements of addressable arrays can be modified.
+一个数组中的元素个数总是恒定的，我们无法向其中添加元素，也无法从其中删除元素。但是可寻址的数组值中的元素是可以被修改的。
 </p>
 
 <p>
-We can use the built-in <code>append</code> function
-to append multiple elements into a base slice.
-The result of the an <code>append</code> function call is a new slice
-which contains the elements of the base slice and the appended elements.
-Please note, the base slice is not modified
-by the <code>append</code> function call.
-Surely, if we expect, we can assign the result slice to the base slice
-to modify the base slice.
+我们可以通过调用内置<code>append</code>函数，以一个切片为基础，来添加不定数量的元素并返回一个新的切片。
+此新的结果切片包含着基础切片中的所有元素和所有被添加的元素。
+注意，基础切片并未被此<code>append</code>函数调用所修改。
+当然，如果我们愿意（事实上在实践中常常如此），我们可以将结果切片赋值给基础切片以修改基础切片。
 </p>
 
 <p>
-There is not a built-in way to delete an element from a slice.
-We must use the <code>append</code> function together with the subslice feature
-introduced below to achieve this goal.
-Slice element deletions and insertions will be demoed in the below
-<a href="#slice-manipulations">more slice manipulations</a> section.
-Here, the following example only shows how to append slice elements.
+Go中并未提供一个内置方式来从一个切片中删除一个元素。
+我们必须使用<code>append</code>函数和后面将要介绍的子切片语法一起来实现元素删除操作。
+切片元素的删除和插入将在后面的<a href="#slice-manipulations">更多切片操作</a>一节中介绍。
+本节仅展示如何使用<code>append</code>内置函数。
 </p>
 
-An example shows how to append elements to slices:
+下面是一个如何使用<code>append</code>内置函数的例子。
+
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
 func main() {
 	s0 := []int{2, 3, 5}
-	s1 := append(s0, 7)      // append one element
-	s2 := append(s1, 11, 13) // append two elements
+	s1 := append(s0, 7)      // 添加一个元素
+	s2 := append(s1, 11, 13) // 添加两个元素
 	fmt.Println(s0, cap(s0)) // [2 3 5] 3
 	fmt.Println(s1, cap(s1)) // [2 3 5 7] 6
 	fmt.Println(s2, cap(s2)) // [2 3 5 7 11 13] 6
 	s3 := append(s0)         // <=> s3 := s0
-	s4 := append(s0, s0...)  // append all elements of s0
+	s4 := append(s0, s0...)  // 以s0为基础添加s0中所有的元素
 	fmt.Println(s3, cap(s3)) // [2 3 5] 3
 	fmt.Println(s4, cap(s4)) // [2 3 5 2 3 5] 6
 	s0[0], s1[0] = 99, 789
@@ -900,134 +749,151 @@ func main() {
 </code></pre>
 
 <p>
-Note, the built-in <code>append</code> function is a
-<a href="function.html#variadic-function">variadic function</a>.
-It has two parameters, the second one is a
-<a href="function.html#variadic-parameter">variadic parameter</a>.
-There are two manners to <a href="function.html#variadic-call">call variadic functions</a>.
-In the above example, line <i>7</i>, line <i>8</i> and line <i>12</i> use
-one manner and line <i>13</i> uses the other manner.
-For the former manner, we can pass zero or more element values as the variadic arguments.
-For the latter manner, we must pass a slice as the only variadic argument and
-which must be followed by three dots <code>...</code>.
-We can learn how to call variadic functions from the article
-<a href="function.html#variadic-call">function types and values</a> later.
 </p>
 
-Here, line <i>13</i> is equivalent to
+<p>
+注意，内置<code>append</code>函数是一个<a href="function.html#variadic-function">变长参数函数</a>（下下篇文章中介绍）。
+它有两个参数，其中第二个参数（形参）为一个<a href="function.html#variadic-parameter">变长参数参数</a>。
+</p>
+
+<p>
+变长参数函数函数将在下下篇文章中解释。目前，我们只需知道变长参数函数调用中的实参有两种传递方式。
+在上面的例子中，第<i>7</i>行、第<i>8</i>行和第<i>12</i>行使用了同一种方式，第<i>13</i>行使用了另外一种方式。
+在第一种方式中，零或多个实参元素值可以传递给<code>append</code>函数的第二个形参。
+在第二种方式中，一个（和第一个实参同元素类型的）实参切片传递给了第二个形参，此实参切片必须跟随三个点<code>...</code>。
+（关于变长参数函数调用，详见<a href="function.html#variadic-call">下下篇文章</a>。）
+</p>
+
+在上例中，第<i>13</i>行等价于
 
 <pre class="line-numbers"><code class="language-go">	s4 := append(s0, s0[0], s0[1], s0[2])
 </code></pre>
 
+第<i>7</i>和第<i>8</i>行等价于
+
+<pre class="line-numbers"><code class="language-go">	s1 := append(s0, []int{7}...)
+	s2 := append(s1, []int{11, 13}...)
+</code></pre>
+
 <p>
-For the three-dot <code>...</code> manner, the <code>append</code> doesn't
-require the variadic argument must be a slice with the same type as the first
-slice argument, but their element types must be identical.
-In other words, the two argument slices must share the same underlying type.
 </p>
 
-In the above program,
+<p>
+对于三个点方式，<code>append</code>函数并不要求第二个实参的类型和第一个实参一致，但是它们的元素类型必须一致。
+换句话说，它们的<a href="type-system-overview.html#underlying-type">底层类型</a>必须一致。
+</p>
+
+在上面的程序中，
 <ul>
 <li>
-	the <code>append</code> call at line <i>7</i> will allocate a new
-	underlying memory segment for slice <code>s1</code>,
-	for slice <code>s0</code> doesn't have enough redundant element slots
-	to store the new appended element. The same situation is for the
-	<code>append</code> call at line <i>13</i>.
+	第<i>7</i>行的<code>append</code>函数调用将为结果切片<code>s1</code>开辟一段新的内存。
+	原因是切片<code>s0</code>中没有足够的冗余元素槽位来容纳新添加的元素。
+	第<i>13</i>行的<code>append</code>函数调用也是同样的情况。
 </li>
 <li>
-	the <code>append</code> call at line <i>8</i> will not allocate a new
-	underlying memory segment for slice <code>s2</code>,
-	for slice <code>s1</code> has enough redundant element slots
-	to store the new appended elements.
+	第<i>8</i>行的<code>append</code>函数调用不会为结果切片<code>s2</code>开辟新的内存片段。
+	原因是切片<code>s1</code>中的冗余元素槽位足够容纳新添加的元素。
 </li>
 </ul>
 
 <p>
-So, <code>s1</code> and <code>s2</code> share some elements,
-<code>s0</code> and <code>s3</code> share all elements,
-and <code>s4</code> doesn't share elements with others.
-The following picture depicted the memory layouts of these slices
-at the end of the above program.
+所以，上面的程序中在退出之前，切片<code>s1</code>和<code>s2</code>共享一些元素，切片<code>s0</code>和<code>s3</code>共享所有的元素。
+下面这张图描绘了在上面的程序结束之前各个切片的内存布局。
 <br/>
 <img src="res/slice-append.png">
 <br/>
 </p>
 
 <p>
-Up to now (Go 1.10), the first arugment of an <code>append</code> function
-call can't be an untyped <code>nil</code>.
+请注意，当一个<code>append</code>函数调用需要为结果切片开辟内存，结果切片的容量取决于具体编译器实现。
+在这种情况下，对于官方标准编译器，如果基础切片的容量较小，则结果切片的容量至少为基础切片的两倍。
+这样做的目的是使结果切片有足够多的冗余元素槽位，以防止此结果切片被用作后续其它<code>append</code>函数调用的基础切片时再次开辟内存。
 </p>
 
-</div>
+上面提到了，在实际编程中，我们常常将<code>append</code>函数调用的结果赋值给基础切片。
+比如：
 
-<p class="anchor" id="make"></p>
-<h3>Create Slices And Maps With The Built-in <code>make</code> Function</h3>
-
-<div>
-<p>
-Besides using composite literals to create map and slice values,
-we can also use the built-in <code>make</code> function to create map and slice values.
-The built-in <code>make</code> function can't be used to create array values.
-</p>
-
-<p><i>
-(The built-in <code>make</code> function can also be used to create
-channels, which will be explained in the article
-<a href="channel.html">channels in Go</a> later.)
-</i></p>
-
-Assume <code>M</code> is a map type and <code>n</code> is non-negative integer,
-we can use the following two forms to create new maps of type <code>M</code>.
-The first form creates a new empty map which is allocated with enough space to
-hold the <code>n</code> elements.
-The second form only takes one argument,
-in which case a new empty map with enough space to
-hold a small number of elements is allocated.
-The small number is compiler dependent.
-<pre class="line-numbers"><code class="language-go">make(M, n)
-make(M)
-</code></pre>
-
-<p>
-</p>
-
-Assume <code>S</code> is a slice type, <code>length</code> and
-<code>capacity</code> are two non-negative integers,
-<code>length</code> is not larger than <code>capacity</code>,
-we can use the following two forms to create new slices of type <code>S</code>.
-
-<pre class="line-numbers"><code class="language-go">make(S, length, capacity)
-make(S, length)
-</code></pre>
-
-<p>
-The first form creates a new slice with the specified length and capacity.
-The second form only takes two arguments, in which case the capacity of
-the new created slice is the same as its length.
-</p>
-
-<p>
-All the elements in the result slice of a <code>make</code> function call
-are initialized as the zero value (of the slice element type).
-</p>
-
-An example on how to use the built-in <code>make</code> function
-to create maps and slices:
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
 func main() {
-	// Make new maps.
+	var s = append([]string(nil), "array", "slice")
+	fmt.Println(s)      // [array]
+	fmt.Println(cap(s)) // 2
+	s = append(s, "map")
+	fmt.Println(s)      // [array slice map]
+	fmt.Println(cap(s)) // 4
+	s = append(s, "channel")
+	fmt.Println(s)      // [array slice map string channel]
+	fmt.Println(cap(s)) // 4
+}
+</code></pre>
+
+<p>
+</p>
+
+<p>
+截至目前（Go 1.11），<code>append</code>函数调用的第一个实参不能为类型不确定的<code>nil</code>。
+</p>
+
+</div>
+
+<p class="anchor" id="make"></p>
+<h3>使用内置<code>make</code>函数来创建切片和映射表</h3>
+
+<div>
+<p>
+除了使用组合字面值来创建映射表和切片，我们还可以使用内置<code>make</code>函数来创建映射表和切片。
+数组不能使用内置<code>make</code>函数来创建。
+</p>
+
+<p><i>
+（内置<code>make</code>函数也可以用来创建<a href="channel.html">数据通道</a>值。）
+</i></p>
+
+假设<code>M</code>是一个映射表类型并且<code>n</code>是一个非负整数，我们可以用下面的两种函数调用来各自生成一个类型为<code>M</code>的映射表值。
+
+<pre class="line-numbers"><code class="language-go">make(M, n)
+make(M)
+</code></pre>
+
+<p>
+第一个函数调用形式创建了一个可以容纳至少<code>n</code>个条目而无需再次开辟内存的空映射表值。
+第二个函数调用形式创建了一个可以容纳一个小数目的条目而无需再次开辟内存的空映射表值。此小数目的值取决于具体编译器实现。
+</p>
+
+假设<code>S</code>是一个切片类型，<code>length</code>和<code>capacity</code>是两个非负整数，并且<code>length</code>小于等于<code>capacity</code>，我们可以用下面的两种函数调用来各自生成一个类型为<code>S</code>的切片值。
+
+<pre class="line-numbers"><code class="language-go">make(S, length, capacity)
+make(S, length) // <=> make(S, length, length)
+</code></pre>
+
+<p>
+第一个函数调用创建了一个长度为<code>length</code>并且容量为<code>capacity</code>的切片。
+第一个函数调用创建了一个长度为<code>length</code>并且容量也为<code>length</code>的切片。
+</p>
+
+<p>
+使用<code>make</code>函数创建的切片中的所有元素值均被初始化为（结果切片的元素类型的）零值。
+</p>
+
+下面是一个展示了如何使用<code>make</code>函数来创建映射表和切片的例子：
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import "fmt"
+
+func main() {
+	// 创建映射表。
 	fmt.Println(make(map[string]int)) // map[]
 	m := make(map[string]int, 3)
 	fmt.Println(m, len(m)) // map[] 0
 	m["C"] = 1972
 	m["Go"] = 2009
 	fmt.Println(m, len(m)) // map[C:1972 Go:2009] 2
-	
-	// Make new slices.
+
+	// 创建切片。
 	s := make([]int, 3, 5)
 	fmt.Println(s, len(s), cap(s)) // [0 0 0] 3 5
 	s = append(s, 7, 11)
@@ -1043,33 +909,27 @@ func main() {
 </div>
 
 <p class="anchor" id="new"></p>
-<h3>Allocate Containers With The Built-in <code>new</code> Function</h3>
+<h3>使用内置<code>new</code>函数来创建容器值</h3>
 
 <div>
 <p>
-From the article <a href="pointer.html">pointers in Go</a>, we learned that
-we can also call the built-in <code>new</code> function to allocate
-a value of any type and get a pointer which references the allocated value.
-The allocated value is a zero value of its type.
-For this reason, it is a nonsense to use <code>new</code> function to
-create map and slice values.
+在前面的<a href="pointer.html">指针</a>一文中，我们已经了解到内置<code>new</code>函数可以用来为一个任何类型的值开辟内存并返回一个存储有此值的地址的指针。
+用<code>new</code>函数开辟出来的值均为零值。因为这个原因，<code>new</code>函数对于创建映射表和切片值来说没有任何价值。
 </p>
 
 <p>
-It is not totally a nonsense to allocate a zero value of an array type
-with the built-in <code>new</code> fucntion.
-However, it is seldom to do this in practice,
+使用<code>new</code>函数来用来创建数组值并非是完全没有意义的，但是在实践中很少这么做，因为使用组合字面值来创建数组值更为方便。
 </p>
 
-Example:
+一个使用<code>new</code>函数创建容器值的例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
 func main() {
-	m := *new(map[string]int)   // <=> var m map[string]int
+	m := *new(map[string]int)   // <=> var m = map[string]int(nil)
 	fmt.Println(m == nil)       // true
-	s := *new([]int)            // <=> var s []int
+	s := *new([]int)            // <=> var s = []int(nil)
 	fmt.Println(s == nil)       // true
 	a := *new([5]bool)          // <=> var a [5]bool
 	fmt.Println(a == [5]bool{}) // true
@@ -1077,39 +937,30 @@ func main() {
 </code></pre>
 
 <p>
-Composite literals and the built-in <code>make</code> fucntion
-are used much more popularly than the built-in <code>new</code> function
-to create container values.
 </p>
 
 </div>
 
-<h3>Addressability Of Container Elements</h3>
+<h3>容器元素的可寻址性</h3>
 
 <div>
-Following are some facts about the addressabilities of container elements.
+一些关于容器元素的可寻址性的事实：
 <ul>
 <li>
-	Elements of addressable array values are also addressable.
-	Elements of unaddressable array values are also unaddressable.
-	The reason is each array value is only composed of one direct part.
+	可寻址的数组的元素也是可寻址的。不可寻址的数组的元素也是不可寻址的。
+	原因很简单，因为一个数组中的所有元素均处于此数组的直接部分。
 </li>
 <li>
-	Elements of any slice value are always addressable,
-	whether or not that slice value is addressable.
-	This is because the elements of a slice are stored in
-	the underlying value part of the slice and the underlying part
-	is always hosted on an allocated memory segment.
+	一个切片值的任何元素都是可寻址的，即使此切片本身是不可寻址的。
+	这是因为一个切片的底层元素总是存储在一个被开辟出来的内存片段上。
 </li>
 <li>
-	Elements of map values are always unaddressable.
-	The reason is the underlying continuous memory segment of a map
-	may need reallocated when the number of elements of the map grows.
-	After a reallocation, all elements will be move to other places.
+	任何映射表元素都是不可寻址的。原因详见<a href="unofficial-faq.html#maps-are-unaddressable">此条问答</a>。
+	
 </li>
 </ul>
 
-For example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -1123,10 +974,10 @@ func main() {
 	fmt.Println(*pa2, *ps1) // 99 true
 	ps0 := &[]string{"Go", "C"}[0]
 	fmt.Println(*ps0) // Go
-	
+
 	m := map[int]bool{1: true}
 	_ = m
-	// The following lines fail to compile.
+	// 下面这几行编译不通过。
 	/*
 	_ = &[3]int{2, 3, 5}[0]
 	_ = &map[int]bool{1: true}[1]
@@ -1139,30 +990,25 @@ func main() {
 </p>
 
 <p>
-Unlike most other unaddressable values, which direct parts can not be modified,
-the direct part of a map element values can be modified,
-but can only be modified (overwritten) as a whole.
-For most kinds of element types, this is not a big issue.
-However, if the element type of map type is an array type or struct type,
-things become some counter-intuitive.
+一般来说，一个不可寻址的值的直接部分是不可修改的。但是映射表元素是个例外。
+映射表元素虽然不可寻址，但是每个映射表元素可以被整个修改（但不能被部分修改）。
+对于大多数做为映射表元素类型的类型，在修改它们的值的时候，一般体现不出来整个修改和部分修改的差异。
+但是如果一个映射表的元素类型为数组或者结构体类型，这个差异是很明显的。
 </p>
 
-From the last article, <a href="value-part.html">value parts</a>, we learned
-that each of struct and array values is composed of only one direct part.
-So
+在上一篇文章<a href="value-part.html">值部</a>中，我们了解到每个数组或者结构体值都是仅含有一个直接部分。所以
 <ul>
 <li>
-	if the element type of a map is a struct type,
-	we can not individually modify each field of an element of the map.
+	如果一个映射表类型的元素类型为一个结构体类型，则我们无法修改此映射表类型的值中的每个结构体元素的单个字段。
+	我们必须整体地修改每个结构体元素。
 </li>
 <li>
-	if the element type of a map is an array type,
-	we can not individually modify each element of an element
-	(which is an array) of the map.
+	如果一个映射表类型的元素类型为一个数组类型，则我们无法修改此映射表类型的值中的每个数组元素的单个元素。
+	我们必须整体地修改每个数组元素。
 </li>
 </ul>
 
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -1170,31 +1016,28 @@ import "fmt"
 func main() {
 	type T struct{age int}
 	mt := map[string]T{}
-	mt["John"] = T{age: 29}
+	mt["John"] = T{age: 29} // 整体修改是允许的
 	ma := map[int][5]int{}
-	ma[1] = [5]int{1: 789}
-	
-	// Accessments are ok
-	fmt.Println(ma[1][1]) // 789
-	fmt.Println(mt["John"].age) // 29
-	
-	// The following two modifications fail to compile.
+	ma[1] = [5]int{1: 789} // 整体修改是允许的
+
+	// 这两个赋值编译不通过，因为部分修改一个映射表元素是非法的。
+	// 这看上去确实有些反直觉。
 	/*
 	ma[1][1] = 123      // error: cannot assign to a[1][1]
 	mt["John"].age = 30 // cannot assign to struct field
 	                    // mt["John"].age in map.
 	*/
+
+	// 访问映射表元素的元素或者字段是没问题的。
+	fmt.Println(ma[1][1])       // 789
+	fmt.Println(mt["John"].age) // 29
 }
 </code></pre>
 
 <p>
 </p>
 
-To make any expected modification work in the above example,
-the curresponding map element should be saved in a temporary variable firstly,
-then the temporary variable is modified as needed, in the end
-the curresponding map element is overwritten by the temporary variable.
-For example,
+为了让上例中的两行编译不通过的两行赋值语句编译通过，欲修改的映射表元素必须先存放在一个临时变量中，然后修改这个临时变量，最后再用这个临时变量整体覆盖欲修改的映射表元素。比如：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1206,15 +1049,15 @@ func main() {
 	mt["John"] = T{age: 29}
 	ma := map[int][5]int{}
 	ma[1] = [5]int{1: 789}
-	
-	t := mt["John"] // a temporary copy
+
+	t := mt["John"] // 临时变量
 	t.age = 30
-	mt["John"] = t // overwrite it back
-	
-	a := ma[1] // a temporary copy
+	mt["John"] = t // 整体修改
+
+	a := ma[1] // 临时变量
 	a[1] = 123
-	ma[1] = a // overwrite it back
-	
+	ma[1] = a // 整体修改
+
 	fmt.Println(ma[1][1], mt["John"].age) // 123 30
 }
 </code></pre>
@@ -1222,39 +1065,34 @@ func main() {
 </div>
 
 <p class="anchor" id="subslice"></p>
-<h3>Derive Slices From Arrays And Slices</h3>
+<h3>从数组或者切片派生切片（取子切片）</h3>
 
 <div>
 <p>
-We can derive a new slice from an array or slice
-by using the subslice syntax forms.
-The elements of the derived slice and the base array or slice
-are hosted on the same underlying continuous memory segment.
-In other words, the derived slice and the base array or slice
-may share some contiguous elements.
+我们可以从一个基础切片或者一个可寻址的基础数组派生出另一个切片。此派生操作也常称为一个取子切片操作。
+派生出来的切片的元素和基础切片（或者数组）的元素位于同一个内存片段上。或者说，派生出来的切片很可能和基础切片（或者数组）共享一些元素。
 </p>
 
-There are two subslice syntax forms (<code>baseContainer</code> is an array or slice):
-<pre class="line-numbers"><code class="language-go">baseContainer[low : high]       // two-index form
-baseContainer[low : high : max] // three-index form
+Go中有两种取子切片的语法形式（假设<code>baseContainer</code>是一个切片或者数组）：
+
+<pre class="line-numbers"><code class="language-go">baseContainer[low : high]       // 双下标形式
+baseContainer[low : high : max] // 三下标形式
 </code></pre>
 
-The two-index form is equivalent to
+上面所示的双下标形式等价于下面的三下标形式：
+
 <pre class="line-numbers"><code class="language-go">baseContainer[low : high : cap(baseContainer)]
 </code></pre>
 
 <p>
-So the two-idnex form is a special case of the three-index form.
-The two-index form is used munch more popularly
-than the three-index form in practice.
+所以双下标形式是三下标形式的特例。在实践中，双下标形式使用得相对更为广泛。
 </p>
 
 <p>
-Note, the three-index form is only supported for Go 1.2+.
+（三下标形式是从Go 1.2开始支持的。）
 <p>
 
-In a subslice expression, the <code>low</code>, <code>high</code> and
-<code>max</code> indexes must satisfy the following requirements:
+上面所示的取子切片表达式的语法形式中得下标必须满足下列关系，否则代码要么编译不通过，要么在运行时刻将造成恐慌。
 <ul>
 <li>
 	<code>0 &lt;= low &lt;= high &lt;= max &lt;= cap(baseContainer)</code>.
@@ -1264,52 +1102,36 @@ In a subslice expression, the <code>low</code>, <code>high</code> and
 </li>
 </ul>
 
-<p>
-Indexes not satisfying these requirements may make the subslice expression
-fail to compile at compile time or panic at run time,
-depending on the base container type kind
-and whether or not the indexes are constants.
-</p>
-
-Note,
+注意：
 <ul>
 <li>
-	the <code>high</code> index can be larger than
-	<code>len(baseContainer)</code>, but must not larger than
-	<code>cap(baseContainer)</code>, if <code>baseContainer</code> is a slice
-	and <code>len(baseContainer)</code> is smaller than <code>cap(baseContainer)</code>.
+	下标<code>high</code>可以大于<code>len(baseContainer)</code>，但是它一定不能大于<code>cap(baseContainer)</code>。
 </li>
 <li>
-	a subslice expression will not cause a panic if the base container
-	is a nil slice and all indexes used in the expression are zero.
-	The result slice derived from a nil slice is still a nil slice.
+	如果<code>baseContainer</code>是一个零值nil切片，只要上面所示的子切片表达式中下标的值均为<code>0</code>，则此这两个子切片表达式不会造成恐慌。
+	在这种情况下，结果切片也是nil切片。
 </li>
 </ul>
 
 <p>
-The length of the result derived slice is equal to <code>high - low</code>, and
-the capacity of the result derived slice is equal to <code>max - low</code>.
-The length of a derived slice may be larger than the base container,
-but the capacity will never be larger than the base container.
+子切片表达式的结果切片的长度为<code>high - low</code>、容量为<code>max - low</code>。
+派生出来的结果切片的长度可能大于基础切片的长度，但结果切片的容量绝不可能大于基础切片的容量。
 </p>
 
-In pratice, for simplicity, we often omitted some indexes in subslice syntax forms.
-The omission rules are:
+在实践中，我们常常在子切片表达式中省略若干下标，以使代码看上去更加整洁。省略规则如下：
 <ul>
 <li>
-	if the <code>low</code> index is equal to zero, it can be omitted,
-	either for two-index or three-index forms.
+	如果下标<code>low</code>为零，则它可被省略。此条规则同时适用于双下标形式和三下标形式。
 </li>
 <li>
-	if the <code>high</code> is equal to <code>len(baseContainer)</code>,
-	it can be omitted, but only for two-index forms.
+	如果下标<code>high</code>等于<code>len(baseContainer)</code>，则它可被省略。此条规则同时只适用于双下标形式。
 </li>
 <li>
-	the <code>max</code> can never be omitted in three-index forms.
+	三下标形式中的下标<code>max</code>在任何情况下都不可被省略。
 </li>
 </ul>
 
-For example, the following expressions are equivalent.
+比如，下面的子切片表达式都是相互等价的：
 <pre class="line-numbers"><code class="language-go">baseContainer[0 : len(baseContainer)]
 baseContainer[: len(baseContainer)]
 baseContainer[0 :]
@@ -1318,7 +1140,8 @@ baseContainer[0 : len(baseContainer) : cap(baseContainer)]
 baseContainer[: len(baseContainer) : cap(baseContainer)]
 </code></pre>
 
-An example of using subslice syntax forms:
+一个使用了子切片语法的例子：
+
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -1346,44 +1169,49 @@ func main() {
 </code></pre>
 
 <p>
-The following picture depicts the final memory layouts of the array
-and slice values used in the above example.
+下面这张图描绘了上面的程序在退出之前各个数组和切片的内存布局。
 <br/>
 <img src="res/slice-subslice.png">
 <br/>
 </p>
 
 <p>
-From the picture, we know that the elements of slice <code>s7</code> and <code>s8</code>
-are hosted on a different underlying memory segment than the other containers.
-The elements of the other slices are hosted on the same memory segment
-hosting the array <code>a</code>.
+从这张图片可以看出，切片<code>s7</code>和<code>s8</code>共享存储它们的元素的底层内存片段，其它切片和数组<code>a</code>共享同一个存储元素的内存片段。
+</p>
+
+请注意，子切片操作有可能会造成暂时性的内存泄露。
+比如，下面在这个函数中开辟的内存块中的前50个元素槽位在它的调用返回之后将不再可见。
+这50个元素槽位所占内存浪费了，这属于暂时性的内存泄露。
+当这个函数中开辟的内存块今后不再被任何切片所引用，此内存块将被回收，这时内存才不再继续泄漏。
+
+<pre class="line-numbers"><code class="language-go">func f() []int {
+	s := make([]int, 100)
+	return s[50:]
+}
+</code></pre>
+
+<p>
 </p>
 
 </div>
 
 <p class="anchor" id="copy-slice-elements"></p>
-<h3>Copy Slice Elements With The Built-in <code>copy</code> Function</h3>
+<h3>使用内置<code>copy</code>函数来复制切片元素</h3>
 
 <div>
 <p>
-We can use the built-in <code>copy</code> function to copy elements from one
-slice to another, the types of the two slices are not required to be identical,
-but their element types must be identical.
-In other words, the two argument slices must share the same underlying type.
-The first argument of the <code>copy</code> function is the destination slice
-and the second one is the source slice.
-The two arguments can overlap some elements.
-The <code>copy</code> function returns the number of elements copied,
-which will be the smaller one of the lengths of the two arguments.
+我们可以使用内置<code>copy</code>函数来将一个切片中的元素复制到另一个切片。
+这两个切片的类型可以不同，但是它们的元素类型必须相同。
+换句话说，这两个切片的类型的底层类型必须相同。
+<code>copy</code>函数的第一个参数为目标切片，第二个参数为源切片。
+<code>copy</code>函数返回复制了多少个元素，此值（<code>int</code>类型）为这两个切片的长度的较小值。
 <p>
 
 <p>
-With the help of the subslice syntax, we can use the <code>copy</code> function to
-copy elements between two arrays or between an array and a slice.
+结合上一节介绍的子切片语法，我们可以使用<code>copy</code>函数来在两个数组之间或者一个数组与一个切片之间复制元素。
 </p>
 
-An example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -1397,8 +1225,8 @@ func main() {
 	fmt.Println(n, dest) // 3 [5 6 7]
 	n = copy(dest[1:], dest)
 	fmt.Println(n, dest) // 2 [5 5 6]
-	
-	a := [4]int{} // an array
+
+	a := [4]int{} // 一个数组
 	n = copy(a[:], src)
 	fmt.Println(n, a) // 4 [5 6 7 8]
 	n = copy(a[:], a[2:])
@@ -1409,11 +1237,9 @@ func main() {
 <p>
 </p>
 
-In fact, the <code>copy</code> function is not very essential.
-We can implement it by using the built-in <code>append</code> function,
-though our implementation doesn't support generic.
+事实上，<code>copy</code>并不是一个基本函数。我们可以用<code>append</code>来实现它。
 
-<pre class="line-numbers"><code class="language-go">// Assume element type is T.
+<pre class="line-numbers"><code class="language-go">// 假设元素类型为T。
 func Copy(dest, src []T) int {
 	if len(dest) < len(src) {
 		_ = append(dest[:0], src[:len(dest)]...)
@@ -1426,63 +1252,51 @@ func Copy(dest, src []T) int {
 </code></pre>
 
 <p>
-Although the <code>copy</code> function is not an essential function in Go,
-for many circumstances, it is more convenient that the just shown way.
+尽管<code>copy</code>函数不是一个基本函数，它比上面的用<code>append</code>的实现使用起来要方便得多。
 </p>
 
 <p>
-From another point of view, the <code>append</code> function can also be viewed
-as a non-essential function (whereas <code>copy</code> is viewed as an
-essential function), for all its uses can be implemented with
-<code>make</code> and <code>copy</code> function calls.
+从另外一个角度，我们也可以认为<code>append</code>不是一个基本函数，因为我们可以用<code>make</code>加<code>copy</code>函数来实现它。
 </p>
 
 <p>
-Note, as a special case, the built-in <code>copy</code> function
-can be used to <a href="string.html#use-string-as-byte-slice">copy bytes
-from a string to a byte slice</a>.
+注意，做为一个特例，<code>copy</code>函数可以用来<a href="string.html#use-string-as-byte-slice">将一个字符串中的字节复制到一个byte切片</a>。
 </p>
 
 <p>
-Up to now (Go 1.10), neither of the two arugments of a <code>copy</code>
-function call can be an untyped <code>nil</code> value.
+截至目前（Go 1.11），<code>copy</code>函数调用的两个实参均不能为类型不确定的<code>nil</code>。
 </p>
 
 </div>
 
 <p class="anchor" id="iteration"></p>
-<h3>Container Element Iterations</h3>
+<h3>遍历容器元素</h3>
 
 <div>
-
-In Go, keys and elements of a container value can be iterated with
-the following syntax:
+在Go中，我们可以使用下面的语法形式来遍历一个容器中的键值和元素：
 <pre><code class="language-go">for key, element = range aContainer {
-	// use key and element ...
+	// 使用key和element ...
 }
 </code></pre>
-where <code>key</code> and <code>element</code> are called iteration variables.
-
 <p>
-The assignment sign <code>=</code> can be a short variable declaration sign
-<code>:=</code>, in which case the two iteration variables are both two new
-declared variables which are only visible within the <code>for-range</code>
-code block body.
+在此语法形式中，<code>key</code>和<code>element</code>称为循环变量。
 </p>
 
 <p>
-Like the traditional <code>for</code> loop block, each <code>for-range</code>
-loop block creates two code blocks, an implicit one and an explicit one
-which is formed by using <code>{}</code>.
-The explicit one is nested in the implicit one.
+上面所示的<code>for-range</code>语法形式中的等号<code>=</code>也可以是一个变量短声明符号<code>:=</code>。
+当短声明符号被使用的时候，<code>key</code>和<code>element</code>总是两个新声明的变量。
 </p>
 
 <p>
-Like <code>for</code> loop blocks, <code>break</code> and <code>continue</code>
-statements can also be used in <code>for-range</code> loop blocks,
+和传统的<code>for</code>循环流程控制一样，每个<code>for-range</code>循环流程控制形成了两个代码块，其中一个是隐式的，另一个是显式的（花括号<code>{}</code>起始的部分）。
+此显式的代码块内嵌在隐式的代码块之中。
 </p>
 
-Example:
+<p>
+和<code>for</code>循环流程控制一样，<code>break</code>和<code>continue</code>也可以使用在一个<code>for-range</code>循环流程控制中的显式代码块中。
+</p>
+
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -1492,12 +1306,12 @@ func main() {
 	for lang, year := range m {
 		fmt.Printf("%v: %v \n", lang, year)
 	}
-	
+
 	a := [...]int{2, 3, 5, 7, 11}
 	for i, prime := range a {
 		fmt.Printf("%v: %v \n", i, prime)
 	}
-	
+
 	s := []string{"go", "defer", "goto", "var"}
 	for i, keyword := range s {
 		fmt.Printf("%v: %v \n", i, keyword)
@@ -1506,68 +1320,56 @@ func main() {
 </code></pre>
 
 <p>
-If the iteration variable <code>i</code> in the above example is declared
-outside of the <code>for-range</code> code block,
-its type must be the built-in type <code>int</code>.
+如果上例中的循环变量<code>i</code>声明在<code>for-range</code>循环之外，则它的类型必须为内置类型<code>int</code>。
 </p>
 
-The form <code>for-range</code> code block syntax has several variants:
-<pre class="line-numbers"><code class="language-go">// Ignore the key iteration variable.
+<code>for-range</code>循环代码块以一些变种形式：
+<pre class="line-numbers"><code class="language-go">// 忽略键值循环变量。
 for _, element = range aContainer {
 	// ...
 }
 
-// Ignore the element iteration variable.
+// 忽略元素循环变量。
 for key, _ = range aContainer {
 	element = aContainer[key]
 	// ...
 }
 
-// The element iteration variable is omitted.
-// This form is equivalent to the last one.
+// 舍弃元素循环变量。此形式和上一个变种等价。
 for key = range aContainer {
 	element = aContainer[key]
 	// ...
 }
 
-// Ignore both the key and element iteration variables.
+// 键值和元素循环变量均被忽略。
 for _, _ = range aContainer {
-	// This variant is not much useful.
+	// 这个变种形势没有太大实用价值。
 }
 
-// Both the key and element iteration variables are omitted.
-// This form is equivalent to the last one.
+// 键值和元素循环变量均被舍弃。此形式和上一个变种等价。
 for range aContainer {
-	// This variant is not much useful.
+	// 这个变种形势没有太大实用价值。
 }
 </code></pre>
 
 <p>
-Iterating over nil maps or nil slices is allowed,
-the number of iterated key-element pairs is zero for such cases.
+遍历一个nil映射表或者nil切片是允许的。这样的遍历可以看作是一个空操作。
 </p>
 
-Some details about iterations over maps are lsit here.
+一些关于遍历映射表条目的细节：
 <ul>
 <li>
-	For a map, the entry order in an iteration is not guaranteed to be the
-	same as the next iteration, even if the map is not modified between
-	the two iterations. By Go specification, the order is randomized.
+	映射表中的条目的遍历顺序是随机的。或者说，同一个映射表中的条目的两次遍历中，条目的顺序很可能是不一致的，即使在这两次遍历之间，此映射表并为发生任何改变。
 </li>
 <li>
-	If a map entry (a key-element pair) which has not yet been reached
-	is removed during an iteration, then the entry will not
-	iterated in the same iteration for sure.
+	如果在一个映射表中的条目的遍历过程中，一个还没有被遍历到的条目被删除了，则此条目保证不会被遍历出来。
 </li>
 <li>
-	If a map entry is created during an iteration,
-	that entry may be iterated during the same iteration, or not.
+	如果在一个映射表中的条目的遍历过程中，一个新的条目被添加入此映射表，则此条目并不保证将在此遍历过程中被遍历出来。
 </li>
 </ul>
 
-If it is promised that there are no other goroutines
-manipulating a map <code>m</code>, then the following code is guaranteed to
-clear all key-element pairs stored in the map <code>m</code>:
+如果可以确保没有其它协程操纵一个映射表<code>m</code>，则下面的代码保证将清空<code>m</code>中所有条目。
 <pre class="line-numbers"><code class="language-go">for key := range m {
 	delete(m, key)
 }
@@ -1576,7 +1378,7 @@ clear all key-element pairs stored in the map <code>m</code>:
 <p>
 </p>
 
-Surely, array and slice elements can also be iterated by using the traditional <code>for</code> loop block:
+当然，数组和切片元素也可以用传统的<code>for</code>循环来遍历。
 <pre class="line-numbers"><code class="language-go">for i := 0; i < len(anArrayOrSlice); i++ {
 	element := anArrayOrSlice[i]
 	// ...
@@ -1586,50 +1388,40 @@ Surely, array and slice elements can also be iterated by using the traditional <
 <p>
 </p>
 
-For a <code>for-range</code> loop block
+对一个<code>for-range</code>循环代码块
 
 <pre class="line-numbers"><code class="language-go">for key, element = range aContainer {...}
 </code></pre>
 
-there are three important facts.
+有三个重要的事实存在：
 
 <ol>
 <li>
-	The ranged container is <b>a copy</b> of <code>aContainer</code>.
-	However, please note, <a href="value-part.html#about-value-copy">only
-	the direct part of <code>aContainer</code> is copied</a>.
-	The copied container is anonymous, so there are no ways to modify it.
+	被遍历的容器值是<code>aContainer</code>的<b>一个副本</b>。
+	注意，<a href="value-part.html#about-value-copy">只有<code>aContainer</code>的直接部分被复制了</a>。
+	此（直接部分的）副本是一个匿名的值，所以它是不可被修改的。
 	<ul>
 	<li>
-		If the <code>aContainer</code> is an array, then the
-		modifications made on the array elements during the iteration
-		will not be reflected to the iteration variables.
-		The reason is that the clone of the array doesn't
-		share elements with the array.
+		如果<code>aContainer</code>是一个数组，那么在遍历过程中对此数组元素的修改不会体现到循环变量中。
+		原因是此数组的副本（被真正遍历的容器）和此数组不共享任何元素。
 	</li>
 	<li>
-		If the <code>aContainer</code> is a slice or map, then the
-		modifications made on the slice or map elements during
-		the iteration will be reflected to the iteration variables.
-		The reason is that the clone of the slice (or map)
-		shares all elements (entries) with the slice (or map).
+		如果<code>aContainer</code>是一个切片（或者映射表），那么在遍历过程中对此切片（或者映射表）元素的修改将体现到循环变量中。
+		原意是此切片（或者映射表）的副本和此切片或者映射表共享元素（或条目）。
 	</li>
 	</ul>
 </li>
 <li>
-	A key-element pair of the copy of <code>aContainer</code> will be
-	assigned (copied) to the iteration variables at each iteration step,
-	so the modifications made on <b>the direct parts</b>
-	of the iteration variables will not be refelcted to the elements
-	(and keys for maps) stored in <code>aContainer</code>.
+	在遍历中的每个循环步，<code>aContainer</code>副本中的一个键值对对将被赋值（复制）给循环变量。
+	所以对循环变量的直接部分的修改将不会体现在<code>aContainer</code>中的对应元素（或者条目）上。
+	（因为这个原因，并且<code>for-range</code>循环是遍历映射表条目的唯一途径，最好不要使用大尺寸的映射表键值和元素类型，以避免较大的复制负担。）
 </li>
 <li>
-	All key-element pairs will be assigned to the <b>same</b>
-	iteration variables.
+	所有被遍历的键值对将被赋值给<b>同一对</b>循环变量。
 </li>
 </ol>
 
-An example which proves the first and second facts.
+下面这个例子验证了上述第一个和第二个事实。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1643,18 +1435,18 @@ func main() {
 	persons := [2]Person {{"Alice", 28}, {"Bob", 25}}
 	for i, p := range persons {
 		fmt.Println(i, p)
-		// This modification has no effects on the iteration,
-		// for the ranged array is a copy of the persons array.
+		// 此修改将不会体现在这个遍历过程中，
+		// 因为被遍历得数组是persons的一个副本。
 		persons[1].name = "Jack"
-		// This modification has not effects on the persons array,
-		// for p is just a copy of a copy of one persons element.
+		// 此修改不会反映到persons数组中，
+		// 因为p是一个persons数组元素的副本。
 		p.age = 31
 	}
 	fmt.Println("persons:", &persons)
 }
 </code></pre>
 
-The output:
+输出结果：
 <pre class="output"><code>0 {Alice 28}
 1 {Bob 25}
 persons: &[{Alice 28} {Jack 25}]
@@ -1663,9 +1455,8 @@ persons: &[{Alice 28} {Jack 25}]
 <p>
 </p>
 
-If we change the array in the above to a slice, then the modification on the
-slice during the iteration has effects on the iteration, but
-the modification on the iteration variable still has no effects on the slice.
+如果我们将上例中的数组改为一个切片，则在循环中对此切片的修改将在循环过程中体现出来。
+但是对循环变量的修改仍然不会体现在此切片中。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1679,16 +1470,16 @@ func main() {
 	persons := []Person {{"Alice", 28}, {"Bob", 25}} // a slice
 	for i, p := range persons {
 		fmt.Println(i, p)
-		// Now this modification has effects on the iteration.
+		// 这次，此修改将反映在此次遍历过程中。
 		persons[1].name = "Jack"
-		// This modification still has no any real effects.
+		// 这个修改仍然不会体现在persons切片容器中。
 		p.age = 31
 	}
 	fmt.Println("persons:", &persons)
 }
 </code></pre>
 
-The output becomes to:
+输出结果变成了：
 <pre class="output"><code>0 {Alice 28}
 1 {Jack 25}
 persons: &[{Alice 28} {Jack 25}]
@@ -1697,7 +1488,7 @@ persons: &[{Alice 28} {Jack 25}]
 <p>
 </p>
 
-An example to prove the second and third facts.
+下面这个例子验证了上述的第二个和第三个事实：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -1708,54 +1499,49 @@ func main() {
 		{false, true}:  {"Go": 2009},
 		{false, false}: {"C": 1972},
 	}
-	// The key type and element type of this map are both
-	// pointer types. Some weird, just for education purpose.
+	// 此映射表的键值和元素类型均为指针类型。这有些不寻常，只是为了讲解目的。
 	m0 := map[*struct{ dynamic, strong bool }]*map[string]int{}
 	for category, langInfo := range langs {
 		m0[&category] = &langInfo
-		// This following line has no real effects on langs.
+		// 下面这行修改对映射表langs没有任何影响。
 		category.dynamic, category.strong = true, true
 	}
+	for category, langInfo := range langs {
+		fmt.Println(category, langInfo)
+	}
+	
 	m1 := map[struct{ dynamic, strong bool }]map[string]int{}
 	for category, langInfo := range m0 {
 		m1[*category] = *langInfo
 	}
-	// m0 and m1 both contain only one entry.
-	fmt.Println(len(m0), len(m1), m1)
-	for category, langInfo := range langs {
-		fmt.Println(category, langInfo)
-	}
+	// 映射表m0和m1中均只有一个条目。
+	fmt.Println(len(m0), len(m1)) // 1 1
+	fmt.Println(m1)               // map[{true true}:map[C:1972]]
+	
 }
 </code></pre>
 
-As above has mentioned, the entry iteration order is randomized,
-so the output of the above program may be also randomized.
-One possible output:
-<pre class="output"><code>1 1 map[{true true}:map[C:1972]]
-{true false} map[JavaScript:1995]
-{false true} map[Go:2009]
+上面已经提到了，映射表条目的遍历顺序是随机的。所以下面前三行的输出顺序可能会略有不同：
+
+<pre class="output"><code>{false true} map[Go:2009]
 {false false} map[C:1972]
+{true false} map[JavaScript:1995]
+1 1
+map[{true true}:map[Go:2009]]
 </code></pre>
 
 <p>
 </p>
 
 <p>
-The cost of copying a slice or map is small, but the cost of copying an array
-is large if the size of the array type is large.
-So, generally, it is not a good idea to range over a large array.
-We can range over a slice derived from the array, or range over a pointer
-to the array (see the next section for details).
+一个切片或者映射表赋值的代价很小，但是复制一个大尺寸的数组的代价比较大。
+所以，一般来说，<code>range</code>关键字后跟随一个大尺寸数组不是一个好主意。
+如果我们要遍历一个大尺寸数组中的元素，我们以遍历从此数组派生出来的一个切片，或者遍历一个指向此数组的指针（详见下一节）。
 </p>
 
-For an array or slice, if the size of its element type is large, then,
-generally, it is also not a good idea to use the second iteration variable to
-store the iterated element at each loop step.
-For such arrays and slices, we should use the one-iteration-variable
-<code>for-range</code> loop variant or the traditional <code>for</code>
-loop to iterate their elements.
-In the following example, the loop in function <code>fa</code> is much less
-efficient than the loop in function <code>fb</code>.
+对于一个数组或者切片，如果它的元素类型的尺寸较大，则一般来说，用第二个循环变量来存储每个循环步中被遍历的元素不是一个好主意。
+对于这样的数组或者切片，我们忽略或者舍弃<code>for-range</code>代码块中的第二个循环变量，或者使用传统的<code>for</code>循环来遍历元素。
+比如，在下面这个例子中，函数<code>fa</code>中的循环效率比函数<code>fb</code>中的循环低得多。
 
 <pre class="line-numbers"><code class="language-go">type Buffer struct {
 	start, end int
@@ -1785,29 +1571,28 @@ func fb(buffers []Buffer) int {
 </div>
 
 <p class="anchor" id="use-pointer-as-array"></p>
-<h3>Use Array Pointers As Arrays</h3>
+<h3>把数组指针当做数组来使用</h3>
 
 <div>
 <p>
-In many situations, we can use a pointer to an array as the array.
+对于某些情形，我们可以把数组指针当做数组来使用。
 </p>
 
-We can range over a pointer to an array to iterate the elements of the array.
-For arrays with large lengths, this way is much more efficient, for copying
-a pointer is much more efficient than copying a large-size array.
-In the following example, the two loop blocks are equivalent
-and both are efficient.
+我们可以通过在<code>range</code>关键字后跟随一个数组的指针来遍历此数组中的元素。
+对于大尺寸的数组，这种方法比较有效，因为复制一个指针比复制一个大尺寸数组的代价低得多。
+下面的例子中的两个循环是等价的，它们的效率也基本相同。
+
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
 func main() {
 	var a [100]int
-	
+
 	for i, n := range &a { // copying a pointer is cheap
 		fmt.Println(i, n)
 	}
-	
+
 	for i, n := range a[:] { // copying a slice is cheap
 		fmt.Println(i, n)
 	}
@@ -1817,9 +1602,8 @@ func main() {
 <p>
 </p>
 
-If the second iteration is neither ignored nor omitted, then range over a nil
-array pointer will panic. In the following example, each of the first two loop
-blocks will print five indexes, however, the last one will produce a panic.
+如果一个<code>for-range</code>循环中的第二个循环变量既没有被忽略，也没有被舍弃，并且<code>range</code>关键字后跟随一个nil数组指针，则此循环将造成一个恐慌。
+在下面这个例子中，前两个循环都将打印出5个下标，但最后一个循环将导致一个恐慌。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1827,15 +1611,15 @@ import "fmt"
 
 func main() {
 	var p *[5]int // nil
-	
+
 	for i, _ := range p { // okay
 		fmt.Println(i)
 	}
-	
+
 	for i := range p { // okay
 		fmt.Println(i)
 	}
-	
+
 	for i, n := range p { // panic
 		fmt.Println(i, n)
 	}
@@ -1845,8 +1629,8 @@ func main() {
 <p>
 </p>
 
-Array pointers can also used to index array elements.
-Indexing array eleemnts through a nil array pointer produces a panic.
+我们可以通过数组的指针来访问此数组中的元素。如果此指针是一个nil指针，将导致一个恐慌。
+
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -1864,8 +1648,7 @@ func main() {
 <p>
 </p>
 
-We can also derived slices from array pointers.
-Deriving slices from a nil array pointer produce a panic.
+我们可以从一个数组的指针派生出一个切片。从一个nil数组指针派生切片将导致一个恐慌。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1883,9 +1666,8 @@ func main() {
 <p>
 </p>
 
-We can also pass array pointers as the arguments of the built-in
-<code>len</code> and <code>cap</code> functions.
-Nil array pointer arguments for the two functons will not produce panics.
+内置<code>len</code>和<code>cap</code>函数调用接受数组指针做为实参。
+nil数组指针实参不会导致恐慌。
 
 <pre class="line-numbers"><code class="language-go">var pa *[5]int // nil
 fmt.Println(len(pa), cap(pa)) // 5 5
@@ -1897,27 +1679,24 @@ fmt.Println(len(pa), cap(pa)) // 5 5
 </div>
 
 <p class="anchor" id="memclr"></p>
-<h3>The <code>memclr</code> Optimization</h3>
+<h3><code>memclr</code>优化</h3>
 
 <div>
-Assume <code>t0</code> is a literal presentation of the zero value of
-type <code>T</code>, and <code>a</code> is an array which element type is
-<code>T</code>, then the standard Go compiler will translate the following
-one-iteration-variable <code>for-range</code> loop block
+假设<code>t0</code>是一个类型<code>T</code>的零值的文字表示形式，并且<code>a</code>是一个元素类型为<code>T</code>的数组，则官方标准编译器将把下面的单循环变量<code>for-range</code>代码块优化为<a href="https://github.com/golang/go/issues/5373">内部的<code>memclr</code>调用</a>。
+大多数情况下，此<code>memclr</code>调用比一个一个的重置元素要快。
+
 <pre class="line-numbers"><code class="language-go">for i := range a {
 	a[i] = t0
 }
 </code></pre>
+
 <p>
-to an <a href="https://github.com/golang/go/issues/5373">internal
-<code>memclr</code> call</a>, generally which is faster
-than resetting each element one by one.
+从优化在官方Go编译器1.5版本中被引入。
 </p>
 
-The optimization also works if the ranged container is a slice. Sadly,
-it doesn't work if the ranged value is an array pointer (up to Go 1.10).
-So if you want to reset an array, don't range its pointer. In particular,
-it is recommended to range a slice derived from the array, like this:
+此优化也适用于<code>a</code>为一个切片的情形。但是，有点遗憾，此优化不适用于<code>a</code>为一个数组指针的情形，至少到目前（Go 1.11）为止。
+所以，如果你打算重置一个数组，最好不要在<code>range</code>关键字后跟随此数组的指针。
+特别地，推荐在<code>range</code>关键字后跟随一个从此数组派生出来的切片，如下：
 
 <pre class="line-numbers"><code class="language-go">s := a[:]
 for i := range s {
@@ -1926,27 +1705,21 @@ for i := range s {
 </code></pre>
 
 <p>
-The reason of why is is recommended to range over a derived slice is
-it is very possible that other Go compilers don't make the above optimization,
-and as above has mentioned, ranging over an array will make a copy
-of the array (though the standard Go compiler won't in this optimization).
+不推荐在<code>range</code>关键字后直接此数组的原因是其它可能的第三方编译器可能并没有实现此优化，<code>range</code>关键字后一个数组将复制此数组。
 </p>
 
 </div>
 
 <p class="anchor" id="compile-time-evaluation"></p>
-<h3>Calls To The Built-in <code>len</code> And <code>cap</code> Functions May Be Evaluated At Compile Time</h3>
+<h3>内置函数<code>len</code>和<code>cap</code>的调用可能会在编译时刻被估值</h3>
 
 <div>
 <p>
-If the argument passed to a built-in function <code>len</code> or
-<code>cap</code> function call is an array or an array pointer value,
-then the call is evaluated at compile time and the ressult of the call
-is a typed constant with default type as the built-in type <code>int</code>.
-The result can be bound to named constants.
+如果传递给内置函数<code>len</code>或者<code>cap</code>的一个调用的实参是一个数组或者数组指针，则此调用将在编译时刻被估值。
+此估值结果是一个类型为内置类型<code>int</code>的类型确定常量值。
 </p>
 
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -1954,7 +1727,7 @@ import "fmt"
 var a [5]int
 var p *[7]string
 
-// N and M are both typed constants.
+// N和M都是类型确定值。
 const N = len(a)
 const M = cap(p)
 
@@ -1969,19 +1742,16 @@ func main() {
 </div>
 
 <p class="anchor" id="modify-slice-length-and-capacity"></p>
-<h3>Modify The Length And Capacity Properties Of A Slice Individually</h3>
+<h3>单独修改一个切片的长度或者容量</h3>
 
 <div>
 <p>
-As above has mentioned, generally, the length and capacity of
-a slice value can't be modified individually.
-A slice value can only be overwritten as a whole
-by assigning another slice value to it.
-However we can modify the length and capacity of a slice
-individually by using reflections.
+上面已经提到了，一般来说，一个切片的长度和容量不能被单独修改。一个切片只有通过赋值的方式被整体修改。
+但是，事实上，我们可以通过反射的途径来单独修改一个切片的长度或者容量。
+（反射将在<a href="reflection.html">后面的一篇文章</a>中详解。）
 </p>
 
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
@@ -1992,101 +1762,86 @@ import (
 func main() {
 	s := make([]int, 2, 6)
 	fmt.Println(len(s), cap(s)) // 2 6
-	
+
 	reflect.ValueOf(&s).Elem().SetLen(3)
 	fmt.Println(len(s), cap(s)) // 3 6
-	
+
 	reflect.ValueOf(&s).Elem().SetCap(5)
 	fmt.Println(len(s), cap(s)) // 3 5
 }
 </code></pre>
 
 <p>
-The argument passed to the <code>reflect.SetLen</code> function must not
-be larger than the current capacity of the argument slice <code>s</code>.
-The argument passed to the <code>reflect.SetCap</code> function must not
-be smaller than the current length of the argument slice <code>s</code> and
-larger than the current capacity of the argument slice <code>s</code>.
+传递给函数<code>reflect.SetLen</code>调用的第二个实参值必须不大于第一个实参切片值的容量。
+传递给函数<code>reflect.SetCap</code>调用的第二个实参值必须不小于第一个实参切片值的长度并且须不大于第一个实参切片值的容量。
+否则，在运行时刻将产生一个恐慌。
 </p>
 
 <p>
-The reflection way is very inefficient, it is slower than a slice assignment.
+反射的效率很低，远低于一个切片的赋值。
 </p>
 </div>
 
 <p class="anchor" id="slice-manipulations"></p>
-<h3>More Slice Manipulations</h3>
+<h3>更多切片操纵</h3>
 
 <p>
-Go doesn't support more slice operations, such as slice clone,
-element deletion and insertion, in the built-in way.
-We must compose the built-in ways to achieve those operations.
+Go不支持更多的内置切片操作，比如切片克隆、元素删除和插入。
+我们必须用上面提到的各种内置操作来实现这些操作。
 </p>
 
 <p>
-In the following examples in the current section,
-assume <code>s</code> is the talked slice,
-<code>T</code> is its element type and <code>t0</code>
-is a zero value literal representation of <code>T</code>.
+在下面当前大节中的例子中，假设<code>s</code>是被谈到的切片、<code>T</code>是它的元素类型、<code>t0</code>是类型<code>T</code>的零值的文字表示形式。
 </p>
 
-<h4>Clone Slices</h4>
+<h4>切片克隆</h4>
 
 <div>
-Up to the official Go SDK 1.10, the best way to clone a slice
-is to use the following way.
+截至官方Go SDK 1.11，最有效的克隆一个切片的方法为：
 <pre class="line-numbers"><code class="language-go">sClone := append(s[:0:0], s...)
 </code></pre>
 
-For slices with large lengths (throunsands of elements),
-the above way is more efficient than
+对于长度较大（并且元素值的直接部分不含有指针）的切片，上面这种方法比下面这种方法效率更高。
 <pre class="line-numbers"><code class="language-go">sClone := make([]T, len(s))
 copy(sClone, s)
 </code></pre>
 
 <p>
-The second way is not perfect as the first one.
-If <code>s</code> is a nil slice, the second way results a non-nil clone.
+刚提到的第二种方法并不完美，如果<code>s</code>是一个nil切片，此第二种方法将得到一个非nil切片。
 </p>
 
 </div>
 
-<h4>Delete A Segment Of Slice Elements</h4>
+<p class="anchor" id="delete-slice-elements"></p>
+<h4>删除一段切片元素</h4>
 
 <div>
-Above has mentioned that the elements a slice are stored contiguously
-in memory and there are no gaps between any two adjacent elements of the slice.
-So when a slice element is removed,
+前面已经提到了切片的元素在内存中是连续存储的，相邻元素之间是没有间隙的。所以，当切片的一个元素段被删除时，
 <ul>
 <li>
-	if the element order must be preserved,
-	then each of the subsequent elements followed the removed element
-	must be moved forwards.
+	如果剩余元素的次序必须保持原样，则被删除的元素段后面的每个元素都得前移。
 </li>
 <li>
-	if the element order doesn't need to be preserved,
-	then we can move the last element in the slice to the removed index.
+	如果剩余元素的次序不需要保持原样，则我们可以将尾部的一些元素移到被删除的元素的位置上。
 </li>
 </ul>
 
-In the following example, assume <code>from</code> and <code>to</code> are
-two legal indexes, <code>from</code> is not larger than <code>to</code>,
-and the <code>to</code> index is exclusive.
-<pre class="line-numbers"><code class="language-go">// way 1 (preserve element orders):
+在下面的例子中，假设<code>from</code>（包括）和<code>to</code>（不包括）是两个合法的下标，并且<code>from</code>不大于<code>to</code>。
+
+<pre class="line-numbers"><code class="language-go">// 第一种方法（保持剩余元素的次序）：
 s = append(s[:from], s[to:]...)
 
-// way 2 (preserve element orders):
+// 第二种方法（保持剩余元素的次序）：
 s = s[:from + copy(s[from:], s[to:])]
 
-// Don't preserve element orders:
+// 第三种方法（不保持剩余元素的次序）：
 copy(s[from:to], s[len(s)+from-to:])
 s = s[:len(s)+from-to]
 </code></pre>
 
-If the slice elements contain pointers, we should reset
-tail elements in the old slice to avoid memory leaking.
+如果切片的元素可能引用着其它值，则我们应该重置因为删除元素而多出来的元素槽位上的元素值，以避免暂时性的内存泄露：
 
-<pre class="line-numbers"><code class="language-go">// "len(s)+to-from" is the old slice length.
+<pre class="line-numbers"><code class="language-go">// "len(s)+to-from"是删除操作之前切片s的长度。
 temp := s[len(s):len(s)+to-from]
 for i := range temp {
 	temp[i] = t0
@@ -2094,34 +1849,30 @@ for i := range temp {
 </code></pre>
 
 <p>
-As above has mentioned, the <code>for-range</code> loop code block will be
-optimized as a <code>memclr</code> call by the standard Go compiler.
+刚才已经提到了，上面这个<code>for-range</code>循环将被官方标准编译器优化为一个<code>memclr</code>调用。
 </p>
 
 </div>
 
-<h4>Delete One Slice Element</h4>
+<p class="anchor" id="delete-one-slice-element"></p>
+<h4>删除一个元素</h4>
 
 <div>
 <p>
-Deleting one element is similar to, and also simpler than,
-deleting a segment of elements.
+删除一个元素是删除一个元素段的特例。在实现上可以简化一些。
 </p>
 
-In the following example,
-assume <code>i</code> the index of the element to be removed
-and <code>i</code> is a legal index.
+在下面的例子中，假设<code>i</code>将被删除的元素的下标，并且它是一个合法的下标。
 
-<pre class="line-numbers"><code class="language-go">// Way 1 (preserve element orders):
+<pre class="line-numbers"><code class="language-go">// 第一种方法（保持剩余元素的次序）：
 s = append(s[:i], s[i+1:]...)
 
-// Way 2 (preserve element orders):
+// 第二种方法（保持剩余元素的次序）：
 s = s[:i + copy(s[i:], s[i+1:])]
 
-// There will be len(s)-i-1 elements being copied in
-// in either of the above two ways.
+// 上面两种方法都需要复制len(s)-i-1个元素。
 
-// Don't preserve element orders:
+// 第三种方法（不保持剩余元素的次序）：
 s[i] = s[len(s)-1]
 s = s[:len(s)-1]
 </code></pre>
@@ -2129,9 +1880,8 @@ s = s[:len(s)-1]
 <p>
 </p>
 
-If the slice elements contain pointers, then after the deletion action,
-we should reset the last element of the old slice value
-to avoid memory leaking:
+如果切片的元素可能引用着其它值，则我们应该重置刚多出来的元素槽位上的元素值，以避免暂时性的内存泄露：
+
 <pre class="line-numbers"><code class="language-go">s[len(s):][0] = t0
 </code></pre>
 
@@ -2139,12 +1889,12 @@ to avoid memory leaking:
 </p>
 </div>
 
-<h4>Delete Slice Elements Conditionally</h4>
+<h4>条件性的删除切片元素</h4>
 
 <div>
-Sometimes, we may need to delete slice elements by some conditions.
+有时，我们需要删除满足某些条件的切片元素。
 
-<pre class="line-numbers"><code class="language-go">// Assume T is a small-size type.
+<pre class="line-numbers"><code class="language-go">// 假设T是一个小尺寸类型。
 func DeleteElements(s []T, shouldKeep func(T) bool, clear bool) []T {
 	result := make([]T, 0, len(s))
 	for _, v := range s {
@@ -2152,10 +1902,10 @@ func DeleteElements(s []T, shouldKeep func(T) bool, clear bool) []T {
 			result = append(result, v)
 		}
 	}
-	if clear { // avoid memory leaking
+	if clear { // 避免暂时性的内存泄露。
 		temp := s[len(result):]
 		for i := range temp {
-			temp[i] = t0 // t0 is a zero value literal of T.
+			temp[i] = t0 // t0是类型T的零值的文字表示形式
 		}
 	}
 	return result
@@ -2164,16 +1914,15 @@ func DeleteElements(s []T, shouldKeep func(T) bool, clear bool) []T {
 
 </div>
 
-<h4>Insert A Slice Into Another One</h4>
+<h4>将一个切片中的所有元素插入到另一个切片中</h4>
 
 <div>
-Assume the insertion position is a legal index <code>i</code>
-and the slice to be inserted is called <code>elements</code>.
+假设插入位置<code>i</code>是一个合法的下标并且切片<code>elements</code>中的元素将被插入到另一个切片<code>s</code>中。
 
-<pre class="line-numbers"><code class="language-go">// One-line implementation:
+<pre class="line-numbers"><code class="language-go">// 第一种方法:一行实现。
 s = append(s[:i], append(elements, s[i:]...)...)
 
-// A more efficient but more verbose way:
+// 另一种效率更高的但较为繁琐的实现。
 if cap(s)-len(s) >= len(elements) {
 	s = s[:len(s)+len(elements)]
 	copy(s[i+len(elements):], s[i:])
@@ -2186,34 +1935,33 @@ if cap(s)-len(s) >= len(elements) {
 	s = x
 }
 
-// Push:
+// Push（插入到结尾）。
 s = append(s, elements...)
 
-// Unshift:
+// Unshift（插入到开头）。
 s = append(elements, s...)
 </code></pre>
 
-<h4>Insert Several Slice Elements</h4>
+<h4>插入若干独立的元素</h4>
 
 <p>
-Inserting several elements is similar to inserting a slice.
-We can construct a slice with a slice composite literal with the elements
-to be inserted, then use the above ways to insert the new slice.
+插入若干独立的元素和插入一个切片中的所有元素类似。
+我们可以使用切片组合字面形式构建一个临时切片，然后使用上面的方法插入这些元素。
 </p>
 
-<h4>Special Deletions And Insertions: Push Front/Back, Pop Front/Back</h4>
+<h4>特殊的插入和删除：前推/后推，前弹出/后弹出</h4>
 
 <div>
 Assume the pushed or popped element is <code>e</code> and slice
 <code>s</code> has at least one element.
 
-<pre class="line-numbers"><code class="language-go">// Pop front (shift):
+<pre class="line-numbers"><code class="language-go">// 前弹出（pop front，又称shift）：
 s, e = s[1:], s[0]
-// Pop back:
+// 后弹出（pop back）：
 s, e = s[:len(s)-1], s[len(s)-1]
-// Push front:
+// 前推（push front）：
 s = append([]T{e}, s...)
-// Push back
+// 后推（push back）：
 s = append(s, e)
 </code></pre>
 
@@ -2221,51 +1969,35 @@ s = append(s, e)
 </p>
 </div>
 
-<h4>About The Above Examples For More Slice Operations</h4>
+<h4>关于上面各种切片操控的例子</h4>
 
 <p>
-In reality, the needs are varied.
-For some cases, it is possible none of the above ways shown
-in the above examples are the most efficient way. And sometimes,
-the above ways may not satisfy some specific requirements in parctice.
-So, please learn and apply elastically.
-This may be the reason why Go doesn't support the more oprations
-introduced above in the built-in way.
+在实践中，需求是各种各样的。对于某些特定的情形，上面的例子中的代码实现可能并非是最优化的，甚至是不满足要求的。
+所以，请在实践中根据具体情况来实现代码。或许，这是为什么Go没有支持更多的内置切片操作的原因。
 </p>
 
 </div>
 
-<h3>Use Maps To Simulate Sets</h3>
+<h3>用映射表来模拟集合（set）</h3>
 
 <p>
-Go doesn't support built-in <b>set</b> types.
-However, it is easy to use a map type to simulate a set type.
-In practice, we often use the map type <code>map[K]struct{}</code>
-to simulate a set type.
-The size of the map element type <code>struct{}</code> is zero,
-elements of values of such map types don't occupy memory space.
+Go不支持内置集合（<b>set</b>）类型。但是，集合类型可以用轻松使用映射表类型来模拟。
+在实践中，我们常常使用映射表类型<code>map[K]struct{}</code>来模拟一个元素类型为<code>K</code>的集合类型。
+类型<code>struct{}</code>的尺寸为零，所以此映射表类型的值中的元素不消耗内存。
 </p>
 
-<h3>Container Related Opetaions Are Not Synchronized Internally</h3>
+<h3>上述各种容器操作内部都未同步</h3>
 
 <p>
-Please note that, all container operations are not synchronized internally.
-Without making using of any data synchronization technique,
-it is okay for multiple goroutines to read a container concurrently,
-but it is not okay for multiple goroutines to maniluplate a container
-concurrently and at least one goroutine modifies the container.
-The latter case will cause data races, even make goroutines panic.
-We must synchronize the container operations manually.
-Please read the articles on
-<a href="concurrent-synchronization-overview.html">data synchrinizations</a>
-for details.
+请注意，上述所有各种容器操作的内部实现都未进行同步。如果不使用今后将要介绍的各种并发同步技术，多个协程并发读取同一个容器值是安全的，但是并发修改同一个容器值是不安全的。
+不使用并发同步技术而并发修改同一个容器值将会造成数据竞争。请阅读以后的<a href="concurrent-synchronization-overview.html">并发同步概述</a>一文以了解Go支持的各种并发同步技术。
 </p>
 
 
 
 
 
- 
+
 
 
 

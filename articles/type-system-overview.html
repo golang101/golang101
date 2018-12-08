@@ -4,7 +4,7 @@
 本文将介绍Go中的各个类型分类。Go类型系统中的各种概念也将被介绍。如果不熟知这些概念，则很难精通Go编程。
 </p>
 
-<h3>概念：基本类型</h3>
+<h3>概念：基本类型（basic types）</h3>
 
 <div>
 内置基本类型已经在前面的文章<a href="basic-types-and-value-literals.html">基本类型和它们的值的字面表示形式</a>一文中介绍了。
@@ -22,11 +22,11 @@
 </ul>
 
 <p>
-除了<a href="string.html">字符串类型</a>，Go 101后续其它文章将不再做详细讲解。
+除了<a href="string.html">字符串类型</a>，Go 101后续其它文章将不再对其它基本类型做详细讲解。
 </p>
 </div>
 
-<h3>概念：组合类型</h3>
+<h3>概念：组合类型（composite types）</h3>
 
 <div>
 Go支持下列组合类型：
@@ -97,7 +97,7 @@ chan<- T
 </p>
 
 <p class="anchor" id="type-definition"></p>
-<h3>语法：类型定义</h3>
+<h3>语法：类型定义（type definition declaration）</h3>
 
 <p><i>
 （<b>类型定义</b>又称类型定义声明。在Go 1.9之前，类型定义被称为类型声明并且是唯一的一种类型声明形式。
@@ -199,7 +199,7 @@ func f() {
 </div>
 
 <p class="anchor" id="type-alias"></p>
-<h3>语法：类型别名声明</h3>
+<h3>语法：类型别名声明（type alias declaration）</h3>
 
 <p><i>
 （<b>类型别名声明</b>是一种在Go 1.9中新增的类型声明形式。）
@@ -258,7 +258,7 @@ Type alias declarations are much useful in refactoring large Go projects.
 </div>
 
 <p class="anchor" id="non-defined-type"></p>
-<h3>概念：定义类型和非定义类型</h3>
+<h3>概念：定义类型和非定义类型（defined types and undefined types）</h3>
 
 <p>
 一个定义类型是一个在某个类型定义声明中定义的类型，或者是另外一个定义类型的别名。
@@ -281,7 +281,7 @@ type C = []string
 </div>
 
 <p class="anchor" id="named-type"></p>
-<h3>概念：有名类型和无名类型</h3>
+<h3>概念：有名类型和无名类型（named types and unnamed types）</h3>
 
 <div>
 在Go中，
@@ -364,7 +364,7 @@ Ages → AgeSlice → []Age <span style="color:#aaa">→ <strike>[]MyInt</strike
 底层类型这个概念在<a href="value-conversions-assignments-and-comparisons.html">类型转换、赋值和比较规则</a>中扮演者重要角色。
 </p>
 
-<h3>概念：值</h3>
+<h3>概念：值（value）</h3>
 
 <p>
 一个类型的一个实例称为此类型的一个值。一个类型可以有很多不同的值，其中一个为它的零值。
@@ -404,7 +404,7 @@ Ages → AgeSlice → []Age <span style="color:#aaa">→ <strike>[]MyInt</strike
 </p>
 
 <p class="anchor" id="value-part"></p>
-<h3>概念：值部</h3>
+<h3>概念：值部（value part）</h3>
 
 <p>
 在运行时刻，很多值是存储在内存的。每个这样的值都有一个直接部分，但是有一些值还可能有一个或多个间接部分。
@@ -483,7 +483,7 @@ Go白皮书没有规定非数值类型的值尺寸的大小。对数值类型的
 
 <p>
 接口类型类型的值称为接口值。一个接口值可以包裹装载一个非接口值。包裹在一个接口值中的非接口值称为此接口值的动态值。此动态值的类型称为此接口值的动态类型。
-一个什么也没包裹的接口值为一个零值接口值。
+一个什么也没包裹的接口值为一个零值接口值。零值接口值的动态值和动态类型均为不存在。
 </p>
 
 <p>
@@ -496,6 +496,17 @@ Go白皮书没有规定非数值类型的值尺寸的大小。对数值类型的
 
 <p>
 <a href="interface.html">接口</a>一文详细解释了接口类型和接口值。
+</p>
+
+<p class="anchor" id="concrete-type"></p>
+<h3>概念：一个值的具体类型（concrete type）</h3>
+
+<p>
+对于一个（类型确定的）非接口值，它的具体类型就是它的类型。
+</p>
+
+<p>
+对于一个接口值，如果它的动态类型存在的话，则它的具体类型就是它的动态类型，否则它的具体类型亦不存在。
 </p>
 
 <h3>概念：容器类型</h3>
@@ -604,7 +615,7 @@ Go并不全面支持面向对象编程，但是Go确实支持一些面向对象�
 </ul>
 </div>
 
-<h3>事实：Go对范型（generic）的支持</h3>
+<h3>事实：Go对范型（generics）的支持</h3>
 
 <p>
 目前（Go 1.11），Go中范型支持只局限在内置类型和内置函数中。自定义范型还处于草案阶段。请阅读<a href="generic.html">内置范型</a>一文以了解更多。

@@ -101,15 +101,19 @@ type PP *Ptr  // PP是一个定义的多级指针类型，它的基类型为Ptr�
 	存储在返回指针值所表示的地址处的值（可被看作是一个匿名变量）为<code>T</code>的零值。
 </li>
 <li>
-	我们也可以使用前置取地址操作符<code>&amp;</code>来获取一个可被取地址的值的地址。
-	对于一个类型为<code>T</code>的可被取地址的值<code>t</code>，我们可以用<code>&amp;t</code>来取得它的地址。<code>&amp;t</code>的类型为<code>*T</code>。
+	我们也可以使用前置取地址操作符<code>&amp;</code>来获取一个可寻址的值的地址。
+	对于一个类型为<code>T</code>的可寻址的值<code>t</code>，我们可以用<code>&amp;t</code>来取得它的地址。<code>&amp;t</code>的类型为<code>*T</code>。
 </li>
 </ol>
 </div>
 
 <p>
-所有变量都是可以被取地址的。所有常量、函数返回值和强制转换结果都是不可被取地址的。更多可被（或不可被）取地址的值将在以后的文章中逐渐提及。
-如果你已经对Go比较熟悉，你可以阅读<a href="summaries.html#not-addressable">此条总结</a>来了解在Go中哪些值可以或不可以被取地址。
+
+</p>
+
+<p>
+所有变量都是可以寻址的。所有常量、函数返回值和强制转换结果都是不可寻址的。更多可被（或不可被）寻址的值将在以后的文章中逐渐提及。
+如果你已经对Go比较熟悉，你可以阅读<a href="summaries.html#not-addressable">此条总结</a>来了解在Go中哪些值可以或不可以寻址。
 </p>
 
 <p>
