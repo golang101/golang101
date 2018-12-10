@@ -1,70 +1,54 @@
-<h1>Strings In Go</h1>
+<h1>字符串</h1>
 
 <p>
-Like many programming languages, string is also one important kind of types in Go.
-This article will list all the facts of strings.
+和很多其它编程语言一样，字符串类型是Go中的一种重要类型。本文将列举出关于字符串的各种事实。
 </p>
 
-<h3>The Internal Structure Of String Types</h3>
+<h3>字符串类型的内部结构定义</h3>
 
 <div>
-For the standard Go compiler,
-the internal structure of any string type is declared like:
+对于官方标准Go编译器，字符串类型的内部结构声明如下：
+
 <pre class="line-numbers"><code class="language-go">type _string struct {
-	elements *byte // underlying bytes
-	len      int   // number of bytes
+	elements *byte // 引用着底层的字节
+	len      int   // 字符串中字节数
 }
 </code></pre>
 <p>
-From the declaration, we know that the a string is actually
-a <code>byte</code> sequence wrapper
-(or a container which elements are bytes).
+从这个声明来看，我们可以将一个字符串的内部看作为一个字节序列。或者说一个字符串是一个元素类型为<code>byte</code>的容器。
 </p>
 </div>
 
 <p>
-Note, in Go, <code>byte</code> is a built-in alias of type <code>uint8</code>.
+注意，前面的文章已经提到过多次，内置类型<code>byte</code>是内置类型<code>uint8</code>的一个别名。
 </p>
 
-<h3>Some Simple Facts About Strings</h3>
+<h3>关于字符串的一些简单事实</h3>
 
 <div>
 
-We have learned the following facts about strings from previous articles.
+从前面的若干文章，我们已经了解到下列关于字符串的一些事实：
 <ul>
 <li>
-	String values can be used as constants (along with boolean and all kinds of nummeric values).
+	字符串值（和布尔以及各种数值类型的值）可以被用作常量。
 </li>
 <li>
-	Go supports <a href="basic-types-and-value-literals.html#string-literals">two styles of
-	string literals</a>, the double-quote style (or raw interpreted literals)
-	and the back-quote style (or raw string literals).
+	Go支持<a href="basic-types-and-value-literals.html#string-literals">两种风格的字符串字面表示形式</a>：双引号风格（解释型字面表示）和反引号风格（直白字面表示）。
 </li>
 <li>
-	The zero values of string types are blank strings, which can be represented
-	with <code>""</code> or <code>``</code> in literal.
+	字符串类型的零值为空字符串。一个空字符串可以用<code>""</code>或者<code>``</code>来表示。
 </li>
 <li>
-	Strings can be concatenated with <code>+</code> and <code>+=</code> operators.
+	我们可以用运算符<code>+</code>和<code>+=</code>来衔接字符串。
 </li>
 <li>
-	String types are all comparable (by using the <code>==</code> and <code>!=</code> operators).
-	And like integer and floating-point values, two values of the same string type can also be compared with
-	<code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code> and <code>&lt;=</code> operators.
-	When comparing two strings, their underlying bytes will be compared, one byte by one byte.
-	If one string is a prefix of the other one and the other one is longer,
-	then the other one will be viewed as the larger one.
+	字符串类型都是可比较类型。同一个字符串类型的值可以用<code>==</code>和<code>!=</code>比较运算符来比较。
+	并且和整数/浮点数一样，同一个字符串类型的值也可以用<code>&gt;</code>、<code>&lt;</code>、<code>&gt;=</code>和<code>&lt;=</code>比较运算符来比较。
+	当比较两个字符串值的时候，它们的底层字节将逐一进行比较。如果一个字符串是另一个字符串的前缀，并且另一个字符串较长，则另一个字符串为两者中的较大者。
 </li>
 </ul>
 
-<p>
-When comparing two strings, their underlying bytes will be compared,
-one byte by one byte.
-If one string is a prefix of the other one and the other one is longer,
-then the other one will be viewed as the larger one.
-</p>
-
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -73,12 +57,12 @@ func main() {
 	const World = "world"
 	var hello = "hello"
 	
-	// Concat strings.
+	// 衔接字符串。
 	var helloWorld = hello + " " + World
 	helloWorld += "!"
 	fmt.Println(helloWorld) // hello world!
 	
-	// Compare strings.
+	// 比较字符串。
 	fmt.Println(hello == "hello")   // true
 	fmt.Println(hello > helloWorld) // false
 }
@@ -87,50 +71,39 @@ func main() {
 <p>
 </p>
 
-More facts about string types and values in Go.
+更多关于字符串类型和值的事实：
 <ul>
 <li>
-	Like Java, the contents of string values are immutable.
-	Once created, their contents can't be modified.
-	The lengths of string values are also immutable.
-	A string value can only be overwritten as a whole by assigning another string value to it.
+	和Java语言一样，字符串值的内容（即底层字节）是不可更改的。
+	字符串值的长度也是不可独立被更改的。
+	一个可寻址的字符串只能通过将另一个字符串复制给它来整体修改它。
 </li>
 <li>
-	String type has no methods (just like most other built-in types in Go), but
+	字符串类型没有内置的方法。我们可以
 	<ul>
 	<li>
-		the <a href="https://golang.org/pkg/strings/"><code>strings</code> standard package</a> contains many string utility functions.
+		使用<a href="https://golang.org/pkg/strings/"><code>strings</code>标准库</a>提供的函数来进行各种字符串操作。
 	</li>
 	<li>
-		the built-in function <code>len</code> can be used to get the length of a string (number of bytes stored in the string).
+		调用内置函数<code>len</code>来获取一个字符串值的长度（此字符串中存储的字节数）。
 	</li>
 	<li>
-		like <a href="container.html#element-accessment">element
-		accessments of arrays, slices and maps</a>,
-		the syntax <code>aString[i]</code> is also used to get the
-		<b>i</b><i>th</i> <code>byte</code> value stored in <code>aString</code>.
-		The expression <code>aString[i]</code> is not addressable.
-		In other words, value <code>aString[i]</code> can't be modified.
+		使用<a href="container.html#element-accessment">容器元素访问</a>语法<code>aString[i]</code>来获取<code>aString</code>中的第<b>i</b><i></i>个字节。
+		表达式<code>aString[i]</code>是不可寻址的。换句话说，<code>aString[i]</code>不可被修改。
 	</li>
 	<li>
-		like <a href="container.html#subslice">the subslice
-		syntax</a> for arrays, slices and maps,
-		the syntax <code>aString[start:end]</code> is used to get a substring of <code>aString</code>.
-		Here, <code>start</code> and <code>end</code> are both indexes of bytes stored in <code>aString</code>.
+		使用<a href="container.html#subslice">子切片语法</a><code>aString[start:end]</code>来获取<code>aString</code>的一个4。
+		这里，<code>start</code>和<code>end</code>均为<code>aString</code>中存储的字节的下标。
 	</li>
 	</ul>
 </li>
 <li>
-	For the standard Go compiler,
-	the destination string variable and source string value in a string assignment will
-	share the same underlying byte sequence in memory.
-	The result of a substring expression <code>aString[start:end]</code>
-	also shares the same underlying byte sequence with the original string
-	<code>aString</code> in memory.
+	对于官方标准Go编译器来说，一个字符串的赋值完成之后，此赋值中的目标值和源值将共享底层字节。
+	一个子切片表达式<code>aString[start:end]</code>的估值结果也将和基础字符串<code>aString</code>共享一部分底层字节。
 </li>
 </ul>
 
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
@@ -141,12 +114,12 @@ import (
 func main() {
 	var helloWorld = "hello world!"
 	
-	var hello = helloWorld[:5] // substring
-	// 104 is the ascii code (and Unicode) of char 'h'
+	var hello = helloWorld[:5] // 子字符串
+	// 104是英文字符h的ASCII（和Unicode）码。
 	fmt.Println(hello[0])         // 104
 	fmt.Printf("%T \n", hello[0]) // uint8
-	// hello[0] = 'H'             // error: hello[0] is immutable
-	// fmt.Println(&hello[0])     // error: hello[0] is not addressable
+	// hello[0] = 'H'             // error: hello[0]不可修改
+	// fmt.Println(&hello[0])     // error: hello[0]不可寻址
 	
 	fmt.Println(len(hello), len(helloWorld))          // 5 12
 	fmt.Println(strings.HasPrefix(helloWorld, hello)) // true
@@ -154,117 +127,95 @@ func main() {
 </code></pre>
 </div>
 
-<h3>String Encoding And Runes</h3>
+<h3>字符串编码和Unicode码点</h3>
 
 <p>
-In Go, all strings are viewed as UTF-8 encoded.
-The basic units in UTF-8 encoded strings are called code points.
-Most code points can be viewed as the charators we speak of in daily life.
-But for a few charators, each of them is composed of several code points.
+Unicode标准为全球各种人类语言中的每个字符制定了一个独一无二的值。
+但Unicode标准中的基本单位不是字符，而是码点（code point）。大多数的码点实际上就对应着一个字符。
+但也有少数一些字符是由多个码点组成的。
 </p>
 
 <p>
-Code points are represented as rune values in Go.
-The built-in <code>rune</code> type is an alias of type <code>int32</code>.
+码点值在Go中用<a href="basic-types-and-value-literals.html#rune">rune值</a>来表示。
+内置<code>rune</code>类型为内置<code>int32</code>类型的一个别名。
 </p>
 
 <p>
-At compile time, illegal UTF-8 runes in string literals (and rune literals) will make compilation fail.
-At run time, Go runtime can't prevent some bytes stored in a string from being UTF-8 illegal.
-In other words, a string at run time may be ill UTF-8 encoded.
+在具体应用中，码点值的编码方式有很多，比如UTF-8编码和UTF-16编码等。
+目前最流行编码方式为UTF-8编码。在Go中，所有的字符串常量都被视为是UTF-8编码的。
+在编译时刻，非法UTF-8编码的字符串常量将导致编译失败。
+在运行时刻，Go运行时无法阻止一个字符串中是非法UTF-8编码的。
 </p>
 
 <p>
-As the above has mentioned, each string is actually a byte sequence wrapper.
-So each rune in a string will be stored as one or more bytes (up to four bytes).
-For example, each English code point stores as one byte in Go strings,
-however each Chinese code point stores as three bytes in Go strings.
+在UTF-8编码中，一个码点值可能由1到4个字节组成。
+比如，在Go字符串中，每个英语码点值（均对应一个英语字符）均由一个字节组成，而每个中文字符（均对应一个中文字符）均由三个字节组成。
 </p>
 
 <p class="anchor" id="conversions"></p>
-<h3>String Related Conversions</h3>
+<h3>字符串相关的类型转换</h3>
 
 <div>
-In the article <a href="constants-and-variables.html#explicit-conversion">constants and variables</a>,
-we have learned that intergers can be explicitly converted to strings (but not vice versa).
-Here introduces two more string related conversions rules in Go:
+在<a href="constants-and-variables.html#explicit-conversion">常量和变量</a>一文中，我们已经了解到整数可以被显式转换为字符串类型（但是反之不行）。
+这里介绍两种新的字符串相关的类型转换规则：
 <ol>
 <li>
-	a string value can be explicitly converted to a byte slice, and vice versa.
-	A byte slice is a slice whose underlying type is <code>[]byte</code>
-	(a.k.a, <code>[]uint8</code>).
+	一个字符串值可以被显式转换为一个字节切片（byte slice），反之亦然。
+	一个字节切片类型是一个元素类型为内置类型<code>byte</code>的切片类型。
+	或者说，一个字节切片类型的底层类型为<code>[]byte</code>（亦即<code>[]uint8</code>）。
 </li>
 <li>
-	a string value can be explicitly converted to a rune slice, and vice versa.
-	A rune slice is a slice whose underlying type is <code>[]rune</code>
-	(a.k.a, <code>[]int32</code>).
+	一个字符串值可以被显式转换为一个码点切片（rune slice），反之亦然。
+	一个码点切片类型是一个元素类型为内置类型<code>rune</code>的切片类型。
+	或者说，一个码点切片类型的底层类型为<code>[]rune</code>（亦即<code>[]int32</code>）。
 </li>
 </ol>
 
 <p>
-In the conversions from rune slices to strings,
-each slice element (a rune value) will be converted to its respective
-UTF-8 encoding byte sequence representation.
-If a slice element values is outside the range of valid Unicode code points,
-the it will be viewed as <code>0xFFFD</code>,
-the code point for the Unicode replacement character.
-<code>0xFFFD</code> is represented with three bytes in UTF-8 encoding
-(<code>"\uFFFD" == "\xef\xbf\xbd"</code>).
+在一个从码点切片到字符串的转换中，码点切片中的每个码点值将被UTF-8编码为一到四个字节至结果字符串中。
+如果一个码点值是一个不合法的Unicode码点值，则它将被视为Unicode替换字符（码点）值<code>0xFFFD</code>（Unicode replacement character）。
+替换字符值<code>0xFFFD</code>将被UTF-8编码为三个字节<code>0xef 0xbf 0xbd</code>。
 <p>
 
 <p>
-When a string is converted to a rune slice, the bytes stored in the string
-will be viewed as successive UTF-8 encoding byte sequence representations
-of many Unicode code points. Bad UTF-8 encoding representations will be
-converted to a rune value <code>0xFFFD</code>.
+当一个字符串被转换为一个码点切片时，此字符串中存储的字节序列将被解读为一个一个码点的UTF-8编码序列。
+非法的UTF-8编码字节序列将被转化为Unicode替换字符值<code>0xFFFD</code>。
 </p>
 
 <p>
-When a string is converted to a byte slice,
-the result byte slice is just a deep copy of
-the underlying byte sequence of the string.
-When a byte slice is converted to a string,
-the underlying byte sequence of the result string
-is also just a deep copy of the byte slice.
-A memory allocation is needed to store the deep copy
-in each of such conversions.
-The reason why a deep copy is essential is slice elements are mutable
-but the bytes stored in strings are immutable,
-so a byte slice and a string can't share byte elements.
+当一个字符串被转换为一个字节切片时，结果切片中的底层字节序列是此字符串中存储的字节序列的深复制。
+即Go运行时将为结果切片开辟一块足够大的内存来容纳被复制过来的所有字节。当此字符串的长度较长时，此转换开销是比较大的。
+同样，当一个字节切片被转换为一个字符串时，此字节切片中的字节序列也将被深复制到结果字符串中。
+当此字节切片的长度较长时，此转换开销同样是比较大的。
+在这两种转换中，必须使用深复制的原因是字节切片中的字节元素是可修改的，但是字符串中的字节是不可修改的，所以一个字节切片和一个字符串是不能共享底层字节序列的。
 </p>
 
-
-Please note, for conversions between strings and byte slices,
+请注意，在字符串和字节切片之间的转换中，
 <ul>
 <li>
-	illegal UTF-8 encoded bytes are allowed and will keep unchanged.
+	非法的UTF-8编码字节序列将被保持原样。
 </li>
 <li>
-	the standard Go compiler makes some optimiazations
-	for some special cases of such conversions,
-	so that the deep copies are not made.
-	Such optimiazations will be introduced below.
+	官方标准Go编译器做了一些优化，从而使得这些转换在某些情形下将不用深复制。
+	这样的情形将在下一节中介绍。
 </li>
 </ul>
 
-Conversions between byte slices and rune slices are not supported directly in Go,
-We can use the following ways to achieve this purpose:
+Go并不支持字节切片和码点切片之间的直接转换。我们可以用下面列出的方法来实现这样的转换：
 <ul>
 <li>
-	use string values as a hop. This way is convenient but not very efficient.
+	利用字符串做为中间过渡。这种方法相对方便但效率较低，因为需要做两个深复制。
 </li>
 <li>
-	use the functions in <a href="https://golang.org/pkg/unicode/utf8/">unicode/utf8</a> standard package.
+	使用<a href="https://golang.org/pkg/unicode/utf8/">unicode/utf8</a>标准库包中的函数来实现这些转换。
+	这种方法效率较高，但使用起来不太方便。
 </li>
 <li>
-	we can use <a href="https://golang.org/pkg/bytes/#Runes">the
-	<code>Runes</code> function in the bytes standard package</a>
-	to convert a <code>[]byte</code> value to a <code>[]rune</code> value.</li>
+	使用<a href="https://golang.org/pkg/bytes/#Runes"><code>bytes</code>标准库包中的<code>Runes</code>函数</a>来将一个字节切片转换为码点切片。
+	但此包中没有将码点切片转换为字节切片的函数。
 </ul>
 
-
-
-Example:
+一个展示了上述各种转换的例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
@@ -285,7 +236,7 @@ func Runes2Bytes(rs []rune) []byte {
 }
 
 func main() {
-	s := "Color Infection is a good game."
+	s := "Color Infection is a fun game."
 	bs := []byte(s) // string -> []byte
 	s = string(bs)  // []byte -> string
 	rs := []rune(s) // string -> []rune
@@ -304,12 +255,12 @@ todo: if later the meaning of "byte slice" is changed.
       The beginning of this article may be also
       need changed. "a <code>byte</code> sequence" should be changed
       to "a byte sequence".
--->
 
-Maybe it is not intentional, for the standard Go compiler,
+Maybe it is not intentional, for the standard Go compiler
+(at least up to v1.11),
 it looks a string can also be converted to a slice type whose
 element type's underlying type is <code>byte</code>,
-but not versa.
+but not vice versa.
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -321,62 +272,56 @@ func main() {
 }
 </code></pre>
 
+-->
 
 <p>
 </p>
 </div>
 
 <p class="anchor" id="conversion-optimizations"></p>
-<h3>Compiler Optimizations For Conversions Between Strings And Byte Slices</h3>
+<h3>字符串和字节切片之间的转换的编译器优化</h3>
 
 <div>
-Above has mentioned that the underlying bytes in the conversions
-between strings and byte slices will be copied.
-The current standard Go compiler (v1.10) will make some optimizations
-for some special scenarios to avoid the duplicate copies.
-These scenarios include:
+上面已经提到了字符串和字节切片之间的转换将深复制它们的底层字节序列。
+当前官方标准Go编译器（v1.11）做了一些优化，从而在某些情形下避免了深复制。
+这样的情形包括：
 <ul>
 <li>
-	a conversion (from string to byte slice) which
-	follows the <Code>range</code> keyword in a <code>for-range</code> loop.
+	一个<code>for-range</code>循环中跟随<code>range</code>关键字的从字符串到字节切片的转换；
 </li>
 <li>
-	a conversion (from byte slice to string) which is used as a map key.
+	一个在映射表元素访问语法中被用作映射表主健的从字节切片到字符串的转换；
 </li>
 <li>
-	a conversion (from byte slice to string) which is used in a comparison.
+	一个字符串比较表达式中被用作两个比较值之一的从字节切片到字符串的转换；
 </li>
 <li>
-	a conversion (from byte slice to string) which is used in
-	a string concatenation, and at least one of concatenated
-	string values is a non-blank string constant.
+	一个（至少有一个被衔接的字符串值为非空字符串常量的）字符串衔接表达式中的从字节切片到字符串的转换。
 </li>
 </ul>
 
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
 func main() {
 	var str = "world"
-	// Here, the []byte(str) conversion will not copy
-	// the underlying bytes of str.
+	// 这里，转换[]byte(str)将不需要一个深复制。
 	for i, b := range []byte(str) {
 		fmt.Println(i, ":", b)
 	}
 	
 	key := []byte{'k', 'e', 'y'}
 	m := map[string]string{}
-	// Here, the string(key) conversion will not copy the bytes
-	// in key. The optimization will be still made even if key
-	// is a package-level variable.
+	// 这里，转换string(key)将不需要一个深复制。
+	// 即使key是一个包级变量，此优化仍然有效。
 	m[string(key)] = "value"
 	fmt.Println(m[string(key)]) // value
 }
 </code></pre>
 
-Another example:
+另一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -387,16 +332,16 @@ var x = []byte{1024: 'x'}
 var y = []byte{1024: 'y'}
 
 func fc() {
-	// None of the below 4 conversions will
-	// copy the underlying bytes of x and y.
+	// 下面的四个转换都不需要深复制
 	if string(x) != string(y) {
 		s = (" " + string(x) + string(y))[1:]
 	}
 }
 
 func fd() {
-	// Only the two conversions in the comparison
-	// will not copy the underlying bytes of x and y.
+	// 两个在比较表达式中的转换不需要深复制，
+	// 但两个字符串衔接中的转换仍需要深复制。
+	// 请注意此字符串衔接和fc中的衔接的差别。
 	if string(x) != string(y) {
 		s = string(x) + string(y)
 	}
@@ -409,154 +354,133 @@ func main() {
 </code></pre>
 </div>
 
-<h3><code>for-range</code> On Strings</h3>
+<h3>使用<code>for-range</code>循环遍历字符串中的码点</h3>
 
 <div>
 <p>
-The <code>for-range</code> loop control flow applies to strings.
-But please note, <code>for-range</code> will iterate the Unicode code points
-(as <code>rune</code> values), instead of bytes, in a string.
-Bad UTF-8 encoding representations in the string will be
-interpreted as <code>rune</code> value <code>0xFFFD</code>.
+<code>for-range</code>循环控制中的<code>range</code>关键字后可以跟随一个字符串，用来遍历此字符串中的码点（而非字节元素）。
+字符串中非法的UTF-8编码字节序列将被解读为Unicode替换码点值<code>0xFFFD</code>。
 </p>
 
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
 func main() {
-	s := "éक्षिaπ汉字"
+	s := "éक्षिaπ囧"
 	for i, rn := range s {
-		fmt.Printf("%v: 0x%x %v \n", i, rn, string(rn))
+		fmt.Printf("%2v: 0x%x %v \n", i, rn, string(rn))
 	}
+	fmt.Println(len(s))
 }
 </code></pre>
 
-The output of the above program:
-<pre>
-0: 0x65 e
-1: 0x301 ́
-3: 0x915 क
-6: 0x94d ्
-9: 0x937 ष
-12: 0x93f ि
-15: 0x61 a
-16: 0x3c0 π
-18: 0x6c49 汉
-21: 0x5b57 字
-</pre>
-Please note:
-<ol>
-<li>the index value may be not continuous, for one code point may need more than one bytes to represent.</li>
-<li>the first character, <code>é</code>, is composed of two runes (3 bytes total)</li>
-<li>the second character, <code>क्षि</code>, is composed of four runes (12 bytes total).</li>
-<li>the English character, <code>a</code>, is composed of one rune (1 byte).</li>
-<li>the character, <code>π</code>, is composed of one rune (2 bytes).</li>
-<li>each of the two Chinese characters, <code>汉字</code>, is composed of one rune (3 bytes each).</li>
-</ol>
-</div>
+此程序的输出如下：
+<pre class="output"><code> 0: 0x65 e 
+ 1: 0x301 ́ 
+ 3: 0x915 क 
+ 6: 0x94d ् 
+ 9: 0x937 ष 
+12: 0x93f ि 
+15: 0x61 a 
+16: 0x3c0 π 
+18: 0x56e7 囧 
+21
+</code></pre>
 
-<div>
-Then how to iterate bytes in a string? Do this:
+从此输出结果可以看出：
+<ol>
+<li>下标循环变量的值并非连续。原因是下标循环变量为字符串中字节的下标，而一个码点可能需要多个字节进行UTF-8编码。</li>
+<li>第一个字符<code>é</code>由两个码点（共三字节）组成, 其中一个码点需要两个字节进行UTF-8编码。</li>
+<li>第二个字符<code>क्षि</code>由四个码点（共12字节）组成，每个码点需要三个字节进行UTF-8编码。</li>
+<li>英语字符<code>a</code>由一个码点组成，此码点只需一个字节进行UTF-8编码。</li>
+<li>字符<code>π</code>由一个码点组成，此码点只需两个字节进行UTF-8编码。</li>
+<li>汉字<code>囧</code>由一个码点组成，此码点只需三个字节进行UTF-8编码。</li>
+</ol>
+
+那么如何遍历一个字符串中的字节呢？使用传统<code>for</code>循环：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
 func main() {
-	s := "éक्षिaπ汉字"
+	s := "éक्षिaπ囧"
 	for i := 0; i < len(s); i++ {
-		fmt.Printf("The byte at index %v: 0x%x \n", i, s[i])
+		fmt.Printf("第%v个字节为0x%x\n", i, s[i])
 	}
 }
 </code></pre>
 
 <p>
-As you have seen, <code>len(s)</code> will return the number of bytes in strings.
-The time complexity of <code>len(s)</code> is <code><i>O</i>(1)</code>.
-How to get the number of runes in a string?
-Using <code>for-range</code> to iterate and count all runes is a way, and using the
-<a href="https://golang.org/pkg/unicode/utf8/#RuneCountInString">RuneCountInString</a>
-function in the <code>unicode/utf8</code> standard package is another way.
-The efficiencies of the two ways are almost the same.
-Please note that the time complexities of both ways are <code><i>O</i>(n)</code>.
-
-<!--
-todo: len([]rune(str))
-   https://github.com/golang/go/issues/24923
--->
 </p>
-</div>
 
-<div>
-Surely, we can also make use of the compiler optimization mentioned above to iterate bytes in a string.
-For the standard Go compiler, this way is a little more efficient than the above one.
+当然，我们也可以利用前面介绍的编译器优化来使用<code>for-range</code>循环遍历一个字符串中的字节元素。
+对于官方标准编译器来说，此方法比刚展示的方法效率更高。
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
 func main() {
-	s := "éक्षिaπ汉字"
-	for i, b := range []byte(s) { // here, the underlying bytes are not copied.
+	s := "éक्षिaπ囧"
+	// 这里，[]byte(s)不需要深复制底层字节。
+	for i, b := range []byte(s) {
 		fmt.Printf("The byte at index %v: 0x%x \n", i, b)
 	}
 }
 </code></pre>
 <p>
 </p>
+
+<p>
+从上面几个例子可以看出，<code>len(s)</code>将返回字符串<code>s</code>中的字节数。
+<code>len(s)</code>的时间复杂度为<code><i>O</i>(1)</code>。
+如何得到一个字符串中的码点数呢？使用刚介绍的<code>for-range</code>循环来统计一个字符串中的码点数是一种方法，使用<code>unicode/utf8</code>标准库包中的<a href="https://golang.org/pkg/unicode/utf8/#RuneCountInString">RuneCountInString</a>是另一种方法。
+这两种方法的效率基本一致。第三种方法为使用<code>len([]rune(s）)</code>来获取字符串<code>s</code>中码点数。官方标准Go编译器从1.11版本开始，对此表达式做了优化以避免一个不必要的深复制，从而使得它的效率和前两种方法一致。
+注意，这三种方法的时间复杂度均为<code><i>O</i>(n)</code>。
+</p>
 </div>
 
 <p class="anchor" id="string-concatenation"></p>
-<h3>More String Concatenation Methods</h3>
+<h3>更多字符串衔接方法</h3>
 
 <div>
-Besides using the <code>+</code> operator to concatenate strings, you can also use following methods to concatenation strings.
+除了使用<code>+</code>运算符来衔接字符串，我们也可以用下面的方法来衔接字符串：
 <ul>
 <li>
-	The <code>Sprintf</code>/<code>Sprint</code>/<code>Sprintln</code> functions
-	in the <code>fmt</code> standard package
-	can be used to concatenate values of any types, including string types.
+	<code>fmt</code>标准库包中的<code>Sprintf</code>/<code>Sprint</code>/<code>Sprintln</code>函数可以用来衔接各种类型的值的字符串表示，当然也包括字符串类型的值。
 </li>
 <li>
-	Use the <code>Join</code> function in the <code>strings</code> standard package.
+	使用<code>strings</code>标准库包中的<code>Join</code>函数。
 </li>
 <li>
-	The <code>Buffer</code> type in the <code>bytes</code> standard package
-	(or the built-in <code>copy</code> function) can be used to build byte slices,
-	which afterwards can be converted to string values.
+	<code>bytes</code>标准库包提供的<code>Buffer</code>类型可以用来构建一个字节切片，然后我们可以将此字节切片转换为一个字符串。
 </li>
 <li>
-	Since Go 1.10, the <code>Builder</code> type in the <code>strings</code> standard package
-	can be used to build strings. This method avoids making a duplicate copy
-	of underlying bytes of the result string.
+	从Go 1.10开始，<code>strings</code>标准库包中的<code>Builder</code>类型可以用来拼接字符串。
+	和<code>bytes.Buffer</code>类型类似，此类型内部也维护着一个字节切片，但是它在将此字节切片转换为字符串时避免了底层字节的深复制。
 </li>
 </ul>
 
 <p>
-The Go standard compiler makes optimizations for string concatenations by using the <code>+</code> operator.
-So generally, using <code>+</code> operator to concatenate strings is convenient and efficient
-if the number of the concatenated strings is knwon.
+官方标准Go编译器对使用<code>+</code>运算符的字符串衔接做了特别的优化。
+所以，一般说来，在被衔接的字符串的数量是已知的情况下，使用<code>+</code>运算符进行字符串衔接是比较高效的。
 </p>
 </div>
 
 <p class="anchor" id="use-string-as-byte-slice"></p>
-<h3>Sugar: Use Strings As Byte Slices</h3>
+<h3>语法糖：将字符串当作字节切片使用</h3>
 
 <div>
 
 <p>
-From the article <a href="container.html">arrays, slices and maps</a>,
-we have leanred that we can use the built-in <code>copy</code> and
-<code>append</code> functions to copy and append slice elements.
-In fact, as a special case,
-if the type of the first argument of a call to either of the two
-functions is a byte slice, then the second argument can be a string
-(if the call is an <code>append</code> call, then the string argument
-must be followed by three dots <code>...</code>).
-In other words, a string can be used as a byte slice for the special case.
+在<a href="container.html">上一篇文章</a>中，我们了解到内置函数<code>copy</code>和<code>append</code>可以用来复制和添加切片元素。
+事实上，做为一个特例，如果这两个函数的调用中的第一个实参为一个字节切片的话，那么第二个实参可以是一个字符串。
+（对于<code>append</code>函数调用，字符串实参后必须跟随三个点<code>...</code>。）
+换句话说，在此特例中，字符串可以当作字节切片来使用。
 </p>
 
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -565,58 +489,45 @@ func main() {
 	hello := []byte("Hello ")
 	world := "world!"
 	
-	// helloWorld := append(hello, []byte(world)...) // the normal way
-	helloWorld := append(hello, world...)            // the sugar way
+	// helloWorld := append(hello, []byte(world)...) // 正常的语法
+	helloWorld := append(hello, world...)            // 语法糖
 	fmt.Println(string(helloWorld))
 	
 	helloWorld2 := make([]byte, len(hello) + len(world))
 	copy(helloWorld2, hello)
-	// copy(helloWorld2[len(hello):], []byte(world)) // the normal way
-	copy(helloWorld2[len(hello):], world)            // the sugar way
+	// copy(helloWorld2[len(hello):], []byte(world)) // 正常的语法
+	copy(helloWorld2[len(hello):], world)            // 语法糖
 	fmt.Println(string(helloWorld2))
 }
 </code></pre>
 </div>
 
 <p class="anchor" id="comparison"></p>
-<h3>More About String Comparisons</h3>
+<h3>更多关于字符串的比较</h3>
 
 <div>
-Above has mentioned that comparing two strings is comparing their underlying bytes in fact.
-Most compilers will made some optimizations for string comparisons.
+上面已经提到了比较两个字符串事实上将逐个比较这两个字符串中的字节。
+Go编译器一般会做出如下的优化：
 <ul>
 <li>
-	If the lengths of the compared two strings are not equal,
-	then the two strings must be also not equal.
+	对于<code>==</code>和<code>!=</code>比较，如果这两个字符串的长度不相等，则这两个字符串肯定不相等（无需进行字节比较）。
 </li>
 <li>
-	If their underlying byte sequence pointers of
-	the compared two strings are equal,
-	then the comparison result is the same as
-	comparing the lengths of the two strings.
+	如果这两个字符串底层引用着字符串切片的指针相等，则比较结果等同于比较这两个字符串的长度。
 </li>
 </ul>
 
 <p>
-So for two equal strings, the time complexity of comparing them
-depends on whether or not their underlying byte sequence pointers are equal.
-If the two equal string values don't share the same underlying bytes,
-then the time complexity of comparing the two values is <code><i>O</i>(n)</code>,
-where <code>n</code> is the length of the two strings,
-otherwise, the time complexity is <code><i>O</i>(1)</code>.
+所以两个相等的字符串的比较的时间复杂度取决于它们是否引用着同一个底层字节序列。
+如果它们引用着同一个底层字节序列，则对它们的比较的时间复杂度为<code><i>O</i>(1)</code>，否则时间复杂度为<code><i>O</i>(n)</code>。
 </p>
-</div>
 
-<div>
 <p>
-As above mentioned, for the standard Go compiler, in a string value assignment,
-the destination string value and the source string value will
-share the same underlying byte sequence in memory.
-So after the assignment, the cost of comparing
-the two strings becomes very small.
+上面已经提到了，对于官方标准Go编译器，一个字符串赋值完成之后，目标字符串和源字符串将共享同一个底层字节序列。
+所以比较这两个字符串的代价很小。
 </p>
 
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
@@ -630,11 +541,11 @@ func main() {
 	s1 := string(bs)
 	s2 := s1
 	
-	// s0, s1 and s2 are three equal strings.
-	// The underlying bytes of s0 is a copy of bs.
-	// The underlying bytes of s1 is also a copy of bs.
-	// The underlying bytes of s0 and s1 are two different copies of bs.
-	// s2 shares the same underlying bytes with s1.
+	// s0、s1和s2是三个相等的字符串。
+	// s0的底层字节序列是bs的一个深复制。
+	// s1的底层字节序列也是bs的一个深复制。
+	// s0和s1底层字节序列为两个不同的字节序列。
+	// s2和s1共享同一个底层字节序列。
 
 	startTime := time.Now()
 	_ = s0 == s1
@@ -648,14 +559,13 @@ func main() {
 }
 </code></pre>
 
-Output:
+输出如下：
 <pre class="output"><code>duration for (s0 == s1): 10.462075ms
 duration for (s1 == s2): 136ns
 </code></pre>
 
 <p>
-1ms is 1000000ns! So please try to avoid comparing two long strings
-if they don't share the same underlying byte sequence.
+1ms等于1000000ns！所以请尽量避免比较两个很长的不共享底层字节序列的几乎相等的字符串。
 </p>
 </div>
 
