@@ -54,7 +54,7 @@ func main() {
 </code></pre>
 
 非常简单！我们编写了一个并发（Concurrent）程序！
-此程序在运行时在某一时刻将很可能会有三个协程并存。
+此程序在运行的时候在某一时刻将很可能会有三个协程并存。
 运行之，可能会得到如下的结果（也可能是其它结果）：
 
 <pre class="output"><code>hi!
@@ -239,7 +239,7 @@ func main() {
 </p>
 
 <p>
-在运行时，我们可以调用<a href="https://golang.org/pkg/runtime/#GOMAXPROCS"><code>runtime.GOMAXPROCS</code></a>函数来获取和设置逻辑处理器的的数量。
+在运行时刻，我们可以调用<a href="https://golang.org/pkg/runtime/#GOMAXPROCS"><code>runtime.GOMAXPROCS</code></a>函数来获取和设置逻辑处理器的的数量。
 对于官方标准编译器，在Go 1.5之前，默认初始逻辑处理器的数量为1；自从Go 1.5之后，默认初始逻辑处理器的数量和逻辑CPU的数量一致。
 此新的默认设置在大多数情况下是最佳选择。但是对于某些文件操作十分频繁的程序，设置一个大于<code>runtime.NumCPU()</code>的<code>GOMAXPROCS</code>值可能是有好处的。
 </p>
@@ -342,7 +342,7 @@ func Triple(n int) (r int) {
 	defer func() {
 		r += n // 修改返回值
 	}()
-	
+
 	return n + n // <=> r = n + n; return
 }
 
@@ -454,9 +454,9 @@ func main() {
 		time.Sleep(time.Second)
 		fmt.Println(x, a) // 123 789
 	}(a)
-	
+
 	a = 789
-	
+
 	time.Sleep(2 * time.Second)
 }
 </code></pre>
@@ -551,12 +551,12 @@ import (
 
 func main() {
 	fmt.Println("hi!")
-	
+
 	go func() {
 		time.Sleep(time.Second)
 		panic(123)
 	}()
-	
+
 	for {
 		time.Sleep(time.Second)
 	}

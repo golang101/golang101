@@ -229,19 +229,27 @@ func main() {
 	x, y := func() (int, int) {
 		println("This fucntion has no parameters.")
 		return 3, 4
-	}() // 一对小括号表示立即调用此函数。
+	}() // 一对小括号表示立即调用此函数。不需传递实参。
 	
-	// 这个匿名函数有两个输入参数，但没有返回结果。
+	// 下面这些匿名函数没有返回结果。
+	
 	func(a, b int) {
 		println("a*a + b*b =", a*a + b*b) // a*a + b*b = 25
-	}(x, y) // 立即调用。
+	}(x, y) // 立即调用并传递两个实参。
 	
-	// 这个匿名函数既没有输入参数，也没有返回结果。
 	func() {
 		println("x*x + y*y =", x*x + y*y) // x*x + y*y = 25
-	}()
+	}() // 不需传递实参。
+	
+	func(x int) {
+		// 形参x压制了外层声明的变量x。
+		println("x*x + y*y =", x*x + y*y) // x*x + y*y = 32
+	}(y) // 将实参y传递给形参x。
 }
 </code></pre>
+
+<p>
+</p>
 
 <p>
 注意，上例中的最后一个匿名函数处于变量<code>x</code>和<code>y</code>的作用域内，所以在它的函数体内可以直接使用这两个变量。

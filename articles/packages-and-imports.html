@@ -365,6 +365,7 @@ Go不支持循环引用（依赖）。
 </p>
 </div>
 
+<p class="anchor" id="init"></p>
 <h3><code>init</code>函数</h3>
 
 <p>
@@ -377,7 +378,7 @@ Go不支持循环引用（依赖）。
 </p>
 
 <p>
-在程序运行时，在进入<code>main</code>入口函数之前，每个<code>init</code>函数在此包加载的时候将被（串行）执行并且只执行一遍。
+在程序运行时刻，在进入<code>main</code>入口函数之前，每个<code>init</code>函数在此包加载的时候将被（串行）执行并且只执行一遍。
 </p>
 
 <div>
@@ -422,7 +423,7 @@ bye
 
 <div>
 <p>
-一个程序中所涉及到的所有的在运行时要用到的代码包的加载是串行执行的。
+一个程序中所涉及到的所有的在运行时刻要用到的代码包的加载是串行执行的。
 在一个程序启动时，每个包中总是在它所有依赖的包都加载完成之后才开始加载。
 程序代码包总是最后一个被加载的代码包。每个包只会被加载一次。
 </p>
@@ -495,7 +496,7 @@ import (
 func main() {
 	random.Seed(time.Now().UnixNano())
 	format.Print("A pseudo-random number: ", random.Uint32(), "\n")
-	
+
 	// 下面这两行编译不通过。
 	/*
 	rand.Seed(time.Now().UnixNano())
