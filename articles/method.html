@@ -1,86 +1,70 @@
-﻿<h1>Methods In Go</h1>
+﻿<h1>方法</h1>
 
 <p>
-Go supports some object-orient programming features.
-Method is one of these features.
-A method is a special function which has a receiver parameter (see below).
-This article will explain method related concepts in Go.
+Go支持一些面向对象编程特性，方法是这些所支持的特性之一。
+本篇文章将介绍在Go中和方法相关的各种概念。
 </p>
 
-<h3>Method Declarations</h3>
+<h3>方法声明</h3>
 
 <div>
-In Go, we can (explicitly) declare a method for type
-<code>T</code> and <code>*T</code>,
-where <code>T</code> must satisfiy 4 conditions:
+在Go中，我们可以为类型<code>T</code>和<code>*T</code>显式地声明一个方法，其中类型<code>T</code>必须满足四个条件：
 <ol>
 <li>
-	<code>T</code> must be defined type;
+	<code>T</code>必须是一个<a href="type-system-overview.html#non-defined-type">定义类型</a>；
 </li>
 <li>
-	<code>T</code> must be defined in the same package as the method declaration;
+	<code>T</code>必须和此方法声明定义在同一个代码包中；
 </li>
 <li>
-	<code>T</code> must not be a pointer type;
+	<code>T</code>不能是一个指针类型；
 </li>
 <li>
-	<code>T</code> must not be an interface type.
-	(Interface types will be explained in
-	<a href="interface.html">the next article</a>.)
+	<code>T</code>不能是一个接口类型。（接口类型将在<a href="interface.html">下一篇文章</a>中讲解。）
 </li>
 </ol>
 
 <p>
-<code>T</code> is called the receiver base types of all methods declared
-for both type <code>T</code> and <code>*T</code>.
-(Below will explain what are receivers.)
+类型<code>T</code>和<code>*T</code>称为它们各自的方法的属主类型（receiver type）。
+类型<code>T</code>被称作为类型<code>T</code>和<code>*T</code>声明的所有方法的属主基类型（receiver base type）。
 </p>
 
 <p>
-We can also declare methods for alias types of the <code>T</code>
-and <code>*T</code> types specified above.
-The effect is the same as declaring methods for the <code>T</code>
-and <code>*T</code> types themselves.
+注意：我们也可以为满足上列条件的类型<code>T</code>和<code>*T</code>的<a href="type-system-overview.html#type-alias">别名类型</a>声明方法。
+这样做的效果和直接为类型<code>T</code>和<code>*T</code>声明方法是一样的。
 </p>
 
 <p>
-If a method is declared for a type, we can say the type has (owns) the method.
+如果我们为某个类型声明了一个方法，以后我们可以说此类型拥有此方法。
 </p>
 
-From the above listed conditions, we will get the conclusion that
-we can never (explicitly) declare methods for
+从上面列出的条件，我们知道我们不能为下列类型（显式地）声明方法：
 <ul>
 <li>
-	built-in basic types, such as <code>int</code> and <code>string</code>,
-	for we can't declare methods in the <code>builtin</code> standard package.
+	内置类型。比如<code>int</code>和<code>string</code>。
+	因为这些类型声明在内置<code>builtin</code>标准包中，而我们不能在标准包中声明方法。
 </li>
 <li>
-	interface types. But an interface type can own methods.
-	Please read <a href="type-embedding.html">the next article</a> for details.
+	接口类型。但是接口类型可以拥有方法。详见<a href="interface.html">下一篇文章</a>。
 </li>
 <li>
-	unnamed types except the pointer types <code>*T</code> which are described above,
-	including unnamed array, map, slice, function, channel and struct types.
-	However, if an unnamed struct type embeds other types which have methods,
-	then compiler will implicitly declare some methods for the unnamed struct type
-	and the unnamed pointer type whose base type is the unnamed struct type.
-	Please read <a href="type-embedding.html">type embedding</a> for details.
+	除了满足上面条件的指针类型<code>*T</code>的<a href="type-system-overview.html#non-defined-type">非定义类型</a>，
+	包括各种<a href="type-system-overview.html#named-type">无名</a>组合类型。
+	但是无名结构体类型可以通过内嵌其它类型而获得（一些隐式声明的）方法。
+	详见后面的<a href="type-embedding.html">类型内嵌</a>一文。
 </li>
 </ul>
 
 <p>
-A method declaration is similar to a function declaration,
-but it has an extra parameter declaration part.
-The extra parameter is called a receiver parameter.
-Each method must be declared with one and only one receiver parameter.
-The receiver parameter must be enclosed in a <code>()</code>
-and declared between the <code>func</code> keyword and the method name.
-The type of the receiver parameter is called the receiver type of that method.
+一个方法声明和一个函数声明很相似，但是比函数声明多了一个额外的参数声明部分。
+此额外的参数声明部分只能含有一个类型为此方法的属主类型的参数，此参数称为此方法声明的属主参数（receiver parameter）。
+此属主参数声明必须包裹在一对小括号<code>()</code>之中。
+此属主参数声明部分必须处于<code>func</code>关键字和方法名之间。
 </p>
 
-Here are some method declaration examples:
-<pre class="line-numbers"><code class="language-go">// Age and int are two distinct types.
-// We can't declare methods for int, but can for Age.
+下面是一个方法声明的例子：
+<pre class="line-numbers"><code class="language-go">// Age和int是两个不同的类型。我们不能为int和*int
+// 类型声明方法，但是可以为Age和*Age类型声明方法。
 type Age int
 func (age Age) LargerThan(a Age) bool {
 	return age > a
@@ -89,13 +73,13 @@ func (age *Age) Increase() {
 	*age++
 }
 
-// Receiver of custom defined function type.
+// 为自定义的函数类型FilterFunc声明方法。
 type FilterFunc func(in int) bool
 func (ff FilterFunc) Filte(in int) bool {
 	return ff(in)
 }
 
-// Receiver of custom defined map type.
+// 为自定义的映射表类型StringSet声明方法。
 type StringSet map[string]struct{}
 func (ss StringSet) Has(key string) bool {
 	_, present := ss[key]
@@ -108,7 +92,7 @@ func (ss StringSet) Remove(key string) {
 	delete(ss, key)
 }
 
-// Receiver of custom defined struct type.
+// 为自定义的结构体类型Book和它的指针类型*Book声明方法。
 type Book struct {
 	pages int
 }
@@ -121,72 +105,49 @@ func (b *Book) SetPages(pages int) {
 </code></pre>
 
 <p>
-From the above examples, we know that the receiver base types
-not only can be struct types, but also can be
-other kinds of types, such as basic types and container types,
-as long as the receiver base types satisfy the 4 conditions listed above.
+从上面的例子可以看出，我们可以为各种种类（kind）的类型声明方法，而不仅仅是结构体类型。
 </p>
 
 <p>
-In some other programming languages,
-the receiver parameter names are always the implicit <code>this</code>,
-which is not a recommended identifier for receiver parameter names in Go.
+在很多其它面向对象的编程语言中，属主参数名总是为隐式声明的<code>this</code>或者<code>self</code>。这样的名称不推荐在Go编程中使用。
 </p>
 
 <p>
-The receiver of type <code>*T</code> are called <b><i>pointer receiver</i></b>,
-non-pointer receivers are called <b><i>value receivers</i></b>.
-Personally, I don't recommand to view the terminology <b><i>pointer</i></b>
-as an oppoiste of the terminology <b><i>value</i></b>,
-for pointer values are just special values.
-But, I am not against using the pointer receiver and value receiver terminologies here.
-The reason will be explained below.
+指针类型的属主参数称为<b><i>指针类型属主</i></b>，非指针类型的属主参数称为<b><i>值类型属主</i></b>。
+在大多数情况下，我个人非常反对将<b><i>指针</i></b>和<b><i>值</i></b>这两个术语用做对立面，但是在这里，我并不反对这么用，原因将在下面谈及。
 </p>
 </div>
 
 <p>
-Method names can be the blank identifier <code>_</code>.
-A type can have multiple methods with the blank identifier as names.
-But such methods can never be called.
-</p>
-
-<p>
-Only exported methods can be called from other packages.
+方法名可以是空标识符<code>_</code>。一个类型可以拥有若干名可以是空标识符的方法，但是这些方法无法被调用。
+只有导出的方法才可以在其它代码包中调用。
+方法调用将在后面的一节中介绍。
 </p>
 
 <p class="anchor" id="method-as-function"></p>
-<h3>Each Method Corresponds To An Implicit Function</h3>
+<h3>每个方法对应着一个隐式声明的函数</h3>
 
 <div>
-For each method declaration, compiler will declare a corresponding implicit function for it.
-For the last two methods declared for type <code>Book</code> and type <code>*Book</code>
-in the last example in the last section,
-two following functions are implicitly declared by compiler:
+对每个方法声明，编译器将自动隐式声明一个相对应的函数。
+比如对于上一节的例子中为类型<code>Book</code>和<code>*Book</code>声明的两个方法，编译器将自动声明下面的两个函数：
 
 <pre class="line-numbers"><code class="language-go">func Book.Pages(b Book) int {
-	return b.pages // the body is the same as the Pages method
+	return b.pages // 此函数体和Book类型的Pages方法体一样
 }
 
 func (*Book).SetPages(b *Book, pages int) {
-	b.pages = pages // the body is the same as the SetPages method
+	b.pages = pages // 此函数体和*Book类型的SetPages方法体一样
 }
 </code></pre>
 
 <p>
-In each of the two implicit function declarations, the receiver parameter
-is removed from its correponding method declaration and inserted
-into the normal parameter list as the first one.
-The function bodies of the two implicitly declared functions
-are the the same as their corresponding method bodies.
+在上面的两个隐式函数声明中，它们各自对应的方法声明的属主参数声明被插入到了普通参数声明的第一位。
+它们的函数体和各自对应的方法的显式方法体是一样的。
 </p>
 
-The implict method names, <code>Book.Pages</code> and <code>(*Book).SetPages</code>,
-are both of the form <code>TypeDenotation.MethodName</code>.
-As identifiers in Go can't contain the period special characters,
-the two implict function names are not legal identifiers,
-so the two functions can't be dclared explicitly.
-They can only be declared by compiler implicitly,
-but they can be called in user code:
+两个隐式函数名<code>Book.Pages</code>和<code>(*Book).SetPages</code>都是<code>TypeDenotation.MethodName</code>这种形式的。
+我们不能显式声明名称为这种形式的函数，因为这种形式不属于合法标识符。
+这样的函数只能由编译器隐式声明，但是我们可以在代码中调用这些隐式声明的函数：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -204,9 +165,22 @@ func (b *Book) SetPages(pages int) {
 
 func main() {
 	var book Book
-	// Call the two implicit decalred functions.
+	// 调用这两个隐式声明的函数。
 	(*Book).SetPages(&book, 123)
 	fmt.Println(Book.Pages(book)) // 123
+}
+</code></pre>
+
+<p>
+</p>
+
+事实上，在隐式声明上述两个函数的同时，编译器也将改写这两个函数对应的显式方法，让这两个方法在体内直接调用这两个隐式函数：
+
+<pre class="line-numbers"><code class="language-go">func (b Book) Pages() int {
+	return Book.pages(b)
+}
+func (b *Book) SetPages(pages int) {
+	(*Book).SetPages(b, pages)
 }
 </code></pre>
 
@@ -216,34 +190,25 @@ func main() {
 </div>
 
 <p class="anchor" id="implicit-pointer-methods"></p>
-<h3>Implicit Methods With Pointer Receivers</h3>
+<h3>为指针类型属主隐式声明的方法</h3>
 
 <div>
-For each method declared for value receiver type <code>T</code>,
-a corresponding method with the same name will be
-implictly declared by compiler for type <code>*T</code>.
-By the example above, the <code>Pages</code> method is declared for type <code>Book</code>,
-so compiler will implicitly declare a method with the same name <code>Pages</code>
-for type <code>*Book</code>. The same name method only contain one line of code,
-which is a call to the implicit function <code>Book.Pages</code> introduced above.
+对每一个为值类型属主<code>T</code>声明的方法，编译器将自动隐式地为其对应的指针类型属主<code>*T</code>声明一个相应的同名方法。
+以上面的为类型<code>Book</code>声明的<code>Pages</code>方法为例，编译器将自动为类型<code>*Book</code>声明一个同名方法：
 
 <pre class="line-numbers"><code class="language-go">func (b *Book) Pages() int {
-	return Book.Pages(*b)
+	return Book.Pages(*b) // 调用上节中隐式声明的函数
 }
 </code></pre>
 
 <p>
-This is why I don't reject to use the value receiver terminology
-(as the opposite of pointer receiver).
-After all, when we expliclty declare a method for a non-pointer type,
-in fact two methods are declared, the explicit one for the non-pointer type,
-the other implicit one is for the corresponding pointer type.
+这是为什么我并不排斥使用值类型属主做为指针类型属主的对立面的原因。
+毕竟，当我们为一个非指针类型显式声明一个方法的时候，事实上两个方法被声明了。
+一个方法是为非指针类型显式声明的，另一个是为指针类型隐式声明的。
 </p>
 
-As the last section has mentioned, for each declared method,
-compiler will also declare a correponding implicit function for it.
-So for the just mentioned implicitly declared method,
-the following implicit function is declared by compiler.
+上一节已经提到了，每一个方法对应着一个编译器隐式声明的函数。
+所以对于刚提到的隐式方法，编译器也将隐式声明一个相应的函数：
 
 <pre class="line-numbers"><code class="language-go">func (*Book).Pages(b *Book) int {
 	return Book.Pages(*b)
@@ -251,26 +216,21 @@ the following implicit function is declared by compiler.
 </code></pre>
 
 <p>
-In other words, for each explicitly declared method with a value receiver,
-two implicit functions and one implicit method will also be declared at the same time.
+换句话说，对于每一个为值类型属主显式声明的方法，同时将有一个隐式方法和两个隐式函数被自动声明。
 </p>
 </div>
 
 <p class="anchor" id="method-set"></p>
-<h3>Method Prototypes And Method Sets</h3>
+<h3>方法原型（method prototype）和方法集（method set）</h3>
 
 <div>
 
 <p>
-A method prototype can be viewed as a
-<a href="function.html#prototype">function prototype</a>
-without the <code>func</code> keyword.
-We can view each method declaration is composed of the <code>func</code> keyword,
-a receiver parameter declartion, a method prototype and a method (function) body.
+一个方法原型可以看作是一个不带<code>func</code>关键字的<a href="function.html#prototype">函数原型</a>。
+我们可以把每个方法声明看作是由一个<code>func</code>关键字、一个属主参数声明部分、一个方法原型和一个方法体组成。
 </p>
 
-For example, the method prototypes of the <code>Pages</code> and
-<code>SetPages</code> methods shown above are
+比如，上面的例子中的<code>Pages</code>和<code>SetPages</code>的原型如下：
 
 <pre class="line-numbers"><code class="language-go">Pages() int
 SetPages(pages int)
@@ -280,20 +240,15 @@ SetPages(pages int)
 </p>
 
 <p>
-Each type has a method set.
-The method set of a non-interface type is composed of all the method prototypes
-of the methods declared, either explicitly or implicitly, for the type,
-except the ones whose names are the blank identifier <code>_</code>.
-(Interface types will be explained in
-<a href="interface.html">the next article</a>.)
+每个类型都有个方法集。一个非接口类型的方法集由所有为它声明的（不管是显式的还是隐式的，但不包含方法名为空标识符的）方法的原型组成。
+（接口类型将在<a href="interface.html">下一篇文章</a>详述。）
 </p>
 
-For example, the method sets of the <code>Book</code> type shown in the
-previous sections is
+比如，在上面的例子中，<code>Book</code>类型的方法集为：
 <pre class="line-numbers"><code class="language-go">Pages() int
 </code></pre>
 
-and the method set of the <code>*Book</code> type is
+而<code>*Book</code>类型的方法集为：
 
 <pre class="line-numbers"><code class="language-go">Pages() int
 SetPages(pages int)
@@ -303,45 +258,33 @@ SetPages(pages int)
 </p>
 
 <p>
-The order of the method prototypes in a method set is not important for the method set.
+方法集中的方法原型的次序并不重要。
 </p>
 
 <p>
-For a method set, if every method prototype in it is also in another method set,
-then we say the former method set is a subset of the latter one.
-If two method sets are subsets of each other,
-then we say the two method sets are identical.
+对于一个方法集，如果其中的每个方法原型都处于另一个方法集中，则我们说前者方法集为后者（即另一个）方法集的子集，后者为前者的超集。
+如果两个方法集互为子集（或超集），则这两个方法集必等价。
 </p>
 
 <p>
-Given a type <code>T</code>, assume it is neither a pointer type nor an
-interface type, for <a href="#implicit-pointer-methods">the reason</a>
-mentioned above, the method set of a type <code>T</code> is always
-a subset of the method set of type <code>*T</code>.
-For example, the method set of the <code>Book</code> type shown above is a
-subset of the method set of the <code>*Book</code> type.
+给定一个类型<code>T</code>，假设它既不是一个指针类型也不是一个接口类型，因为上一节中提到的原因，类型<code>T</code>的方法集总是类型<code>*T</code>的方法集的子集。
+比如，在上面的例子中，<code>Book</code>类型的方法集为<code>*Book</code>类型的方法集的子集。
 </p>
 
 <p>
-Please note, <b>non-exported method names, which start with lower-case letters,
-from different packages will be always viewed as two different method names</b>.
-In other words, a method prototype with a non-exported method name is always
-different from any prototype from other packages.
+请注意：<b>不同代码包中的同名非导出方法名将总被认为是不同名的。</b>
 </p>
 
 <p>
-Method sets play an important role in the polymorphism feature of Go.
-About polymorphism, please read <a href="interface.html">the next article</a>
-(interfaces in Go) for details.
+方法集在Go中的多态特性中扮演着重要的角色。多态将在<a href="interface.html">下一篇文章</a>中讲解。
 </p>
 
-
-The method sets of the following types are always blank:
+下列类型的方法集总为空：
 <ul>
-<li>built-in basic types.</li>
-<li>defined pointer types.</li>
-<li>unnamed pointer types whose base types are interface or pointer types.</li>
-<li>unnamed array, slice, map, function and channel types.</li>
+<li>内置基本类型；</li>
+<li>定义的指针类型；</li>
+<li>基类型为指针类型或者接口类型的指针类型；</li>
+<li>非定义的数组/切片/映射表/函数/数据通道类型。</li>
 </ul>
 
 <p>
@@ -350,27 +293,21 @@ The method sets of the following types are always blank:
 </div>
 
 <p class="anchor" id="call"></p>
-<h3>Method Values And Method Calls</h3>
+<h3>方法值和方法调用</h3>
 
 <p>
-Methods are special functions in fact.
-When a method is declared for a type, then each value of the type
-will own an immutable member of a function type.
-The member name is the same as the method name.
-The function type is the same as the function declared
-with the form of the method declaration but without the receiver part.
-The member is often called a member function.
-The member function can also be called the method of its corresponding value.
+方法事实上是特殊的函数。方法也常被称为成员函数。
+当一个类型拥有一个方法，则此类型的每个值将拥有一个不可修改的函数类型的成员（类似于结构体的字段）。
+此成员的名称为此方法名，它的类型和从此方法的声明中去掉属主部分的函数声明的类型一致。
+一个值的成员函数也可以称为此值的方法。
 </p>
 
 <p>
-A method call is just a call to such a member function.
-For a value <code>v</code>, its method <code>m</code> can be accessed
-with the selector form <code>v.m</code>.
+一个方法调用其实是调用了一个值的成员函数。假设一个值<code>v</code>有一个名为<code>m</code>的方法，则此方法可以用选择器语法形式<code>v.m</code>来表示。
 </p>
 
 <div>
-An example containing some method calls:
+下面这个例子展示了如何调用为<code>Book</code>和<code>*Book</code>类型声明的方法：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -392,37 +329,36 @@ func main() {
 
 	fmt.Printf("%T \n", book.Pages)       // func() int
 	fmt.Printf("%T \n", (&book).SetPages) // func(int)
-	// &book has an implicit method.
+	// &book值有一个隐式方法Pages。
 	fmt.Printf("%T \n", (&book).Pages)    // func() int
 
+	// 调用这三个方法。
 	(&book).SetPages(123)
-	fmt.Println(book.Pages()) // 123
-	// Call the impliict method of &book.
+	book.SetPages(123)           // 等价于上一行
+	fmt.Println(book.Pages())    // 123
 	fmt.Println((&book).Pages()) // 123
 }
 </code></pre>
 
 <p>
+<!--
 In the above example, the value <code>book</code> is called the base value of both
 the receiver arguments of the <code>Pages</code> and <code>SetPages</code> method calls.
+-->
 </p>
 
 <p><i>
-(Different from C language, there is not the <code>-&gt;</code> operator in Go
-to call methods with pointer receivers,
-so <code>(&amp;book)-&gt;SetPages(123)</code> is illegal in Go.)
+（和C语言不同，Go中没有<code>-&gt;</code>操作符用来通过指针属主值来调用方法。<code>(&amp;book)-&gt;SetPages(123)</code>在Go中是非法的。）
 </i></p>
 
-Method calls make Go programs clean and more readable.
-In fact, the above example can be cleaner.
-The line <code>(&amp;book).SetPages(123)</code> in the above example
-can be simplified to <code>book.SetPages(123)</code>.
-But how can this happen?
-After all, the value <code>book</code> has not a method called <code>SetPages</code>.
-Aha, this is just a syntactic sugar to make progrmaming convenient.
-This sugar only works for addressable values of type <code>Book</code>.
-Compiler will automitically take the addresses of the addressable values
-when they are passed as the receiver arguments of the <code>SetPages</code> method calls.
+<p>
+事实上，上例中的<code>(&amp;book).SetPages(123)</code>一行可以被简化为<code>book.SetPages(123)</code>。
+为什么呢？毕竟，类型<code>book</code>并不拥有一个<code>SetPages</code>方法。
+啊哈，这是Go中特别设计的为了让代码看上去更整洁的语法糖。此语法糖只对可寻址的<code>Book</code>类型的属主有效。
+编译器会自动将<code>book.SetPages(123)</code>改写为<code>(&amp;book).SetPages(123)</code>。
+</p>
+
+<!--
 <pre class="line-numbers"><code class="language-go"> ...
 
 // Function results are not addressable in Go.
@@ -439,6 +375,7 @@ func main() {
 	MakeBook().SetPages(123)
 }
 </code></pre>
+-->
 
 <!--
 In fact, the method value <code>book.Pages</code>
@@ -461,19 +398,16 @@ can be viewed as closures returned by:
 -->
 
 <p>
-As above just mentioned, when a method is declared for a type,
-each value of the type will own a member function.
-Zero values are not exceptions, whether or not the zero values
-can be represented by <code>nil</code>.
+如上面刚提到的，当为一个类型声明了一个方法后，每个此类型的值将拥有一个和此方法同名的成员函数。
+此类型的零值也不例外，不论此类型的零值是否可以用<code>nil</code>来表示。
 </p>
 
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 type StringSet map[string]struct{}
 func (ss StringSet) Has(key string) bool {
-	_, present := ss[key] // Never panic here,
-	                      // even if ss is nil.
+	_, present := ss[key] // 永不会产生恐慌，即使ss为nil。
 	return present
 }
 
@@ -482,38 +416,33 @@ func (age *Age) IsNil() bool {
 	return age == nil
 }
 func (age *Age) Increase() {
-	*age++ // If age is a nil pointer, then
-	       // dereferencing it will panic.
+	*age++ // 如果age是一个空指针，则此行将产生一个恐慌。
 }
 
 func main() {
-	_ = (StringSet(nil)).Has   // will not panic
-	_ = ((*Age)(nil)).IsNil    // will not panic
-	_ = ((*Age)(nil)).Increase // will not panic
+	_ = (StringSet(nil)).Has   // 不会产生恐慌
+	_ = ((*Age)(nil)).IsNil    // 不会产生恐慌
+	_ = ((*Age)(nil)).Increase // 不会产生恐慌
 
-	_ = (StringSet(nil)).Has("key") // will not panic
-	_ = ((*Age)(nil)).IsNil()       // will not panic
+	_ = (StringSet(nil)).Has("key") // 不会产生恐慌
+	_ = ((*Age)(nil)).IsNil()       // 不会产生恐慌
 
-	// This line will panic. But the panic is not caused
-	// by invoking the method. It is caused by the nil
-	// pointer dereference within the method body.
+	// 下面这行将产生一个恐慌，但是此恐慌不是在调用方法的时
+	// 候产生的，而是在此方法体内解引用空指针的时候产生的。
 	((*Age)(nil)).Increase()
 }
 </code></pre>
 </div>
 
-<h3>Receiver Arguments Are Passed By Copy</h3>
+<h3>属主参数的传参是一个值复制过程</h3>
 
 <p>
-Same as general function arguments,
-the receiver arguments are also passed by copy.
-So, the modifications on the <a href="value-part.html">dirct part</a>
-of a receiver argument in a method call will not be reflected to
-the outside of the method.
+和普通参数传参一样，属主参数的传参也是一个值复制过程。
+所以，在方法体内对属主参数的<a href="value-part.html">直接部分</a>的修改将不会反映到方法体外。
 </p>
 
 <div>
-An example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -533,7 +462,10 @@ func main() {
 }
 </code></pre>
 
-Another example:
+<p>
+</p>
+
+另一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -545,11 +477,9 @@ type Book struct {
 type Books []Book
 
 func (books Books) Modify() {
-	// Modifications on the underlying part of the receiver
-	// will be reflected to outside of the method.
+	// 对属主参数的间接部分的修改将反映到方法之外。
 	books[0].pages = 500
-	// Modifications on the direct part of the receiver
-	// will not be reflected to outside of the method.
+	// 对属主参数的直接部分的修改不会反映到方法之外。
 	books = append(books, Book{789})
 }
 
@@ -560,9 +490,10 @@ func main() {
 }
 </code></pre>
 
-Some off topic, if the two lines in the orders of
-the above <code>Modify</code> method are exchanged, then both of the modifications
-will not be reflected to outside of the method body.
+<p>
+</p>
+
+有点题外话：如果将上例中<code>Modify</code>方法中的两行代码次序调换，那么此方法中的两处修改都不能反映到此方法之外。
 <pre class="line-numbers"><code class="language-go">func (books Books) Modify() {
 	books = append(books, Book{789})
 	books[0].pages = 500
@@ -576,13 +507,11 @@ func main() {
 </code></pre>
 
 <p>
-The reason here is that the <code>append</code> call will allocate a new
-memory block to storage the elements of the copy of the passed slice receiver argument.
-The allocation will not reflect to the passed slice receiver argument itself.
+这两处修改都不能反映到<code>Modify</code>方法之外的原因是<code>append</code>函数调用将开辟一块新的内存来存储传入的切片属主实参的两个元素的副本。
+在此开辟的内存中所做的修改不会反映到<code>Modify</code>方法之外。
 </p>
 
-To make both of the modifications be reflected to outside of the method body,
-the receiver of the method must be a pointer one.
+为了将此两处修改反映到<code>Modify</code>方法之外，<code>Modify</code>方法的属主类型应该改为指针类型：
 <pre class="line-numbers"><code class="language-go">func (books *Books) Modify() {
 	*books = append(*books, Book{789})
 	(*books)[0].pages = 500
@@ -596,54 +525,37 @@ func main() {
 </code></pre>
 </div>
 
-<h3>Should A Method Be Declared With Pointer Receiver Or Value Receiver?</h3>
+<h3>方法声明使用值类型属主还是指针类型属主？</h3>
 
 <p>
-Firstly, from the last section,
-we know that sometimes we must declare methods with pointer receivers.
+首先，从上一节中的例子，我们可以得知有时候我们必须在某些方法声明中使用指针类型属主。
 </p>
 
 <p>
-In fact, we can always declare methods with pointer recievers without any logic problems.
-It is just a matter of program performance that sometimes it is better to declare methods
-with value receivers.
+事实上，我们总可以在方法声明中使用指针类型属主而不会产生任何逻辑问题。
+我们仅仅是为了程序效率考虑有时候才会在函数声明中使用值类型属主。
 </p>
 
 <div>
-For the cases value receivers and pointer receivers are both acceptable,
-here are some factors needed to be considered to make decisions.
+对于值类型属主还是指针类型属主都可以接受的方法声明，下面列出了一些考虑因素：
 <ul>
 <li>
-	Too many pointer copies may cause heavier workload for garbage colllector.
+	太多的指针可能会增加垃圾回收器的负担。
 </li>
 <li>
-	If the value size of a receiver type is large,
-	then the receiver argument copy cost may be not neglectable.
-	In particular if the passed argument is an interface value
-	(please read <a href="interface.html#polymorphism">polymorphism</a> for details),
-	there will be two copies made in the argument passing.
-	Here we just need to know that
-	pointer values are all <a href="value-copy-cost.html">small sized values</a>.
-	In fact, for the standard Go compiler and runtime,
-	types other than array and struct types are all small sized types.
-	Struct types with very few fields are also small sized.
+	如果一个值类型的尺寸太大，那么属主参数在传参的时候的复制成本将不可忽略。
+	指针类型都是小尺寸类型。
+	关于各种不同类型的尺寸，请阅读<a href="value-copy-cost.html">值复制代价</a>。
 </li>
 <li>
-	Mixing value receivers and pointer receivers for the same base type
-	is more likely to cause data races if the declared methods
-	are called concurrently in multiple goroutines.
+	在并发场合下，同时调用为同一个属主基类型声明的值类型属主和指针类型属主方法比较易于产生数据竞争。
 </li>
 <li>
-	Values of the types in the <code>sync</code> standard package
-	should not be copied, so defining methods with value receivers for
-	sturct types which embedding the types in the <code>sync</code>
-	standard package is problematic.
+	<code>sync</code>标准库包中的类型的值不应该被复制，所以如果一个结构体类型<a href="type-embedding.html">内嵌</a>了这些类型，则不能为这个结构体类型声明值类型属主的方法。
 </li>
 </ul>
 </div>
 
 <p>
-If it is hard to make a decision whether
-a method should use a pointer receiver or a value receiver,
-then just choose pointer receiver.
+如果实在没有主意在一个方法声明中使用值类型属主还是指针类型属主，那么请使用指针类型属主。
 </p>
