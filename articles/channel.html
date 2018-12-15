@@ -1,677 +1,543 @@
-﻿<h1>Channels In Go</h1>
+﻿<h1>数据通道</h1>
 
 <p>
-Channel is an important built-in feature in Go.
-It is one of the features that make Go unique.
-Along with another unique feature, goroutine, the two unique features
-make concurrent programming in Go become very convenient and fun.
-And the two features lower the difficulties of concurrent programming much.
+数据通道是Go的一种一等公民类型。它是Go的招牌特性之一。
+和另一个招牌特性协程一起，这两个招牌特性使得并发编程（concurrent programming）变得十分方便和有趣，并且大大降低了并发编程的难度。
 </p>
 
 <p>
-This article will list all the channel related concepts, syntaxes and rules.
-To understand channels better, the internal structure of channels and some
-implementation details by the standard Go compiler/runtime are also simply described.
+本片文章将列出所有的和数据通道相关的概念、语法和规则。为了更好地理解数据通道，本文也对数据通道的可能的内部实现略加介绍。
 </p>
 
 <p>
-The information in this article may be some intensive for new gophers.
-Some parts of this article may be needed to read for several times to digest.
+本篇文章中的信息量对于Go初学者来说可能有些密集。本文的某些段落可能需要反复阅读几遍才能有效吸收消化理解.
 </p>
 
-<h3>Concurrent Programming And Concurrency Synchronization</h3>
+<h3>并发编程和并发同步（concurrency synchronization）</h3>
 
 <div>
 <p>
-Modern CPUs often have multiple cores, and some CPU cores support hyper-threading.
-In other words, modern CPUs can process multiple instruction pipelines simultaneously.
-To fully use the power of modern CPUs,
-we need to do concurrent programming in coding our programs.
+现代CPU一般含有多个核，并且一个核可能支持多线程。换句话说，现代CPU可以同时执行多条指令流水线。
+为了将CPU的能力发挥到极致，我们常常需要使我们的程序支持并发运算。
 </p>
 
 <p>
-Concurrent computing is a form of computing in which
-several computations are executed during overlapping time periods.
-The following picture depicts two concurrent computing cases.
-In the picture, A and B represent two separate computations.
-The second case is also called parallel computing,
-which is special concurrent computing.
-In the first case, A and B are only in parallel during a small piece of time.
+并发运算是指若干运算可能在某些时间片段内同时运行，但在某些时间点只有某些运算在运行。
+下面这两张图描绘了两种并发运算的场景。在此图中，A和B表示两个运算。
+在第一种情形中，两个运算只在某些时间片段同时运行。
+第二种情形称为并行运算。在并行运算中，多个运算在任何时间点都在同时运行。并行运算是一种特殊的并发运算。
 <br/>
 <img src="res/concurrent-vs-parallel.png">
 <br/>
 </p>
 
 <p>
-Concurrent computing may happen in a program, a computer, or a network.
-In Go 101, we only talk about program-scope concurrent computing.
-<a href="control-flows-more.html">Goroutines</a>, which are introduced before,
-is the Go way to create concurrent computations.
+并发运算可能发生在同一个程序中、同一台电脑上或者同一个网络中。
+造Golang 101中，我们只谈及发生在同一个程序中的并发运算。
+前面已经介绍过的<a href="control-flows-more.html">协程</a>是Go中创建运算的唯一途径。
 </p>
 
-Concurrent computations may share resources, generally memory resource.
-There are some circumstances may happen in a concurrent computing.
+不同的并发运算可能共享一些资源，其中共享内存资源为最常见。
+在一个并发程序中，常常会发生下面情形：
 <ul>
 <li>
-	In the same period of one computation is writing data to a memory segment,
-	another computation is reading data from the same memory segment.
-	Then the integrity of the data read by the other computation might be not preserved.
+	在一个运算向一段内存写数据的时候，另一个运算从此内存段读数据，结果导致读出的数据的完整性得不到保证。
 </li>
 <li>
-	In the same period of one computation is writing data to a memory segment,
-	another computation is also writing data to the same memory segment.
-	Then the integrity of the data stored at the memory segment might be not preserved.
+	在一个运算向一段内存写数据的时候，另一个运算也向此段内存写数据，结果导致被写入的数据的完整性得不到保证。
 </li>
 </ul>
 
 <p>
-These circumstances are called data races. One of the duties in concurrent
-programming is to control resource sharing among concurrent computations,
-so that data races will not happen.
-The ways to achieve this duty are called concurrency synchronization,
-or data synchronization.
-Go supports several data synchronization techniques.
-Below will introduce one of them, channel.
+这些情形被称为数据竞争（data race）。并发编程的一大任务就是要调度不同运算，控制它们对资源的访问时段，以使数据竞争的情况比会发生。
+此任务常成为并发同步（或者数据同步）。Go支持几种并发同步技术，本文将只介绍它们中的一个：数据通道。
 </p>
 
-Other duties in concurrent programming include
+并发编程中的其它任务包括：
 <ul>
 <li>
-	determine how many computations are needed.
+	决定需要开启多少运算；
 </li>
 <li>
-	determine when to start and end a computation.
+	决定何时开启哪些运算；
 </li>
 <li>
-	determine how to distribute workload among concurrent computations.
+	决定如何在不同的运算中分担工作负载。
 </li>
 </ul>
 
 <p>
-Most operations in Go are not synchronized, in other words,
-they are not thread-safe.
-These operations include value assignments, argument passing and
-container element manipulations, etc.
-There are only a few operations which are synchronized,
-including the several to be introduced channel operations below.
+Go中大多数的操作都是未同步的。换句话说，它们都不是并发安全的。
+这些操作包括赋值、传参和各种容器值操作等。
+Go中只有少数操作是并发安全的，本文下面将介绍其中的几个。
 </p>
 
 <p>
-In Go, generally, each computation is a goroutine.
-So later we use goroutines to represent computations.
+在Go中，每个运算都是一个协程。所以以后我们也常常用协程来表示运算。
 </p>
 
 </div>
 
-<h3>Channel Introduction</h3>
+<h3>数据通道（channel）介绍</h3>
 
 <p>
-One suggestion (made by <i>Rob Pike</i>) for concurrent programming is
-<b>don't (let goroutines) communicate by sharing memory,
-(let them) share memory by communicating (through channels)</b>.
-The channel mechanism is a result of this philosophy.
+Go语言设计团队的首任负责人<i>Rob Pike</i>对并发编程的一个建议是<b>不要让运算通过共享内存来通讯，而应该让它们通过通讯来共享内存</b>。
+数据通道机制就是这种哲学的一个设计结果。
 </p>
 
 <p>
-Communicating by sharing memory and sharing memory by communicating
-are two patterns in concurrent programming.
-When goroutines communicate by sharing memory, we need use some
-tranditional concurrency synchronization techniques, such as mutex locks,
-to protect the shared memory to prevent data races.
+通过共享内存来通讯和通过通讯来共享内存是并发编程中的两种编程风格。
+当通过共享内存来通讯的时候，我们需要一些传统的并发同步技术（比如互斥锁）来避免数据竞争。
 </p>
 
 <p>
-Go provides a unique concurrency synchronization technique, channel,
-Channels make goroutines share memory by communicating.
-We can view a channel as an internal FIFO (first in, first out) data queue
-within a program. Some goroutines send values to the queue and some other
-goroutines receive values from the queue.
+Go提供了一种独特的并发同步技术来实现通过通讯来共享内存。此技术即为数据通道。
+我们可以把一个数据通道看作是在一个程序内部的一个先进先出数据队列（FIFO：first in, first out）数据队列。
+一些协程可以向此数据通道发送数据，另外一些协程可以从此数据通道接收数据。
 <p>
 
 <p>
-Along with transferring values,
-the ownerships of some values may be also transferred between goroutines.
-When a goroutine sends a value to a channel,
-we can view the goroutine releases the ownerships of some values.
-When a goroutine receives a value from a channel,
-we can view the goroutine acquires the owerships of some values.
-The values (whose owerships are transferred) are often referenced
-(but are not required to be referenced) by the transferred value.
+随着一个数据值的传送（发送和接收），一些数据值的所有权从一个协程转移到了另一个协程。
+当一个协程发送一个值到一个数据通道，我们可以认为此协程释放了（常常被此发送值所引用着）一些值的所有权。
+当一个协程从一个数据通道接收到一个值，我们可以认为从协程获取了（常常被此接收值所引用着）一些值的所有权。
+所有权发生转移的这些值并不一定被通过数据通道传输的值所引用这着。
 </p>
 
 <p>
-Surely, there may be also not any ownerships transferred
-along with channel communications.
+当然，在通过数据通道传输数据的时候，也可能没有任何所有权发生转移。
+另外请注意，在Go中，和Rust语言不同，数据所有权的转移并非体现在语法上，而是体现在逻辑上。
 </p>
 
 <p>
-Please note, here, when we talk about ownerships,
-we mean the ownerships from the logic view.
-Not like Rust language, Go doesn't assure value ownerships from the syntax level.
-Go channels can help programmers write data races free code easily,
-but Go channels don't prevent programmers from writing bad concurrent code.
+请注意，在这里，数据的所有权是从逻辑上的一个概念。
+和Rust语言不同，在Go中， 数据所有权的转移并非体现在语法上。
+Go数据通道可以帮助程序员轻松地避免数据竞争，但是不能保证程序员会犯错而写出糟烂的代码。
 </p>
 
 <p>
-Although Go also supports tranditional concurrency synchronization techniques.
-only channel is first-level citizen in Go. Channel is one kind of types in Go,
-so we can use channels without importing any packages.
-On the other hand,
-<a href="concurrent-synchronization-overview.html">those
-tranditional concurrency synchronization techniques</a> are provided
-in the <code>sync</code> and <code>sync/atomic</code> standard packages.
+尽管Go也支持几种传统的数据同步技术，但是只有数据通道为一等公民。
+数据通道是Go中的一种类型，所以我们可以无需引进任何代码包就可以使用数据通道。
+几种传统的数据同步技术提供在<code>sync</code>和<code>sync/atomic</code>标准代码库包中。
 </p>
 
 <p>
-Honestly, each concurrency synchronization technique
-has its own best use scenarios.
-But channel has <a href="channel-use-cases.html">a wider application range
-and has more variety in using</a>.
-And, for many scenarios, the concurrency code using channels often looks cleaner
-and easiler to understand than using other data syncrhonization techniques.
+实事求是地说，每种并发同步技术都有它们各自的最佳应用场景，但是数据通道的<a href="channel-use-cases.html">应用范围更广</a>。
+使用数据通道来做同步常常可以使得代码看上去更整洁和易于理解。
 </p>
 
 <p>
-One problem of channels is, the experience of programming with channels is
-so enjoyable and fun that programmers often even prefer to use channels for
-the scenarios which channels are not best for.
+数据通道的一个问题是数据通道的编程体验常常很有趣以至于程序员们经常在并非是数据通道的最佳应用场景中仍坚持使用数据通道。
 </p>
 
-<h3>Channel Types And Values</h3>
+<h3>数据通道类型和值</h3>
 
 <div>
 <p>
-Channel types are composite types. Like array, slice and map,
-each channel type has an element type.
-All data to be sent to the channel must be values of the element type.
+和数组、切片以及映射表类型一样，每个数据通道类型也有一个元素类型。
+一个数据通道只能传送它的（数据通道类型的）元素类型的值。
 </p>
 
-Channel types can be bi-directional or single-directional.
-Assume <code>T</code> is an arbitrary type,
+数据通道可以使双向的，也可以是单向的。
 <ul>
 <li>
-	<code>chan T</code> denotes a bidirectional channel type.
-	Compilers allow both receiving values from and sending values to
-	bidirectional channels.
+	字面形式<code>chan T</code>表示一个元素类型为<code>T</code>的双向数据通道类型。
+	编译器允许从此类型的值中接收和向此类型的值中发送数据。
 </li>
 <li>
-	<code>chan&lt;- T</code> denotes a send-only channel type.
-	Compilers don't allow receiving values from send-only channels.
+	字面形式<code>chan&lt;- T</code>表示一个元素类型为<code>T</code>的单向发送数据通道类型。
+	编译器不允许从此类型的值中接收数据。
 </li>
 <li>
-	<code>&lt;-chan T</code> denotes a receive-only channel type.
-	Compilers dsn't allow sending values to receive-only channels.
+	字面形式<code>&lt;-chan T</code>表示一个元素类型为<code>T</code>的单向接收数据通道类型。
+	编译器不允许向此类型的值中发送数据。
 </li>
 </ul>
 
 <p>
-<code>T</code> is called element types of these channel types.
+双向数据通道<code>chan T</code>的值可以被隐式转换为单向数据通道类型<code>chan&lt;- T</code>和<code>&lt;-chan T</code>，但反之不行（即使显式也不行）。
+类型<code>chan&lt;- T</code>和<code>&lt;-chan T</code>的值不能相互转换。
 </p>
 
 <p>
-Values of bidirectional channel type <code>chan T</code> can be converted to
-both send-only type <code>chan&lt;- T</code> and
-receive-only type <code>&lt;-chan T</code>, but not vice versa.
-Values of send-only type <code>chan&lt;- T</code> can't be converted to
-receive-only type <code>&lt;-chan T</code>, and vice versa.
+每个数据通道值有一个容量属性。此属性将在下一节中得到解释。
+一个容量为0的数据通道值成为一个非缓冲数据通道（unbuffered channel），一个容量不为0的数据通道值成为一个缓冲数据通道（buffered channel）。
 </p>
 
 <p>
-Each channel has a capacity, which will be explained in the next section.
-A channel with a zero capacity is called unbuffered channel and
-a channel with a non-zero capacity is called buffered channel.
-</p>
-
-<p>
-The zero values of channel types are represented with
-the predeclared identifier <code>nil</code>.
-A non-nil channel value must be created by using the built-in <code>make</code>
-function. For example, <code>make(chan int, 10)</code> will create a channel
-whose element type is <code>int</code>.
-The second argument of the <code>make</code> function call specifies
-the capacity of the new created channel.
-The second parameter is optional and its default value is zero.
+数据通道类型的零值也使用预声明的<code>nil</code>来表示。
+一个非零数据通道值必须通过内置函数<code>make</code>来创建。
+比如<code>make(chan int, 10)</code>将创建一个元素类型为<code>int</code>的数据通道值。
+第二个参数表示指定了欲创建的数据通道的容量。此第二个实参是可选的，它的默认值为<code>0</code>。
 </p>
 
 </div>
 
 <p class="anchor" id="assign-and-compare"></p>
-<h3>Channel Assignments And Comparisons</h3>
+<h3>数据通道值的赋值和比较</h3>
 
 <p>
-All channel types are comparable types.
+所有数据通道类型均为可比较类型。
 </p>
 
 <p>
-From the article <a href="value-part.html">value parts</a>,
-we know that non-nil channel values are multi-part values.
-After one channel value is assigned to another,
-the two channels share the same undrelying part(s).
-In other words, the two channels represent the same internal channel object.
-The result of comparing them is <code>true</code>.
+从<a href="value-part.html">值部</a>一文，我们了解到一个数据通道值可能含有底层部分。
+当一个数据通道值被赋给另一个数据通道值后，这两个数据通道值将共享相同的底层部分。
+换句话说，这两个数据通道引用着同一个底层的内部数据通道对象。
+比较这两个数据通道的结果为<code>true</code>。
 </p>
 
 <p class="anchor" id="operations"></p>
-<h3>Channel Operations</h3>
+<h3>数据通道操作</h3>
 
 <div>
 <p>
-There are five operations we can perform on a channel.
-Assume the channel is <code>ch</code>,
-their syntaxes and function calls of these operations are listed here.
+Go中有五种数据通道相关的操作。假设一个数据通道（值）为<code>ch</code>，下面列出了这五种操作的语法或者函数调用。
 </p>
 <ol>
 <li>
-	Close the channel by using the following function call
+	调用内置函数<code>close</code>来关闭一个数据通道：
 <pre><code class="language-go">close(ch)
 </code></pre>
 	<p>
-	where <code>close</code> is a built-in function.
-	The argument of a <code>close</code> function call must be a channel value,
-	and the channel value must not be a receive-only channel.
+	传给<code>close</code>函数调用的实参必须为一个数据通道值，并且此数据通道值的类型不能为单向接收的。
 	</p>
 </li>
 <li>
-	Send a value, <code>v</code>, to the channel
-	by using the following syntax
+	使用下面的语法向数据通道<code>ch</code>发送一个值<code>v</code>：
 <pre><code class="language-go">ch &lt;- v
 </code></pre>
 	<p>
-	where <code>v</code> must be a value which is assignable to
-	the element type of channel <code>ch</code>.
+	<code>v</code>必须能够赋值给数据通道<code>ch</code>的元素类型。
+	<code>ch</code>不能为单向接收数据通道类型。
+	<code>&lt;-</code>称为数据发送操作符。
 	</p>
 </li>
 <li>
-	Receive a value from the channel by using the following syntax
+	使用下面的语法从数据通道<code>ch</code>接收一个值：
 <pre><code class="language-go">&lt;-ch
 </code></pre>
-	A channel receive operation always returns at least one result,
-	which is a value of the element type of the channel.
-	For most scenarios, a channel receive operation is viewed as
-	a single-valued expression.
-	However, when a channel operation is used as the only source value
-	expression in an assignment, it can be viewed as a multi-valued
-	expression and result a second optional untyped boolean value,
-	which indicates whether or not the first result is sent
-	before the channel is closed.
-	(Below we will learn that we can receive unlimited number of values
-	from a closed channel.)
-	For example,
+	一个数据通道操作总会返回至少一个值，此值的类型为数据通道<code>ch</code>的元素类型。
+	<code>ch</code>不能为单向发送数据通道类型。
+	<code>&lt;-</code>称为数据接收操作符。是的它和数据发送操作符的表示形式是一样的。
+
+	<p>
+	</p>
+
+	在大多数场合下，一个数据接收操作可以被认为是一个单值表达式。
+	但是，当一个数据接收操作被用做一个赋值语句中的唯一的源值的时候，它可以返回第二个可选的类型不确定的布尔值返回值从而成为一个多值表达式。
+	此类型不确定的布尔值表示第一个接收到的值是否在数据通道被关闭前发送的。
+	（从后面的章节，我们将得知我们可以从一个以关闭的数据通道中接收到无穷个值。）
+
+	<p>
+	</p>
+	
+	数据接收操作在赋值中被用做源值的例子：
 <pre><code class="language-go">v = &lt;-ch
 v, sentBeforeClosed = &lt;-ch
 </code></pre>
 </li>
 <li>
-	Query the value buffer capacity of the channel
-	by using the following function call
+	查询一个数据通道的容量：
 <pre><code class="language-go">cap(ch)
 </code></pre>
 	<p>
-	where <code>cap</code> is a built-in function which has ever been
-	introduced in <a href="container.html#cap-len">containers in Go</a>.
-	The return result of a <code>cap</code> function call
-	is an <code>int</code> value.
+	其中<code>cap</code>是一个已经在<a href="container.html#cap-len">容器类型</a>一文中介绍过的内置函数。
+	<code>cap</code>的返回值的类型为<code>int</code>。
 	</p>
 </li>
 <li>
-	Query the current number of values in the value buffer
-	(or the length)
-	of the channel by using the following function call
+	查询一个数据通道的长度：
 <pre><code class="language-go">len(ch)
 </code></pre>
 	<p>
-	where <code>len</code> is a built-in function
-	which also has ever been introduced before.
-	The return value of a <code>len</code> function call
-	is an <code>int</code> value.
-	The result length is number of elements which have already
-	been sent successfully to the queried channel
-	but haven't been received (taken out) yet.
+	其中<code>len</code>是一个已经在<a href="container.html#cap-len">容器类型</a>一文中介绍过的内置函数。
+	<code>len</code>的返回值的类型也为<code>int</code>。
+	一个数据通道的长度是指当前有多少个已被发送到此数据通道但还未被接收的元素值。
 	</p>
 </li>
 </li>
 </ol>
 
 <p>
-All these operations are already synchronized,
-so no further synchronizations are needed to perform these operations.
-However, like most other operations in Go,
-channel value assignments are not synchronized.
-Similarly, assigning the received value to another value is also
-not synchronized, though any channel receive operation is synchronized.
+上面这些所有列出的操作都已经同步过了，因此它们可以在并发协程中安全运行而无需其它同步操作。
+但是，请注意，数据通道的赋值和其它类型值的赋值一样，是未同步的。
+同样，将刚从一个数据通道接收出来的值赋给另一个值也是未同步的。
 </p>
 
 <p>
-If the queried channel is a nil channel, both of the
-built-in <code>cap</code> and <code>len</code> functions return zero.
-The two query operations are so simple that
-they will not get further explanations later.
-In fact, the two operations are seldom used in practice.
+如果被查询的数据通道为一个nil零值数据通道，则<code>cap</code>和<code>len</code>函数调用都返回<code>0</code>。
+这两个操作是如此简单，所以后面将不再对它们进行详解。
+事实上，这两个操作在实践中很少使用。
 </p>
 
 <p>
-The rules for channel send, receive and close operations will be
-introduced and explained in the following sections.
+数据通道的发送、接收和关闭操作将在下一节得到详细解释。
 </p>
 
 </div>
 
-<p class="anchor" id="simple-rule-summary"></p>
-<h3>A Simple Summary Of Channel Operation Rules</h3>
+<p class="anchor" id="channel-operation-explanations"></p>
+<h3>数据通道操作详解</h3>
 
 <div>
-To make the explanations for channel operation rules simple and clear,
-in the remaining of this article,
-channels will be classified into three categories:
+为了让解释简单清楚，在本文后续部分，数据通道将被归为三类：
 <ol>
 <li>
-	nil channels.
+	零值（nil）数据通道；
 </li>
 <li>
-	non-nil but closed channels.
+	非零值但已关闭的数据通道；
 </li>
 <li>
-	not-closed non-nil channels.
+	非零值并且尚未关闭的数据通道。
 </li>
 </ol>
 
 <p>
-The following a table simply describes the rules for all kinds of operations
-applying on nil, closed and not-closed non-nil channels.
-More detailed explanations will made in
-<a href="#full-rule-explanations">a later section</a>.
+下表简单地描述了三种数据通道操作施加到三类数据通道的结果。
 </p>
 
 <table class="table table-bordered text-center" style="width: auto !important;">
 <thead>
 	<tr class="active">
-	<th class="text-center">Operation</th>
-	<th class="text-center">A Nil Channel</th>
-	<th class="text-center">A Closed Channel</th>
-	<th class="text-center">A Not-Closed Non-Nil Channel</th>
+	<th class="text-center">操作</th>
+	<th class="text-center">一个零值数据通道</th>
+	<th class="text-center">一个非零值但已关闭的数据通道</th>
+	<th class="text-center">一个非零值且尚未关闭的数据通道</th>
 	</tr>
 </thead>
 <tbody>
 	<tr>
-	<th scope="row" class="text-center">Close</th>
+	<th scope="row" class="text-center">关闭</th>
 	<td>panic</td>
 	<td>panic</td>
-	<td>succeed to close <sup>(C)</sup></td>
+	<td>成功关闭succeed to close <sup>(C)</sup></td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center">Send Value To</th>
-	<td>block for ever</td>
+	<th scope="row" class="text-center">发送数据</th>
+	<td>永久阻塞</td>
 	<td>panic</td>
-	<td>block or succeed to send <sup>(B)</sup></td>
+	<td>阻塞或者成功发送<sup>(B)</sup></td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center">Receive Value From</th>
-	<td>block for ever</td>
-	<td>never block <sup>(D)</sup></td>
-	<td>block or succeed to receive <sup>(A)</sup></td>
+	<th scope="row" class="text-center">接收数据</th>
+	<td>永久阻塞</td>
+	<td>永不阻塞<sup>(D)</sup></td>
+	<td>阻塞或者成功接收<sup>(A)</sup></td>
 	</tr>
 </tbody>
 </table>
 
-For the five unlabelled cases, the rules are very clear.
+对于上表中的五种未打上标的情形，规则很简单：
 <ul>
 <li>
-	Closing a nil or a already closed channel
-	produces a panic in the current goroutine.
+	关闭一个nil数据通道或者一个已经关闭的数据通道将产生一个恐慌。
 </li>
 <li>
-	Sending a value to a closed channel also
-	produces a panic in the current goroutine.
+	向一个已关闭的数据通道发送数据也将导致一个恐慌。
 </li>
 <li>
-	Sending a value to or receiving a value from a nil channel makes
-	the current goroutine enter and stay in blocking state for ever.
+	向一个nil数据通道发送数据或者从一个nil数据通道接收数据将使当前协程永久阻塞。
 </li>
 </ul>
 
 <p>
-The following will make more explanations for the four labelled cases.
+下面将详细解释其它四种被打了上标（A/B/C/D）的情形。
 </p>
 
-To better understand channel types and values and to make the some explanations
-easier, knowing the rough internal structures of internal channel objects
-is very helpful. We can think each channel maintains three queues internally:
+<p>
+为了更好地理解数据通道和为了后续讲解方便，先了解一下数据通道类型的大致内部实现是很有帮助的。
+</p>
 
+我们可以认为一个数据通道内部维护了三个队列（均可被视为先进先出队列）：
 <ol>
 <li>
-	the receiving goroutine queue.
-	The queue is a linked list without size limitation.
-	Goroutines in this queue are called blocked receiving goroutines on this channel.
+	接收数据协程队列。此队列是一个没有长度限制的链表。
+	此队列中的协程均处于阻塞状态，它们正等待着从此数据通道接收数据。
+	<!-- not true
 	The addresses of the values which are prepared to store the received
 	values are also stored in the queue along with each goroutine.
+	-->
 </li>
 <li>
-	the sending goroutine queue.
-	The queue is also a linked list without size limitation.
-	Goroutines in this queue are called blocked sending goroutines on this channel.
-	The addresses of values these goroutines are trying to send are also
-	stored in the queue along with each goroutine.
+	发送数据协程队列。此队列也是一个没有长度限制的链表。
+	此队列中的协程亦均处于阻塞状态，它们正等待着向此数据通道发送数据。
+	此队列中的每个协程将要发送的值（或者此值的指针，取决于具体编译器实现）和此协程一起存储在此队列中。
 </li>
 <li>
-	the value buffer queue. This is a circular queue.
-	Its size is equal to the capacity of the channel.
-	If the current number of values stored in the value buffer queue of the channel
-	reaches the capacity of the channel, the channel is called in full status.
-	If no values are stored in the value buffer queue of the channel currently,
-	the channel is called in empty status.
-	For a zero-capacity channel, it is always in both full and empty status.
+	数据缓冲队列。这是一个循环队列，它的长度为此数据通道的容量。此队列中存放的值的类型都为此数据通道的元素类型。
+	如果此队列中当前存放的值的个数已经达到此数据通道的容量，则我们说此数据通道已经处于满槽状态。
+	如果此队列中当前存放的值的个数为零，则我们说此数据通道处于空槽状态。
+	对于一个非缓冲数据通道（容量为零），它总是同时处于满槽状态和空槽状态。
 </li>
 </ol>
 
+<p>
+每个数据通道内部含有一个互斥锁用来在各种数据通道操作中防止数据竞争。
+</p>
 
-[<u>Channel rule case A</u>]:
-when a goroutine tries to receive a value from a not-closed non-nil channel,
-the goroutine first tries to acquire the lock accociated with the channel,
-then do the following steps until one condition is satisfied.
+
+<u><b>数据通道操作情形A</b>：
+当一个协程<code>Gr</code>尝试从一个非零且尚未关闭的数据通道接收数据的时候</u>，此协程<code>Gr</code>将首先尝试获取此数据通道的锁，成功之后将执行下列步骤，直到其中一个步骤的条件得到满足。
 <ol>
 <li>
-	If the value buffer queue of the channel is not empty, in which
-	case the receiving goroutine queue of the channel must be empty,
-	the goroutine will receive (by unshifting) a value
-	from the value buffer queue.
-	If the sending goroutine queue of the channel is also not empty,
-	a sending goroutine will be unshifted out of the sending goroutine queue
-	and resumed to running state again.
-	The value the just unshifted sending goroutine trying to send
-	will be pushed into the value buffer queue of the channel.
-	The receiving goroutine continues running.
-	For this scenario, the channel send operation
-	is called a <b>non-blocking operation</b>.
+	如果此数据通道的缓冲队列不为空（这种情况下，接收数据协程队列必为空），此协程<code>Gr</code>将从缓冲队列取出接收一个值。
+	如果发送数据协程队列不为空，一个发送协程将从此队列中弹出，此协程欲发送的值将被推入缓冲队列。	此发送协程将恢复至运行状态。
+	接收数据协程<code>Gr</code>继续运行，不会阻塞。对于这种情况，此数据接收操作为一个<b>非阻塞操作</b>。
 </li>
 <li>
-	Otherwise, if the value buffer queue of the channel is empty but
-	the sending goroutine queue of the channel is not empty,
-	in which case the channel must be an unbuffered channel,
-	the receiving goroutine will unshift a sending goroutine from the
-	sending goroutine queue of the channel and receive the value
-	the just unshifted sending goroutine trying to send.
-	The just unshifted sending goroutine will get unblocked
-	and resumed to running state again.
-	The receiving goroutine continues running.
-	For this scenario, the channel send operation
-	is called a <b>non-blocking operation</b>.
+	否则（即此数据通道的缓冲队列为空），如果发送数据协程队列不为空（这种情况下，此数据通道必为一个非缓冲数据通道），
+	一个发送数据协程将从此队列中弹出，此协程欲发送的值将被接收数据协程<code>Gr</code>接收。此发送协程将恢复至运行状态。
+	接收数据协程<code>Gr</code>继续运行，不会阻塞。对于这种情况，此数据接收操作为一个<b>非阻塞操作</b>。
 </li>
 <li>
-	If value buffer queue and the sending goroutine queue
-	of the channel are both empty,
-	the goroutine will be pushed into the receiving goroutine queue
-	of the channel and enter (and stay in) blocking state.
-	It may be resumed to running state when another goroutine
-	sends a value to the channel later.
-	For this scenario, the channel send operation
-	is called a <b>blocking operation</b>.
+	对于剩下的情况（即此数据通道的缓冲队列和发送数据协程队列均为空），此接收数据协程<code>Gr</code>将被推入接收数据协程队列，并进入阻塞状态。
+	它以后可能会被另一个发送数据协程唤醒。
+	对于这种情况，此数据接收操作为一个<b>阻塞操作</b>。
 </li>
 </ol>
 
-[<u>Channel rule case B</u>]:
-when a goroutine tries to send a value to a not-closed non-nil channel,
-the goroutine first tries to acquire the lock accociated with the channel,
-then do the following steps until one step condition is satisfied.
+<u><b>数据通道操作情形B</b>：
+当一个协程<code>Gs</code>尝试向一个非零且尚未关闭的数据通道发送数据的时候</u>，此协程<code>Gs</code>将首先尝试获取此数据通道的锁，成功之后将执行下列步骤，直到其中一个步骤的条件得到满足。
 <ol>
 <li>
-	If the receiving goroutine queue of the channel is not empty,
-	in which case the value buffer queue of the channel must be empty,
-	the sending goroutine will unshift a receiving goroutine
-	from the receiving goroutine queue of the channel
-	and send the value to the just unshifted receiving goroutine.
-	The just unshifted receiving goroutine will get unblocked
-	and resumed to running state again.
-	The sending goroutine continues running.
-	For this scenario, the channel send operation
-	is called a <b>non-blocking operation</b>.
+	如果此数据通道的接收数据协程队列不为空（这种情况下，缓冲队列必为空），
+	一个接收数据协程将从此队列中弹出，此协程将接收到发送协程<code>Gs</code>发送的值。此接收协程将恢复至运行状态。
+	发送数据协程<code>Gs</code>继续运行，不会阻塞。对于这种情况，此数据发送操作为一个<b>非阻塞操作</b>。
 </li>
 <li>
-	If the receiving goroutine queue is empty
-	and the value buffer queue of the channel is not full,
-	in which case the sending goroutine queues must be also empty,
-	the value the sending goroutine trying to send will be pushed into
-	the value buffer queue, and the sending goroutine continues running.
-	For this scenario, the channel send operation
-	is called a <b>non-blocking operation</b>.
+	否则（接收数据协程队列为空），如果缓冲队列未满（这种情况下，发送数据协程队列必为空），
+	发送协程欲<code>Gs</code>发送的值将被推入缓冲队列，发送数据协程<code>Gs</code>继续运行，不会阻塞。
+	对于这种情况，此数据发送操作为一个<b>非阻塞操作</b>。
 </li>
 <li>
-	If the receiving goroutine queue is empty
-	and the value buffer queue of the channel is full,
-	the sending goroutine will be pushed into the sending goroutine queue
-	of the channel and enter (and stay in) blocking state.
-	It may be resumed to running state when another goroutine
-	receives a value from the channel later.
-	For this scenario, the channel send operation
-	is called a <b>blocking operation</b>.
+	对于剩下的情况（接收数据协程队列为空，并且缓冲队列已满），此发送协程<code>Gs</code>将被推入发送数据协程队列，并进入阻塞状态。
+	它以后可能会被另一个接收数据协程唤醒。
+	对于这种情况，此数据发送操作为一个<b>阻塞操作</b>。
 </li>
 </ol>
 
 <p>
-Once a non-nil channel is closed, sending a value to the channel will
-produce a runtime panic in the current goroutine,
-and the send operation is viewed as a <b>non-blocking operation</b>.
+上面已经踢过，一旦一个非零数据通道被关闭，继续向此数据通道发送数据将产生一个恐慌。
+注意，向关闭的数据通道发送数据属于一个<b>非阻塞操作</b>。
 </p>
 
-[<u>Channel rule case C</u>]:
-when a goroutine tries to close a not-closed non-nil channel,
-both of the following two steps will be performed by the following order.
+<u><b>数据通道操作情形C</b>：
+当一个协程成功获取到一个非零且尚未关闭的数据通道的锁并且准备关闭此数据通道时</u>，下面两布将依次执行：
 <ol>
 <li>
-	If the receiving goroutine queue of the channel is not empty,
-	in which case the value buffer of the channel must be empty,
-	all the goroutines in the receiving goroutine queue of
-	the channel will be unshifted one by one and each of them will
-	receive a zero value of the element type of the channel.
+	如果此数据通道的接收数据协程队列不为空（这种情况下，缓冲队列必为空），此队列中的所有协程将被依个弹出，并且每个协程将接收到此数据通道的元素类型的一个零值，然后恢复至运行状态。
 </li>
 <li>
-	If the sending goroutine queue of the channel is not empty,
-	all the goroutines in the sending goroutine queue of the channel
-	will be unshifted one by one and
-	each of them will produce a panic for sending on a closed channel.
-	The values which have been already pushed into the value buffer
-	of the channel are still there.
+	如果此数据通道的发送数据协程队列不为空，此队列中的所有协程将被依个弹出，并且每个协程中将产生一个恐慌（因为向已关闭的数据通道发送数据），
+	如果缓冲队列不为空，它不会被清空，其中的数据仍然可以被后续的数据接收操作所接收到。
 </li>
 </ol>
 
 <p>
-[<u>Channel rule case D</u>]:
-after a channel is closed,
-channel receive operations on the channel will never block.
-The values in the value buffer of the channel can still be received.
-Once all the values in the value buffer are taken out and received,
-infinite zero values of the element type of the channel will received
-by any of following receive operations on the channel.
-As above has mentioned,
-the second return result of a channel receive operation is an untype boolean
-value which indicates whether or not the first result (the received value)
-is sent before the channel is closed.
+<u><b>数据通道操作情形D</b>：
+一个非零数据通道被关闭之后，此数据通道上的后续数据接收操作将永不会阻塞</u>。
+此数据通道的缓冲队列中存储数据仍然可以被接收出来。
+一旦此缓冲队列变为空，后续的数据接收操作将永不阻塞并且总会接收到一个此数据通道的元素类型的零值。
+上面已经提到了，一个接收操作的第二个可选返回（类型不确定布尔）值表示一个接收到的值是否是在此数据通道被关闭之前发送的。
+如果此返回值为<code>false</code>，则第一个返回值必然是一个此数据通道的元素类型的零值。
 </p>
 
 <p>
-Knowing what are blocking and non-blocking channel send or receive operations
-is important to understand the mechanism of <code>select</code> control flow
-blocks which will be introduced in a later section.
+知道哪些数据通道操作是阻塞的和哪些是非阻塞的对正确理解后面将要介绍的<code>select</code>流程控制机制非常重要。
 </p>
 
 <p>
-In the above explanations, if a goroutine is unshifted out of a queue
-(either the sending goroutine queue or the receiving goroutine queue) of a channel,
-and the goroutine was blocked for being pushed into the queue at a
-<a href="#select"><code>select</code> control flow code block</a>,
-then the goroutine will be resumed to running state at the step <i>9</i> of the
-<a href="#select-implementation"><code>select</code> control flow code block execution</a>.
-It may be dequeued from the corresponding goroutine queues of
-several goroutines involved in the <code>select</code> control flow code block.
+在上面的解释中，如果一个协程被从一个数据通道的某个队列中（不论发送数据协程队列还是接收数据协程队列）弹出，并且此协程是曾在一个<a href="#select"><code>select</code>控制流程</a>中推入到此队列，
+那么此协程将在下面将要讲解的<a href="#select-implementation"><code>select</code>控制流程的执行步骤</a>中的第<i>9</i>步中恢复至运行状态，
+并且同时它可能被从相应的<code>select</code>控制流程中的相关的若干数据通道的协程队列中移除掉。
 </p>
 
-By the rules listed above, we can get some facts about the internal queues of a channel.
+根据上面的解释，我们可以得出如下的关于一个数据通道的内部的三个队列的各种事实：
 <ul>
 <li>
-	If the channel is closed,
-	both of its sending goroutine queue and receiving goroutine queue must be empty,
-	but its value buffer queue may not be empty.
+	如果一个数据通道已经关闭了，则它的发送数据协程队列和接收数据协程队列肯定都为空，但是它的缓冲队列可能不为空。
 </li>
 <li>
-	At any time, if the value buffer is not empty,
-	then its receiving goroutine queue must be empty.
+	在任何时刻，如果缓冲队列不为空，则接收数据协程队列必为空。
 </li>
 <li>
-	At any time, if the value buffer is not full,
-	then its sending goroutine queue must be empty.
+	在任何时刻，如果缓冲队列不为空，则接收数据协程队列必未满，则发送数据协程队列必为空。
 </li>
 <li>
-	If the channel is buffered, then at any time,
-	one of its sending goroutine queue and receiving goroutine queue must be empty.
+	如果一个数据通道是缓冲的，则在任何时刻，它的发送数据协程队列和接收数据协程队列之一必为空。
 </li>
 <li>
-	If the channel is unbufferd, then at any time, generally
-	one of its sending goroutine queue and the receiving goroutine queue must be empty,
-	but with an exception that a goroutine may be pushed into both of
-	the two queues when executing a
-	<a href="#select"><code>select</code> control flow code block</a>.
+	如果一个数据通道是非缓冲的，则在任何时刻，一般说来，它的发送数据协程队列和接收数据协程队列之一必为空，
+	但是有一个例外：一个协程可能在一个<a href="#select"><code>select</code>流程控制</a>中同时被推入到此数据通道的发送数据协程队列和接收数据协程队列中。
 </li>
 </ul>
 </div>
 
-<h3>Some Channel Use Examples</h3>
+<h3>一些数据通道的使用例子</h3>
 
 <div>
 <p>
-Let's view some channel use examples to consume the above introduced rules.
+来看一些数据通道的使用例子来加深一下对上一节中的解释的理解。
 </p>
 
-A simple request/response example.
-The two goroutines in this exampe talk with each other
-through an unbuffered channel.
+一个简单的通过一个非缓冲的数据通道实现的请求/相应的例子：
 <pre class="line-numbers"><code class="language-go">package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 func main() {
-	c := make(chan int) // an unbuffered channel
-	go func() {
-		x := <- c // blocking here until a value is received.
-		c <- x*x  // blocking here until the result is received.
-	}()
-	c <- 3   // blocking here until the value is received.
-	y := <-c // blocking here until the result is received.
-	fmt.Println(y) // 9
+	c := make(chan int) // 一个非缓冲数据通道
+	go func(ch chan<- int, x int) {
+		time.Sleep(time.Second)
+		// <-ch    // 此操作编译不通过
+		ch <- x*x  // 阻塞在此，直到发送的值被接收
+	}(c, 3)
+	done := make(chan struct{})
+	go func(ch <-chan int) {
+		n := <-ch      // 阻塞在此，直到有值发送到c
+		fmt.Println(n) // 9
+		// ch <- 123   // 此操作编译不通过
+		time.Sleep(time.Second)
+		done <- struct{}{}
+	}(c)
+	<-done // 阻塞在此，直到有值发送到done
+	fmt.Println("bye")
+}
+
+
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	c := make(chan int) // 一个非缓冲数据通道
+	go func(x int) {
+		time.Sleep(time.Second)
+		c <- x*x  // 阻塞在此，直到发送的值被接收
+	}(3)
+	n := <-c       // 阻塞在此，直到有值发送到c
+	fmt.Println(n) // 9
 }
 </code></pre>
 
 <p>
 </p>
 
-A demo of using a buffered channel.
-This program is not a concurrent one.
-Once the channel is closed, infinite values can be received from it.
+下面的例子使用了一个缓冲数据通道。此例子程序并非是一个并发程序，它只是为了展示缓冲数据通道的使用。
 
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
 func main() {
-	c := make(chan int, 2) // a buffered channel
+	c := make(chan int, 2) // 一个容量为2的缓冲数据通道
 	c <- 3
 	c <- 5
 	close(c)
@@ -687,15 +553,15 @@ func main() {
 	x, ok = <-c
 	fmt.Println(x, ok) // 0 false
 	fmt.Println(len(c), cap(c)) // 0 2
-	close(c) // panic!
-	c <- 7   // also panic if the last line is removed.
+	close(c) // 此行将产生一个恐慌
+	c <- 7   // 如果上一行不存在，此行也将产生一个恐慌。
 }
 </code></pre>
 
 <p>
 </p>
 
-A never-ending football game.
+一场永不休场的足球比赛：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -708,18 +574,18 @@ func main() {
 	var ball = make(chan string)
 	kickBall := func(playerName string) {
 		for {
-			fmt.Println(<-ball, "kicked the ball.")
+			fmt.Print(<-ball, "传球", "\n")
 			time.Sleep(time.Second)
 			ball <- playerName
 		}
 	}
-	go kickBall("John")
-	go kickBall("Alice")
-	go kickBall("Bob")
-	go kickBall("Emily")
-	ball <- "referee" // kick off
-	var c chan bool   // nil
-	<-c               // blocking here for ever
+	go kickBall("张三")
+	go kickBall("李四")
+	go kickBall("王二麻子")
+	go kickBall("刘大")
+	ball <- "裁判"   // 开球
+	var c chan bool // 一个零值nil数据通道
+	<-c             // 永久阻塞在此
 }
 </code></pre>
 
@@ -727,61 +593,44 @@ func main() {
 </p>
 
 <p>
-Please read <a href="channel-use-cases.html">channel use cases</a>
-for more channel use examples.
+请阅读<a href="channel-use-cases.html">数据通道用例大全</a>来查看更多据通道的使用例子。
 </p>
 
 </div>
 
-<h3>Channel Element Values Are Transferred By Copy</h3>
+<h3>数据通道的元素值的传输都是复制</h3>
 
 <p>
-When a value is sent to or receive from a channel,
-a value copy occurs.
-Like value assignments and function argument passing,
-when a value is copied, <a href="value-part.html#about-value-copy">only
-its direct part is copied</a>.
+在一个值被从一个协程传递到另一个协程的过程中，此值将被复制至少一次。
+如果此传输值曾经在某个数据通道的缓冲队列中停留过，则它在此传递过程中将被复制两次。
+一次复制发生在从发送协程向缓冲队列推入此值的时候，另一个复制发生在接收协程从缓冲队列取出此值的时候。
+和赋值以及函数调用传参一样，当一个值被传递时，<a href="value-part.html#about-value-copy">只有它的直接部分被复制</a>。
 </p>
 
 <p>
-For the standard Go compiler,
-the size of channel element types must be smaller than <code>65536</code>.
-However, generally, we shouldn't create channels with large-size element types,
-for all channel send and receive operations will copy the transferred values.
-When an element value is passed from one goroutine to another,
-two value copies will be made.
-So if the passed value size is too large,
-it is best to use a pointer element type instead,
-to avoid a large value copy cost.
+对于官方标准编译器，最大支持的数据通道的元素类型的尺寸为<code>65535</code>。
+但是，一般说来，为了在数据传递过程中过大的复制成本，我们不应该使用尺寸很大的数据通道元素类型。
+如果欲传送的值的尺寸较大，最该改用指针类型做为数据通道的元素类型。
 </p>
 
-<h3>About Channel And Goroutine Garbage Collections</h3>
+<h3>关于数据通道和协程的垃圾回收</h3>
 
 <p>
-Note, a channel is referenced by all the goroutines in either
-the sending or the receiving goroutine queue of the channel,
-so if neither of the two queues of the channel is empty,
-the channel will not be garbage collected for sure.
-On the other hand, if a goroutine is blocked and stays in either
-the sending or the receiving goroutine queue of a channel,
-then the goroutine will also not be garbage collected for sure,
-even if the channel is referenced only by this goroutine.
-In fact, a goroutine can be only garbage collected when it has already exited.
+注意，一个数据通道被其发送数据协程队列和接收数据协程队列中的所有协程引用着。因此，如果一个数据通道的这两个队列只要有一个不为空，则此数据通道肯定不会被垃圾回收。
+另一方面，如果一个协程处于一个数据通道的某个协程队列之中，则此协程肯定不会被垃圾回收，即使此数据通道仅被此协程所引用。
+事实上，一个协程只有退出后才能被垃圾回收。
 </p>
 
-<h3>Channel Send And Receive Operations Are Simple Statements</h3>
+<h3>数据接收和发送操作都属于简单语句</h3>
 
 <div>
 <p>
-Note, channel send operations and receive operations are
-<a href="expressions-and-statements.html#simple-statements">simple statements</a>.
-A channel receive operation can also be used as a single-valued expression.
-Simple statements and expressions can be used at certain portions of
-<a href="control-flows.html">basic control flow blocks</a>.
+数据接收和发送操作都属于<a href="expressions-and-statements.html#simple-statements">简单语句</a>，
+另外一个数据接收操作总是可以被用做一个单值表达式。
+简单表达式和表达式可以被用在<a href="control-flows.html">一些控制流程</a>的某些部分。
 </p>
 
-An example in which channel send and receive operations
-appear as simple statements in two <code>for</code> control flow blocks.
+在下面这个例子中，数据接收和发送操作被用在两个<code>for</code>循环的初始化和步尾语句。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -795,7 +644,7 @@ func main() {
 		c := make(chan uint64)
 		go func() {
 			var x, y uint64 = 0, 1
-			for ; y < (1 << 63); c <- y { // here
+			for ; y < (1 << 63); c <- y { // 步尾语句
 				x, y = y, x+y
 			}
 			close(c)
@@ -803,7 +652,7 @@ func main() {
 		return c
 	}
 	c := fibonacci()
-	for x, ok := <-c; ok; x, ok = <-c { // here
+	for x, ok := <-c; ok; x, ok = <-c { // 初始化和步尾语句
 		time.Sleep(time.Second)
 		fmt.Println(x)
 	}
@@ -816,22 +665,19 @@ func main() {
 </div>
 
 <p class="anchor" id="range"></p>
-<h3>For-Range On Channels</h3>
+<h3><code>for-range</code>应用于数据通道</h3>
 
 <div>
-The <code>for-range</code> control flow code block applies to channels.
-The loop will try to iteratively receive the values sent to a channel,
-until the channel is closed and no more values are still in its value buffer queue.
-Unlike the <code>for range</code> syntax on arrays, slices and maps,
-most one iteration variable is allowed to be present
-in the <code>for range</code> syntax on channels.
+<code>for-range</code>循环控制流程也适用于数据通道。
+此循环将不断地尝试从一个数据通道接收数据，直到此数据通道关闭并且它的缓冲队列中为空为止。
+和应用于数组/切片/映射表的<code>for-range</code>语法不同，应用于数据通道的<code>for-range</code>语法中最多只能出现一个循环变量，此循环变量用来存储接收到的值。
 
 <pre class="line-numbers"><code class="language-go">for v = range aChannel {
-	// use v
+	// 使用v
 }
 </code></pre>
 
-is equivalent to
+等价于
 
 <pre class="line-numbers"><code class="language-go">for {
 	v, ok = <-aChannel
@@ -843,12 +689,11 @@ is equivalent to
 </code></pre>
 
 <p>
-Surely, here the <code>aChannel</code> value must not be a send-only channel.
-If it is a nil channel, the loop will block there for ever.
+当然，这里的数据通道<code>aChannel</code>一定不能为一个单向发送数据通道。
+如果它是一个nil零值，则此<code>for-range</code>循环将是当前协程永久阻塞。
 </p>
 
-For example, the second <code>for</code> loop block in the example
-shown in the last section can be simplified to
+上一节中的例子中的最后一个<code>for</code>循环可以改写为下面这样：
 
 <pre class="line-numbers"><code class="language-go">	for x := range c {
 		time.Sleep(time.Second)
@@ -861,52 +706,39 @@ shown in the last section can be simplified to
 </div>
 
 <p class="anchor" id="select"></p>
-<h3><code>select-case</code> Control Flow Code Blocks</h3>
+<h3><code>select-case</code>分支流程控制代码块</h3>
 
 <div>
-There is a <code>select-case</code> code block syntax which is specially designed for channels in Go.
-The syntax is much like the <code>switch</code> block syntax, for example,
-there can be multiple <code>case</code> branches and at most one
-<code>default</code> branch in the <code>select-case</code> code block.
-But there are also some obvious differences between them.
+Go中有一个专门为数据通道设计的<code>select-case</code>分支流程控制语法。
+此语法和<code>switch-case</code>分支流程控制语法很相似。
+比如，<code>select-case</code>流程控制代码块中也可以有若干<code>case</code>分支和最多一个<code>default</code>分支。
+但是，这两种流程控制也有很多不同点。在一个<code>select-case</code>流程控制中，
 <ul>
 <li>
-	No statements and expressions are allowed to follow the <code>select</code> keyword
-	(before <code>{</code>).
+	<code>select</code>关键字和<code>{</code>之间不允许存在任何表达式和语句。
 </li>
 <li>
-	No <code>fallthrough</code> statements are allowed to be used in <code>case</code> branches.
+	<code>fallthrough</code>语句不能被使用.
 </li>
 <li>
-	Each statement following a <code>case</code> keyword in a <code>select-case</code> code block
-	must be either a channel receive operation or a channel send operation statement.
+	每个<code>case</code>关键字后必须跟随一个数据通道接收数据操作或者一个数据通道发送数据操作。
+	数据通道接收数据操作可以做为一个简单赋值语句的源值。
+	以后，一个<code>case</code>关键字后跟随的数据通道操作将被称为一个<code>case</code>操作。
 </li>
 <li>
-	In case of there are some non-blocking channel operations followed
-	<code>case</code> keywords in a <code>select-case</code> code block,
-	Go runtime will <b>randomly select one of non-blocking channel operations to execute</b>,
-	then continue to execute the corresponding <code>case</code> branch.
+	所有的非阻塞<code>case</code>操作中将有一个被随机选择执行（而不是按照从上到下的顺序），然后执行此操作对应的<code>case</code>分支代码块。
 </li>
 <li>
-	In case of all the channel operations followed the <code>case</code> keywords
-	in a <code>select-case</code> code block are blocking operations,
-	the <code>default</code> branch will be selected to execute
-	if the <code>default</code> branch is present.
-	If the <code>default</code> branch is absent,
-	the current goroutine will be pushed into the corresponding
-	sending goroutine queue and receiving goroutine queue of
-	every channels involved in the channel operations
-	followed <code>case</code> keywords,
-	then enter blocking state.
+	在所有的<code>case</code>操作均为阻塞的情况下，如果<code>default</code>分支存在，则<code>default</code>分支代码块将得到执行，
+	否则，当前协程将被推入所有阻塞操作中相关的数据通道的发送数据协程队列或者接收数据协程队列中，并进入阻塞状态。
 </li>
 </ul>
 
 <p>
-By the rules, a <code>select-case</code> code block without any branches,
-<code>select{}</code>, will make the current goroutine stay in blocking state forever.
+按照上述规则，一个不含任何分支的<code>select-case</code>代码块<code>select{}</code>将使当前协程永久处于阻塞状态。
 </p>
 
-The following program will enter the <code>default</code> branch for sure.
+在下面这个例子中，<code>default</code>分支将铁定得到执行，因为另两个<code>case</code>分支后的操作均为阻塞的。
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -914,8 +746,8 @@ import "fmt"
 func main() {
 	var c chan struct{} // nil
 	select {
-	case <-c:             // blocking operation
-	case c <- struct{}{}: // blocking operation
+	case <-c:             // 阻塞操作
+	case c <- struct{}{}: // 阻塞操作
 	default:
 		fmt.Println("Go here.")
 	}
@@ -925,7 +757,8 @@ func main() {
 <p>
 </p>
 
-An example showing how to use try-send and try-receive:
+下面这个例子中实现了尽量发送（try-send）和尽量接收（try-receive）。
+它们都是用含有一个<code>case</code>分支和一个<code>default</code>分支的<code>select-case</code>代码块来实现的。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -936,18 +769,18 @@ func main() {
 	trySend := func(v string) {
 		select {
 		case c <- v:
-		default: // go here if c is full.
+		default: // 如果c的缓冲已满，则执行default分支。
 		}
 	}
 	tryReceive := func() string {
 		select {
 		case v := <-c: return v
-		default: return "-" // go here if c is empty.
+		default: return "-" // 如果c的缓冲为空，则执行default分支。
 		}
 	}
 	trySend("Hello!")
 	trySend("Hi!")
-	trySend("Bye!") // fail to send, but will not blocked.
+	trySend("Bye!") // 发送失败，但不会阻塞。
 	fmt.Println(tryReceive()) // Hello!
 	fmt.Println(tryReceive()) // Hi!
 	fmt.Println(tryReceive()) // -
@@ -957,8 +790,10 @@ func main() {
 <p>
 </p>
 
-The following example has 50% possibility to panic.
-Both of the two <code>case</code> operations are non-blocking in this example.
+下面这个程序有50%的几率会因为恐慌而崩溃。
+此程序中<code>select-case</code>代码块中的两个<code>case</code>操作均不堵塞，所以随机一个将被执行。
+如果第一个<code>case</code>操作（向已关闭的数据通道发送数据）被执行，则一个恐慌将产生。
+
 <pre class="line-numbers"><code class="language-go">package main
 
 func main() {
@@ -975,108 +810,98 @@ func main() {
 </div>
 
 <p class="anchor" id="select-implementation"></p>
-<h3>The Implementation Of The Select Mechanism</h3>
+<h3><code>select-case</code>流程控制的实现机理</h3>
 
+<div>
 <p>
-The select mechanism in Go is an important and unique feature.
-Here the steps of <a href="https://github.com/golang/go/blob/master/src/runtime/select.go">the
-select mechanism implementation by the official Go runtime</a> are listed.
+<code>select-case</code>流程控制是Go中的一个重要和独特的特性。
+下面列出了官方标准运行时中<code>select-case</code>流程控制的<a href="https://github.com/golang/go/blob/master/src/runtime/select.go">实现步骤</a>。
 </p>
 
 <!--
 If the step ids change, please also update the above reference ones.
 -->
 
-<div>
-There are several steps to execute a select block:
 <ol>
 <li>
-	evaluate all involved channels and values to be potentially sent, from top to bottom and left to right.
+	将所有<code>case</code>操作中涉及到的数据通道表达式和发送值表达式按照从上到下，从左到右的顺序一一估值。
+	（在简单赋值中做为源值的）数据接收操作对应的目标值在此时刻不需要被估值。
 </li>
 <li>
-	randomize the case orders for polling (the default branch is treated as a special case).
-	The corresponding channels of the orders may be duplicate.
-	The default branch is always put at the last position.
+	将所有分支的随机排序。<code>default</code>分支总是排在最后。
+	所有<code>case</code>操作中相关的数据通道可能会有重复的。
 </li>
 <li>
-	sort all involved channels to avoid deadlock in the next step.
-	No duplicate channels are in the first <code>N</code> channels of the sorted result,
-	where <code>N</code> is the number of involved channels in the select block.
-	Below, <b><i>the sorted lock order</i></b> mean for the  the first <code>N</code> ones.
+	为了防止在下一步中造成死锁，对所有<code>case</code>操作中相关的数据通道进行排序。
+	排序结果中前<code>N</code>个数据通道不存在重复的情况。
+	<code>N</code>为所有<code>case</code>操作中不重复的数据通道的数量。
+	下面，<b><i>通道锁顺序</i></b>是针对此排序结果中的前<code>N</code>个数据通道来说的，<b><i>通道锁逆序</i></b>是指此顺序的逆序。
 </li>
 <li>
-	lock all involved channels by the sorted lock order in last step.
+	按照上一步中的生成的通道锁顺序获取所有相关的数据通道的锁。
 </li>
 <li>
-	poll each cases in the select block by the randomized case orders:
+	按照第<i>2</i>步中生成的分支顺序检查相应分支：
 	<ol>
 	<li>
-		if the corresponding channel operation is a send-value-to-closed-channel operation, unlock all channels and panic.
-		Go to step 12.
+		如果这是一个<code>case</code>分支并且相应的数据通道操作是一个向关闭了的数据通道发送数据操作，则按照通道锁逆序解锁所有的数据通道并在当前协程中产生一个恐慌。
+		跳到第<i>12</i>步。
 	</li>
 	<li>
-		if the corresponding channel operation is non-blocked, perform the channel operation and unlock all channels,
-		then execute the corresponding <code>case</code> branch body.
-		The channel operation may wake up another blocked goroutine.
-		Go to step 12.
+		如果这是一个<code>case</code>分支并且相应的数据通道操作是非阻塞的，则按照通道锁逆序解锁所有的数据通道并执行相应的<code>case</code>分支代码块。
+		（此相应的数据通道操作可能会唤醒另一个处于阻塞状态的协程。）
+		跳到第<i>12</i>步。
 	</li>
 	<li>
-		if the case is the default branch, then unlock all channels and execute the default body.
-		Go to step 12.
+		如果这是<code>default</code>分支，则按照通道锁逆序解锁所有的数据通道并执行此<code>default</code>分支代码块。
+		跳到第<i>12</i>步。
 	</li>
 	</ol>
-	(Up to here, there must be not a default branch and all case channel operations are blocked.)
+	（到这里，<code>default</code>分支肯定是不存在的，并且所有的<code>case</code>操作均为阻塞的。）
 </li>
 <li>
-	push (enqueue) the current goroutine (with the case channel operation information) into
-	the receiving or sending goroutine queue of the involved channel in each case operation.
-	The current goroutine may be pushed into the queues of a channel multiple times,
-	for the involved channels in multiple cases may be the same one.
+	将当前协程（和对应<code>case</code>分支信息）推入到每个<code>case</code>操作中对应的数据通道的发送数据协程队列或接收数据协程队列中。
+	当前协程可能会被多次推入到同一个数据通道的这两个队列中，因为多个<code>case</code>操作中对应的数据通道可能为同一个。
 </li>
 <li>
-	block the current goroutine and unlock all channels by the sorted lock order.
+	使当前协程进入阻塞状态并则按照通道锁逆序解锁所有的数据通道。
 </li>
 <li>
-	..., in blocking state, waiting other channel operations to wake up the current goroutine, ...
+	...，当前协程处于阻塞状态，等待其它协程通过数据通道操作唤醒当前协程，...
 </li>
 <li>
-	the current goroutine is waken up by another channel operation in another goroutine.
-	The other operation may be a channel close operation or a channel send/receive operation.
-	If it is a channel send/receive operation, there must be a case channel receive/send operation cooperating with it.
-	In the cooperation, the current goroutine will be dequeued from the receiving/sending goroutine queue of the channel.
+	当前协程被另一个协程中的一个数据通道操作唤醒。
+	此唤醒数据通道操作可能是一个数据通道关闭操作，也可能是一个数据发送/接收操作。
+	如果它是一个数据发送/接收操作，则（当前正被解释的<code>select-case</code>流程中）肯定有一个相应<code>case</code>操作与之配合传递数据。
+	在此配合过程中，当前协程将从相应<code>case</code>操作相关的数据通道的接收/发送数据协程队列中弹出。
 </li>
 <li>
-	lock all involved channels by the sorted lock order.
+	按照第<i>3</i>步中的生成的通道锁顺序获取所有相关的数据通道的锁。
 </li>
 <li>
-	dequeue the current goroutine from the receiving goroutine queue or sending goroutine queue of the involved channel in each case operation,
+	将当前协程从各个<code>case</code>操作中对应的数据通道的发送数据协程队列或接收数据协程队列中（可能以非弹出的方式）移除。
 	<ol>
-	<li>if the current goroutine is waken up by a channel close operation, go to step 5.</li>
-	<li>if the current goroutine is waken up by a channel send/receive operation,
-		the corresponding case of the cooperating receive/send operation has already been found in the dequeuing process,
-		so just unlock all channels by the sorted lock order and execute the corresponding case body.
+	<li>
+		如果当前协程时被一个数据通道关闭操作所唤醒，则跳到第<i>5</i>步。
+	</li>
+	<li>
+		如果当前协程时被一个数据发送/接收操作所唤醒，则相应的<code>case</code>分支已经在第<i>9</i>步中知晓。
+		按照通道锁逆序解锁所有的数据通道并执行此<code>case</code>分支代码块。
 	</li>
 	</ol>
 </li>
 <li>
-	done.
+	完毕。
 </li>
 </ol>
 
-From the implementation, we know that
+从此实现中，我们知道
 <ul>
 <li>
-	a goroutine may stay in the sending goroutine queues and
-	the receiving goroutine queues of multiple channels at the same time.
-	It can even stay in the sending goroutine queue and the
-	receiving goroutine queue of the same channel at the same time.
+	一个协程可能同时多次处于同一个数据通道的发送数据协程队列或接收数据协程队列中。
 </li>
 <li>
-	when a goroutine being blocked at a <code>select-case</code> code block gets resumed later,
-	it will be removed from all the sending goroutine queues
-	and the receiving goroutine queues of every channels
-	involved in the channel operations followed <code>case</code> keywords
-	in the <code>select-case</code> code block.
+	当一个协程被阻塞在一个<code>select-case</code>流程控制中并在以后被唤醒时，它可能会从多个数据通道的发送数据协程队列和接收数据协程队列中移除。
 </li>
 </ul>
 
@@ -1085,19 +910,18 @@ From the implementation, we know that
 
 </div>
 
-<h3>More About Channels</h3>
+<h3>更多</h3>
 
 <p>
-We can find more channel use cases in <a href="channel-use-cases.html">this article</a>.
-Although channels can help us write
-<a href="channel-closing.html">correct concurrent code easily</a>,
-like other data synchronization techniques,
-channels will not prevent you from
-<a href="concurrent-common-mistakes.html">writing improper concurrent code</a>.
-And channel may be not always the best solutuon for all use cases for data synchronizations.
-Please read <a href="concurrent-synchronization-more.html">this article</a>
-and <a href="concurrent-atomic-operation.html">this article</a>
-for more synchronization techniques in Go.
+我们可以在<a href="channel-use-cases.html">数据通道用例大全</a>一文中找到更多数据通道的使用例子。
+</p>
+
+<p>
+尽管数据通道可以帮助我们<a href="channel-closing.html">轻松地写出正确的并发代码</a>，和其它并发同步技术一样，数据通道并不会阻止我们<a href="concurrent-common-mistakes.html">写出不正确的并发代码</a>。
+</p>
+
+<p>
+数据通道并非在任何场合总是最佳的并发同步方案，请阅读<a href="concurrent-synchronization-more.html">其它并发同步技术</a>和<a href="concurrent-atomic-operation.html">原子操作</a>来了解Go中支持的更多的并发同步技术。
 </p>
 
 
