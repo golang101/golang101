@@ -1,87 +1,130 @@
-﻿<h1>Type Embedding</h1>
+﻿<h1>类型内嵌</h1>
 
 <p>
-From the article <a href="struct.html">structs in Go</a>,
-we know that a struct type can have many fields.
-Each of the fields is composed of one field name and one field type.
-In fact, sometimes, a struct field can be composed of one field type only.
-Such fields are called embedded fields.
-Some articles also call embedded fields as anonymous fields.
+从<a href="struct.html">结构体</a>一文中，我们得知一个结构体类型可以拥有若干字段。
+每个字段由一个字段名和一个字段类型组成。事实上，有时，一个字段可以仅由一个字段类型组成。
+这样的字段声明方式称为类型内嵌（type embedding）。
 </p>
 
 <p>
-This article will explain the intention of type embedding and all kinds of details in type embedding.
+此篇文章将解释类型内嵌的目的和各种和类型内嵌相关的细节。
 </p>
 
-<h3>What Does Type Embedding Look Like?</h3>
+<h3>类型内嵌语法</h3>
 
 <div>
-Here is an example of type embedding:
+
+显面是一个使用了类型内嵌的例子：
 <pre class="line-numbers"><code class="language-go">package main
 
+import "net/http"
+
 func main() {
-	type S = []int
+	type P = *bool
 	var x struct {
-		string // a defined non-pointer type
-		error  // a defined interface type
-		*int   // an unnamed pointer type
-		S      // an alias of an unnamed pointer type
-		
+		string // 一个定义的非指针类型
+		error  // 一个定义的接口类型
+		*int   // 一个无名指针类型
+		P      // 一个无名指针类型的别名类型
+
+		http.Header // 一个定义的映射表类型
 	}
 	x.string = "Go"
 	x.error = nil
 	x.int = new(int)
-	x.S = []int{}
+	x.P = new(bool)
+	x.Header = http.Header{}
 }
 </code></pre>
 
 <p>
-In the above example, four types are embedded in the struct type.
-Each type embedding forms an embedded field.
+在上面这个例子中，有五个类型被内嵌在了一个结构体类型中。每个类型内嵌形成了一个内嵌字段（embedded field）。
 </p>
 
-In fact, each embedded field has an implicit name.
-The unqualified type names of the four embedded fields are their names
-or their base type names.
-For example, the names of the four embedded fields in the above examples are
-<code>string</code>, <code>int</code>m <code>error</code>,
-and <code>S</code>, respectively.
+<p>
+因为历史原因，内嵌字段有时也称为匿名字段。但是，事实上，每个内嵌字段有一个（隐式的）名字。
+此字段的<a href="https://golang.org/ref/spec#Qualified_identifiers">非限定（unqualified）</a>类型名即为此字段的名称。
+比如，上例中的五个内嵌字段的名称分别为<code>string</code>、<code>error</code>、<code>int</code>、<code>P</code>和<code>Header</code>。
+</p>
 </div>
 
 <p class="anchor" id="embeddable-types"></p>
-<h3>Which Types Can be Embedded?</h3>
+<h3>哪些类型可以被内嵌？</h3>
 
 <div>
-The following types can't be embedded:
-<ul>
-<li>
-	defined pointer types.
-</li>
-<li>
-	unnamed types, except unnamed one-level pointer types
-	whose base types are non-interface and non-poiner defined types.
-</li>
-</ul>
+当前的Go白皮书（1.11）<a href="https://golang.org/ref/spec#Struct_types">规定</a>：
 
-Other types can be embedded.
-Specifically speaking, the following types can be embedded (in a struct type):
-<ul>
-<li>
-	a <a href="type-system-overview.html#named-type">named type</a> which is not a pointer type, or
-</li>
-<li>
-	an unnamed pointer type which based type is a named non-pointer non-interface type.
-</li>
-</ul>
+<div class="alert alert-info">
+An embedded field must be specified as a type name <code>T</code>
+or as a pointer to a non-interface type name <code>*T</code>,
+and <code>T</code> itself may not be a pointer type.
+</div>
 
-Following lists some types which can and can't be embedded (in struct types):
+翻译过来：
+
+<div class="alert alert-info">
+一个内嵌字段必须被声明为一个类型名称<code>T</code>或者一个基类型为非接口类型的指针<code>*T</code>，并且<code>T</code>本身不能为一个指针类型。
+</div>
+
+<p>
+此规则描述在Go 1.09之前是精确的。但是随着从Go 1.09引入的自定义类型别名概念，此描述<a href="https://github.com/golang/go/issues/22005">有些过时和不太准确了</a>。
+比如，此描述没有包括上一节的例子中的<code>P</code>内嵌字段的情形。
+</p>
+
+<p>
+下面对什么类型可以被内嵌的的描述更为准确：
+<p>
+
+<div class="alert alert-success">
+下列类型可被内嵌：
+<ol>
+<li>
+	非指针<a href="type-system-overview.html#named-type">有名类型</a>；
+</li>
+<li>
+	基类型为有名非指针非接口类型的指针类型；
+</li>
+<li>
+	上两种情况中的类型的别名类型。
+</li>
+</ol>
+</div>
+
+<p>
+</p>
+
+换句话说，
+
+<div class="alert alert-danger">
+下列类型不可被内嵌：
+<ol>
+<li>
+	<a href="type-system-overview.html#non-defined-type">定义的</a>指针类型；
+</li>
+<li>
+	无名的非指针类型；
+</li>
+<li>
+	基类型为指针或者接口类型的指针类型。
+</li>
+</ol>
+</div>
+
+<p>
+上面列出的哪些类型可以被内嵌的规则有些过度严格和不必要的复杂，这使得很难将这些规则描述得既简单又清晰。
+看上去这些规则的目的是为了避免内嵌方法集肯定为空的类型，但是，同时这些规则也允许内嵌很多方法集肯定为空的类型，比如内置基本类型和很多无名类型的别名类型。
+曾有<a href="https://github.com/golang/go/issues/24062">一个提议</a>将以将这些规则简单化，但是此提议被否决了。
+此提议建议将这些规则简化为：<b>如果一个类型可以提供一个（非限定）类型名，则此类型可以被内嵌</b>。
+</p>
+
+下面列出了一些可以被或不可以被内嵌的类型：
 <pre class="line-numbers"><code class="language-go">type Encoder interface {Encode([]byte) []byte}
 type Person struct {name string; age int}
 type Alias = struct {name string; age int}
 type AliasPtr = *struct {name string; age int}
 type IntPtr *int
 
-// These types can be embedded in a struct type.
+// 这些类型都可以被内嵌。
 Encoder
 Person
 *Person
@@ -91,75 +134,57 @@ AliasPtr
 int
 *int
 
-// These types can't be embedded.
-*Encoder         // base type is an interface type
-*AliasPtr        // base type is a pointer type
-IntPtr           // defined pointer type
-*IntPtr          // base type is a pointer type
-struct {age int} // unnamed type
-map[string]int   // unnamed type
-[]int64          // unnamed type
-func()           // unnamed type
+// 这些类型都不能被内嵌。
+*Encoder         // 基类型为一个接口类型
+*AliasPtr        // 基类型为一个指针类型
+IntPtr           // 定义的指针类型
+*IntPtr          // 基类型为一个指针类型
+struct {age int} // 无名非指针类型
+map[string]int   // 无名非指针类型
+[]int64          // 无名非指针类型
+func()           // 无名非指针类型
 </code></pre>
 
 <p>
 </p>
 
 <p>
-No two fields are allowed to have the same name in a struct,
-there are not exceptions for annonymous struct fields.
-By the embedded field naming rules,
-an unnamed pointer type can't be embedded along with its base type
-in the same struct type.
-For example, <code>int</code> and <code>*int</code> can't be embedded
-in a struct type at the same time.
+一个结构体类型中不允许有两个同名字段，此规则对匿名字段同样适用。
+根据上述内嵌字段的隐含名称规则，一个无名指针类型不能和它的基类型同时内嵌在同一个结构体类型中。
+比如，<code>int</code>和<code>*int</code>类型不能同时内嵌在同一个结构体类型中。
 </p>
 </div>
 
 <p>
-A struct type can't embed itself or its alias types.
-Interface types can only embed named interface types.
+一个结构体类型不能内嵌（无论间接还是直接）它自己。
 </p>
 
 <p>
-Generally, it is only meaningful to embed types who have fields or methods,
-though some types without any field and method can also be embedded.
-The following sections will explain why.
+一般说来，只有内嵌含有字段或者拥有方法的类型才有意义（后续几节将阐述原因），尽管很多既没有字段也没有方法的类型也可以被内嵌。
 </p>
 
-<h3>What Is The Meaningfulness Of Type Embedding?</h3>
+<h3>类型内嵌的意义是什么？</h3>
 
 <div>
 <p>
-The main purpose of type embedding is to extend the functionalities of the embedded types
-into the embedding type, so that we don't need to reimplement
-the functionalities of the embeded types for the embedding type.
+类型内嵌的主要目的是为了将被内嵌类型的功能扩展到内嵌它的结构体类型中，从而我们不必再为此结构体类型上重复实现一下被内嵌类型的功能。
 </p>
 
-Many other object-oriented programming languages use inheritance
-to achieve the same goal of type embedding.
-Both mechanisms have their own
-<a href="https://en.wikipedia.org/wiki/Composition_over_inheritance">benefits and drawbacks</a>.
-Here, this article will not discuss which one is better.
-We should just know Go chose the type embedding mechanism,
-and there is a big difference between the two:
+很多其它流行面向对象的编程语言都是用继承来实现上述目的。两种实现方式有<a href="https://en.wikipedia.org/wiki/Composition_over_inheritance">它们各自的利弊</a>。
+这里，此篇文章将不讨论它种方式更好一些，我们只需知道Go选择了类型内嵌这种方式。
+这两种方式有一个很大的不同点：
 <ul>
 <li>
-	If a type <code>T</code> inherits another type,
-	then type <code>T</code> obtains the abilities of the other type.
-	At the same time, each value of type <code>T</code> can also be
-	viewed as a value of the other type.
+	如果类型<code>T</code>继承了另外一个类型，则类型<code>T</code>获取了另外一个类型的能力。
+	同时，一个<code>T</code>类型的值也可以被当作另外一个类型的值来使用。
 </li>
 <li>
-	If a type <code>T</code> embeds another type,
-	then type other type becomes a part of type <code>T</code>,
-	and type <code>T</code> obtains the abilities of the other type,
-	but none values of type <code>T</code> can be viewed as values of the other type.
+	如果一个类型<code>T</code>内嵌了另外一个类型，则另外一个类型变成了类型<code>T</code>的一部分。
+	类型<code>T</code>获取了另外一个类型的能力，但是<code>T</code>类型的任何值都不能被当作另外一个类型的值来使用。
 </li>
 </ul>
 
-Here is an example to show how an embedding type extends
-the functionalities of the embedded types.
+下面是一个展示了如何通过类型内嵌来扩展类型功能的例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -191,14 +216,11 @@ func main() {
 </code></pre>
 
 <p>
-From the above example, it looks that after embedding type <code>Person</code>,
-the type <code>Singer</code> obtains (inherits) all methods and fields of type <code>Person</code>,
-and type <code>*Singer</code> obtains (inherits) all methods of type <code>*Person</code>.
-Are the conclusions right? The following sections will answer this question.
+从上例中，当类型<code>Singer</code>内嵌了类型<code>Person</code>，看上去类型<code>Singer</code>获取了类型<code>Person</code>所有的字段和方法，
+并且类型<code>*Singer</code>获取了类型<code>*Person</code>所有的方法。此结论是否正确？随后几节将给出答案。
 </p>
 
-Please note that, a <code>Singer</code> value is not a <code>Person</code> value,
-the following code doesn't compile:
+注意，类型<code>Singer</code>的一个值不能被当作<code>Person</code>类型的值用。下面的代码编译不通过：
 <pre class="line-numbers"><code class="language-go">var gaga = Singer{}
 var _ Person = gaga
 </code></pre>
@@ -208,16 +230,20 @@ var _ Person = gaga
 
 </div>
 
-<h3>Does The Embedding Type Obtain The Fields Of The Embedded Types?</h3>
+<h3>当一个结构体类型内嵌了另一个类型，此结构体类型是否获取了被内嵌类型的字段和方法？</h3>
 
 <div>
-Let's list all the fields and methods of type <code>Singer</code>
-and the methods of  type <code>*Singer</code>
-used in the last example by using reflection
-functionalities provided by the <code>reflect</code> standard package:
-<pre class="line-numbers"><code class="language-go">...
-import "reflect"
-...
+下面这个程序使用<a href="reflection.html">反射</a>列出了上一节的例子中的<code>Singer</code>类型的字段和方法，以及<code>*Singer</code>类型的方法。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import (
+	"fmt"
+	"reflect"
+)
+
+... // 为节省篇幅，上一个例子中声明的类型在这里省略了。
+
 func main() {
 	t := reflect.TypeOf(Singer{}) // the Singer type
 	fmt.Println(t, "has", t.NumField(), "fields:")
@@ -228,62 +254,50 @@ func main() {
 	for i := 0; i < t.NumMethod(); i++ {
 		fmt.Print("   method#", i, ": ", t.Method(i).Name, "\n")
 	}
-	
+
 	pt := reflect.TypeOf(&Singer{}) // the *Singer type
-	fmt.Println(t, "has", pt.NumMethod(), "methods:")
+	fmt.Println(pt, "has", pt.NumMethod(), "methods:")
 	for i := 0; i < pt.NumMethod(); i++ {
 		fmt.Print("   method#", i, ": ", pt.Method(i).Name, "\n")
 	}
 }
 </code></pre>
 
-The result:
+输出结果：
 <pre class="output"><code>main.Singer has 2 fields:
    field#0: Person
    field#1: works
 main.Singer has 1 methods:
    method#0: PrintName
-main.Singer has 2 methods:
+*main.Singer has 2 methods:
    method#0: PrintName
    method#1: SetAge
 </code></pre>
 </div>
 
 <p>
-From the result, we know that the type <code>Singer</code> really owns
-a <code>PrintName</code> method, and the type <code>*Singer</code> really
-owns two methods, <code>PrintName</code> and <code>SetAge</code>.
-But the type <code>Singer</code>doesn't own a <code>Name</code> field.
-Then why is the selector expression <code>gaga.Name</code>
-legal for a <code>Singer</code> value <code>gaga</code>?
-Please read the next section to get the reason.
+从此输出结果中，我们可以看出类型<code>Singer</code>确实拥有一个<code>PrintName</code>方法，以及类型<code>*Singer</code>确实拥有两个方法：<code>PrintName</code>和<code>SetAge</code>。
+但是类型<code>Singer</code>并不拥有一个<code>Name</code>字段。那么为什么选择器表达式<code>gaga.Name</code>是合法的呢？
+毕竟<code>gaga</code>是<code>Singer</code>类型的一个值。
+请阅读下一节来获取原因。
 </p>
 
-<h3>Shorthands Of Selectors</h3>
+<h3>选择器的缩写形式</h3>
 
 <p>
-From the articles <a href="struct.html">structs in Go</a> and
-<a href="method.html">methods in Go</a>, we have learned that,
-for a value <code>x</code>, <code>x.y</code> is called a selector,
-where <code>y</code> is either a field name or a method name.
-If <code>y</code> is a field name,
-then <code>x</code> must be a struct value or a struct pointer value.
-A selector is an expresssion, which represents a value.
-If the selector <code>x.y</code> denotes a field, it may also
-has its own fields (if <code>x.y</code> is a struct value) and methods.
-Such as <code>x.y.z</code>,
-where <code>z</code> can also be either a field name or a method name.
+从前面的<a href="struct.html">结构体</a>和<a href="method.html">方法</a>两篇文章中，我们得知，对于一个值<code>x</code>，<code>x.y</code>称为一个选择器，其中<code>y</code>可以是一个字段名或者方法名。
+如果<code>y</code>是一个字段名，那么<code>x</code>必须为一个结构体值或者结构体指针值。
+一个选择器是一个表达式，它表示着一个值。
+如果选择器<code>x.y</code>表示一个字段，此字段也可能拥有自己的字段（如果此字段的类型为一个结构体类型）和方法，比如<code>x.y.z</code>，其中<code>z</code>可以是一个字段名，也可是一个方法名。
 </p>
 
 <p>
-There is a syntactic sugar in Go, (without considering selector colliding and
-shadowing explained in a later section), <b><i>if a middle name in a seletor
-corresponds to an embedded field, then that name can be omitted from the selector</i></b>.
-This is why embedded types are also called anonymous fields.
+在Go中，（不考虑下面将要介绍的选择器碰撞和掩盖），<b><i>如果一个选择其中的中部的某项对应着一个内嵌字段，则此项可被省略掉</i></b>。
+这是为什么内嵌字段又被称为匿名字段的原因。
 </p>
 
 <div>
-For example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 type A struct {
@@ -297,17 +311,17 @@ type B struct {
 type C struct {
 	B
 }
-	
+
 func main() {
 	var c C
-	
-	// The following 4 lines are equivalent.
+
+	// 下面的赋值语句中的选择器都是相互等价的。
 	_ = c.B.A.x
 	_ = c.B.x
 	_ = c.A.x
-	_ = c.x
-	
-	// The following 4 lines are equivalent.
+	_ = c.x // x被称为类型C的一个提升字段
+
+	// 这下面的几个方法调用都是互相等价的。
 	c.B.A.MethodA()
 	c.B.MethodA()
 	c.A.MethodA()
@@ -316,27 +330,23 @@ func main() {
 </code></pre>
 
 <p>
-This is why the expression <code>gaga.Name</code> is legal
-in the example in the last section.
-For it is just the shorthand of <code>gaga.Person.Name</code>.
+设就是为什么在上一节的例子中选择器表达式<code>gaga.Name</code>是合法的原因，
+因为它只不过是<code>gaga.Person.Name</code>的一个缩写形式。
+<code>Name</code>被称为类型<code>Singer</code>的提升字段（promoted field）。
 </p>
 
-As any embedding type must be a struct type,
-the article <a href="struct.html">structs in Go</a>
-has mentioned that the field of an addressable struct value
-can be accessed through the pointers of the struct value.
-So the following code is also legal in Go.
+因为任何内嵌其它类型的类型必然是结构体类型，并且<a href="struct.html#use-pointer-as-struct">结构体</a>一文中已经了我们可以通过一个可寻址的结构体值的指针来访问此结构体的字段，所以下面的代码也是合法的：
 <pre class="line-numbers"><code class="language-go">func main() {
 	var c C
 	pc = &c
-	
-	// The following 4 lines are equivalent.
+
+	// 这几行等价。
 	fmt.Println(pc.B.A.x)
 	fmt.Println(pc.B.x)
 	fmt.Println(pc.A.x)
 	fmt.Println(pc.x)
-	
-	// The following 4 lines are equivalent.
+
+	// 这几行等价。
 	pc.B.A.MethodA()
 	pc.B.MethodA()
 	pc.A.MethodA()
@@ -348,69 +358,49 @@ So the following code is also legal in Go.
 </p>
 
 <p>
-Similarly, the selector <code>gaga.PrintName</code> can be viewed as
-a shorthand of <code>gaga.Person.PrintName</code>.
-But, it is also okay if we think it is not a shorthand.
-After all, the type <code>Singer</code> really has a <code>PrintName</code>
-method, though the method is declared implicitly
-(please read the next next section for details).
-For the similar reason, the selector <code>(&gaga).PrintName</code>
-and <code>(&gaga).SetAge</code> can also be viewed as, or not as,
-shorthands of <code>(&gaga.Person).PrintName</code> and
-<code>(&gaga.Person).SetAge</code>.
+类似的，选择器<code>gaga.PrintName</code>可以被看作是<code>gaga.Person.PrintName</code>的缩写形式。
+但是，我们也可以不把它看作是一个缩写。毕竟，类型<code>Singer</code>确实拥有一个<code>PrintName</code>方法，
+尽管此方法是被隐式声明的（请阅读下下节以获得详情）。
+同样的原因，选择器<code>(&gaga).PrintName</code>和<code>(&gaga).SetAge</code>可以看作是（也可以不看作是）<code>(&gaga.Person).PrintName</code>和<code>(&gaga.Person).SetAge</code>的缩写。
 </p>
 
 <p>
-Note, we can also use the selector <code>gaga.SetAge</code>, but only if
-<code>gaga</code> is an addressable value of type <code>Singer</code>.
-It is just a sugar of <code>(&gaga).SetAge</code>.
-Please read <a href="method.html#call">method calls</a> for details.
+注意，我们也可以使用选择器<code>gaga.SetAge</code>，但是只有在<code>gaga</code>是一个可寻址的类型为<code>Singer</code>的值的情况下。
+它只不过是<code>(&gaga).SetAge</code>的一个<a href="method.html#call">语法糖</a>。
 </p>
 
 <p>
-In the above examples, <code>c.B.A.x</code> is called the full form
-of selectors <code>c.x</code>, <code>c.B.x</code> and <code>c.A.x</code>. 
-Similarly, <code>c.B.A.MethodA</code> is called the full form of selectors
-<code>c.MethodA</code>, <code>c.B.MethodA</code> and <code>c.A.MethodA</code>.
+在上面的例子中，<code>c.B.A.x</code>称为选择器表达式<code>c.x</code>、<code>c.B.x</code>和<code>c.A.x</code>的完整形式。
+类似的，<code>c.B.A.MethodA</code>可以称为<code>c.MethodA</code>、<code>c.B.MethodA</code>和<code>c.A.MethodA</code>的完整形式。
 </p>
 
 <p>
-If every middle name in the full form of a selector corresponds to
-an embedded field, then the number of moddile names in the selector
-is called the depth of the selector.
-The depths of all the selectors used in the above two examples are two.
+如果一个选择器的完整形式中部的所有项均对应着一个内嵌字段，则完整形式中部项的数量称为此选择器的深度。
+比如，上面的例子中的选择器<code>c.MethodA</code>的深度为<i>2</i>，因为此选择器的完整形式为<code>c.B.A.MethodA</code>，并且<code>B</code>和<code>A</code>都对应着一个内嵌字段。
 </p>
 </div>
 
-<h3>Selector Shadowing And Colliding</h3>
+<h3>选择器掩盖和碰撞</h3>
 
 <div>
-For a value <code>x</code>, it is possible that many of its full-form
-selectors have the same last item <code>y</code>
-(which is either a explicitly declared field or method)
-and every middle names of these selectors represents an embedded field.
-For such cases,
+一个值<code>x</code>可能有同时有多个最后一项相同的选择器，并且这些选择器的中间项均对应着一个内嵌字段。
+对于这种情形（假设最后一项为<code>y</code>）：
 <ul>
 <li>
-	only the full-form selector with the shallowest depth can be shortened as <code>x.y</code>.
-	In other words, <code>x.y</code> denotes the the full-form selector with the shallowest depth.
-	Other full-form selectors are <b>shadowed</b> by the one with the shallowest depth.
+	只有深度最浅的一个完整形式的选择器（并且最浅者只有一个）可以已被缩写为<code>x.y</code>。
+	换句话说，<code>x.y</code>表示深度最浅的一个选择器，其它完整形式的选择器被此最浅者所掩盖。
 </li>
 <li>
-	if there are more than one full-form selectors with the shallowest depth,
-	then none of those full-form selectors can be shortened as <code>x.y</code>.
-	We say those full-form selectors with the shallowest depth are <b>colliding</b>.
+	如果有多个完整形式的选择器同时拥有最浅深度，则任何完整形式的选择器都不能被缩写为<code>x.y</code>。
+	我们称这些同时拥有最浅深度的完整形式的选择器发生了碰撞。
 </li>
 </ul>
 
 <p>
-If a method selector is shadowed by another method selector,
-and the two corresponding method signatures are identical,
-we say the first method is overridden by the other one.
+如果一个方法选择器被另一个方法选择器所掩盖，并且它们对应的方法原型是一致的，那么我们可以说第一个方法被第二个覆盖（overridden）了。
 </p>
 
-For example, assume <code>A</code>, <code>B</code> and <code>C</code>
-are three defined types.
+举个例子，假设<code>A</code>、<code>B</code>和<code>C</code>为三个定义的类型：
 
 <pre class="line-numbers"><code class="language-go">type A struct {
 	x string
@@ -429,10 +419,8 @@ type C struct {
 }
 </code></pre>
 
-The following code doesn't compile.
-The reasons is selector <code>v1.A.x</code> and <code>v1.B.x</code> are collided,
-so both of them can't be shortened to <code>v1.x</code>.
-The same sotuation is for selector <code>v1.A.y</code> and <code>v1.B.y</code>.
+下面这段代码编译不通过，原因是选择器<code>v1.A.x</code>和<code>v1.B.x</code>发生了碰撞，结果导致它们都不能被缩写为<code>v1.x</code>。
+同样的情况发生在选择器<code>v1.A.y</code>和<code>v1.B.y</code>身上。
 
 <pre class="line-numbers"><code class="language-go">var v1 struct {
 	A
@@ -445,11 +433,11 @@ func f1() {
 }
 </code></pre>
 
-The following code compiles okay.
-The selector <code>v2.C.B.x</code> is shadowed by <code>v2.A.x</code>, so the
-selector <code>v2.x</code> is a shortened form of <code>v2.A.x</code> actually.
-For the same reason, the selector <code>v2.y</code> is a shortened form of
-<code>v2.A.y</code>, not of <code>v2.C.B.y</code>.
+<p>
+</p>
+
+下面的代码编译没问题。选择器<code>v2.C.B.x</code>被另一个选择器<code>v2.A.x</code>掩盖了，所以其实<code>v2.x</code>是选择器<code>v2.A.x</code>的缩写形式。
+因为同样的原因，<code>v2.y</code>是选择器<code>v2.A.y</code>（而不是选择器<code>v2.C.B.y</code>）的缩写形式。
 
 <pre class="line-numbers"><code class="language-go">var v2 struct {
 	A
@@ -467,60 +455,46 @@ func f2() {
 
 </div>
 
-<h3>Implicit Methods For Embedding Types</h3>
+<h3>为内嵌了其它类型的结构体类型声明的隐式方法</h3>
 
 <div>
 
 <p>
-As above has mentioned, both of type <code>Singer</code> and
-type <code>*Singer</code> have a <code>PrintName</code> method each.
-And the type <code>*Singer</code> also has a <code>SetAge</code> method.
-However, we never explicitly declare these methods
-for the two types. Where do these methods come from?
+上面已经提到过，类型<code>Singer</code>和<code>*Singer</code>都有一个<code>PrintName</code>方法，并且类型<code>*Singer</code>还有一个<code>SetAge</code>方法。
+但是，我们从没有为这两个类型声明国这几个方法。这几个方法从哪来的呢？
 </p>
 
-In fact,
+事实上，
 <ul>
 <li>
-	for each method of an embedded type,
-	if the selectors to that method neither collide nor are shadowed
-	by other selectors, then compilers will implicitly declare
-	a correspoding method for the embedding struct type.
-	And consequently, compiler will also
-	<a href="method.html#implicit-pointer-methods">implicitly declare
-	a correspoding method</a> for the unnamed pointer type
-	whose base type is the embedding struct type.
+	对内嵌类型的每一个方法，如果此方法对应的选择器既不和其它选择器碰撞也未被其它选择器掩盖，则编译器将会隐式地为内嵌此类型的结构体类型声明一个同样原型的方法。
+	继而，编译器也将为基类型为此结构体类型的指针类型<a href="method.html#implicit-pointer-methods">隐式声明</a>一个相应的方法。
 </li>
 <li>
-	assume a struct type <code>S</code> embeds a named type <code>T</code>,
-	for each method of type <code>*T</code>,
-	if the selectors to that method neither collide nor are shadowed
-	by other selectors, then compilers will implicitly declare
-	a correspoding method for type <code>*S</code>.
+	假设结构体类型<code>S</code>内嵌了另一个有名类型<code>T</code>，则对类型<code>*T</code>的每一个方法，
+	如果此方法对应的选择器既不和其它选择器碰撞也未被其它选择器掩盖，则编译器将会隐式地为类型<code>*S</code>声明一个同样原型的方法。
 </li>
 </ul>
 
-Simply speaking,
+简单说来，如果没有发生选择器碰撞和掩盖，
 <ul>
 <li>
-	both type <code>struct{T}</code> and type <code>*struct{T}</code>
-	will obtain (inherit) all the methods of type <code>T</code>.
+	类型<code>struct{T}</code>将获取类型<code>T</code>的所有方法。
 </li>
 <li>
-	type <code>*struct{T}</code> will obtain (inherit)
-	all the methods of type <code>*T</code> as well.
+	类型<code>*struct{T}</code>将获取类型<code>*T</code>的所有方法。
 </li>
 <li>
-	both type <code>struct{*T}</code> and type <code>*struct{*T}</code>
-	will obtain (inherit) all the methods of type <code>*T</code>.
-	As the method set of type <code>T</code> is a subset of type <code>*T</code>,
-	we can also say both type <code>struct{*T}</code> and <code>*struct{*T}</code>
-	will obtain (inherit) all the methods of type <code>T</code>.
+	类型<code>struct{*T}</code>和<code>*struct{*T}</code>都将获取类型<code>*T</code>的所有方法。
 </li>
 </ul>
 
-Here are the implicitly declared methods for type <code>Singer</code>
-and type <code>*Singer</code>.
+<p>
+注意，<a href="method.html#method-set">类型<code>T</code>的方法集总是类型<code>*T</code>的方法集的子集</a>，
+所以我们以可以说三个类型<code>*struct{T}</code>、<code>struct{*T}</code>和<code>*struct{*T}</code>均获取了类型<code>T</code>的所有方法。
+</p>
+
+下面展示了为类型<code>Singer</code>和<code>*Singer</code>隐式声明的三个方法：
 
 <pre class="line-numbers"><code class="language-go">func (s Singer) PrintName() {
 	s.Person.PrintName()
@@ -539,13 +513,11 @@ func (s *Singer) SetAge(age int) {
 </p>
 
 <p>
-From the article <a href="method.html">methods in Go</a>,
-we know that we can't explicitly declare methods for non-defined struct types
-and non-defined pointer types whose base types are non-defined struct types.
-But through type embedding, such non-defined types can also own methods.
+从<a href="method.html">方法</a>一文中，我们得知我们不能为非定义的结构体类型（和基类型为非定义的结构体类型的指针类型）声明方法。
+但是，通过类型内嵌，这样的类型也可以拥有方法。
 </p>
 
-Here is another example to show which implicit methods are declared.
+下面是另一个证明了类型内嵌导致了一些方法被隐式声明的例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -579,20 +551,20 @@ func main() {
 			fmt.Print("   method#", i, ": ", t.Method(i).Name, "\n")
 		}
 	}
-	
+
 	var s struct {
 		F
 		*B
 		I
 	}
-	
+
 	PrintTypeMethods(reflect.TypeOf(s))
 	fmt.Println()
 	PrintTypeMethods(reflect.TypeOf(&s))
 }
 </code></pre>
 
-The result:
+输出结果：
 <pre class="output"><code>struct { main.F; *main.B; main.I } has 5 methods:
    method#0: Invert
    method#1: IsTrue
@@ -613,32 +585,27 @@ The result:
 </p>
 
 <p>
-If a struct type embeds a type which implements an interface type
-(the embedded type may be the interface type itself),
-then generally the struct type also implements the interface type,
-exception there is a method specified by the interface type
-shadowed by or colliding other methods or fields.
+如果一个结构体类型内嵌了一个实现了一个接口类型的类型（此内嵌类型可以使此接口类型自己），则一般说来，此结构体类型也实现了此接口类型，除非发生了选择器碰撞和掩盖。
+比如，上例中的结构体类型和以它为基类型的指针类型均实现了接口类型<code>I</code>。
 </p>
 
-Please note, a type will only obtain the methods of the types its contains
-(embeds directly or indirectly).
-For example, in the the following code,
+请注意，一个类型将只会获取它（直接或者间接）内嵌了的类型的方法。
+比如，在下面的例子中，
 <ul>
 <li>
-	type <code>Age</code> has no methods, for it doesn't embed any types.
+	类型<code>Age</code>没有方法，因为它没有内嵌任何类型。
 </li>
 <li>
-	type <code>X</code> has two methods, <code>IsOdd</code> and <code>Double</code>.
-	<code>IsOdd</code> is obtained through embedding type <code>MyInt</code>.
+	类型<code>X</code>有两个方法：<code>IsOdd</code>和<code>Double</code>。
+	其中<code>IsOdd</code>方法是通过内嵌类型<code>MyInt</code>而得来的。
 </li>
 <li>
-	type <code>Y</code> has no methods, for its embedded type <code>Age</code> has not methods.
+	类型<code>Y</code>没有方法，因为它所内嵌的类型<code>Age</code>没有方法。
 </li>
 <li>
-	type <code>Z</code> has only one method, <code>IsOdd</code>.
-	for it contains type <code>MyInt</code>.
-	It doesn't obtain the method <code>Double</code> from type <code>X</code>,
-	for it doesn't contain type <code>X</code>.
+	类型<code>Z</code>只有一个方法：<code>IsOdd</code>。
+	此方法是通过内嵌类型<code>MyInt</code>而得来的。
+	它没有获取到类型<code>X</code>的<code>Double</code>方法，因为它并没有内嵌类型<code>X</code>。
 </li>
 </ul>
 
@@ -668,12 +635,10 @@ type Z X
 
 </div>
 
-<h3>Interface Types Embed Interface Types</h3>
+<h3>接口类型内嵌接口类型</h3>
 
 <p>
-Not only can struct types embed other types, but also interface types can.
-But interface types can only embed named interface types.
-Please read <a href="interface.html#embedding">interfaces in Go</a> for details.
+不但结构体类型可以内嵌类型，接口类型也可以内嵌类型，但是接口类型只能内嵌接口类型。详情请阅读<a href="interface.html#embedding">接口</a>一文。
 </p>
 
 <!--
@@ -693,14 +658,12 @@ For example,
 -->
 
 <p class="anchor" id="dead-loop-example"></p>
-<h3>An Interesting Type Embedding Example</h3>
+<h3>一个有趣的类型内嵌的例子</h3>
 
 <div>
-In the end, let's view an interesting example,
-the example program will dead loop and stack overflow.
-If you have understood the above content and
-<a href="interface.html#polymorphism">polymorphism</a>,
-it is easy to understand why it will dead loop.
+在本文的最后，让我们来看一个有趣的例子。
+此例子程序将陷入死循环并会因对栈溢出而崩溃推出。
+如果你已经理解了<a href="interface.html#polymorphism">多态</a>，那么就不难理解为什么此程序将死循环。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -716,7 +679,7 @@ func main() {
 	var t T
 	var i = &t
 	t.I = i
-	i.m() // will call t.m(), then will call i.m() again, ...
+	i.m() // 将调用t.m()，然后再次调用i.m()，...
 }
 </code></pre>
 

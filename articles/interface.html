@@ -1,42 +1,41 @@
-﻿<h1>Interfaces In Go</h1>
+﻿<h1>接口</h1>
 
 <p>
-Interface types are one special kind of types in Go.
-Interface kind plays several important roles in Go.
-Firstly, interface types make Go support value boxing.
-Consequently, through value boxing, reflection and polymorphism get supported.
+接口类型是Go中的一种很特别的类型。接口类型在Go中扮演着重要的角色。
+首先，在Go中，接口值可以用来包裹非接口值；然后，通过值包裹，反射和多态得以实现。
 </p>
 
 <p>
-The remaining of this article will explain the functionalities of interfaces
-in detail. Some interface related details will also be shown.
+本文剩余的部分将详细解释接口类型和接口值。一些接口相关的细节也将得到介绍。
 </p>
 
-<h3>What Are Interface Types?</h3>
+<h3>什么是接口类型？</h3>
 
 <p>
-An interface type specifies a collection of
-<a href="method.html#method-set">method prototypes</a>.
-In other words, each interface type defines a method set.
-In fact, we can view an interface type as a method set.
-For any of the method prototype specified in an interface type,
-its name can't be the blank identifier <code>_</code>.
+一个接口类型指定了一个<a href="method.html#method-set">方法原型</a>的集合。
+换句话说，一个接口类型定义了一个<a href=method.html#method-set">方法集</a>。
+事实上，我们可以把一个接口类型看作是一个方法集。
+接口类型中指定的任何方法原型中的方法名称都不能为空标识符<code>_</code>。
+</p>
+
+<p>
+我们也常说一个接口类型规定了一个（用此接口类型指定的方法集表示的）行为规范。
 </p>
 
 <div>
-Some examples of interface types:
-<pre class="line-numbers"><code class="language-go">// This is an unnamed interface type.
+一些接口类型的例子：
+<pre class="line-numbers"><code class="language-go">// 一个无名接口类型。
 interface {
 	About() string
 }
 
-// ReadWriter is a defined interface type.
+// ReadWriter是一个定义的接口类型。
 type ReadWriter interface {
 	Read(buf []byte) (n int, err error)
 	Write(buf []byte) (n int, err error)
 }
 
-// Comparable is a named interface alias type.
+// Comparable是一个有名接口类型。它是一个别名类型。
 type Comparable = interface {
 	IsEqualTo(another Comparable) bool
 }
@@ -45,10 +44,9 @@ type Comparable = interface {
 <p>
 </p>
 
-Please note that the <code>error</code> result type in the method prototypes
-specified by the <code>ReadWriter</code> interface type is
-<a href="https://golang.org/pkg/builtin/#error">a built-in interface type</a>.
-It is defined as
+请注意<code>ReadWriter</code>接口类型中指定的方法原型都有一个<code>error</code>类型的返回值。
+<code>error</code>类型为一个<a href="https://golang.org/pkg/builtin/#error">内置接口类型</a>。
+它的定义声明如下：
 
 <pre class="line-numbers"><code class="language-go">type error interface {
         Error() string
@@ -58,76 +56,59 @@ It is defined as
 <p>
 </p>
 
-In particular, an interface type with a blank method set
-is called a blank interface type.
-Here are some blank interface types examples:
+特别地，一个没有指定任何方法原型的接口类型称为一个空接口类型。
+下面是两个空接口类型：
 
-<pre class="line-numbers"><code class="language-go">// An unnamed blank interface type.
+<pre class="line-numbers"><code class="language-go">// 一个无名空接口类型。
 interface{}
 
-// Type I is a defined blank interface type.
+// 类型I是一个定义的空接口类型。
 type I interface{}
 </code></pre>
 </div>
 
-<h3>The Method Set Of A Type</h3>
+<h3>类型的方法集</h3>
 
 <div>
-Each type has a <a href=method.html#method-set">method set</a> associated with it.
+每个类型都有一个<a href=method.html#method-set">方法集</a>。
 <ul>
 <li>
-	For an interface type, its method set is the method prototype collection it specifies.
+	对于一个非接口类型，它的方法集由所有为它<a href="method.html">声明的（包括显式和隐式的）方法</a>的原型组成。
 </li>
 <li>
-	For a non-interface type, its method set is the prototype collection of
-	all the methods (either explicit or implicit ones) declared for it.
+	对于一个接口类型，它的方法集就是它所指定的方法集。
 </li>
 </ul>
 </div>
 
-<p><i>
-(About methods of non-interface types, please read
-<a href="method.html">methods in Go</a> and
-<a href="type-embedding.html">type embedding</a>.)
-</i></p>
-
 <p>
-For convenience, the method set of a type is often also called
-the method set of any value of the type.
+为了解释方便，一个类型的方法集常常也可称为它的任何值的方法集。
 </p>
 
 <p>
-Two unnamed interface types are identical if their method sets are identical.
+如果两个无名接口类型指定的方法集是等价的，则这两个接口类型为同一个类型。
+请注意：不同代码包中的同名非导出方法名将总被认为是不同名的。
 </p>
 
 <p class="anchor" id="implementation"></p>
-<h3>What Are Implementations?</h3>
+<h3>什么是实现（implementation）？</h3>
 
 <p>
-If the method set of an arbrtrary type <code>T</code>, <code>T</code>
-may be an interface type or not,
-is a super set of the method set of an interface type <code>I</code>,
-then we say type <code>T</code> implements interface <code>I</code>.
+如果一个任意类型<code>T</code>的方法集为一个接口类型的方法集的超集，则我们说类型<code>T</code>实现了此接口类型。
+<code>T</code>可以是一个非接口类型，也可是一个接口类型。
 </p>
 
 <p>
-Implementations are all implicit in Go.
-The implementation relations are not needed to be specified for compilers in code explicitly.
-There is not an <code>implements</code> keyword in Go.
-Go compilers will check the implementation relations automaticlly as needed.
+实现关系在Go中是隐式的。两个类型之间的实现关系不需要在代码中显式表示出来。Go中没有类似于<code>implements</code>的关键字。
+Go编译器将自动喜爱需要的时候检查两个类型之间的实现关系。
 </p>
 
 <p>
-An interface type always implements itself.
-Two interface types with the same method set implement each other.
+一个接口类型总是实现了它自己。两个指定了一个相同的方法集的接口类型相互实现了对方。
 </p>
 
 <div>
-For example, in the following example, the method sets of
-stuct pointer type <code>*Book</code>, integer type <code>MyInt</code> and
-pointer type <code>*MyInt</code> all contain the method prototype
-<code>About() string</code>, so they all implement the above mentioned
-interface type <code>interface {About() string}</code>.
+比如，在下面的例子中，类型<code>*Book</code>、<code>MyInt</code>和<code>*MyInt</code>都拥有一个原型为<code>About() string</code>的方法，所以它们都实现了接口类型<code>interface {About() string}</code>。
 <pre class="line-numbers"><code class="language-go">type Book struct {
 	name string
 	// more other fields ...
@@ -148,57 +129,44 @@ func (MyInt) About() string {
 </p>
 
 <p>
-Note, as any method set is a super set of a blank method set,
-so <b>any type implements any blank interface type</b>.
-This is an important fact in Go.
+注意：因为任何方法集都是一个空方法集的超集，所以<b>任何类型都实现了任何空接口类型</b>。
+这是Go中的一个重要事实。
 </p>
 
+隐式实现关系的设计是的一个声明在另一个代码包（包括标准库包）中的类型可以被动地实现一个用户代码包中的接口类型。
+比如，如果我们声明一个像下面这样的接口类型，则<a href="https://golang.org/pkg/database/sql/"><code>database/sql</code></a>标准库包中生命的<code>DB</code>和<code>Tx</code>类型都实现了这个接口类型，因为它们拥有此接口类型指定的的三个方法。
 
-The implicit implementation design makes it possible to let concrete types
-defined in other library packages, such as standard packages,
-passively implement some interface types declared in user packages.
-For example, if we define an interface type as the following one,
-then the type <code>DB</code> and type <code>Tx</code> declared in
-<a href="https://golang.org/pkg/database/sql/">the <code>database/sql</code>
-standard package</a> will both implement the interface type automatically,
-for they both have the three corresponding methods specified in the interface.
+<pre class="line-numbers"><code class="language-go">import "database/sql"
 
-<pre class="line-numbers"><code class="language-go">type DatabaseStorer interface {
-	Exec(query string, args ...interface{}) (Result, error)
+...
+
+type DatabaseStorer interface {
+	Exec(query string, args ...interface{}) (sql.Result, error)
 	Prepare(query string) (*Stmt, error)
-	Query(query string, args ...interface{}) (*Rows, error)
+	Query(query string, args ...interface{}) (*sql.Rows, error)
 }
 </code></pre>
 </div>
 
 <p class="anchor" id="boxing"></p>
-<h3>Value Boxing</h3>
+<h3>值包裹</h3>
 
 <div>
 <p>
-In Go, if a type <code>T</code> implements an interface type <code>I</code>,
-then any value of type <code>T</code> can be implicitly converted to type <code>I</code>.
-In other words, any value of type <code>T</code> is
-<a href="constants-and-variables.html#assignment">assignable</a>
-to (addressable) values of type <code>I</code>.
+每个接口值都可以看作是一个用来包裹一个非接口值的盒子。
 </p>
 
-In such a conversion (or an assignment),
+在Go中，如果类型<code>T</code>实现了一个接口类型<code>I</code>，则类型<code>T</code>的值都可以隐式转换到类型<code>I</code>。
+换句话说，类型<code>T</code>的值可以赋给类型<code>I</code>的可修改值。
+当一个<code>T</code>值被转换到类型<code>I</code>（或者赋给一个<code>I</code>值），
 <ul>
 <li>
-	If type <code>T</code> is a non-interface type, then
-	a copy of the <code>T</code> value is boxed (or encapsulated)
-	into the result (or destination) <code>I</code> value.
-	The time complexity of the copy is <code><i>O</i>(n)</code>,
-	where <code>n</code> is the size of copied <code>T</code> value.
+	如果类型<code>T</code>是一个非接口类型，则此<code>T</code>值的一个复制将被包裹在结果（或者目标）<code>I</code>值中。
+	此操作的时间复杂度为<code><i>O</i>(n)</code>，其中<code>n</code>为<code>T</code>值的尺寸。
 </li>
 <li>
-	If type <code>T</code> is also an interface type, then
-	a copy of the value boxed in the <code>T</code> value is boxed
-	(or encapsulated) into the result (or destination) <code>I</code> value.
-	The standard Go compiler makes an optimazation here,
-	so the time complexity of the copy is <code><i>O</i>(1)</code>,
-	instead of <code><i>O</i>(n)</code>.
+	如果类型<code>T</code>也为一个接口类型，则此<code>T</code>值中当前包裹的（非接口）值将被复制一份到结果（或者目标）<code>I</code>值中。
+	官方标准编译器为此操作做了优化，使得此操作的时间复杂度为<code><i>O</i>(1)</code>，而不是<code><i>O</i>(n)</code>。
 	<!--
 	http://commaok.xyz/post/interface-allocs
 	since Go1.5, in the official compiler implementation (), if the dynamic value
@@ -209,59 +177,46 @@ In such a conversion (or an assignment),
 </ul>
 
 <p>
-The type infomation of the boxed value is also stored in the result interface value.
+包裹在一个接口值中的非接口值的类型信息和此接口值一起包裹在此接口值中（见下面详解）。
 </p>
 
 <p>
-When a value is boxed in an interface value, the value is called
-the <b><i>dynamic value</i></b> of the interface value.
-The type of the dynamic value is called the
-<b><i>dynamic type</i></b> of the interface value.
+当一个非接口值被包裹在一个接口值中，此非接口值称为此接口值的<b><i>动态值</i></b>，此非接口值的类型称为此接口值的<b><i>动态类型</i></b>。
 </p>
 
 <p>
-The dynamic value of an interface value must be a non-interface value.
-The dynamic value itself is immutable.
-We can replace the dynamic value of an interface value with another dynamic
-value, but there are no (safe) ways to modify any part of the dynamic value.
+接口值的动态值的直接部分是不可修改的。当然，我们可以将一个接口值的动态值整体替换为另一个动态值。
 </p>
 
+<!--
 <p>
-Dynamic values and dynamic types are also called
-concrete values and concrete types sometimes.
+一个接口值的动态值和动态类型为此接口值的<a href="type-system-overview.html#concrete-type">具体值和具体类型</a>。
 </p>
+-->
 
 <p>
-In Go, the zero values of any interface type are represented
-by the predeclared <code>nil</code> identifier.
-Nothing is boxed in a nil interface value.
-Assigning an untyped <code>nil</code> to an interface value will
-clear the dynamic value boxed in the interface value.
+接口类型的零值也是用预声明的<code>nil</code>标识符来表示。
+一个nil接口值中什么也没包裹。将一个接口值修改为nil将清空包裹在此接口值中的非接口值。
 </p>
 
 <p><i>
-(Note, the zero values of many non-interface types in Go
-are also represented by <code>nil</code> in Go.
-Non-interface nil values can also be boxed in interface values.
-Such interface values are not nil interface values.)
+（注意，在Go中，很多其它非接口类型的零值也使用<code>nil</code>标识符来表示。
+非接口类型的nil零值也可以被包裹在接口值中。
+一个包裹了一个nil非接口值的接口值不是一个nil接口值，因为它并非什么都没包裹。）
 </i></p>
 
 <p>
-As any type implements any blank interface types,
-so any non-interface value can be boxed in (or assigned to) a blank interface value.
-For this reason, blank interface types can be viewed as the
-<code>any</code> type in many other languages.
+因为任何类型都实现了空接口类型，所以任何非接口值可都可以包裹在任何一个空接口类型的接口值中。
+（以后，一个空接口类型的接口值将被称为一个空接口值。注意空接口值和nil接口值是两个不同的概念。）
+因为这个原因，空接口值可以被认为是很多其它语言中的<code>any</code>类型。
 </p>
 
 <p>
-When an untyped value (except untype <code>nil</code> values)
-is assigned to a blank interface value,
-the untyped value will be first converted to its default type.
-(Or, we can think the untyped value is deduced as a value of its default type.)
+当一个类型不确定值（除了<code>nil</code>）被转换为一个空接口类型（或者赋给一个空接口值），此类型不确定值将首先转换为它的默认类型。
+（或者说，此类型不确定值将被推断为一个它的默认类型的值。）
 </p>
 
-Let's view an example which demonstrates some assignments
-with interface values as the destinations.
+下面这个例子展示了一些目标值为接口类型的赋值。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -271,7 +226,7 @@ type Aboutable interface {
 	About() string
 }
 
-// Type *Book implements Aboutable.
+// 类型*Book实现了接口类型Aboutable。
 type Book struct {
 	name string
 }
@@ -280,32 +235,30 @@ func (book *Book) About() string {
 }
 
 func main() {
-	// A *Book value is boxed into an Aboutable value.
+	// 一个*Book值被包裹在了一个Aboutable值中。
 	var a Aboutable = &Book{"Go 101"}
 	fmt.Println(a) // &{Go 101}
 
-	// i is a blank interface value.
+	// i是一个空接口值。类型*Book实现了任何空接口类型。
 	var i interface{} = &Book{"Rust 101"}
 	fmt.Println(i) // &{Rust 101}
 
-	// Aboutable implements interface{}.
+	// Aboutable实现了空接口类型interface{}。
 	i = a
 	fmt.Println(i) // &{Go 101}
 }
 </code></pre>
 
-Please note, the prototype of the <code>fmt.Println</code> function is
+请注意，在之前的文章中多次使用过的<code>fmt.Println</code>函数的原型为：
 
 <pre class="line-numbers"><code class="language-go">func Println(a ...interface{}) (n int, err error)
 </code></pre>
 
 <p>
-This is why a <code>fmt.Println</code> function call can take arguments of
-any types.
+这是为什么任何类型的实参都可有使用在<code>fmt.Println</code>函数调用中。
 </p>
 
-The following is another example which shows how a blank interface value
-is used to box values of any non-interface type.
+下面是一个另一个展示一个空接口类型的值是如果包裹各种非接口类型的值的例子：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -324,7 +277,7 @@ func main() {
 	i = "abc"
 	fmt.Println(i) // abc
 
-	// Clear the boxed value in interface value i.
+	// 将接口值i中包裹的值清除掉。
 	i = nil
 	fmt.Println(i) // &lt;nil&gt;
 }
@@ -333,68 +286,65 @@ func main() {
 <p>
 </p>
 
-As above has mentioned, the information of the dynamic type of an interface
-value is also stored in (more accureately, referenced by) the interface value.
-The dynamic type information is essential
-for implementing two important features in Go.
+<p>
+在编译时刻，Go编译器将构建一个全局表用来存储代码中要用到的各个类型的信息。
+对于一个类型来说，这些信息包括：此类型的<a href="type-system-overview.html#type-kinds">种类（kind）</a>、此类型的所有方法和字段信息、此类型的尺寸，等等。
+这个全局表将在程序启动的时候被加载到内存中。
+</p>
+
+<p>
+在运行时刻，当一个非接口值被包裹到一个接口值，Go运行时（至少对于官方标准运行时来说）将分析和构建这两个值的对应的类型对的实现关系信息，并将此实现关系信息存入到此接口值内。
+对每一对这样的类型，它们的实现关系信息将仅被最多构建一次，并且为了程序效率考虑，此实现关系信息被缓存在内存中的一个全局映射表中，以备后用。
+所以此全局映射表中的条目数永不减少。
+事实上，一个非零接口值<a href="value-part.html#interface-structure">在内部只是使用一个指针字段来引用着此全局映射表中一个实现关系信息条目</a>。
+</p>
+
+对于一个非接口类型和接口类型对，它们的实现关系信息包括两部分的内容：
 <ol>
 <li>
-	The dynamic type information includes a method table which stores
-	all the corresponding methods specified by the interface type
-	and declared for the dynamic type of the interface type.
-	This table is the key to implement <a href="#polymorphism">polymorphism</a> in Go.
+	动态类型（即此非接口类型）的信息。
 </li>
 <li>
-	The dynamic type information also includes all sorts of
-	other information about the dynamic type, such as
-	what <a href="type-system-overview.html#type-kinds">kind</a> the dynamic type belongs to
-	and the method and field lists of the dynamic type, etc.
-	The information is the key to implement <a href="#reflection">reflection</a> in Go.
+	一个方法表（切片类型），其中存储了所有此接口类型指定的并且为此非接口类型（动态类型）声明了的方法。
 </li>
 </ol>
 
-<p>
-At run time, the information items of all types are stored in a global zone.
-Each interface value just holds a reference to one type information item.
-Each non-interface to interface type implementation relation corresponds
-to one global method table.
-For the standard Go compiler/runtime.
-a method table will only be created as needed.
-</p>
+两部分的内容对于实现Go中的两个特性起着至关重要的作用。
+<ol>
+<li>
+	动态类型信息是实现<a href="#reflection">反射</a>的关键。
+</li>
+<li>
+	此方法表是实现多态（见下一节）的关键。
+</li>
+</ol>
 </div>
 
 <p class="anchor" id="polymorphism"></p>
-<h3>Polymorphism</h3>
+<h3>多态（polymorphism）</h3>
 
 <p>
-Polymorphism is one key functionality provided by interfaces,
-and it is an important feature of Go.
+多态是接口的一个关键功能和Go语言的一个重要特性。
 </p>
 
 <p>
-When a non-interface value <code>t</code> of a type <code>T</code>
-is boxed in an interface value <code>i</code> of type <code>I</code>,
-calling a method specified by the interface type <code>I</code>
-on the interface value <code>i</code>
-will call the corresponding method declared for the non-interface type <code>T</code>
-on the non-interface value <code>t</code> actually.
-In other words, calling method <code>i.m</code> will call method <code>t.m</code> actually.
-With different values boxed into the interface value,
-the interface value behaves differently. This is called polymorphism.
+当一个非接口类型<code>T</code>的值<code>t</code>被包裹在一个接口类型<code>I</code>的接口值值<code>i</code>中，通过<code>i</code>调用接口类型<code>I</code>指定的一个方法时，事实上为非接口类型<code>T</code>声明的对应方法将通过非接口值<code>t</code>被调用。
+换句话说，<b>调用一个接口值的方法实际上将调用此接口值的动态值的对应方法</b>。
+比如，当方法<code>i.m</code>被调用时，其实被调用的是方法<code>t.m</code>。
+一个接口值可以通过包裹不同动态类型的动态值来表现出各种不同的行为，这称为多态。
 </p>
 
 <p>
-The method table stored in an interface value is a slice.
-Method lookup in the table is just a slice element indexing.
+当方法<code>i.m</code>被调用时，<code>i</code>存储的实现关系信息的方法表的方法<code>t.m</code>将被找到并被调用。
+此方法表是一个切片，所以此寻找过程只不过是一个切片元素访问，不会消耗很多时间。
 </p>
 
-<p><i>
-(Note, calling methods on a nil interface value will panic at run time,
-for there are no available declared methods can be called.)
-</i></p>
+<p>
+注意，在nil接口值上调用方法将产生一个恐慌，因为没有具体的方法可被调用（<code>t.m</code>为nil）。
+</p>
 
 <div>
-An example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -404,10 +354,10 @@ type Filter interface {
 	Process([]int) []int
 }
 
-// A UniqueFilter will remove duplicated numbers.
+// UniqueFilter用来删除重复的数字。
 type UniqueFilter struct{}
 func (UniqueFilter) About() string {
-	return "remove duplicated numbers"
+	return "删除重复的数字"
 }
 func (UniqueFilter) Process(inputs []int) []int {
 	outs := make([]int, 0, len(inputs))
@@ -421,11 +371,10 @@ func (UniqueFilter) Process(inputs []int) []int {
 	return outs
 }
 
-// A MultipleFilter will only keep numbers which are
-// multiples of the MultipleFilter as an int value.
+// MultipleFilter用来只保留某个整数的倍数数字。
 type MultipleFilter int
 func (mf MultipleFilter) About() string {
-	return fmt.Sprintf("keep multiples of %v", mf)
+	return fmt.Sprintf("保留%v的倍数", mf)
 }
 func (mf MultipleFilter) Process(inputs []int) []int {
 	var outs = make([]int, 0, len(inputs))
@@ -437,11 +386,9 @@ func (mf MultipleFilter) Process(inputs []int) []int {
 	return outs
 }
 
-// With the help of polymorphism, only one "filteAndPrint"
-// function is needed.
+// 在多态特性的帮助下，只需要一个filteAndPrint函数。
 func filteAndPrint(fltr Filter, unfiltered []int) []int {
-	// Call the methods of "fltr" will call the methods
-	// of the value boxed in "fltr" actually.
+	// 在fltr参数上调用方法其实是调用fltr的动态值的方法。
 	filtered := fltr.Process(unfiltered)
 	fmt.Println(fltr.About() + ":\n\t", filtered)
 	return filtered
@@ -449,206 +396,169 @@ func filteAndPrint(fltr Filter, unfiltered []int) []int {
 
 func main() {
 	numbers := []int{12, 7, 21, 12, 12, 26, 25, 21, 30}
-	fmt.Println("before filtering:\n\t", numbers)
+	fmt.Println("过滤之前：\n\t", numbers)
 
-	// Three non-interface values are boxed into three Filter
-	// interface slice element values.
+	// 三个非接口值被包裹在一个Filter切片的三个接口元素中。
 	filters := []Filter{
 		UniqueFilter{},
 		MultipleFilter(2),
 		MultipleFilter(3),
 	}
 
-	// Each slice element will be assigned to the local variable
-	// "fltr" (of interface type Filter) one by one. The value
-	// boxed in each element will also be copied into "fltr".
+	// 每个切片元素将被赋值给类型为Filter的循环变量fltr。
+	// 每个元素中的动态值也将被同时复制给循环变量fltr。
 	for _, fltr := range filters {
 		numbers = filteAndPrint(fltr, numbers)
 	}
 }
 </code></pre>
 
-The output:
-<pre class="output"><code>before filtering:
+输出结果：
+<pre class="output"><code>过滤之前：
 	 [12 7 21 12 12 26 25 21 30]
-remove diplicated numbers:
+删除重复的数字:
 	 [12 7 21 26 25 30]
-keep multiples of 2:
+保留2的倍数:
 	 [12 26 30]
-keep multiples of 3:
+保留3的倍数:
 	 [12 30]
 </code></pre>
 
 <p>
-In the above example, polymorphism makes it unnecessary to
-write one <code>filteAndPrint</code> function for each filter types.
+在上面这个例子中，多态使得我们不必为每个过滤器类型写一个单独的<code>filteAndPrint</code>函数。
 </p>
 
 <p>
-Besides the above benifit, polymorphism also makes it possible for
-package developers to write exported functions and methods which
-accept any user defined types, as long as the user types implement the
-interface types of the parameters of the exported functions and methods.
+除了上述这个好处，多态也使得一个代码包的开发者可以在此代码包中声明一个接口类型并声明一个拥有此接口类型参数的函数（或者方法），从而此代码包的一个用户可以在用户包中声明一个实现了此接口类型的用户类型，并且将此用户类型的实参传递给此代码包中声明的函数（或者方法）的调用。
+此代码包的开发者并不用关心一个用户类型具体是如何声明的，只要此用户类型满足此代码包中声明的接口类型规定的行为即可。
 </p>
 </div>
 
 <p>
-In fact, polymorphism is not an essential feature for a language.
-There are alternative ways to achieve the same job,
-such as callback functions.
-But the polymorphism way is cleaner and more elegant.
+事实上，多态对于一个语言来说并非一个不可或缺的特性。我们可以通过其它途径来实现多态的作用。
+但是，多态可以使得我们的代码更加简洁和优雅。
 </p>
 
 <p class="anchor" id="reflection"></p>
-<h3>Reflection</h3>
+<h3>反射（reflection）</h3>
 
 <p>
-The dynamic type information stored in an interface value
-can be used to inspect and manipulate the values referenced by
-the dynamic value which is boxed in the interface value.
-This is called reflection in programming.
+一个接口值中存储的动态类型信息可以被用来检视此接口值的动态值和操纵此动态值所引用的值。
+这称为反射。
 </p>
 
 <p>
-Currently (v1.10), Go doesn't support generic for custom functions and types.
-Reflection partially remedies the inconveniences caused by lacking of generic.
+到目前为止（Go 1.11），Go尚未支持自定义函数和类型的范型。
+反射部分地弥补了一些因为缺少范型而导致的编程不便。
 </p>
 
 <p>
-This article will not explain the functionalities provided by
-<a href="https://golang.org/pkg/reflect/">the <code>reflect</code> standard package</a>.
-Please read <a href="reflection.html">reflections in Go</a>
-to get how to use this package.
-Below will only introduce the built-in reflection functionalities in Go.
-In Go, built-in reflections are achieved with type assertion and type switch.
+本片文章将不介绍<code>reflect</code>标准包中提供的各种反射功能。
+请阅读后面的<a href="https://golang.org/pkg/reflect/">Go中的反射</a>一文来了解如何如何使用此包。
+本文下面将值介绍Go中的内置反射反射机制。在Go中，内置反射机制包括类型断言（type assertion）和类型<code>type-switch</code>流程控制代码块。
 </p>
 
 <p class="anchor" id="type-assertion"></p>
-<h4>Type Assertion</h4>
+<h4>类型断言</h4>
 
 <div>
-There are four kinds of interface value involved value conversion cases in Go:
+Go中有四种接口相关的类型转换情形：
 <ol>
 <li>
-	convert a non-interface value to an interface value,
-	where the type of the non-interface value
-	must implement the type of the interface value.
+	将一个非接口值转换为一个接口类型。在这样的转换中，此非接口值的类型必须实现了此接口类型。
 </li>
 <li>
-	convert an interface value to an interface value,
-	where the type of the source interface value
-	must implement the type of the destination interface value.
+	将一个接口值转换为另一个接口类型（前者接口值的类型实现了后者目标接口类型）。
 </li>
 <li>
-	convert an interface value to a non-interface value,
-	where the type of the non-interface value
-	may or may not implement the type of the interface value.
+	将一个接口值转换为一个非接口类型（此非接口类型必须实现了此接口值的接口类型）。
 </li>
 <li>
-	convert an interface value to an interface value,
-	where the type of the source interface value
-	may or may not implement the type of the destination interface value.
+	将一个接口值转换为另一个接口类型（前者接口值的类型可以实现了也可以未实现后者目标接口类型）。
 </li>
 </ol>
 
 <p>
-Above has explained the first two kinds of cases.
-The two both require the source value type must implement the destination interface type.
-The convertibility for the first two are verified at compile time.
+前两种情形已经在前面几节中介绍过了。这两种情形都要求源值的类型必须实现了目标接口类型。
+它们都是通过普通类型转换（无论是隐式的还是显式的）来达成的。这两种情形的合法性是在编译时刻验证的。
 </p>
 
 <p>
-Here will explain the later two kinds of cases.
-The convertibility for the later two are verified and achieved at run time,
-by using a syntax called <b><i>type assertion</i></b>.
-In fact, the syntax also applies to the second kind of conversions.
+本节将介绍后两种情形。这两种情形的合法性是在运行时刻通过类型断言语法来验证的。
+事实上，类型断言语法也适用于上面列出的第二种情形。
 </p>
 
-The form of a type assertion expression is <code>i.(T)</code>,
-where <code>i</code> is an interface value and <code>T</code> is
+一个类型断言表达式的语法为<code>i.(T)</code>，其中<code>i</code>为一个接口值，<code>T</code>为一个类型名或者类型字面表示。
+类型<code>T</code>可以为
 <ul>
 <li>
-	either a non-interface type which must implement the type of <code>i</code>,
+	一个实现了<code>i</code>的接口类型的非接口类型
 </li>
 <li>
-	or an arbrtrary interface type.
+	或者一个任意接口类型。
 </li>
 </ul>
 
-In a type assertion <code>i.(T)</code>,
-<code>i</code> is called the asserted value
-and <code>T</code> is called the asserted type.
-A type assertion would succeed or fail.
+在一个类型断言表达式<code>i.(T)</code>中，<code>i</code>称为断言值，<code>T</code>称为断言类型。
+一个断言可能成功或者失败。
 <ul>
 <li>
-	If <code>T</code> is a non-interface type,
-	then the intention of the type assertions is
-	to get (a copy of) the dynamic value boxed in an interface value.
-	<code>T</code> must be the dynamic type of <code>i</code>
-	to make the assertion succeed.
-	Each of such conversion can be viewed as a value unboxing attempt.
+	对于<code>T</code>是一个非接口类型的情况，如果断言值<code>i</code>的动态类型存在并且此动态类型和<code>T</code>为同一类型，则此断言将成功，否则，此断言失败。
+	当此断言成功时，此类型断言表达式的估值结果为断言值<code>i</code>的动态值的一个复制。
+	我们可以把此种情况看作是动态值的一次拆封尝试。
 </li>
 <li>
-	If <code>T</code> is an interface type,
-	then the intention of the type assertion is to make the dynamic value
-	boxed in an interface value also boxed in another interface value of
-	type <code>T</code>.
-	The dynamic value of <code>i</code> must be convertible to
-	interface type <code>T</code> to make the assertion succeed.
-	In other words, the dynamic type of <code>i</code> must implement
-	the interface type <code>T</code> to make the assertion succeed.
+	对于<code>T</code>是一个接口类型的情况，当断言值<code>i</code>的动态类型存在并且此动态类型实现了接口类型<code>T</code>，则此断言将成功，否则，此断言失败。
+	当此断言成功时，此类型断言表达式的估值结果为一个包裹了断言值<code>i</code>的动态值的一个复制的<code>T</code>值。
 </li>
 </ul>
 
 <p>
-For most scenarios, a type assertion results one value of the asserted type
-and is viewed as a single-valued expression.
-However, when a type assertion is used as the only source value expression
-in an assignment, it can be viewed as a multi-valued expression
-and result a second optional untyped boolean value,
-which indicates whether or not the type assersion succeeds.
+一个失败的类型断言的估值结果为断言类型的零值。
 </p>
 
 <p>
-If a type assersion fails, the first return result must be
-a zero value of the asserted type, and the second return result
-(assume it is present) is an untyped boolean value <code>false</code>.
-If it succeeds, then the first return result is a copy of
-the dynamic value of the asserted interface value, and the second return result
-(assume it is present) is an untyped boolean value <code>true</code>.
+按照上述规则，如果一个类型断言中的断言值是一个零值nil接口值，则此断言必定失败。
 </p>
 
 <p>
-If a type assersion fails and the type assertion is used as a
-single-valued expression (the second return result is absent),
-a panic will occur.
+对于大多数场合，一个类型断言被用作一个单值表达式。
+但是，当一个类型断言被用作一个赋值语句中的唯一源值时，此断言可以返回一个可选的第二个结果并被视作为一个多值表达式。
+此可选的第二个结果为一个类型不确定的布尔值，用来表示此断言是否成功了。
 </p>
 
-An example (<code>T</code> is a non-interface type):
+<p>
+注意：当一个断言失败并且它的可选的第二个结果未呈现，则一个恐慌将产生。
+</p>
+
+一个展示了如何使用类型断言的例子（断言类型为非接口类型）：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
 func main() {
-	// Compiler will deduce the type of 123 as int.
+	// 编译器将把123的类型推断为内值类型int。
 	var x interface{} = 123
 
-	// Case 1:
+	// 情形一：
 	n, ok := x.(int)
 	fmt.Println(n, ok) // 123 true
 	n = x.(int)
 	fmt.Println(n) // 123
 
-	// Case 2:
+	// 情形二：
 	a, ok := x.(float64)
 	fmt.Println(a, ok) // 0 false
 
-	// Case 3:
-	a = x.(float64) // will panic
+	// 情形三：
+	a = x.(float64) // 将产生一个恐慌
 }
 </code></pre>
 
-Another example (<code>T</code> is an interface type):
+<p>
+</p>
+
+一个展示了如何使用类型断言的例子（断言类型为接口类型）：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -664,27 +574,28 @@ func (DummyWriter) Write(buf []byte) (int, error) {
 
 func main() {
 	var x interface{} = DummyWriter{}
-	var y interface{} = "abc" // dynamic type is "string"
+	var y interface{} = "abc" // y的动态类型为内置类型string
 	var w Writer
 	var ok bool
 
-	// DummyWriter implements both Writer and interface{}.
+	// DummyWriter既实现了Writer，也实现了interface{}。
 	w, ok = x.(Writer)
 	fmt.Println(w, ok) // {} true
 	x, ok = w.(interface{})
 	fmt.Println(x, ok) // {} true
 
-	// The dynamic type of y is "string", which doesn't
-	// implement Writer.
+	// y的动态类型为string。string类型并没有实现Writer。
 	w, ok = y.(Writer)
 	fmt.Println(w, ok) // &ltnil&gt; false
-	w = y.(Writer)     // will panic
+	w = y.(Writer)     // 将产生一个恐慌
 }
 </code></pre>
 
 <p>
-In fact, the method call of <code>i.m(...)</code> on an interface value <code>i</code>
-which dynamic type is <code>T</code> is equivalent to the method call of <code>i.(T).m(...)</code>.
+</p>
+
+<p>
+事实上，对于一个动态类型为<code>T</code>的接口值<code>i</code>，方法调用<code>i.m(...)</code>等价于<code>i.(T).m(...)</code>。
 </p>
 </div>
 
@@ -692,13 +603,12 @@ which dynamic type is <code>T</code> is equivalent to the method call of <code>i
 </div>
 
 <p class="anchor" id="type-switch"></p>
-<h4>Type Switch Control Flow Block</h4>
+<h4><code>type-switch</code>流程控制代码块</h4>
 
 <div>
-
-The type switch syntax may be the weirdest syntax in Go.
-It can be viewed as the enhanced version of type assertion.
-A type switch block looks like:
+<code>type-switch</code>流程控制的语法或许是Go中最古怪的语法。
+它可以被看作是类型断言的增强版。它和<code>switch-case</code>流程控制代码块有些相似。
+一个<code>type-switch</code>流程控制代码块的语法如下所示：
 <pre class="line-numbers"><code class="language-go">switch aSimpleStatement; v := x.(type) {
 case TypeA:
 	...
@@ -712,23 +622,22 @@ default:
 </code></pre>
 
 <p>
-The <code>aSimpleStatement;</code> portion is optional in a type switch code block.
+其中<code>aSimpleStatement;</code>部分是可选的。
+<code>aSimpleStatement</code>必须是一个<a href="expressions-and-statements.html#simple-statements">简单语句</a>。
+<code>x</code>必须为一个估值结果为接口值的表达式，它称为此代码块中的断言值。
+<code>v</code>称为此代码块中的断言结果，它必须出现一个短变量声明形式中。
 </p>
 
 <p>
-The <code>case</code> keywords in a type switch block can be followed by
-a <code>nil</code> identifier, one or more type names and type literals.
-None of such items can follow more than one <code>case</code> keywords
-at the same time in the same type switch block.
+在一个<code>type-switch</code>代码块中，每个<code>case</code>关键字后可以跟随一个<code>nil</code>标识符和若干个类型名或类型字面表示。
+在同一个<code>type-switch</code>代码块中，这些跟随在所有<code>case</code>关键字后的条目不可重复。
 </p>
 
 <p>
-If the type denoted by a type name or type literal following a <code>case</code> keyword
-in a type switch block is not an interface type, then it
-must implement the interface type of the interface value followed by <code>.(type)</code>.
+如果跟随在某个<code>case</code>关键字后的条目为一个非接口类型（用一个类型名或类型字面表示），则此非接口类型必须实现了断言值<code>x</code>的（接口）类型。
 </p>
 
-Here is an example of type switch:
+下面是一个使用了<code>type-switch</code>代码块的例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -739,35 +648,31 @@ func main() {
 		[]int{1, 2, 3}, map[int]bool{}, nil,
 	}
 	for _, x := range values {
-		// Here, v is declared once, but it denotes
-		// different varialbes in different branches.
+		// 这里，虽然变量v只被声明了一次，但是它在
+		// 不同分支中可以表示为多个类型的变量值。
 		switch v := x.(type) {
-		case []int: // a type literal
-			// The type of v is []int.
+		case []int: // 一个类型字面表示
+			// 在此分支中，v的类型为[]int。
 			fmt.Println("int slice:", v)
-		case string: // one type name
-			// The type of v is string.
+		case string: // 一个类型名
+			// 在此分支中，v的类型为string。
 			fmt.Println("string:", v)
-		case int, float64, int32: // multiple type names
-			// The type of v is always same as x.
-			// In this example, it is interface{}.
+		case int, float64, int32: // 多个类型名
+			// 在此分支中，v的类型为x的类型interface{}。
 			fmt.Println("number:", v)
 		case nil:
-			// The type of v is always same as x.
-			// In this example, it is interface{}.
+			// 在此分支中，v的类型为x的类型interface{}。
 			fmt.Println(v)
 		default:
-			// The type of v is always same as x.
-			// In this example, it is interface{}.
+			// 在此分支中，v的类型为x的类型interface{}。
 			fmt.Println("others:", v)
 		}
-		// Note, each variable denoted by v in the
-		// last three branches is a copy of x.
+		// 注意：在最后的三个分支中，v均为接口值x的一个复制。
 	}
 }
 </code></pre>
 
-The output:
+输出结果：
 <pre class="output"><code>number: 456
 string: abc
 others: true
@@ -778,7 +683,10 @@ others: map[]
 &lt;nil&gt;
 </code></pre>
 
-The above example is equivalent to the following one:
+<p>
+</p>
+
+上面这个例子程序在逻辑上等价于下面这个：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -812,59 +720,62 @@ func main() {
 }
 </code></pre>
 
-Some details about type switch:
+<p>
+</p>
+
+<p>
+如果我们不关心一个<code>type-switch</code>代码块中的断言结果，则此<code>type-switch</code>代码块可简写为<code>switch x.(type) {...}</code>。
+</p>
+
+<code>type-switch</code>代码块和<code>switch-case</code>代码块有很多共同点：
 <ul>
 <li>
-	unlike general <code>switch-case</code> blocks, <code>fallthrough</code> statements
-	can't be used within branch blocks of a type switch block.
+	在一个<code>type-switch</code>代码块中，最多只能有一个<code>default</code>分支存在。
 </li>
 <li>
-	like general <code>switch-case</code> blocks, if the <code>default</code> branch is present,
-	it can be the last branch, the first branch, or a middle branch.
+	在一个<code>type-switch</code>代码块中，如果<code>default</code>分支存在，它可以为最后一个分支、第一个分支或者中间的某个分支。
 </li>
 <li>
-	if we don't care about the assertion value in a type switch,
-	we can use the short form <code>switch x.(type) {...}</code> instead.
-</li>
-<li>
-	like general <code>switch-case</code> blocks,
-	zero or more branches can be present in a type switch block.
-	A type switch block without branches, <code>switch a.(type) {}</code>,
-	is a no-op at run time.
+	一个<code>type-switch</code>代码块可以不包含任何分支，它可以被视为一个空操作。
 </li>
 </ul>
+
+<p>
+但是，和<code>switch-case</code>代码块不一样，<code>fallthrough</code>语句不能使用在<code>type-switch</code>代码块中。
+</p>
+
 </div>
 
-<h3>More About Interfaces In Go</h3>
+<h3>更多接口相关的内容</h3>
 
 <p class="anchor" id="embedding"></p>
-<h4>Interface Type Embedding</h4>
+<h4>接口类型内嵌</h4>
 
 <div>
-In Go, an interface type can embed another named interface type.
-The final effect is the same as unfolding the method prototypes
-specified by the embedded interface type into the definition body
-of the embedding interface type.
-For example, given the following two named interface types:
+一个接口类型可以内嵌另一个有名接口类型。
+此内嵌的效果相当于将此被内嵌的有名接口类型所指定的所有方法原型展开到内嵌它的接口类型的定义体内。
+比如，在下面的例子中，接口类型<code>Ic</code>、<code>Id</code>和<code>Ie</code>的所指定的方法集完全一样。
+
 <pre class="line-numbers"><code class="language-go">type Ia interface {
 	fa()
 }
 
-type Ib interface {
+type Ib = interface {
 	fb()
 }
-</code></pre>
 
-then the following interface type:
-<pre class="line-numbers"><code class="language-go">interface {
-	Ia
-	Ib
-}
-</code></pre>
-
-has the identical method set as <code>Ic</code>:
-<pre class="line-numbers"><code class="language-go">type Ic interface {
+type Ic interface {
 	fa()
+	fb()
+}
+
+type Id = interface {
+	Ia // 内嵌Ia
+	Ib // 内嵌Ib
+}
+
+type Ie interface {
+	Ia // 内嵌Ia
 	fb()
 }
 </code></pre>
@@ -872,151 +783,136 @@ has the identical method set as <code>Ic</code>:
 <p>
 </p>
 
-Up to now (Go 1.10), if two interface types both specify a method prototype with the same name,
-then they can't be embedded as the same time in the same third interface type,
-even if the two method prototypes are identical.
-For example, the following two interafce types are both illegal:
+截止到目前（Go 1.11），如果两个有名接口类型都指定了一个同名方法，则这两个接口类型不可被同时内嵌在同一个接口类型中，即使它们指定的同名方法的原型也一致。
+比如，下面的代码是编译不通过的：
 
-<pre class="line-numbers"><code class="language-go">interface {
+<pre class="line-numbers"><code class="language-go">type Ix interface {
 	Ia
 	Ic
 }
 
-interface {
+type Iy = interface {
 	Ib
 	Ic
 }
 </code></pre>
+
+<p>
+<p>
+
+<p>
+一个接口类型不能内嵌（无论是直接还是间接）它自己。
+</p>
 </div>
 
 <p class="anchor" id="comparison"></p>
-<h4>Interface Values Involved Comparisons</h4>
+<h4>接口值相关的比较</h4>
 
 <div>
-There are two cases of interface values involved comparisons:
+接口值相关的比较有两种情形：
 <ol>
 <li>
-	comparisons between a non-interface value and an interface value.
+	比较一个非接口值和接口值；
 </li>
 <li>
-	comparisons between two interface values.
+	比较两个接口值。
 </li>
 </ol>
 
 <p>
-For the first case,
-the type of the non-interface value must implement the type
-(assume it is <code>I</code>) of the interface value,
-so the non-interface value can be converted to (boxed into)
-an interface value of <code>I</code>.
-This means a comparison between a non-interface value and an interface value
-can be translated to a comparison between two interface values.
-So below only comparisons between two interface values will be explained.
+对于第一种情形，非接口值的类型必须实现了接口值的类型（假设此接口类型为<code>I</code>），所以此非接口值可以被转化为（包裹到）一个<code>I</code>值中。
+这意味着非接口值和接口值的比较可以转化为两个接口值的比较。所以下面我们只探讨两个接口值比较的情形。
 </p>
 
 <p>
-Comparing two interface values is comparing their respective dynamic types
-and dynamic values actually.
+比较两个接口值其实是比较这两个接口值的动态类型和和动态值。
 </p>
 
-The steps of comparing two interface values (with the <code>==</code> operator):
+下面是（使用<code>==</code>比较运算符）比较两个接口值的步骤：
 <ol>
 <li>
-	if one of two interface values is a nil interface value,
-	then the comparison result is whether or not
-	the other interface value is also a nil interface value.
+	如果其中一个接口值是一个nil接口值，则比较结果为另一个接口值是否也为一个nil接口值。
 </li>
 <li>
-	if the dynamic types of the two interface values are two different types,
-	then the comparison result is <code>false</code>.
+	如果这两个接口值的动态类型不一样，则比较结果为<code>false</code>。
 </li>
 <li>
-	for the case of the dynamic types of the two interface values are the same type,
+	对于这两个接口值的动态类型一样的情形，
 	<ul>
 	<li>
-		if the same dynamic type is an
-		<a href="value-conversions-assignments-and-comparisons.html#comparison-rules">uncomparable type</a>,
-		a panic will occur.
+		如果它们的动态类型为一个<a href="value-conversions-assignments-and-comparisons.html#comparison-rules">不可比较类型</a>，则将产生一个恐慌。
 	</li>
 	<li>
-		otherwise, the comparison result is the result of comparing the dynamic values of the two interface values.
+		否则，比较结果为它们的动态值的比较结果。
 	</li>
 	</ul>
 </li>
 </ol>
 
 <p>
-In short, two interface values are equal only if their respective dynamic types
-and their respective dynamic values are both equal,
-and their dynamic values are comparable.
+简而言之，两个接口值只有在它们都为零值或者它们的动态类型都相同、动态值都相等并且它们的动态类型为可比较类型的时候的比较结果才为<code>true</code>。
 </p>
 
-By the rules, two interface values which dynamic values are both <code>nil</code>
-may be not equal. An example:
+根据此规则，两个包裹了不同类型的<code>nil</code>零值的接口值是不相等的。
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
 func main() {
 	var a, b, c interface{} = "abc", 123, "a"+"b"+"c"
-	fmt.Println(a == b) // a case of step 3. Print "false".
-	fmt.Println(a == c) // a case of step 3. Print "true".
+	fmt.Println(a == b) // 第二步的情形。 输出"false"。
+	fmt.Println(a == c) // 第三步的情形。 输出"true"。
 
 	var x *int = nil
 	var y *bool = nil
 	var ix, iy interface{} = x, y
 	var i interface{} = nil
-	fmt.Println(ix == iy) // false
-	fmt.Println(ix == i)  // false
-	fmt.Println(ix == i)  // false
+	fmt.Println(ix == iy) // 第二步的情形。 输出"false"。
+	fmt.Println(ix == i)  // 第一步的情形。 输出"false"。
+	fmt.Println(iy == i)  // 第一步的情形。 输出"false"。
 
-	var s []int = nil // []int is an uncomparable type
+	var s []int = nil // []int为一个不可比较类型。
 	i = s
-	fmt.Println(i == nil) // a case of step 1. Print "false".
-	fmt.Println(i == i)   // a case of step 2. Will panic.
+	fmt.Println(i == nil) // 第一步的情形。 输出"false"。
+	fmt.Println(i == i)   // 第三步的情形。 将产生一个恐慌。
 }
 </code></pre>
 </div>
 
-<h4>The Internal Structure Of Interface Values</h4>
+<h4>接口值的内部结构</h4>
 
 <p>
-For the offcial Go compiler/runtime, blank interface values and non-blank interface values
-are represented with two different internal structures.
-Please read <a href="value-part.html#interface-structure">value parts</a> for details.
+对于官方标准Go编译器/运行时，空接口值和非空接口值是使用两种内部结构来表示的。
+详情请阅读<a href="value-part.html#interface-structure">值部</a>一文。
 </p>
 
-<h4>Pointer Dynamic Value vs. Non-Pointer Dynamic Value</h4>
+<!--
+todo: need a picture. Three parts
+* the interface value layout
+* the implementation info layout
+* the type info layout
+-->
+
+<h4>指针类型的动态值和非指针类型的动态值</h4>
 
 <p>
-The offcial Go compiler/runtime makes an optimization
-which makes that boxing pointer values into interface values
-is more efficient than boxing non-pointer values.
-For <a href="value-copy-cost.html">small size values</a>,
-the efficiency differences are small,
-but for large size values, the differences may be not small.
-For the same optimization, type assertions with a pointer type
-are also more efficient than type assertions with the base type
-of the pointer type if the base type is a large size type.
+官方标准Go编译器/运行时接口值的动态值为指针类型的情况做了特别的优化。
+此优化使得接口值包裹指针类型的动态值比包裹非指针类型的动态值效率更高。
+对于<a href="value-copy-cost.html">小尺寸值</a>，此优化的作用不大；
+但是对于大尺寸值，包裹它的指针比包裹此值的效率高得多。
+对于类型断言，此结论亦成立。
 </p>
 
 <p>
-So please try to avoid boxing large size values, box their pointers instead.
+所以尽量避免在接口值中包裹大尺寸值。对于大尺寸值，应该尽量包裹它的指针。
 </p>
 
-<p><i>
-(BTW, for the standard Go compiler and runtime,
-types other than array and struct types are all small size types.
-Struct types with very few fields are also viewed as small size types.)
-</i></p>
-
-<h4>Values Of <code>[]T</code> Can't Be Directly Converted To <code>[]I</code>
-	Even If Type <code>T</code> Implements Interface Type <code>I</code>.</h4>
+<h4>一个<code>[]T</code>类型的值不能直接被转换为类型<code>[]I</code>，即使类型<code>T</code>实现了接口类型<code>I</code></h4>
 
 <div>
-For example, sometimes, we may need to convert a <code>[]string</code> value
-to <code>[]interface</code> type. Unlike some other languages, there is no
-direct ways to make the conversion. We must make the conversion manually in a loop:
+比如，我们不能直接将一个<code>[]string</code>值转换为类型<code>[]interface</code>。
+我们必须使用一个循环来实现此转换：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -1027,37 +923,33 @@ func main() {
 		"efficient", "language.",
 	}
 
-	// The prototype of fmt.Println function is
-	// func Println(a ...interface{}) (n int, err error).
-	// So words... can't be passed to it as the argument.
+	// fmt.Println函数的原型为：
+	// func Println(a ...interface{}) (n int, err error)
+	// 所以words...不能传递给此函数的调用。
 
-	// fmt.Println(words...) // not compile
+	// fmt.Println(words...) // 编译不通过
 
-	// Convert the []string value to []interface{}.
+	// 将[]string值转换为类型[]interface{}。
 	iw := make([]interface{}, 0, len(words))
 	for _, w := range words {
 		iw = append(iw, w)
 	}
-	fmt.Println(iw...) // compiles okay
+	fmt.Println(iw...) // 编译没问题
 }
 </code></pre>
 </div>
 
-<h4>Each Method Specified In An Interface Type Corresponds To An Implicit Function</h4>
+<h4>一个接口类型每个指定的每一个方法都对应着一个隐式声明的函数</h4>
 
 <div>
 
 <p>
-For each method with name <code>m</code>
-in the method set defined by an interface type <code>I</code>,
-compilers will implicitly declare a function named <code>I.m</code>,
-which has one more input parameter, of type <code>I</code>, than method <code>m</code>.
-The extra parameter is the first input parameter of function <code>I.m</code>.
-A call to the function <code>I.m(i, ...)</code>
-is equivalent to the method call <code>i.m(...)</code>.
+如果接口类型<code>I</code>指定了一个名为<code>m</code>的方法原型，则编译器将隐式声明一个与之对应的函数名为<code>I.m</code>的函数。
+此函数比<code>m</code>的方法原型中的参数多一个。此多出来的参数为函数<code>I.m</code>的第一个参数，它的类型为<code>I</code>。
+对于一个类型为<code>I</code>的值<code>i</code>，方法调用<code>i.m(...)</code>和函数调用<code>I.m(i, ...)</code>是等价的。
 </p>
 
-An example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -1073,11 +965,11 @@ func (t T) m(n int) bool {
 
 func main() {
 	var i I = T("gopher")
-	fmt.Println (i.m(5))                         // true
-	fmt.Println (I.m(i, 5))                      // true
+	fmt.Println (i.m(5))                          // true
+	fmt.Println (I.m(i, 5))                       // true
 	fmt.Println (interface {m(int) bool}.m(i, 5)) // true
 
-	// The following lines compile okay, but will panic at run time.
+	// 下面这几行被执行的时候都将会产生一个恐慌。
 	I(nil).m(5)
 	I.m(nil, 5)
 	interface {m(int) bool}.m(nil, 5)
