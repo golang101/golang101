@@ -1,126 +1,93 @@
-﻿<h1>Type-Unsafe Pointers</h1>
+﻿<h1>非类型安全指针</h1>
 
 <p>
-We have learned Go pointers from the article
-<a href="pointer.html">pointers in Go</a>.
-From that article, we know that, comparing to C pointers,
-there are many restrictions made for Go pointers.
-For example, Go pointers can't participate arithmetic operations.
-And for two arbitrary pointer types, it is very possible that
-their values can't be converted to each other.
+我们已经在<a href="pointer.html">Go中的指针</a>一文中学习到关于指针的各种概念和规则。
+从那篇文章中，我们得知，相对于C指针，Go指针也很多限制。
+比如，Go指针不支持算术运算，并且对于任意两个指针值，很可能它们不能转换到对方的类型。
 </p>
 
 <p>
-The pointers explained in that article are called type-safe pointers actually.
-Although the restrictions on type-safe pointers really make
-us be able to write safe Go code with ease,
-they also make some obstacles to write efficient code for some scenarios.
+事实上，在那篇文章中解释的指针的完整称呼为类型安全指针。
+虽然类型安全指针有助于我们轻松写出安全的代码，但是有时候施加在类型安全指针上的限制也确实导致我们不能写出最高效的代码。
 </p>
 
 <p>
-In fact, up to currrent (Go 1.10), Go also supports type-unsafe pointers,
-which are pointers without the restrictions made for safe pointers.
-Type-unsafe pointers are also called unsafe pointers in Go.
-Go unsafe pointers are much like C pointers,
-they are powerful, and also dangerous.
-For some scenarios, we can write more efficient code
-with the help of unsafe pointers.
-On the other hand, it is easy to write invalid code which is subtle
-and difficult to detect when using unsafe pointers.
+实际上，Go也支持限制较少的类型非安全指针。
+类型非安全指针和C指针类似，它们都很强大，但同时也都很危险。
+在某些情形下，通过非类型安全指针的帮助，我们可以写出效率更高的代码；
+但另一方面，使用非类型安全指针也使我们可以写出潜在的不安全的代码，这些潜在的不安全点很难及时在它们产生危害之前被发现。
 </p>
 
 <p>
-The biggest risk of using unsafe pointers comes from the fact that
-the unsafe mechanism is not protected by
-<a href="https://golang.org/doc/go1compat">the Go 1 compatibility guidelines</a>.
-Code depending on unsafe pointers works today could break
-since a later Go version.
+使用非安全指针的另外一个较大的风险是Go中目前提供的非安全指针机制并不受到<a href="https://golang.google.cn/doc/go1compat">Go 1 兼容性保证</a>的保护。
+使用了非安全指针的代码可以从今后的某个Go版本开始将不再能编译通过，或者运行行为发生了变化。
 </p>
 
 <p>
-If you really desire the code efficient improvements by using unsafe
-pointers for any reason, not only should you know the above mentioned risks,
-but also should you follow the instructions written in official Go
-documentations and clearly understand the effects of each unsafe pointer use,
-so that you can write safe Go code with unsafe pointers,
-at least if you use the standard Go compiler in Go SDK 1.10.
+如果出于种种原因，你确实希望在你的代码中使用非类型安全指针，你不仅需要地方是上述风险，你还需遵守Go官方文档中列出的用非类型安全指针使用模式，并清楚的知晓使用非类型安全指针带来的效果。
+否则，你很难使用非类型安全指针写出（至少对当前的Go版本来说是）安全的代码。
 </p>
 
-<h3>About The <code>unsafe</code> Standard Package</h3>
+<h3>关于<code>unsafe</code>标准库包</h3>
 
 <div>
-Go provides a special kind of types for unsafe pointers.
-We must import
-<a href="https://golang.org/pkg/unsafe/">the <code>unsafe</code> standard package</a>
-to use unsafe pointers.
-The <code>unsafe.Pointer</code> type is defined as
+类型非安全指针在Go中为<a href="type-system-overview.html#type-kinds">一种</a>特别的类型。
+我们必须引入<a href="https://golang.org/pkg/unsafe/"><code>unsafe</code>标准库包</a>来使用类型非安全指针。
+类型非安全指针code>unsafe.Pointer</code>被声明定义为：
 
 <pre class="line-numbers"><code class="language-go">type Pointer *ArbitraryType
 </code></pre>
 
 <p>
-Surely, it is not a usual type definition.
-Here the <code>ArbitraryType</code>
-just hints that a <code>unsafe.Pointer</code> value can be converted
-to any safe pointer values in Go, and vice versa.
-In other words, <code>unsafe.Pointer</code> is like the <code>void*</code> in C.
+当然，这部是一个普通的类型定义。这里的<code>ArbitraryType</code>仅仅是暗示<code>unsafe.Pointer</code>类型值可以被转换为任意类型安全指针（反之亦然）。
+换句话说，<code>unsafe.Pointer</code>类似于C语言中的<code>void*</code>。
 </p>
 
 <p>
-Go unsafe pointers mean the types
-whose underlying types are <code>unsafe.Pointer</code>.
+非类型安全指针是指底层类型为<code>unsafe.Pointer</code>的类型。
 </p>
 
 <p>
-The zero values of unsafe pointers are also represneted with
-the predelcared identifier <code>nil</code>.
+类型非安全指针的零值也使用预声明的<code>nil</code>标识符来表示。
 </p>
 
-The <code>unsafe</code> standard package also provides three functions.
+<code>unsafe</code>标准库包提供了三个函数：
 <ul>
 <li>
-	<code>func Alignof(variable ArbitraryType) uintptr</code>,
-	which is used to get the address alignment of a value.
-	Please notes, the aligns for struct-field values and non-field values
-	of the same type may be different, though for the standard
-	Go compiler, they are always the same.
-	
+	<code>func Alignof(variable ArbitraryType) uintptr</code>。
+	此函数用来取得一个值在内存中的地址对齐保证（address alignment）。
+	注意，同一个类型的值做为结构体字段和非结构体字段时地址对齐保证可能是不同的。
+	当然，这和具体编译其的实现有关。对于目前的官方标准Go编译器，同一个类型的值做为结构体字段和非结构体字段时地址对齐保证总是相同的。
+	gccgo编译器对这两种情形是区别对待的。
+
 </li>
 <li>
-	<code>func Offsetof(selector ArbitraryType) uintptr</code>,
-	which is used to get the address offset of a field in a struct value.
-	The offset is relative to the address of the struct value.
-	The return results should be always the same for the same corresponding
-	fields of the struct values of the same type in the same program.
+	<code>func Offsetof(selector ArbitraryType) uintptr</code>。
+	此函数用来取得一个结构体值的某个字段的地质相对于此结构体值的地址的偏移。
+	在一个程序中，对于同一个结构体类型的不同值的对应相同字段，此函数的返回值总是相同的。
 </li>
 <li>
-	<code>func Sizeof(variable ArbitraryType) uintptr</code>,
-	which is used to get the size of a value
-	(a.ka.a, the size of the type of the value).
-	The return results should be always the same
-	for all values of the same type in the same program.
+	<code>func Sizeof(variable ArbitraryType) uintptr</code>。
+	此函数用来取得一个值的尺寸（亦即此值的类型的尺寸）。
+	在一个程序中，对于同一个类型的不同值，此函数的返回值总是相同的。
 </li>
 </ul>
 
 <p>
-Note that the types of the return results of the three functions are all
-<code>uintptr</code>. Below we will learn that <code>uintptr</code> values
-can be converted to <code>unsafe.Pointer</code>, and vice versa.
+注意，这三个函数的返回值的类型均为内置类型<code>uintptr</code>。
+下面我们将了解到<code>uintptr</code>类型的值可以转换为非类型安全指针（反之亦然）。
 <p>
 
 <p>
-Although the return results of the three functons
-are consistent in the same program,
-they may be different crossing operation systems of different architectures,
-crossing compilers, and crossing compiler versions.
+尽管这三个函数的任何调用的返回结果在同一个编译好的程序中总是一致的，
+但是这样的一个调用在不同构架的操作系统中（或者使用不同的编译器编译时）的返回值可能是不一样的。
 </p>
 
 <p>
-Calls to the three function are always evaluated at compile time.
-Their results can be assigned to constants.
+这三个函数的调用总是在编译时刻被估值，并且估值结果为常量。
 </p>
 
-An example of using the three functions.
+一个使用了这三个函数的例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -133,12 +100,12 @@ func main() {
 		c string
 	}
 	const M, N = unsafe.Sizeof(x.c), unsafe.Sizeof(x)
-	fmt.Println(M, N)   // 16 32
-	
+	fmt.Println(M, N) // 16 32
+
 	fmt.Println(unsafe.Alignof(x.a)) // 8
 	fmt.Println(unsafe.Alignof(x.b)) // 1
 	fmt.Println(unsafe.Alignof(x.c)) // 8
-	
+
 	fmt.Println(unsafe.Offsetof(x.a)) // 0
 	fmt.Println(unsafe.Offsetof(x.b)) // 8
 	fmt.Println(unsafe.Offsetof(x.c)) // 16
@@ -146,8 +113,7 @@ func main() {
 </code></pre>
 
 <p>
-Please note, the above print results are for the standard
-Go compiler 1.10 on Linux amd64 OSes.
+注意，上面程序中暗示的输出结果是此程序在使用官方标准Go编译器1.11版本编译时的结果。
 </p>
 
 </div>
@@ -205,112 +171,124 @@ They are as dangerous as C pointers, which is Go always tries to avoid.
 </div>
 -->
 
-<h3>Unsafe Pointers Related Conversion Rules</h3>
+<h3>非类型安全指针相关的类型转换</h3>
 
 <div>
-Go compilers allow the following explicit conversions.
+目前（Go 1.11），Go支持下列和非类型安全指针相关的类型转换：
 <ul>
 <li>
-	A safe pointer can be explicitly converted to an unsafe pointer,
-	and vice versa.
+	一个类型安全指针值可以被显式转换为一个类型非安全指针类型，反之亦然。
 </li>
 <li>
-	An uintptr value can be explicitly converted to an unsafe pointer,
-	and vice versa.
+	一个uintptr值可以被显式转换为一个类型非安全指针类型，反之亦然。
+	但是，注意，一个nil非安全指针类型不应该被转换为uintptr并进行算术运算后再转换回来。
 </li>
 </ul>
 
 <p>
-By using these conversions, we can do conversions
-between any two safe pointers, between any two uintptr values,
-and between an arbitrary safe pointer and an uintptr value.
-Unsafe pointers act as bridges in these conversions.
+通过使用这些转换规则，我们可以在任意两个类型安全指针转换为对方的类型，我们也可以将一个安全指针值和一个uintptr值转换为对方的类型。
 </p>
 
 <p>
-However, although these conversions are all legal at compile time,
-not all of them are valid (safe) at run time.
-These conversions defeat the memory safety the whole Go type system
-(except the unsafe part) tries to maintain.
-We must follow the instructions listed in a later section below
-to write valid Go code with unsafe pointers.
+然而，尽管这些转换在编译时刻是合法的，但是它们中一些并非在运行时刻是合法和安全的。
+这些转换摧毁了Go的类型系统（不包括类型非安全指针部分）精心设立的内存安全屏障。
+我们必须遵循本文后面要介绍的一些用法指示来用类型非安全指针写出合法并安全的代码。
 </p>
 
 </div>
 
-<h3>Some Facts In Go We Should Know</h3>
+<h3>我们需要知道的一些事实</h3>
 
 <p>
-Before introducing the valid unsafe pointer use patterns,
-we need to know some facts in Go.
+在开始介绍合法的非类型安全指针使用模式之前，我们需要知道一些事实。
 </p>
 
-<h4>Fact 1: Unsafe Pointers Are Pointers And Uintptr Values Are Intergers</h4>
+<h4>事实一：类型非安全指针值是指针但uintptr值是整数</h4>
 
 <p>
-Each of non-nil safe and unsafe pointers references another value.
-However uintptr values don't reference any values, they are just plain integers,
-though often each of them stores a memory address.
+每一个非零安全或者不安全指针值均引用着另一个值。但是一个uintptr值并不应用任何值，它值被看作是一个整数，尽管常常它存储的是一个地址的数字表示。
 </p>
 
 <p>
-Go is a language supporting automatic garbage collection.
-When a Go program is running, Go runtime will
-<a href="memory-block.html#when-to-collect">check which values are not used
-any more and collect the memory</a> allocated for these unused values,
-from time to time.
-Pointers play an important role in the check process.
-If a value is unreachable from (referenced by) any values still in using,
-then Go runtime thinks it is an unuse value and it can be safely garbage collected.
+Go是一门支持垃圾回收的语言。
+当一个Go程序在运行中，Go运行时将不时地<a href="memory-block.html#when-to-collect">检查哪些内存块将不再被程序中的任何仍在使用中的值所引用并且回收这些内存块</a>。
+指针在这一过程中扮演着重要的角色。值与值之间和内存块与值之间的引用关系是通过指针来表征的。
 </p>
 
 <p>
-As uintptr values are integers, they can participate arithmetic operations.
+既然一个uintptr值是一个整数，那么它可以参与算术运算。
 </p>
 
 <p>
-The example in the next subsection shows the differences between
-pointers and uintptr values.
+下一节中的例子将展示指针和uintptr值的不同。
 </p>
 
-<h4>Fact 2: Unused Values May Be Collected At Any Time</h4>
+<h4>事实二：不再被使用内存块的回收时间点是不确定的</h4>
 
 <div>
 <p>
-At run time, the garbage collector may run at any time,
-so when a value becomes unused, the
-<a href="memory-block.html">memory block</a> allocated for unused values may be
-<a href="memory-block.html#when-can-collect">collected at any time</a>.
+在运行时刻，一次新的垃圾回收过程可能在一个不确定的时间启动，并且此过程可能需要一段不确定的时长才能完成。
+所以一个不再被使用的内存块的<a href="memory-block.html#when-can-collect">回收时间点</a>是不确定的。
 </p>
 
-For example:
+一个例子：
 
-<pre class="line-numbers"><code class="language-go">package main
+<pre class="line-numbers"><code class="language-go">import "unsafe"
 
-import "fmt"
-import "unsafe"
+// 假设此函数不会被内联（inline）。
+func createInt() *int {
+	return new(int)
+}
 
-var x *int
-var y unsafe.Pointer
-var z uintptr
+func foo() {
+	p0, y, z := createInt(), createInt(), createInt()
+	var p1 = unsafe.Pointer(y) // 和y一样引用着同一个值
+	var p2 = uintptr(unsafe.Pointer(z))
 
-func main() {
-	var vx, vy, vz int
-	x = &vx
-	y = unsafe.Pointer(&vy)
-	z = uintptr(unsafe.Pointer(&vz))
+	// 此时，即使z指针值所引用的int值的地址仍旧存储在p2值中，但是此
+	// int值已经不再被使用了，所以垃圾回收器认为可以回收vz值所占据的
+	// 内存块了。另一方面，p0和p1各自所引用的int值仍旧将在下面被使用。
+
+	// uinptr值可以参与算术运算。
+	p2 += 2; p2--; p2--
+
+	*p0 = 1                          // okay
+	*(*int)(p1) = 2                  // okay
+	*(*int)(unsafe.Pointer(p2))) = 3 // 危险操作！
+}
+</code></pre>
+
+<p>
+在上面这个例子中，值<code>p2</code>仍旧在使用这个事实并不能保证曾经被<code>z</code>指针值所引用的<code>int</code>值所占的内存块没有被回收。
+换句话说，当<code>*(*T)(unsafe.Pointer(p2))) = 3</code>被执行的时候，此内存块可能已经被回收了，也可能还没被回收。
+所以，继续通过解引用值<code>p2</code>中存储的地址是非常危险的，因为此内存块可能已经被重新分配其它值使用了。
+</p>
+
+</div>
+
+<h4>事实三：我们可以将一个值的指针传递给<code>runtime.KeepAlive</code>函数调用来确保此值在此调用之前仍然处于被使用中</h4>
+
+<div>
+<p>
+为了确保一个值仍然在使用中，我们应该将引用着此值的另一个值传给一个<code>runtime.KeepAlive</code>函数调用。
+在实践中，我们常常将此值的指针传递给一个<code>runtime.KeepAlive</code>函数调用。
+</p>
+
+比如，通过在上一小节的例子中的最后添加一个<code>runtime.KeepAlive(z)</code>调用，
+<code>*(*int)(unsafe.Pointer(p2))) = 3</code>可以被安全地执行了。
+
+<pre class="line-numbers"><code class="language-go">func foo() {
+	p0, y, z := createInt(), createInt(), createInt()
+	var p1 = unsafe.Pointer(y)
+	var p2 = uintptr(unsafe.Pointer(z))
+
+	p2 += 2; p2--; p2--
+
+	*p0 = 1
+	*(*int)(p1) = 2
+	*(*int)(unsafe.Pointer(p2))) = 3 // 转危为安！
 	
-	// At the time, even if its address of vz is stored in z.
-	// vz has already become unused. Gargage collector can
-	// collect the memory allocated for it now.
-	// On the other hand. vx and vy are still in using,
-	// for they are reachable from the x and y pointers.
-	
-	// uinptr can be used as operands of arithmetic operators.
-	z++
-	z &^= 1 // <=> z = z &^ 1
-	
-	fmt.Println(x, y, z)
+	runtime.KeepAlive(z) // 确保z所引用的值仍在使用中
 }
 </code></pre>
 
@@ -319,28 +297,29 @@ func main() {
 
 </div>
 
-<h4>Fact 3: We Can Use A <code>runtime.KeepAlive</code> Function Call To Mark A Value As Still In Using (Reachable) Currently</h4>
+<h4>事实四：一个值的被使用范围可能并没有代码中看上去的大</h4>
 
 <div>
 <p>
-To mark a value still reachable, we should pass another value which references
-the value as the argument a <code>runtime.KeepAlive</code> function call.
-A pointer to the value is often used as such an argument.
-</p>
+比如中下面这个例子，值<code>t</code>仍旧在使用中并不能保证值<code>t.y</code>仍在被使用。
 
-In the following code, a small modification is made on the example in the last subsection.
+<pre class="line-numbers"><code class="language-go">type T struct {
+	x int
+	y *[1<<23]byte
+}
 
-<pre class="line-numbers"><code class="language-go">func main() {
-	var vx, vy, vz int
-	x = &vx
-	y = unsafe.Pointer(&vy)
-	z = uintptr(unsafe.Pointer(&vz))
+func bar() {
+	t := T{y: new([1<<23]byte)}
+	p := uintptr(unsafe.Pointer(&t.y[0]))
 	
-	// do other things ...
+	... // 使用t.x和t.y
 	
-	// vz is still reachable at least up to here, so
-	// it will not be garbage collected now for sure.
-	runtime.KeepAlive(&vz)
+	// 一个聪明的编译器能够觉察到值t.y将不会再被用到，
+	// 所以认为t.y值所占的内存块可以被回收了。
+	
+	*(*byte)(unsafe.Pointer(p))) = 1 // 危险操作！
+
+	println(t.x) // 继续使用值t，但只使用t.x字段。
 }
 </code></pre>
 
@@ -349,26 +328,25 @@ In the following code, a small modification is made on the example in the last s
 
 </div>
 
-<h4>Fact 4: <code>*unsafe.Pointer</code> Is A General Safe Pointer Type</h4>
+<h4>事实五：<code>*unsafe.Pointer</code>是一个类型安全指针类型</h4>
 
 <div>
 <p>
-Yes, <code>*unsafe.Pointer</code> is a safe unnamed pointer type.
-Its base type is <code>unsafe.Pointer</code>.
-As it is a safe pointer, accroding the conversion rules listed above,
-it can be converted to <code>unsafe.Pointer</code> type, and vice versa.
+是的，类型<code>*unsafe.Pointer</code>是类型安全的。
+它的基类型为<code>unsafe.Pointer</code>。
+既然它是一个类型安全指针类型，根据上面列出的类型转换规则，它的值可以转换为类型<code>unsafe.Pointer</code>，反之亦然。
 </p>
 
-For example:
+一个例子：
 
 <pre class="line-numbers"><code class="language-go">package main
 
 import "unsafe"
 
 func main() {
-	x := 123 // of type int
+	x := 123 // 类型为int
 	p := unsafe.Pointer(&x)
-	pp := &p // of type *unsafe.Pointer
+	pp := &p // 类型为*unsafe.Pointer
 	p = unsafe.Pointer(pp)
 	pp = (*unsafe.Pointer)(p)
 }
@@ -376,36 +354,30 @@ func main() {
 
 </div>
 
-<h3>How To Use Unsafe Pointers Correctly</h3>
+<h3>如何正确地使用类型非安全指针？</h3>
 
 <p>
-The <code>unsafe</code> standard package documentation lists
-<a href="https://golang.org/pkg/unsafe/#Pointer">six unsafe pointer use patterns</a>.
-Following will introduce and explain them one by one.
+<code>unsafe</code>标准库包的文档中列出了<a href="https://golang.org/pkg/unsafe/#Pointer">六种类型非安全指针的使用模式</a>。
+下面将对它们逐一讲解。
 </p>
 
-<h4>Pattern 1: Convert <code>*T1</code> To Unsafe Poniter, Then Convert The Unsafe Pointer Value To <code>*T2</code></h4>
+<h4>使用模式一：将类型<code>*T1</code>的一个值转换为类型非安全指针值，然后将此类型非安全指针值转换为类型<code>*T2</code>。</h4>
 
 <div>
 
 <p>
-As above has mentioned, by using the unsafe pointer conversion rules above,
-we can convert a value of <code>*T1</code> to type <code>*T2</code>,
-where <code>T1</code> and <code>T2</code> are two arbitrary types.
-However, we should only do such conversions if the size of <code>T1</code>
-is no larger than <code>T2</code>, and only if the conversions are meaningful.
+利用前面列出的类型非安全指针相关的转换规则，我们可以将一个<code>*T1</code>值转换为类型<code>*T2</code>，其中<code>T1</code>和<code>T2</code>为两个任意类型。
+然而，我们只有在<code>T1</code>的尺寸不大于<code>T2</code>并且此转换具有实际意义的时候才应该实施这样的转换。
 </p>
 
 <p>
-As a result, we can also achieve the conversions between
-type <code>T1</code> and <code>T2</code> by using this pattern.
+通过将一个<code>*T1</code>值转换为类型<code>*T2</code>，我们也可以将一个<code>T1</code>值转换为类型<code>T2</code>。
 </p>
 
-One example is the <code>math.Float64bits</code> function,
-which converts a <code>float64</code> values to an <code>uint64</code> value.
-Each corresponding bit of the memory representations
-of the two values is identical.
-The <code>math.Float64bits</code> function does reverse conversions.
+一个这样的例子是<code>math</code>标准库包中的<code>Float64bits</code>函数。
+此函数将一个<code>float64</code>值转换为一个<code>uint64</code>值。
+在此转换过程中，此<code>float64</code>值在内存中的每个位（bit）都保持不变。
+函数<code>math.Float64bits</code>为此转换的逆转换。
 
 <pre class="line-numbers"><code class="language-go">func Float64bits(f float64) uint64 {
 	return *(*uint64)(unsafe.Pointer(&f))
@@ -417,15 +389,11 @@ func Float64frombits(b uint64) float64 {
 </code></pre>
 
 <p>
-Please note, the return result of the <code>Float64bits(aFloat64)</code>
-function is different from the result of the explicit conversion
-<code>uint64(aFloat64)</code>.
+请注意，函数调用<code>math.Float64bits(aFloat64)</code>的结果和显式转换<code>uint64(aFloat64)</code>的结果不同。
 </p>
 
-In the following example, we use this pattern to convert a <code>[]MyString</code>
-slice to type <code>[]string</code>, and vice versa.
-The result slice and the original slice share the underlying elements.
-Such conversions are impossible through safe ways,
+在下面这个例子中，我们使用此模式将一个<code>[]MyString</code>值和一个<code>[]string</code>值转换为对方的类型。
+结果切片和被转换的切片将共享底层元素。（这样的转换不可能通过安全的方式实现的。）
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -438,11 +406,11 @@ func main() {
 	type MyString string
 	ms := []MyString{"C", "C++", "Go"}
 	fmt.Printf("%s\n", ms)  // [C C++ Go]
-	// ss := ([]string)(ms) // compiling error
+	// ss := ([]string)(ms) // 编译错误
 	ss := *(*[]string)(unsafe.Pointer(&ms))
 	ss[1] = "Rust"
 	fmt.Printf("%s\n", ms) // [C Rust Go]
-	// ms = []MyString(ss) // compiling error
+	// ms = []MyString(ss) // 编译错误
 	ms = *(*[]MyString)(unsafe.Pointer(&ss))
 }
 </code></pre>
@@ -452,17 +420,14 @@ func main() {
 
 </div>
 
-<h4>Pattern 2: Convert Unsafe Pointer To Uintptr, Then Use The Uintptr Value</h4>
+<h4>使用模式二：将一个类型非安全指针值转换为一个uintptr值，然后使用此uintptr值。</h4>
 
 <div>
 <p>
-This parttern is not very useful.
-Usually, we print the result uintptr values to check the memory addresses
-stored in them. However, there are other less verbose ways to this job.
-So this pattern is not much useful.
+此模式不是很有用。一般我们将最终的转换结果uintptr值输出到日志中用来调试，但是有很多其它安全的途径也可以实现此目的。
 </p>
 
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -478,16 +443,16 @@ func main() {
 </code></pre>
 
 <p>
-Abviously, it is more simple to use the built-in function
-<code>println</code> to print an address.
+输出地址在每次运行中可能都会不同。
 </p>
+
 </div>
 
-<h4>Pattern 3: Convert Unsafe Pointer To Uintptr, Do Arithmetic Operations With The Uintptr Value, Then Convert Back</h4>
+<h4>使用模式三：将一个类型非安全指针转换为一个uintptr值，然后此uintptr值参与各种算术运算，在将算术运算的结果uintptr值转回类型非安全指针。</h4>
 
 <div>
 
-For example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -501,60 +466,50 @@ type T struct {
 const N = unsafe.Offsetof(T{}.y)
 const M = unsafe.Sizeof([3]int16{}[0])
 
-// We use a package-level channel variable to make sure the T
-// value used in the main function will be allocated on heap.
-var c = make(chan *T, 1)
-
 func main() {
-	c <- &T{y: [3]int16{123, 456, 789}}
-	t := <-c
-	p := unsafe.Pointer(t)
-	// "uintptr(p) + N + M + M" stores the address of t.y[2].
+	t := T{y: [3]int16{123, 456, 789}}
+	p := unsafe.Pointer(&t)
+	// "uintptr(p) + N + M + M"为t.y[2]的内存地址。
 	ty2 := (*int16)(unsafe.Pointer(uintptr(p) + N + M + M))
 	fmt.Println(*ty2) // 789
 }
 </code></pre>
 
 <p>
-For this specified example, the conversions are not much useful.
-It is just a demo for education purpose.
 </p>
 
-Please note, for this specified example,
-the above conversion line from <code>uintptr</code> to
-<code>unsafe.Pointer</code> shouldn't be split into two lines,
-like the following code shows.
-Please read the comments in the code for the reason.
+注意：在上面这个例子中，转换<code>unsafe.Pointer(uintptr(p) + N + M + M)</code>不应该象下面这样被拆成两行。
+请阅读下面的代码中的注释以获取原因。
 
-<pre class="line-numbers"><code class="language-go">...
-	p := unsafe.Pointer(t)
-	// Now the t value becomes unused, its memory may
-	// be garbage collected at this time. So the following
-	// use of the address of t.y[2] may be invalid!
+<pre class="line-numbers"><code class="language-go">func main() {
+	t := T{y: [3]int16{123, 456, 789}}
+	p := unsafe.Pointer(&t)
+	// ty2 := (*int16)(unsafe.Pointer(uintptr(p) + N + M + M))
 	addr := uintptr(p) + N + M + M
+	// 从这里到下一行代码执行之前，t值将不再被任何值引用，所以
+	// 垃圾回收器认为它可以被回收了。一旦它真得被回收了，下面
+	// 继续使用t.y[2]值的曾经的地址是非法和反逻辑的！
 	ty2 := (*int16)(unsafe.Pointer(addr))
 	fmt.Println(*ty2)
 }
 </code></pre>
 
 <p>
-Such bugs are so subtle and hard to detect,
-which is why the uses of unsafe pointers are dangerous.
+这样的bug是非常微妙和很难觉察出来的，并且爆发出来的几率是相当得低。
+一旦这样的bug爆发出来，将让人很摸不到头脑。
+这是为什么使用类型非安全指针是危险的原因之一。
 </p>
 
-If we do want to split that conversion line into two lines,
-we should call the <code>runtime.KeepAlive</code> function and
-pass the unsafe pointer <code>p</code> as the argument.
-after the use of the address of <code>t.y[2]</code>. Like this
-
-<pre class="line-numbers"><code class="language-go">...
+如果我们确实希望将上面提到的转换拆成两行，我们应该在拆分后的两行后添加一条<code>runtime.KeepAlive</code>函数调用并将（直接或间接）引用着<code>t.y[2]</code>值的一个值传递给此调用做为实参。
+比如：
+<pre class="line-numbers"><code class="language-go">func main() {
+	t := T{y: [3]int16{123, 456, 789}}
 	p := unsafe.Pointer(t)
 	addr := uintptr(p) + N + M + M
 	ty2 := (*int16)(unsafe.Pointer(addr))
-	fmt.Println(*ty2)
-	// This following line assures the memory of the value
-	// t will not get garbage collected currently for sure.
+	// 下面这条调用将确保整个t值的内存在此时刻不会被回收。
 	runtime.KeepAlive(p)
+	fmt.Println(*ty2)
 }
 </code></pre>
 
@@ -562,55 +517,45 @@ after the use of the address of <code>t.y[2]</code>. Like this
 </p>
 
 <p>
-Another detail to note is that,
-it is not recommended to store the end boundry of a memory block
-in a pointer (either safe or unsafe one).
-Doing this will prevent another memory block which closely follows
-the former memory block from being garbage collected.
+另一个需要注意的细节是最好不要将一个内存块的结尾边界地址存储在一个（安全或非安全）指针中。
+这样做将导致紧随着此内存块的另一个内存块肯定不会被垃圾回收掉。
+请阅读<a href="unofficial-faq.html#final-zero-size-field">这个问答</a>以获取更多解释。
 </p>
 
 </div>
 
-<h4>Pattern 4: Convert Unsafe Pointer To <code>uintptr</code> When Calling <code>syscall.Syscall</code></h4>
+<h4>使用模式四：将类型非安全指针值转换为<code>uintptr</code>值并传递给<code>syscall.Syscall</code>函数调用。</h4>
 
 <div>
 
-From the explanations for the last pattern,
-we know that the following function is dangerous.
+通过对上一个使用模式的解释，我们知道像下面这样含有uintptr类型的参数的函数定义是危险的。
 
-<pre class="line-numbers"><code class="language-go">// Assume this function will not inlined.
+<pre class="line-numbers"><code class="language-go">// 假设此函数不会被内联。
 func DoSomething(addr uintptr) {
-	// read or write values at the passed address ...
+	// 对处于传递进来的地址处的值进行读写...
 }
 </code></pre>
 
 <p>
-The reason why the above function is dangerous is that the function
-itself can't guarantee the values at the passed argument address
-are not garbage collected yet.
-In fact, there may be some new values which have been allocated
-at the passed argument address.
+上面这个函数是危险的原因在于此函数本身不能保证传递进来的地址处的内存块一定没有被回收。
+如果此内存块已经被回收了或者被重新分配给了其它值，那么此函数内部的操作将是非法和危险的。
 </p>
 
-However, the prototype of the <code>Syscall</code> function in
-the <code>syscall</code> standard package is as
+然而，<code>syscall</code>标准库包中的<code>Syscall</code>函数的原型为：
 <pre class="line-numbers"><code class="language-go">func Syscall(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err Errno)
 </code></pre>
 
 <p>
-How does this function guarantee that the values at the passed addresses
-<code>a1</code>, <code>a2</code> and <code>a3</code> are still not garbage
-collected yet within the function internal?
-The function can't guarantee this.
-In fact, compilers will make the guarantee.
-It is the privilege of calls to <code>syscall.Syscall</code> alike functions.
+那么此函数是如何保证处于传递给它的地址参数值<code>a1</code>、<code>a2</code>和<code>a3</code>处的内存块在此函数执行过程中一定没有被回收呢？
+此函数无法做出这样的保证。事实上，是编译器做出了这样的保证。
+这是<code>syscall.Syscall</code>这样的函数的特权。其它自定义函数无法享受到这样的待遇。
 </p>
 
-We can think that, compilers will append a <code>runtime.KeepAlive</code> call
-for each of <code>uintptr</code> arguments, like the folowing code shows:
+我们可以认为编译器在每个<code>syscall.Syscall</code>函数调用后面为每个<code>uintptr</code>类型的实参添加了几条<code>runtime.KeepAlive</code>调用。
+每个<code>uintptr</code>类型的实参被转换为<code>unsafe.Pointer</code>类型后将被传递给其中一个<code>runtime.KeepAlive</code>调用。
 
 <pre class="line-numbers"><code class="language-go">syscall.Syscall(SYS_READ, uintptr(fd), uintptr(unsafe.Pointer(p)), uintptr(n))
-// Compilers will automatically append the following lines for the above line.
+// 编译器将自动添加下面的几句调用。
 runtime.KeepAlive(unsafe.Pointer(uintptr(fd)))
 runtime.KeepAlive(unsafe.Pointer(uintptr(unsafe.Pointer(p))))
 runtime.KeepAlive(unsafe.Pointer(uintptr(n)))
@@ -619,6 +564,7 @@ runtime.KeepAlive(unsafe.Pointer(uintptr(n)))
 <p>
 </p>
 
+<!--
 <p>
 Although the <code>syscall.Syscall</code> function has this privilege,
 there is a requirement to call this function.
@@ -634,44 +580,37 @@ syscall.Syscall(SYS_READ, uintptr(fd), u, uintptr(n))
 
 <p>
 </p>
+-->
 
 <p>
-Again, never use this pattern when calling other functions.
-We should append the <code>runtime.KeepAlive</code> calls manually
-when calling other functions with <code>uintptr</code> parameters.
+再提醒一次，此使用模式不适用于其它自定义函数。我们在其它自定义函数的调用后应该手动添加需要的<code>runtime.KeepAlive</code>调用。
 </p>
 
 </div>
 
-<h4>Pattern 5: Convert The <code>uintptr</code> Result Of <code>reflect.Value.Pointer</code> Or <code>reflect.Value.UnsafeAddr</code> Method Call To Unsafe Pointer</h4>
+<h4>使用模式五：将<code>reflect.Value.Pointer</code>或者<code>reflect.Value.UnsafeAddr</code>方法的<code>uintptr</code>返回值转换为类型非安全指针。</h4>
 
 <div>
 
 <p>
-The methods <code>Pointer</code> and <code>UnsafeAddr</code> of the
-<code>Value</code> type in the <code>reflect</code> standard package
-both return a result of type <code>uintptr</code> instead of
-<code>unsafe.Pointer</code>.
-This is a deliberate design, which is to avoid converting the results of calls
-(to the two methods) to any safe poiner types
-without importing the <code>unsafe</code> standard package.
+<code>reflect</code>标准库包中的<code>Value</code>类型的<code>Pointer</code>和<code>UnsafeAddr</code>方法都返回一个<code>uintptr</code>值，而不是一个<code>unsafe.Pointer</code>值。
+这样设计的目的是避免用户不引用<code>unsafe</code>标准库包就可以将这两个方法的返回值（如果是<code>unsafe.Pointer</code>类型）转换为任何类型安全指针类型。
 </p>
 
 <p>
-The design requires the return result of a call to either of the two methods
-must be converted to an unsafe pointer immediately after making the call.
-Otherwise, there will be small time window in which the value allocated at the
-address stored in the result might lose all references and be garbage collected.
+这样的设计需要我们将这两个方法的调用的<code>uintptr</code>结果立即转换为类型非安全指针。
+否则，将出现一个很小的可能导致处于返回的地址处的内存块被回收掉的时间窗。
 </p>
 
-For example, the following call is valid.
+比如，下面这个调用是安全的：
 
 <pre class="line-numbers"><code class="language-go">p := (*int)(unsafe.Pointer(reflect.ValueOf(new(int)).Pointer()))
 </code></pre>
 
-One the other hand, the following call is invalid.
+而下面这个调用是危险的：
 
 <pre class="line-numbers"><code class="language-go">u := reflect.ValueOf(new(int)).Pointer()
+// 在这个时刻，处于存储在u中的地址处的内存块可能会被回收掉。
 p := (*int)(unsafe.Pointer(u))
 </code></pre>
 
@@ -680,24 +619,19 @@ p := (*int)(unsafe.Pointer(u))
 
 </div>
 
-<h4>Pattern 6: Convert A <code>reflect.SliceHeader.Data</code> Or <code>reflect.StringHeader.Data</code> Field To Unsafe Pointer, And The Inverse.</h4>
+<h4>使用模式六：将一个<code>reflect.SliceHeader</code>或者<code>reflect.StringHeader</code>值的<code>Data</code>字段转换为非类型安全指针，以及其逆转换。</h4>
 
 <div>
 <p>
-For the same reason mentioned in the last subsection, the <code>Data</code> fields
-of the struct type <code>SliceHeader</code> and <code>StringHeader</code> in
-the <code>reflect</code> standard package are declared with type
-<code>uintptr</code> instead of <code>unsafe.Pointer</code>.
+和上一小节中提到的同样的原因，<code>reflect</code>标准库包中的<code>SliceHeader</code>和<code>StringHeader</code>类型的<code>Data</code>字段的类型被指定为<code>uintptr</code>，而不是<code>unsafe.Pointer</code>。
 </p>
 
 <p>
-It is valid to convert a pointer to a string to a <code>StringHeader</code> pointer,
-so that we can manipulate the internal of the string.
-The same, it is valid to convert a pointer to a slice to a <code>SliceHeader</code> pointer,
-so that we can manipulate the internal of the slice.
+我们可以将一个字符串的指针值转换为一个<code>*reflect.StringHeader</code>指针值，从而可以对此字符串的内部进行修改。
+类似地，我们可以将一个切片的指针值转换为一个<code>*reflect.SliceHeader</code>指针值，从而可以对此切片的内部进行修改。
 </p>
 
-An example of using <code>reflect.StringHeader</code>:
+一个使用<code>reflect.StringHeader</code>的例子：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -712,8 +646,8 @@ func main() {
 	hdr.Data = uintptr(unsafe.Pointer(&a))
 	hdr.Len = len(a)
 	fmt.Println(s) // Golang
-	// Now s and a share the same byte sequence,
-	// which makes the string s become mutable.
+	// 现在，字符串s和切片a共享着底层的byte字节序列，
+	// 从而使得此字符串中的字节变得可以修改。
 	a[2], a[3], a[4], a[5] = 'o', 'g', 'l', 'e'
 	fmt.Println(s) // Google
 }
@@ -722,107 +656,93 @@ func main() {
 <p>
 </p>
 
-An example of using <code>reflect.SliceHeader</code>:
+一个使用了<code>reflect.SliceHeader</code>的例子：
 
 <pre class="line-numbers"><code class="language-go">package main
 
-import "fmt"
-import "unsafe"
-import "reflect"
-import "runtime"
+import (
+	"fmt"
+	"unsafe"
+	"reflect"
+	"runtime"
+)
 
 func main() {
+	a := [6]byte{'G', 'o', '1', '0', '1'}
 	bs := []byte("Golang")
-	var pa *[2]byte // an array pointer
 	hdr := (*reflect.SliceHeader)(unsafe.Pointer(&bs))
-	pa = (*[2]byte)(unsafe.Pointer(hdr.Data))
-	runtime.KeepAlive(&bs)
-	fmt.Printf("%s\n", pa) // &Go
-	pa[1] = 'a'
-	fmt.Printf("%s\n", bs) // Galang
+	hdr.Data = uintptr(unsafe.Pointer(&a))
+	runtime.KeepAlive(&a) // 必不可少！
+	hdr.Len = 2
+	hdr.Cap = len(a)
+	fmt.Printf("%s\n", bs) // Go
+	bs = bs[:cap(bs)]
+	fmt.Printf("%s\n", bs) // Go101
 }
 </code></pre>
 
 <p>
-The <code>runtime.KeepAlive</code> call is essential
-if the last <code>Printf</code> line is absent.
+注意：上例中的<code>runtime.KeepAlive</code>调用必不可少。
+否则，在转换<code>uintptr(unsafe.Pointer(&a))</code>被执行之前，分配给数组<code>a</code>的内存可能已经被回收。
 </p>
 
-In general,
-we should only get a <code>StringHeader</code> pointer value from an actual (alreay existed) string,
-or get a <code>SliceHeader</code> pointer value from an actual (alreay existed) slice.
-We shouldn't do the contrary, such as creating a string from a <code>StringHeader</code>,
-or creating a slice from a <code>SliceHeader</code>.
-For example, the following code is invalid.
+一般说来，我们只应该从一个已经存在的字符串值得到一个<code>*reflect.StringHeader</code>指针，
+或者从一个已经存在的切片值得到一个<code>*reflect.SliceHeader</code>指针，
+而不应该从一个<code>StringHeader</code>值生成一个字符串，或者从一个<code>SliceHeader</code>值生成一个切片。
+比如，下面的代码是不安全的：
 
-
-<pre class="line-numbers"><code class="language-go">// Assume p points to a sequence of byte and
-// n is the number of bytes in the sequence.
-var hdr reflect.StringHeader
+<pre class="line-numbers"><code class="language-go">var hdr reflect.StringHeader
 hdr.Data = uintptr(unsafe.Pointer(new([5]byte)))
-// Now the just allocated byte array has lose all
-// references and it can be garbage collected now.
+// 在此时刻，上一行代码中刚开辟的数组内存块已经不再被任何值
+// 所引用，所以它可以被回收了。
 hdr.Len = 5
-s := *(*string)(unsafe.Pointer(&hdr))
+s := *(*string)(unsafe.Pointer(&hdr)) // 危险！
 </code></pre>
 
 <p>
 </p>
 
-The following is an example which shows how to convert byte slices to strings,
-by using the unsafe way, and vice versa.
-Different from the safe conversion from a byte slice to a string,
-the unsafe way doesn't allocate a new underlying byte sequence
-for the result string in each conversion.
+下面是一个展示了如何通过使用非类型途径将一个字符串转换为字节切片的例子。
+和使用安全途径进行转换不同，使用非类型途径可以避免了为底层字节序列开辟内存。
 
 <pre class="line-numbers"><code class="language-go">package main
 
-import "fmt"
-import "unsafe"
-import "reflect"
-import "runtime"
+import (
+	"fmt"
+	"unsafe"
+	"reflect"
+	"runtime"
+	"strings"
+)
 
-func ByteSlice2String(bs []byte) (str string) {
-	sliceHdr := (*reflect.SliceHeader)(unsafe.Pointer(&bs))
+func String2ByteSlice(str string) (bs []byte) {
 	strHdr := (*reflect.StringHeader)(unsafe.Pointer(&str))
-	strHdr.Data = sliceHdr.Data
-	strHdr.Len = sliceHdr.Len
-	// This KeepAlive line is essential to make the 
-	// ByteSlice2String function be always valid.
-	runtime.KeepAlive(&bs)
+	sliceHdr := (*reflect.SliceHeader)(unsafe.Pointer(&bs))
+	sliceHdr.Data = strHdr.Data
+	sliceHdr.Len = strHdr.Len
+	sliceHdr.Cap = strHdr.Len
+	// 下面的KeepAlive是必要的。
+	runtime.KeepAlive(&str)
 	return
 }
 
 func main() {
-	bs := []byte{'G', 'o', 'l', 'a', 'n', 'd'}
-	s := ByteSlice2String(bs)
-	fmt.Println(s) // Goland
-	bs[5] = 'g'
-	fmt.Println(s) // Golang
+	str := strings.Join([]string{"Go", "land"}, "")
+	s := String2ByteSlice(str)
+	fmt.Printf("%s\n", s) // Goland
+	s[5] = 'g'
+	fmt.Println(str) // Golang
 }
 </code></pre>
 
 <p>
-<a href="https://golang.org/pkg/reflect/#SliceHeader">The docs</a>
-of the <code>SliceHeader</code> and <code>StringHeader</code> types in the
-<code>reflect</code> standard package are similar.
-The docs says the representations of the two struct types may change in a later release.
-So the above example may become invalid even if the unsafe rules keep unchanged.
-Fortunately, the current two avaliable Go compilers (the standard Go compiler and the gccgo compiler)
-both recognise the representations of the two types declared
-in the <code>reflect</code> standard package.
+<code>reflect</code>标准库包中<code>SliceHeader</code>和<code>StringHeader</code>类型的<a href="https://golang.org/pkg/reflect/#SliceHeader">文档</a>提到这两个结构体类型的定义不保证在以后的版本中不发生改变。
+好在目前的两个主流Go编译器（官方标准Go编译器和gccgo编译器）都认可当前版本中的定义。
+这也可以看作是使用类型非安全指针的另一个潜在风险。
 </p>
 
-<p>
-It is also possible to convert a string to a byte slice
-by using the unsafe way.
-However, we should treat the result slice as
-an immutable value and never modify its elements.
-</p>
-
-By the way, for the standard Go compiler, currently (Go 1.10),
-there is a more efficient (and more unsafe) way to convert
-a byte slice to a string.
+我们可以使用类似的实现来将一个字节切片转换为字符串。
+然而，当前（Go 1.11），有一个更简单更有效的方法来实现这一转换：
 
 <pre class="line-numbers"><code class="language-go">func ByteSlice2String(bs []byte) string {
 	return *(*string)(unsafe.Pointer(&bs))
@@ -830,40 +750,31 @@ a byte slice to a string.
 </code></pre>
 
 <p>
-This is the implementation adopted by the <code>String</code> method
-of the <code>Builder</code> type supported since Go 1.10 in the
-<code>strings</code> standard package.
-It makes use of the first pattern introduced above.
-It is more efficient than the above one.
+此实现借鉴于<code>strings</code>标准库包中的<code>Builder</code>类型的<code>String</code>方法的实现。
+此实现利用了上述的第一个使用模式。
 </p>
 
 </div>
 
-<h3>Final Words</h3>
+<h3>总结一下</h3>
 
 <p>
-From the above content, we know that, for some scenarios,
-the unsafe mechanism can help us write more efficient Go code.
-However, it is very easy to introduce some subtle bugs when using the unsafe mechanism.
-A program with these bugs may run well for a long time,
-but suddenly behave abnormally and even crash some time later.
-Such bugs are very hard to detect and debug.
+从上面解释中，我们得知，对于某些情形，非安全机制可以帮助我们写出运行效率更高的代码。
+但是，使用非类型安全指针也使得我们轻易地写出一些重现几率非常低的微妙的bug。
+一个含有这样的bug的程序很可能在很长一段时间内都运行正常，但是突然变得不正常甚至崩溃。
+这样的bug很难发现和调试。
 </p>
 
 <p>
-We should only use the unsafe mechanism when we have to,
-and we must use it with extreme care.
-In particular, we should follow the instructions described above.
+我们只应该在不得不使用非安全机制的时候才使用它们。
+特别得，当我们使用非安全机制时，请务必遵循上面列出的使用模式。
 </p>
 
 <p>
-And again, we should aware that the unsafe mechanism introduced above
-may change and even become invalid totally in later Go versions,
-though no evidences this will happen soon.
-If the unsafe mechanism rules change,
-the above introduced valid unsafe pointer use patterns may become invalid.
-So please keep it easy to switch back to the safe implementations
-for you code depending on the unsafe mechanism.
+重申一次，我们应该知晓当前的非安全机制规则和使用模式可能在以后的Go版本中完全失效。
+当然，目前没有任何迹象表明这种变化将很快会来到。
+但是，一旦发生这种变化，本文中列出的当前是正确的代码将变得不再安全甚至编译不通过。
+所以，在实践中，请尽量保证能够将使用了非安全机制的代码轻松改为使用安全途径实现。
 </p>
 
 
