@@ -32,7 +32,7 @@ Go中有很多和容器类型相关的细节，本文将逐一列出这些细节
 
 <p>
 这三种严格意义的容器类型的值在使用上有很多的差别。这些差别多源于它们的值的内存布局的差异。
-通过上一篇文章<a href="value-part.html">值部</a>，我们知道每个数组值仅有一个直接部分组成，而一个切片或者映射表由一个直接部分和一个可能的被此直接部分引用着的间接部分组成。
+通过上一篇文章<a href="value-part.html">值部</a>，我们得知每个数组值仅有一个直接部分组成，而一个切片或者映射表由一个直接部分和一个可能的被此直接部分引用着的间接部分组成。
 </p>
 
 <p>
@@ -956,7 +956,7 @@ func main() {
 </li>
 <li>
 	任何映射表元素都是不可寻址的。原因详见<a href="unofficial-faq.html#maps-are-unaddressable">此条问答</a>。
-	
+
 </li>
 </ul>
 
@@ -1509,7 +1509,7 @@ func main() {
 	for category, langInfo := range langs {
 		fmt.Println(category, langInfo)
 	}
-	
+
 	m1 := map[struct{ dynamic, strong bool }]map[string]int{}
 	for category, langInfo := range m0 {
 		m1[*category] = *langInfo
@@ -1517,7 +1517,7 @@ func main() {
 	// 映射表m0和m1中均只有一个条目。
 	fmt.Println(len(m0), len(m1)) // 1 1
 	fmt.Println(m1)               // map[{true true}:map[C:1972]]
-	
+
 }
 </code></pre>
 

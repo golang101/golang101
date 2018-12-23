@@ -431,7 +431,7 @@ b: 3
 或者
 
 <pre class="line-numbers"><code class="language-go">		for i := 0; i < 3; i++ {
-			i := i // 在下面的调用中，左i遮挡了右i。
+			i := i // 在下面的调用中，左i掩盖了右i。
 			defer func() {
 				fmt.Println("b:", i) // 此i为上面的左i，非循环变量i。
 			}()

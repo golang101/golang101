@@ -56,12 +56,12 @@ import "fmt"
 func main() {
 	const World = "world"
 	var hello = "hello"
-	
+
 	// 衔接字符串。
 	var helloWorld = hello + " " + World
 	helloWorld += "!"
 	fmt.Println(helloWorld) // hello world!
-	
+
 	// 比较字符串。
 	fmt.Println(hello == "hello")   // true
 	fmt.Println(hello > helloWorld) // false
@@ -113,14 +113,14 @@ import (
 
 func main() {
 	var helloWorld = "hello world!"
-	
+
 	var hello = helloWorld[:5] // 子字符串
 	// 104是英文字符h的ASCII（和Unicode）码。
 	fmt.Println(hello[0])         // 104
 	fmt.Printf("%T \n", hello[0]) // uint8
 	// hello[0] = 'H'             // error: hello[0]不可修改
 	// fmt.Println(&hello[0])     // error: hello[0]不可寻址
-	
+
 	fmt.Println(len(hello), len(helloWorld))          // 5 12
 	fmt.Println(strings.HasPrefix(helloWorld, hello)) // true
 }
@@ -257,7 +257,7 @@ todo: if later the meaning of "byte slice" is changed.
       to "a byte sequence".
 
 Maybe it is not intentional, for the standard Go compiler
-(at least up to v1.11),
+(at least up to version 1.11),
 it looks a string can also be converted to a slice type whose
 element type's underlying type is <code>byte</code>,
 but not vice versa.
@@ -283,7 +283,7 @@ func main() {
 
 <div>
 上面已经提到了字符串和字节切片之间的转换将深复制它们的底层字节序列。
-当前官方标准Go编译器（v1.11）做了一些优化，从而在某些情形下避免了深复制。
+当前官方标准Go编译器（1.11）做了一些优化，从而在某些情形下避免了深复制。
 这样的情形包括：
 <ul>
 <li>
@@ -311,7 +311,7 @@ func main() {
 	for i, b := range []byte(str) {
 		fmt.Println(i, ":", b)
 	}
-	
+
 	key := []byte{'k', 'e', 'y'}
 	m := map[string]string{}
 	// 这里，转换string(key)将不需要一个深复制。
@@ -377,15 +377,15 @@ func main() {
 </code></pre>
 
 此程序的输出如下：
-<pre class="output"><code> 0: 0x65 e 
- 1: 0x301 ́ 
- 3: 0x915 क 
- 6: 0x94d ् 
- 9: 0x937 ष 
-12: 0x93f ि 
-15: 0x61 a 
-16: 0x3c0 π 
-18: 0x56e7 囧 
+<pre class="output"><code> 0: 0x65 e
+ 1: 0x301 ́
+ 3: 0x915 क
+ 6: 0x94d ्
+ 9: 0x937 ष
+12: 0x93f ि
+15: 0x61 a
+16: 0x3c0 π
+18: 0x56e7 囧
 21
 </code></pre>
 
@@ -488,11 +488,11 @@ import "fmt"
 func main() {
 	hello := []byte("Hello ")
 	world := "world!"
-	
+
 	// helloWorld := append(hello, []byte(world)...) // 正常的语法
 	helloWorld := append(hello, world...)            // 语法糖
 	fmt.Println(string(helloWorld))
-	
+
 	helloWorld2 := make([]byte, len(hello) + len(world))
 	copy(helloWorld2, hello)
 	// copy(helloWorld2[len(hello):], []byte(world)) // 正常的语法
@@ -540,7 +540,7 @@ func main() {
 	s0 := string(bs)
 	s1 := string(bs)
 	s2 := s1
-	
+
 	// s0、s1和s2是三个相等的字符串。
 	// s0的底层字节序列是bs的一个深复制。
 	// s1的底层字节序列也是bs的一个深复制。
@@ -551,7 +551,7 @@ func main() {
 	_ = s0 == s1
 	duration := time.Now().Sub(startTime)
 	fmt.Println("duration for (s0 == s1):", duration)
-	
+
 	startTime = time.Now()
 	_ = s1 == s2
 	duration = time.Now().Sub(startTime)
