@@ -1,75 +1,61 @@
-﻿<h1><code>nil</code>s In Go</h1>
+﻿<h1>Go中的<code>nil</code></h1>
 
 <p>
-<code>nil</code> is a familiar and important predeclared identifier in Go.
-It is the literal representation of zero values of many kinds of types.
-Many new Go programmers with experiences of some other popular languages
-may view <code>nil</code> as the counterpart of
-<code>null</code> (or <code>NULL</code>) in other languages.
-This is partly right, but there are many differences between <code>nil</code>
-in Go and <code>null</code> (or <code>NULL</code>) in other languages.
+<code>nil</code>是Go中的一个使用频率很高的预声明标识符。
+很多种类型的类型的零值都用<code>nil</code>表示。
+很多有其它语言编程经验的Go程序员将<code>nil</code>看成是其它语言中的<code>null</code>或者<code>NULL</code>。
+这种看法只是部分上正确的，但是Go中的<code>nil</code>和其它语言中的<code>null</code>或者<code>NULL</code>也有很多区别。
 </p>
 
 <p>
-The remaining of this article will list all kinds of facts and details related to <code>nil</code>.
+本文的剩余部分将列出和<code>nil</code>相关的各种事实。
 </p>
 
-<h3><code>nil</code> Is A Predeclared Identifier In Go</h3>
+<h3><code>nil</code>是一个预声明的标识符</h3>
 
 <p>
-You can use <code>nil</code> without declaring it.
+我们可以直接使用它。
 </p>
 
-<h3><code>nil</code> Can Represent Zero Values Of Many Types</h3>
+<h3>预声明的<code>nil</code>标识符可以表示很多种类型的零值</h3>
 
 <div>
-In Go, <code>nil</code> can represent zero values of the following kinds of types:
+在Go中，预声明的<code>nil</code>可以表示下列类型的零值：
 <ul>
-<li>pointer types (including type-unsafe ones).</li>
-<li>map types.</li>
-<li>slice types.</li>
-<li>function types.</li>
-<li>channel types.</li>
-<li>interface types.</li>
+<li>指针类型（包括安全和非安全指针）</li>
+<li>映射表类型</li>
+<li>切片类型</li>
+<li>函数类型</li>
+<li>数据通道类型</li>
+<li>接口类型</li>
 </ul>
 
-<p>
-In other words, in Go, <code>nil</code> may be many values, of different types.
-</p>
 </div>
 
-<h3><code>nil</code> Has Not A Default Type</h3>
+<h3>预声明标识符<code>nil</code>没有默认类型</h3>
 
 <div>
-Each of other predeclared identifiers in Go has a default type.
-For example,
+Go中其它的预声明标识符都有各自的默认类型，比如
 <ul>
 <li>
-	the default types of <code>true</code> and <code>false</code>
-	are both <code>bool</code> type.
+	预声明标识符<code>true</code>和<code>false</code>的默认类型均为内置类型<code>bool</code>。
 </li>
 <li>
-	the default type of <code>iota</code> is <code>int</code>.
+	预声明标识符<code>iota</code>的默认类型为内值类型<code>int</code>。
 </li>
 </ul>
 
 <p>
-But <code>nil</code> has not a default type, though it has many possible types.
-There must be sufficient information for compiler to deduce the type of a
-<code>nil</code> value from context.
+但是，预声明标识符<code>nil</code>没有一个默认类型，尽管它有很多潜在的可能类型。
+事实上，预声明标识符<code>nil</code>是Go中唯一一个没有默认类型的类型不确定值。
+我们必须在代码中提供足够的信息以便让编译器能够推断出一个类型不确定的<code>nil</code>值的类型。
 </p>
 
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 func main() {
-	// This following line doesn't compile.
-	/*
-	v := nil
-	*/
-
-	// There must be sufficient information for compiler
-	// to deduce the type of a nil value.
+	// 代码中必须提供充足的信息来让编译器推断出某个nil的类型。
 	_ = (*struct{})(nil)
 	_ = []int(nil)
 	_ = map[int]bool(nil)
@@ -77,25 +63,28 @@ func main() {
 	_ = (func())(nil)
 	_ = interface{}(nil)
 
-	// This lines are equivalent to the above lines.
+	// 下面这一组和上面这一组等价。
 	var _ *struct{} = nil
 	var _ []int = nil
 	var _ map[int]bool = nil
 	var _ chan string = nil
 	var _ func() = nil
 	var _ interface{} = nil
+
+	//下面这行编译不通过。
+	var _ = nil
 }
 </code></pre>
 </div>
 
-<h3><code>nil</code> Is Not A Keyword In Go</h3>
+<h3><code>nil</code>不是一个关键字</h3>
 
 <div>
 <p>
-The predeclared <code>nil</code> can be shadowed.
+预声明标识符<code>nil</code>可以被更内层的同名标识符所掩盖。
 </p>
 
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -103,35 +92,27 @@ import "fmt"
 func main() {
 	nil := 123
 	fmt.Println(nil) // 123
-	
-	// The following line will compile error, for
-	// nil represents an int value now in this scope.
-	/*
+
+	// 下面这行编译报错，因为此行中的nil是一个int值。
 	var _ map[string]int = nil
-	*/
 }
 </code></pre>
 
 <p><i>
-(BTW, <code>null</code> and <code>NULL</code> in many other languages
-are also not keywords.)
+（顺便说一下，其它语言中的<code>null</code>和<code>NULL</code>也不是关键字。）
 </i></p>
 </div>
 
 <p class="anchor" id="sizes"></p>
-<h3>The Sizes Of <code>nil</code> Values With Types Of Different Kinds May Be Different</h3>
+<h3>不同种类的类型的nil值的尺寸很可能不一样大</h3>
 
 <div>
 <p>
-The memory layouts of all value of a type are always the same.
-<code>nil</code> values of the type are not exceptions.
-The size of a <code>nil</code> value is always the same as
-the sizes of non-nil values whose types are the same as the <code>nil</code> value.
-So <code>nil</code> identifiers representing different zero values
-of different types may have different sizes.
+一个类型的所有值的内存布局都是一样的，此类型nil值也不例外（假设此类型的零值使用<code>nil</code>表示）。
+同一个类型的nil值和非nil值的尺寸是一样的。但是不同类型的nil值的尺寸可能是不一样的。
 </p>
 
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
@@ -161,143 +142,118 @@ func main() {
 </code></pre>
 
 <p>
-The sizes are compiler and architecture dependent.
-The above printed results are for 64-bit architectures and the standard Go compiler.
-For 32--bit architectures, the printed sizes will be half.
 </p>
 
 <p>
-For the standard Go compiler, the sizes of two <code>nil</code> values of different types
-of the same kind are always the same. For example, two <code>nil</code> values of two
-different slice types, <code>[]int</code> and <code>[]string</code>, are the same.
+上例打印出来的尺寸值取决于系统构架和具体编译器实现。
+上例中的输出是使用官方标准编译器编译并在64位的系统构架上运行的结果。
+在32位的系统构架上，这些输出值将减半。
+</p>
+
+<p>
+对于官方标准编译器，零值可以表示成<code>nil</code>的同种（kind）不同类型（types）的值的尺寸都是一样的。
+比如说，任何切片类型的任何值的尺寸都是一样。
 </p>
 </div>
 
-<h3>Two <code>nil</code> Values Of Two Different Types May Be Not Comparable</h3>
+<h3>两个不同类型的nil值可能不能相互比较</h3>
 
 <div>
-For example:
-<pre class="line-numbers"><code class="language-go">// Following lines don't compile.
-var _ = (*int)(nil) == (*bool)(nil)         // error: mismatched types.
-var _ = (chan int)(nil) == (chan bool)(nil) // error: mismatched types.
+比如，下例中的两行中的比较均编译不通过。
+<pre class="line-numbers"><code class="language-go">var _ = (*int)(nil) == (*bool)(nil)         // error: 类型不匹配
+var _ = (chan int)(nil) == (chan bool)(nil) // error:类型不匹配
 </code></pre>
 
-In Go, two values of two different comparable types can only be compared
-only if one of them can be implicitly converted to the type of the other.
-Specifically, there are three cases two values of two different comparable
-can be compared:
-<ol>
-<li>
-	the type of one of the two values is the underlying type of the other one.
-</li>
-<li>
-	the type of one of the two values implements the type
-	(which must be an interface type) of the other value.
-</li>
-<li>
-	the type of one of the two values is a directional channel type
-	and the other one is a bidirectional channel type,
-	the two types have the identical element type,
-	and one of the two types is not an defined type.
-</li>
-</ol>
-
 <p>
-<code>nil</code> values are not exceptions of the above rules.
 </p>
 
-The code lines in the following example all compile okay.
+<p>
+请阅读<a href="value-conversions-assignments-and-comparisons.html#comparison-rules">Go中的值比较规则</a>来了解哪些值可以相互比较。
+类型确定的nil值也要遵循这些规则。
+</p>
+
+下面这些比较是合法的：
 <pre class="line-numbers"><code class="language-go">type IntPtr *int
-// The underlying of type IntPtr is *int.
+// 类型IntPtr的底层类型为*int。
 var _ = IntPtr(nil) == (*int)(nil)
 
-// Every type in Go implements interface{} type.
+// 任何类型都实现了interface{}类型。
 var _ = (interface{})(nil) == (*int)(nil)
 
-// Values of a directional channel type can be converted to the
-// bidirectional channel type which has the same element type.
+// 一个双向数据通道可以隐式转换为和它的元素类型一样的单项数据通道类型。
 var _ = (chan int)(nil) == (chan<- int)(nil)
 var _ = (chan int)(nil) == (<-chan int)(nil)
 </code></pre>
 </div>
 
-<h3>Two <code>nil</code> Values Of The Same Type May Be Not Comparable</h3>
+<h3>同一个类型的两个nil值可能不能相互比较</h3>
 
 <div>
-In Go, map. slice and function types don't support comparison.
-So comparing two <code>nil</code> identifiers specified with any type of
-the uncomparable types is illegal.
-<pre class="line-numbers"><code class="language-go">// The following lines fail to compile.
-var _ = ([]int)(nil) == ([]int)(nil)
+在Go中，映射表类型、切片类型和函数类型是不支持比较类型。
+比较同一个不支持比较类型的两个值（包括nil值）是非法的。
+比如，下面的几个比较都编译不通过。
+<pre class="line-numbers"><code class="language-go">var _ = ([]int)(nil) == ([]int)(nil)
 var _ = (map[string]int)(nil) == (map[string]int)(nil)
 var _ = (func())(nil) == (func())(nil)
 </code></pre>
 
-But any values of the above mentioned uncomparable types can
-be compared with a bare <code>nil</code> identifier.
-<pre class="line-numbers"><code class="language-go">// The following lines compile okay.
+但是，映射表类型、切片类型和函数类型的任何值都可以和裸<code>nil</code>标识符比较。
+<pre class="line-numbers"><code class="language-go">// 这几行编译都没问题。
 var _ = ([]int)(nil) == nil
 var _ = (map[string]int)(nil) == nil
 var _ = (func())(nil) == nil
 </code></pre>
 </div>
 
-<h3>Two <code>nil</code> Values May Be Not Equal</h3>
+<h3>两个nil值可能并不相等</h3>
 
 <div>
 <p>
-If one of the two compared <code>nil</code> values is an interface value
-and the other is not, assume they are comparable,
-then the comparison result is always false.
-The reason is the non-interface value will be converted to the type of the interface value
-before making the comparison.
-The converted interface value has a concrete dynamic type
-but the other interface value has not.
-That is why the comparison result is always false.
+如果可被比较的两个nil值中的一个的类型为接口类型，而另一个不是，则比较结果总是<code>false</code>。
+原因是，在进行此比较之前，此非接口nil值将被转换为另一个nil值的接口类型，从而将此比较转化为两个接口值的比较。
+从<a href="interface.html#boxing">接口</a>一文中，我们的值每个接口值可以看作是包裹非接口值的盒子。
+一个非接口值将被转换为一个接口类型的过程可以看作是用一个接口值将此非接口值包裹起来的过程。
+一个nil接口值什么也没包裹，但是一个包裹了nil非接口值的接口值并非什么都没包裹。
+一个什么都没包裹的接口值和一个包裹了一个非接口值（即使它是nil）的接口值时不相等的。
 </p>
 
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">fmt.Println( (interface{})(nil) == (*int)(nil) ) // false
 </code></pre>
 </div>
 
-<h3>Retrieving Elements From Nil Maps Will Not Panic</h3>
+<h3>访问nil映射表值的条目不会产生恐慌</h3>
 
 <div>
 <p>
-Retrieving element from a nil map value will always return
-a zero element value.
+访问一个nil映射表将得到一个此映射表的类型的元素类型的零值。
 </p>
 
-For example:
+比如：
 <pre class="line-numbers"><code class="language-go">fmt.Println( (map[string]int)(nil)["key"] ) // 0
 fmt.Println( (map[int]bool)(nil)[123] )     // false
 fmt.Println( (map[int]*int64)(nil)[123] )   // &lt;nil&gt;
 </code></pre>
 </div>
 
-<h3>It Is Legal To Range Over Nil Channels, Maps, Slices, And Array Pointers</h3>
+<h3><code>range</code>关键字后可以跟随nil数据通道、nil映射表、nil切片和nil数组指针</h3>
 
 <div>
 <p>
-The number of loops steps by iterate nil maps and slices is zero.
+遍历nil映射表和nil切片的循环步数均为零。
 </p>
 
 <p>
-The number of loops steps by iterate a <code>nil</code> array pointer
-is the length of its corresponding array type.
-(However, if the length of the corresponding array type is not zero,
-and the second iteration is neither ignored nor omitted,
-the iteration will panic at run time.)
+遍历一个nil数组指针的循环步数为对应指针类型的长度。
+（但是，如果此指针类型的长度不为零并且第二个循环变量未被舍弃或者忽略，则对应<code>for-range</code>将导致恐慌。）
 </p>
 
 <p>
-Ranging over a nil channel will block for ever.
+遍历一个nil数据通道将是当前协程永久阻塞。
 </p>
 
-For example, the following code will print <code>0</code>, <code>1</code>,
-<code>2</code>, <code>3</code> and <code>4</code>, then block for ever.
-<code>Hello</code>, <code>world</code> and <code>Bye</code> will never be printed.
+比如，下面的代码将输出<code>0</code>、<code>1</code>、<code>2</code>、<code>3</code>和<code>4</code>后进入阻塞状态。
+<code>Hello</code>、<code>world</code>和<code>Bye</code>不会被输出。
 <pre class="line-numbers"><code class="language-go">for range []int(nil) {
 	fmt.Println("Hello")
 }
@@ -316,10 +272,10 @@ for range chan bool(nil) { // block here
 </code></pre>
 </div>
 
-<h3>Invoking Methods Through Non-Interface <code>nil</code> Arguments Will Not Panic</h3>
+<h3>通过nil非接口属主实参调用方法不会造成恐慌</h3>
 
 <div>
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 type Slice []bool
@@ -336,23 +292,22 @@ func (p *Slice) DoNothing() {
 }
 
 func (p *Slice) Append(x bool) {
-	*p = append(*p, x) // panic if p is nil
+	*p = append(*p, x) // 如果p为空指针，则产生一个恐慌。
 }
 
 func main() {
-	// The following selectors will not cause panics.
+	// 下面这几行中的选择器不会造成恐慌。
 	_ = ((Slice)(nil)).Length
 	_ = ((Slice)(nil)).Modify
 	_ = ((*Slice)(nil)).DoNothing
 	_ = ((*Slice)(nil)).Append
-	
-	// The following two lines will also not panic.
+
+	// 这两行也不会造成恐慌。
 	_ = ((Slice)(nil)).Length()
 	((*Slice)(nil)).DoNothing()
-	
-	// The following two lines will panic. But panics will
-	// not be triggered at the time of invoking the methods.
-	// It will be triggered in the method bodies.
+
+	// 下面这两行都会造成恐慌。但是恐慌不是因为nil
+	// 属主实参造成的。恐慌都来自于这两个方法的内部。
 	/*
 	((Slice)(nil)).Modify(0, true)
 	((*Slice)(nil)).Append(true)
@@ -361,10 +316,10 @@ func main() {
 </code></pre>
 </div>
 
-<h3><code>*new(T)</code> Is Equal To <code>nil</code> If The Zero Value Of Type <code>T</code> Is Represented With <code>nil</code></h3>
+<h3>如果类型<code>T</code>的零值可以用预声明的<code>nil</code>标识符表示，则<code>*new(T)</code>的估值结果为一个nil<code>T</code>值</h3>
 
 <div>
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -380,3 +335,9 @@ func main() {
 </code></pre>
 </div>
 
+<h3>总结一下</h3>
+
+<p>
+在Go中，<code>nil</code>是一个可以表示成很多种类型的零值的预定义标识符。
+换句话说，它可以表示很多内存布局不同的值，而不仅仅是一个值。
+</p>

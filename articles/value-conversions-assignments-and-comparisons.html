@@ -1,92 +1,79 @@
-﻿<h1>Value Conversion, Assignment And Comparison Rules In Go</h1>
+﻿<h1>类型转换、赋值和值比较规则大全</h1>
 
 <p>
-This article will list all the value assignment,
-conversion and comparison rules in Go.
-</p>
-
-<p>
-Note, the definition of conversion in Go 101 is not exactly the same as Go spec.
-The conversion in Go spec means explicit conversion.
-The conversions in Go 101 include both explicit and implicit conversions.
+此篇文章将列出Go中所有的类型转换、赋值和值比较规则。
 </p>
 
 <p class="anchor" id="conversion"></p>
-<h3>Value Conversion Rules</h3>
+<h3>类型转换规则大全</h3>
 
 <p>
-In Go, if a value <code>v</code> can be explicitly converted to type <Code>T</Code>,
-the conversion can be achieveed with the form <code>(T)(v)</code>.
-Sometimes, in particular <code>T</code> is a named type (a defined type or a type alias),
-the form can be simplified to <code>T(v)</code>.
+注意：Golang 101中类型转换术语的意思和Go白皮书中并不完全一致。
+Go白皮书中的类型转换只包括显式类型转换，但是Golang 101中类型转换包括显式和隐式转换。
 </p>
 
 <p>
-One fact we should know is,
-when it says a value <code>x</code> can be implicitly converted to a type <code>T</code>,
-then it means <code>x</code> can also be explicitly converted to type <code>T</code>.
+在Go中，如果一个值<code>v</code>可以被显式地转换为类型<code>T</code>，则此转换可以使用语法形式<code>(T)(v)</code>来表示。
+在大多数情况下，特别是<code>T</code>为一个<a href="type-system-overview.html#named-type">有名类型</a>时，此形式可简化为<code>T(v)</code>。
 </p>
 
-<h4>0. The Apparent Conversion Rule</h4>
+<p>
+当我们说一个值<code>x</code>可以被隐式转换为一个类型<code>T</code>，这同时也意味着<code>x</code>可以被显式转换为类型<code>T</code>。
+</p>
+
+<h4>0. 显然的类型转换规则</h4>
 
 <div class="well">
-If two types <code>T1</code> and <code>T2</code> denote the identical type,
-then their values can be <b>implicitly</b> converted each other.
+如果两个类型<code>T1</code>和<code>T2</code>表示着同一个类型，则它们的值可以相互<u><b>隐式</b></u>转换为这两个类型中的任意一个。
 </div>
 
 <div>
-For example,
+比如，
 <ul>
 <li>
-	values of type <code>byte</code> and <code>uint8</code> can be converted to each other.
+	类型<code>byte</code>和<code>uint8</code>的任何值可以转换为这两个类型中的任意一个。
 </li>
 <li>
-	values of type <code>rune</code> and <code>int32</code> can be converted to each other.
+	类型<code>rune</code>和<code>int32</code>的任何值可以转换为这两个类型中的任意一个。
 </li>
 <li>
-	values of type <code>[]byte</code> and <code>[]uint8</code> can be converted to each other.
+	类型<code>[]byte</code>和<code>[]uint8</code>的任何值可以转换为这两个类型中的任意一个。
 </li>
 </ul>
 </div>
 
 <p>
-Nothing more to explain about this rule, whether you think this case involves conversions or not.
+此条规则没什么可解释的，无论你是否认为此种情况中发生了转换。
 </p>
 
 <p class="anchor" id="conversion-rule-underlying-types"></p>
-<h4>1. Underlying Type Related Conversion Rules</h4>
+<h4>1. 底层类型相关的类型转换规则</h4>
 
 <div class="well">
-Given a non-interface value <code>x</code> and a non-interface type <code>T</code>, assume the type of <code>x</code> is <code>Tx</code>,
+给定一个非接口值<code>x</code>和一个非接口类型<code>T</code>，并假设<code>x</code>的类型为<code>Tx</code>，
 <ul>
 <li>
-	if <code>Tx</code> and <code>T</code> share the same underlying type (ignoring struct tags),
-	then <code>x</code> can be explicitly converted to <code>T</code>,
-	in particular if either <code>Tx</code> or <code>T</code> is not an defined type
-	and they underlying types are identical (considering struct tags),
-	then <code>x</code> can be <b>implicitly</b> converted to <code>T</code>.
+	如果类型<code>Tx</code>和<code>T</code>的<a href="type-system-overview.html#underlying-type">底层类型</a>相同（忽略掉结构体字段标签），则<code>x</code>可以被显式转换为类型<code>T</code>。
 </li>
 <li>
-	if <code>Tx</code> and <code>T</code> have different underlying types,
-	but both <code>Tx</code> and <code>T</code> are
-	<a href="type-system-overview.html#non-defined-type">non-defined</a> pointer types
-	and their base types share the same underlying type (ignoring struct tags),
-	then <code>x</code> can (and must) be explicitly converted to <code>T</code>.
+	如果类型<code>Tx</code>和<code>T</code>中的至少有一个是<a href="type-system-overview.html#non-defined-type">非定义类型</a>并且它们的底层类型相同（考虑结构体字段标签），则<code>x</code>可以被<u><b>隐式</b></u>转换为类型<code>T</code>。
+</li>
+<li>
+	如果类型<code>Tx</code>和<code>T</code>的底层类型不同，但是两者都是非定义的指针类型并且它们的基类型的底层类型相同（忽略掉结构体字段标签），则<code>x</code>可以（而且只能）被显式转换为类型<code>T</code>。
 </li>
 </ul>
 </div>
 
 <p><i>
-(Note, the two <b>ignoring struct tags</b> occurrences have taken effect since Go 1.8.)
+（注意：两处“忽略掉结构体字段标签”从Go 1.8开始生效。）
 </i></p>
 
 <div>
-General example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 func main() {
-	// []int, IntSlice and MySlice share
-	// the same underlying type: []int
+	// 类型[]int、IntSlice和MySlice共享底层类型：[]int。
 	type IntSlice []int
 	type MySlice  []int
 
@@ -96,29 +83,30 @@ func main() {
 	var x struct{n int `foo`}
 	var y struct{n int `bar`}
 
-	// The two lines both fail to compile.
+	// 这两行隐式转换编译不通过。
 	/*
 	is = ms
 	ms = is
 	*/
 
-	// Must use explicit conversions here.
+	// 必须使用显式转换。
 	is = IntSlice(ms)
 	ms = MySlice(is)
 	x = struct{n int `foo`}(y)
 	y = struct{n int `bar`}(x)
 
-	// Implicit conversions are okay here.
+	// 这些隐式转换是没问题的。
 	s = is
 	is = s
 	s = ms
 	ms = s
 }
 </code></pre>
-</div>
 
-<div>
-Pointer example:
+<p>
+</p>
+
+指针相关的转换例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 func main() {
@@ -126,36 +114,47 @@ func main() {
 	type IntPtr *int
 	type MyIntPtr *MyInt
 
-	var pi = new(int) // type is *int
-	var ip IntPtr = pi // ok, same underlying type
+	var pi = new(int)  // pi的类型为*int
+	var ip IntPtr = pi // 没问题，因为底层类型相同
+	                   // 并且pi的类型为非定义类型。
 
-	// var _ *MyInt = pi // can't convert implicitly
-	var _ = (*MyInt)(pi) // ok, must explicitly
+	// var _ *MyInt = pi // 不能隐式转换
+	var _ = (*MyInt)(pi) // 显式转换是没问题的
 
-	// var _ MyIntPtr = pi  // can't convert implicitly
-	// var _ = MyIntPtr(pi) // can't convert explicitly
-	var _ MyIntPtr = (*MyInt)(pi)  // ok
-	var _ = MyIntPtr((*MyInt)(pi)) // ok
+	// 类型*int的值不能被直接转换为类型MyIntPtr，
+	// 但是可以间接地转换过去。
+	/*
+	var _ MyIntPtr = pi  // 不能隐式转换
+	var _ = MyIntPtr(pi) // 也不能显式转换
+	*/
+	var _ MyIntPtr = (*MyInt)(pi)  // 间接隐式转换是没问题的
+	var _ = MyIntPtr((*MyInt)(pi)) // 间接显式转换是没问题的
 
-	// var _ MyIntPtr = ip  // can't convert implicitly
-	// var _ = MyIntPtr(ip) // can't convert explicitly
+	// 类型IntPtr的值不能被直接转换为类型MyIntPtr，
+	// 但是可以间接地转换过去。
+	/*
+	var _ MyIntPtr = ip  // 不能隐式转换
+	var _ = MyIntPtr(ip) // 也不能显式转换
+	*/
+	// 间接隐式或者显式转换都是没问题的。
 	var _ MyIntPtr = (*MyInt)((*int)(ip))  // ok
 	var _ = MyIntPtr((*MyInt)((*int)(ip))) // ok
 }
 </code></pre>
 </div>
 
-<h4>2. Channel Specific Conversion Rule</h4>
+<h4>2. 数据通道相关的类型转换规则</h4>
 
 <div class="well">
-If <code>Tx</code> is a bidirectional channel type, <code>T</code> is a channel type,
-	<code>Tx</code> and <code>T</code> have the identical element type,
-	and either <code>Tx</code> or <code>T</code> is not an defined type,
-	then <code>x</code> can be <b>implicitly</b> converted to <code>T</code>.
+假设类型<code>Tx</code>是一个双向数据通道类型，<code>T</code>也是一个数据通道类型（无论是双向的还是单向的），如果<code>Tx</code>和<code>T</code>的元素类型相同并且它们中至少有一个为非定义类型，则<code>x</code>可以被<u><b>隐式</b></u>转换为类型<code>T</code>。
 </div>
 
+<!--
+a potentail bug: https://github.com/golang/go/issues/29469
+-->
+
 <div>
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 func main() {
@@ -166,37 +165,44 @@ func main() {
 	var ca C
 	var cb chan string
 
-	cb = ca // ok, same underlying type
-	ca = cb // ok, same underlying type
+	cb = ca // ok，因为底层类型相同
+	ca = cb // ok，因为底层类型相同
 
+	// 这4行都满足此第2条转换规则的条件。
 	var _, _ chan<- string = ca, cb // ok
 	var _, _ <-chan string = ca, cb // ok
-	var _ C1 = cb // ok
-	var _ C2 = cb // ok
+	var _ C1 = cb                   // ok
+	var _ C2 = cb                   // ok
 
-	// var _ = C1(ca) // compile error
-	// var _ = C2(ca) // compile error
+	// 类型C的值不能直接转换为类型C1或C2。
+	/*
+	var _ = C1(ca) // compile error
+	var _ = C2(ca) // compile error
+	*/
+	
+	// 但是类型C的值间接转换为类型C1或C2。
 	var _ = C1((chan<- string)(ca)) // ok
 	var _ = C2((<-chan string)(ca)) // ok
+	var _ C1 = (chan<- string)(ca)  // ok
+	var _ C2 = (<-chan string)(ca)  // ok
 }
 </code></pre>
 </div>
 
 <p class="anchor" id="conversion-rule-implementation"></p>
-<h4>3. Implementation Related Conversion Rules</h4>
+<h4>3. 和接口实现相关的类型转换规则</h4>
 
 <div class="well">
-Given a value <code>x</code> and an interface type <code>I</code>, assume the type (or the defaut type) of <code>x</code> is <code>Tx</code>,
-if <code>Tx</code> implements <code>I</code>, then <code>x</code> can be <b>implicitly</b> converted to type <code>I</code>.
-The conversion result is an interface value (of type <code>I</code>), which stores
+给定一个值<code>x</code>和一个接口类型<code>I</code>，假设<code>x</code>类型（或者默认类型）为<code>Tx</code>，如果类型<code>Tx</code>实现了接口类型<code>I</code>，则<code>x</code>可以被<u><b>隐式</b></u>转换为类型<code>I</code>。
+此转换的结果为一个类型为<code>I</code>的接口值。此接口值包裹了
 <ul>
-<li>a copy of <code>x</code>, if <code>Tx</code> is a non-interface type;</li>
-<li>a copy of the dynamic value of <code>x</code>, if <code>Tx</code> is an interface type.</li>
+<li><code>x</code>的一个副本（如果<code>Tx</code>是一个非接口值）；</li>
+<li><code>x</code>的动态值的一个副本（如果<code>Tx</code>是一个接口值）。</li>
 </ul>
 </div>
 
 <div>
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 type Filter interface {
@@ -213,12 +219,12 @@ func (mf MultipleFilter) Filte(n int) bool {
 
 func main() {
 	var mf = MultipleFilter{11}
-	// mf's type MultipleFilter implements Filter,
-	// so here implicit conversion is okay.
+	// mf的类型MultipleFilter实现了接口类型Filter，
+	// 所以下面这个隐式转换是没问题的。
 	var filter = mf
 
-	// all types implement interface{} type, so any
-	// value can be converted to interface{} implicitly.
+	// 任何类型都实现了空接口类型interface{}，所以任何
+	// 值都可以被隐式转换为类型interface{}。
 
 	var n int = 123
 	var b bool = true
@@ -229,70 +235,51 @@ func main() {
 	var _ interface{} = s
 	var _ interface{} = mf
 
-	// interface type Filter also implements interface{}
+	// 接口类型Filter也实现了空接口类型interface{}。
 	var _ interface{} = filter
 }
 </code></pre>
 <p>
-Many parameters of the functions in standard packages are
-of type <code>interface{}</code>.
-As all types implement <code>interface{}</code>, so any value
-can be passed for such parameters without explict conversion.
 </p>
 </div>
-
-<!--
-<p><i>
-BTW, the blank interface type <code>interface{}</code> is popular used
-in Go programming. It plays important roles of
-<a href="reflection.html">reflection</a> and
-<a href="genric-alternatives.html">generic</a> in Go programming.
-</i></p>
--->
 
 <p class="anchor" id="conversion-rule-type-assertion"></p>
-<h4>4. Type Assertion Conversion Rules</h4>
+<h4>4. 类型断言中的类型转换规则</h4>
+
+<div class="well">
+给定一个接口值<code>x</code>和一个非接口类型<code>T</code>，假设<code>x</code>的类型为<code>Ix</code>（一个接口类型）并且类型<code>T</code>实现了<code>Ix</code>，我们知道<code>x</code>可以通过类型断言的方式转换为类型<code>T</code>。
+<ul>
+<li>
+	如果<code>x</code>的动态类型和<code>T</code>为同一个类型，则断言成功并且断言的结果为<code>x</code>的动态值。
+	第二个可选的估值结果（如果它呈现的话）的值为<code>true</code>。
+</li>
+<li>
+	否则，断言失败并且断言的结果为类型<code>T</code>的一个零值。
+	第二个可选的估值结果（如果它呈现的话）的值为<code>false</code>。
+</li>
+</ul>
+</div>
+
+<div class="well">
+给定一个接口值<code>x</code>和一个接口类型<code>I</code>，假设<code>x</code>的类型为<code>Ix</code>（一个接口类型），我们知道<code>x</code>可以通过类型断言的方式转换为接口类型<code>I</code>。
+<ul>
+<li>
+	如果<code>x</code>不是一个nil接口值并且它的动态类型实现了接口类型<code>I</code>，则断言成功并且断言的结果为一个包裹了<code>x</code>的动态值（的一个副本）的<code>I</code>值。
+	第二个可选的估值结果（如果它呈现的话）的值为<code>true</code>。
+</li>
+<li>
+	否则，断言失败并且断言的结果为一个类型为<code>I</code>的nil接口值。
+	第二个可选的估值结果（如果它呈现的话）的值为<code>false</code>。
+</li>
+</ul>
 
 <p>
-(Type switch can be viewed as a special form of type assertion.)
+注意：当一个断言失败并且第二个可选的估值结果未呈现，一个恐慌将产生。
 </p>
-
-<div class="well">
-Given an interface value <code>x</code> and a non-interface type <code>T</code>,
-assume the interface type of <code>x</code> is <code>Ix</code>,
-if <code>T</code> implements <code>Ix</code>, then <code>x</code>
-can be converted to <code>T</code> with type assertion syntax:
-<ul>
-<li>if the dynamic type of <code>x</code> and <code>T</code> are exactly the same type,
-	then the conversion result is the dynamic value of <code>x</code>.
-	If the ok result value is present, its value is <code>true</code>.
-</li>
-<li>otherwise, the conversion result is the zero value of <code>T</code>
-	if the ok result value is present (the returned ok value is <code>false</code>).
-	The conversion will panic if the ok result value is not present.
-</li>
-</ul>
 </div>
 
-<div class="well">
-Given an interface value <code>x</code> and an interface type <code>I</code>,
-assume the interface type of <code>x</code> is <code>Ix</code>,
-then <code>x</code> can be converted to <code>I</code> with type assertion syntax,
-whether <code>I</code> implements <code>Ix</code> or not:
-<ul>
-<li>if <code>x</code> is not a nil interface and
-	the dynamic type of <code>x</code> implements <code>I</code>,
-	then the conversion result (a value of <code>I</code>)
-	stores (a copy of) the dynamic value of <code>x</code>.
-	If the ok result value is present, its value is <code>true</code>.
-</li>
-<li>otherwise, the conversion result is the nil interface
-	if the ok result value is present (the returned ok value is <code>false</code>).
-	The conversion will panic if the ok result value is not present.
-</li>
-</ul>
-</div>
-
+<div>
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 type I interface {
@@ -306,32 +293,30 @@ func main() {
 	var it interface{} = T("abc")
 	var is interface{} = "abc"
 
-	// the two are both okay, for T
-	// implements both I and interface{}
+	// 这两个断言既编译没问题，也不会导致恐慌，因为
+	// 类型T同时实现了接口类型I和interface{}。
 	var _ T = it.(T)
 	var _ I = it.(I)
 
-	// this one is also okay, for
-	// string implements interface{}
+	// 这个断言也没问题，因为内置类型string实现了interface{}。
 	var _ string = is.(string)
 
-	// following 3 compile okay but will
-	// all panic at run time.
+	// 下面这三行均编译没问题，但是都将在运行时刻产生一个恐慌。
 	// _ = is.(I)
 	// _ = is.(T)
 	// _ = it.(string)
 }
 </code></pre>
+</div>
 
-<h4>5. Untyped Value Conversion Rule</h4>
+<h4>5. 类型不确定值相关的类型转换规则</h4>
 
 <div class="well">
-An untyped value can be <b>implicitly</b> converted to type <code>T</code>,
-if the untyped value can represent as values of type <code>T</code>.
+如果一个类型不确定值可以表示为类型<code>T</code>的值，则它可以被<u><b>隐式</b></u>转换为类型<code>T</code>。
 </div>
 
 <div>
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 func main() {
@@ -350,30 +335,31 @@ func main() {
 </code></pre>
 </div>
 
-<h4>6. Constant Number Conversion Rule</h4>
+<h4>6. 常量相关的类型转换规则</h4>
 
 <p><i>
-(This rule is some overlapped with the last one.)
+（此规则和上一条规则有些重叠。）
 </i></p>
 
 <p>
-Converting a constant yields a typed constant as result.
+常量的类型转换结果仍然是一个常量。
+（除了下面第八条规则中将介绍的字符串转换为字节切片或者码点切片的情况。）
 </p>
 
 <div class="well">
-Given a constant value <code>x</code> and a type <code>T</code>, if <code>x</code> is representable by a value of type <code>T</code>,
-then <code>x</code> can be explicitly converted to <code>T</code>, in particular if <code>x</code> is an untyped
-or its type is also <code>T</code>, then <code>x</code> can be <b>implicitly</b> converted to <code>T</code>.
+给定一个常量值<code>x</code>和一个类型<code>T</code>，如果<code>x</code>可以表示成类型<code>T</code>的一个值，则<code>x</code>可以被显式地转换为类型<code>T</code>；特别地，如果<code>x</code>是一个类型不确定值，则它可以被<u><b>隐式</b></u>转换为类型<code>T</code>。
 </div>
 
+<!--
 <p>
 Note, in case of <code>x</code> is a floating-point constant and <code>T</code> is a floating-point type,
 the conversion result <code>T(x)</code> is the rounded value of <code>x</code> by using IEEE 754 round-to-even rules,
 but with an IEEE <code>-0.0</code> further rounded to an unsigned <code>0.0</code>.
 </p>
+-->
 
 <div>
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 func main() {
@@ -385,42 +371,39 @@ func main() {
 	const F32 float32 = F
 	const F32b float32 = I
 	const F64 float64 = F
-	const F64b = float64(I3)
+	const F64b = float64(I3) // 这里必须显式转换
 
 	const C1, C2 complex64 = F, I
-	const I5 = int(C2)
+	const I5 = int(C2) // 这里必须显式转换
 }
 </code></pre>
 </div>
 
-<h4>7. Non-Constant Number Conversion Rules</h4>
+<h4>7. 非常量数值转换规则</h4>
 
 <div class="well">
-Non-constant floating-point and integer values can be explicitly
-converted to any floating-point and integer types.
+非常量浮点数和整数值可以被显式转换为任何浮点数和整数类型。
 </div>
 
 <div class="well">
-Non-constant complex values can be explicitly converted to any complex types.
+非常量复数值可以被显式转换为任何复数类型。
 </div>
 
 <div>
-Note,
+注意，
 <ul>
-<li>Complex non-constant values can't be converted to floating-point and integer types.</li>
-<li>Floating-point and integer non-constant values can't be converted to complex types.</li>
-<li>Data overflow and rounding are allowed in non-constant number conversions.
-	When converting a floating-point non-constant number to an integer, the fraction is discarded (truncation towards zero).
-</li>
+<li>非常量复数值不能被转换为浮点数或整数类型。</li>
+<li>非常量浮点数和整数值不能被转换为复数类型。</li>
+<li>在非常量数值的转换过程中，溢出和舍入是允许的。但一个浮点数被转换为整数时，小数部分将被舍弃（向零靠拢）。</li>
 </ul>
-</div>
 
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
 func main() {
-	var a, b = 1.6, -1.6 // both are float64
+	var a, b = 1.6, -1.6 // 类型均为float64
 	fmt.Println(int(a), int(b)) // 1 -1
 
 	var i, j int16 = 0x7FFF, -0x8000
@@ -430,59 +413,58 @@ func main() {
 	var _ = complex128(c1)
 }
 </code></pre>
+</div>
 
-<h4>8. String Related Conversion Rules</h4>
-
-<p>
-Below, string types means the types whose underlying types are the built-in string type,
-and integer types means the types whose underlying types are the built-in integer types,
-</p>
+<h4>8. 字符串相关的转换规则</h4>
 
 <div class="well">
-If the type (or default type) of a value is an interger type,
-then the value can be explicitly converted to string types.
+如果一个值的类型（或者默认类型）为一个整数类型，则此值可以被当作一个码点值（rune值）显式转换为任何字符串类型。
 </div>
 
 <div class="well">
-A string value can be explicitly converted to a slice type
-whose underlying type is <code>[]byte</code> (a.k.a, <code>[]uint8</code>),
-and vice versa.
+一个字符串可以被显式转换为一个字节切片类型，反之亦然。
+字节切片类型是指底层类型为<code>[]byte</code>的类型。
 </div>
 
 <div class="well">
-A string value can be explicitly converted to a slice type
-whose underlying type is <code>[]rune</code> (a.k.a, <code>[]int32</code>),
-and vice versa.
+一个字符串可以被显式转换为一个码点切片类型，反之亦然。
+码点切片类型是指底层类型为<code>[]rune</code>的类型。
 </div>
 
 <p>
-Please read <a href="string.html#conversions">strings in Go</a> for details and examples.
+请阅读<a href="string.html#conversions">字符串</a>一文获取更多详情和示例。
 </p>
 
-<h4>9. unsafe.Pointer Related Conversion Rules</h4>
+<h4>9. 非安全指针相关的类型转换规则</h4>
 
 <p>
-Above conversion rules can be broken by <code>unsafe.Pointer</code> related conversion rules.
+非安全指针类型是指底层类型为<code>unsafe.Pointer</code>的类型。
 </p>
 
 <div class="well">
-A pointer value of any type can be converted to a type whose underlying type is <code>unsafe.Pointer</code>, and vice versa.
+任何安全指针类型的值可以被显式转化为一个非安全指针类型，反之亦然。
 </div>
 
 <div class="well">
-An <code>uintptr</code> value can be converted to a type whose underlying type is <code>unsafe.Pointer</code>, and vice versa.
+任何uintptr值可以被显式转化为一个非安全指针类型，反之亦然。
 </div>
 
 <p>
-Please read <a href="unsafe.html">type-unsafe pointers in Go</a> for details and examples.
+请阅读<a href="unsafe.html">非安全指针</a>一文获取详情和示例。
 </p>
 
-<h3>Value Assignment Rules</h3>
+<h3>赋值规则</h3>
 
 <p>
-Assignments can be viewed as implicit conversions.
+赋值可以看作是隐式类型转换。
+各种隐式转换规则在上一节中已经列出。
 </p>
 
+<p>
+除了这些规则，赋值语句中的目标值必须为一个可寻址的值、一个映射表元素或者一个空标识符。
+</p>
+
+<!--
 <div class="well">
 In an assignment, if the target value is a new declared variable without given a
 type in code, then the type of the new variable is
@@ -493,14 +475,18 @@ type in code, then the type of the new variable is
 </div>
 
 <p>
-Implicit conversion rules are listed among the conversion rules in the last section.
+</p>
+-->
+
+<p>
+在一个赋值中，源值被复制给了目标值。精确地说，源值的<a href="value-part.html">直接部分</a>被复制给了目标值。
 </p>
 
 <p>
-Note, parameter passing, channel value send and receive operations
-are all value assignment involved.
+注意：函数传参和结果返回其实都是赋值。
 </p>
 
+<!--
 <p>
 For most value assignments, the <a href="value-part.html">direct part</a>
 of each source value is copied to the direct part of the corresponding
@@ -517,7 +503,7 @@ if the source value is not a pointer value.
 If the source value is not a pointer value,
 the direct part of the source value
 will be copied and a pointer to the (hidden and immutable) copy
-will be stored in the the destination interface value.
+will be stored in the destination interface value.
 </p>
 
 <p>
@@ -529,101 +515,76 @@ the destination interface value as dynamic value.
 The standard compiler makes some optimizations here so that
 a pointer is always copied in the process.
 </p>
+-->
 
 <p class="anchor" id="comparison-rules"></p>
-<h3>Value Comparison Rules</h3>
+<h3>值比较规则</h3>
 
 <div>
 
 <p>
-Go specification
-<a href="https://golang.org/ref/spec#Comparison_operators">states</a>:
+Go白皮书<a href="https://golang.org/ref/spec#Comparison_operators">提到</a>：
 </p>
 
 <div class="alert alert-success">
-in any comparison, the first operand must be assignable to
-the type of the second operand, or vice versa.
+在任何比较中，第一个比较值必须能被赋值给第二比较值的类型，或者反之。
 </div>
 
 <p>
-So, the comparison rule is much like the assignment rule.
-In other words, two values are comparable
-if one can be implicitly converted to the type of the other.
+所以，值比较规则和赋值规则非常相似。
+换句话说，两个值是否可以比较取决于其中一个值是否可以隐式转换为另一个值的类型。
+很简单，对吧？此规则描述基本正确，但是有一个例外：
 </p>
 
-The above rule doesn't cover all circumstances.
-What about if both of the two operands in a comparison are untyped constant values?
-The additional rules are simple:
+<!--
+https://github.com/golang/go/issues/28164#issuecomment-430733364
+-->
+<div class="alert alert-danger">
+如果两个值中有一个为接口值，而另一个为非接口值并且它的类型为一个<a href="type-system-overview.html#types-not-support-comparison">不可比较类型</a>，则这两个值不可比较，即使此非接口值可以被隐式转换为接口值的类型（即此不可比较类型实现了接口值的类型）。
+</div>
+
+<p>
+注意，尽管切片/映射表/函数类型为比可比较类型，但是它们的值可以和类型不确定的预定义<code>nil</code>标识符比较。
+</p>
+
+上述规则并未覆盖所有的情况。如果两个值均为类型不确定值，它们可以比较吗？这种情况的规则比较简单：
 <ul>
 <li>
-	untyped boolean values can be compared with untyped boolean values;
+	两个类型不确定的布尔值可以相互比较。
 </li>
 <li>
-	untyped numeric values can be compared with untyped numeric values;
+	两个类型不确定的数字值可以相互比较。
 </li>
 <li>
-	untyped string values can be compared with untyped string values,
+	两个类型不确定的字符串值可以相互比较。
 </li>
 </ul>
 
 <p>
-The results of comparing two untyped constant values obey intuition.
+两个类型不确定的数字值的比较结果服从直觉。
 </p>
 
 <p>
-Any comparison results an untyped boolean value.
+注意，两个类型不确定nil值不能相互比较。
 </p>
-
-</div>
-
-<p class="anchor" id="comparison-restrictions"></p>
-<h4>Comparison Restrictions</h4>
-
-<div>
-Currently (Go 1.10), there are some restrictions for the above comparison rules:
-<ul>
-<li>
-	map, slice and function types don't support comparison.
-	(But values of these types can be compared to the bare <code>nil</code> identifier).
-</li>
-<li>
-	any struct type with a field whose type is uncomparable
-	and any array type which element type is uncomparable also doesn't support comparison.
-</li>
-<li>
-	bare <code>nil</code> identifiers (untyped <code>nil</code> values) can't be compared with each other.
-</li>
-</ul>
 
 <p>
+任何比较的结果均为一个类型不确定布尔值。
 </p>
 
-Here are some uncomparable types.
-<pre class="line-numbers"><code class="language-go">[]int
-map[string]bool
-func() int
-struct{x map[int]int} // one field element type is uncomparable
-[5][]int              // array element type is uncomparable
-</code></pre>
+一些值比较的例子：
 
-<p>
-</p>
-
-Comparison restriction examples:
 <pre class="line-numbers"><code class="language-go">package main
 
-// The types of the following variables are all uncomparable.
+// 一些类型为不可比较类型的变量。
 var s []int
 var m map[int]int
 var f func()()
-var t struct {
-	s []int
-	n int
-}
+var t struct {x []int}
 var a [5]map[int]int
 
 func main() {
-	// The following lines fail to compile.
+	// 这些比较编译不通过。
 	/*
 	_ = s == s
 	_ = m == m
@@ -631,64 +592,81 @@ func main() {
 	_ = t == t
 	_ = a == a
 	_ = nil == nil
+	_ = s == interface{}(nil)
+	_ = m == interface{}(nil)
+	_ = f == interface{}(nil)
 	*/
 
-	// The following lines compile okay.
+	// 这些比较编译没问题。
 	_ = s == nil
 	_ = m == nil
 	_ = f == nil
+	_ = 123 == interface{}(nil)
+	_ = true == interface{}(nil)
+	_ = "abc" == interface{}(nil)
 }
 </code></pre>
-<p></p>
+
+<p>
+</p>
 
 </div>
 
 <p class="anchor" id="comparison-implementation"></p>
-<h4>How Are Two Values Compared</h4>
+<h4>两个值是如何进行比较的？</h4>
 
 <div>
-Assume two values are comparable, and they have the same type <code>T</code>
-(if they have different types, one of them must be implicitly convertible to the type of the other).
+假设两个值可以相互比较，并且它们的类型同为<code>T</code>。
+（如果它们的类型不同，则其中一个可以转换为另一个的类型。这里我们不考虑两者均为类型不确定值的情形。）
 <ol>
 <li>
-	If <code>T</code> is a struct type, then
-	<a href="struct.html#comparison">each pair of the corresponding
-	fields of the two struct values will be compared</a>.
+	如果<code>T</code>是一个布尔类型嗯，则这两个值只有在它们同为<code>true</code>或者<code>false</code>的时候比较结果才为<code>true</code>。
 </li>
 <li>
-	If <code>T</code> is an array type,then
-	<a href="container.html#comparison">each pair of the corresponding
-	elements of the two array values will be compared</a>.
+	如果<code>T</code>是一个整数类型，则这两个值只有在它们在内存中的表示完全一致的情况下比较结果才为<code>true</code>。
 </li>
 <li>
-	If <code>T</code> is an interface type, please read
-	<a href="interface.html#comparison">how two interface values are compared</a>.
+	如果<code>T</code>是一个浮点数类型， 则这两个值只要满足下面任何一种情况，它们的比较结果就为<code>true</code>：
+	<ul>
+	<li>
+		它们都为<code>+Inf</code>；
+	</li>
+	<li>
+		它们都为<code>-Inf</code>；
+	</li>
+	<li>
+		它们中的每个都为<code>-0.0</code>或者<code>+0.0</code>。
+	</li>
+	<li>
+		它们都不是<code>NaN</code>并且它们在内存中的表示完全一致。
+	</li>
+	</ul>
 </li>
 <li>
-	If <code>T</code> is a string type, please read
-	<a href="string.html#comparison">how two string values are compared</a>.
+	如果<code>T</code>是一个复数类型，则这两个值只有在它们的实部和虚部均做为浮点数进行比较的结果都为<code>true</code>的情况下比较结果才为<code>true</code>。
 </li>
 <li>
-	If <code>T</code> is a boolean, numeric or pointer
-	(either safe or unsafe), then each pair of the corresponding bytes
-	occupied in memory by the two values will be compared.
-	The two values are equal only if all the byte comparisons result true.
+	如果<code>T</code>是一个指针类型（安全或者非安全），则这两个值只有在它们所表示的地址值相等的情况下比较结果才为<code>true</code>。
 </li>
 <li>
-	If <code>T</code> is a channel type, the two channel values are equal
-	if they both reference the same underlying channel structure.
+	如果<code>T</code>是一个数据通道类型，则这两个值只有在它们引用着相同的底层内部数据通道或者它们都为nil时比较结果才为<code>true</code>。
+</li>
+<li>
+	如果<code>T</code>是一个结构体类型，则<a href="struct.html#comparison">它们的相应字段将逐对进行比较</a>。
+</li>
+<li>
+	如果<code>T</code>是一个数组类型，则<a href="container.html#comparison">它们的相应元素将逐对进行比较</a>。
+</li>
+<li>
+	如果<code>T</code>是一个接口类型，请参阅<a href="interface.html#comparison">两个接口值是如何惊醒比较的</a>。
+</li>
+<li>
+	如果<code>T</code>是一个字符串类型，请参阅<a href="string.html#comparison">两个字符串值是如何惊醒比较的</a>。
 </li>
 </ol>
 
-<p>
-Please note, comparing two interfaces with the same uncomparable dynamic type
-produces a panic.
-A sub-comparison of the first three cases mentioned above may also
-an interface value comparison.
-So comparisons of the first three cases may be also possible to produce panics.
-<p>
 
-Here is an example in which some panics will occur in comparisons.
+请注意，动态类型均为同一个不可比较类型的两个接口值的比较将产生一个恐慌。比如下面的例子：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -701,21 +679,16 @@ func main() {
 	var y = T{a: x}
 	var z = [3]T{}
 
-	// Each of the following line can produce a panic.
+	// 这三个比较均会产生一个恐慌。
 	_ = x == x
 	_ = y == y
 	_ = z == z
-
-	// The two z lines are commented out, for
-	// there is a bug in the latest standard compiler.
 }
 </code></pre>
 
 <p>
-Please note, the two code lines involved <code>z</code> compile okay for
-the <code>go build</code> and <code>go install</code> commands,
-but fail to compile for the <code>go run</code> command.
-This is a known bug of the standard Go compiler 1.9 and 1.10.
+请注意，上例中含有<code>z</code>的两行使用官方Go SDK各个版本中的<code>go build</code>和<code>go install</code>子命令均编译没问题，但是当使用Go SDK 1.9和1.10中的 <code>go run</code>子命令运行上例时，编译将报错。
+这是Go SDK 1.9和1.10中的<a href="https://github.com/golang/go/issues/24747">一个已知的bug</a>。
 </p>
 </div>
 

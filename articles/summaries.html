@@ -1,71 +1,70 @@
-<h1>Some Simple Summaries</h1>
+<h1>一些简单的总结</h1>
 
 <div>
-Index
+索引：
 <ul>
-<li><a href="#type-with-underlyings">Types whose values may have indirect underlying parts</a>.</li>
-<li><a href="#have-length-types">Types which values can be used as arguments of built-in function <code>len</code>
-	(and functions <code>cap</code>, <code>close</code>, <code>delete</code>, <code>make</code>)</a>.</li>
-<li><a href="#container-types">Comparison of built-in container types</a>.</li>
-<li><a href="#composite-literals-types">Types which values can be represented with composite literals (<code>T{...}</code>)</a>.</li>
-<li><a href="#nil-zero-value-types">Types which zero values can be represented with <code>nil</code></a>.</li>
-<li><a href="#types-can-have-methods">Types we can implement methods for</a>.</li>
-<li><a href="#types-can-be-embedded">Types which can be anonymously embedded in other types</a>.</li>
-<li><a href="#compile-time-evaluation">Functions whose calls will/may be evaluated at compile time</a>.</li>
-<li><a href="#not-addressable">Values that can't be taken addresses</a>.</li>
-<li><a href="#not-comparable">Types which don't support comparisons</a>.</li>
-<li><a href="#declared-but-unused">Which code elements are allowed to be declared but not used</a>.</li>
-<li><a href="#groupable-elements">Named source code elements which declarations can be grouped with <code>()</code></a>.</li>
-<li><a href="#declaration-places">Named source code elements which can be declared both inside functions and outside any functions</a>.</li>
-<li><a href="#additional-return">Expressions which may return an optional additional return value</a>.</li>
-<li><a href="#block-forever">Ways to block current goroutine ‎forever by using the channel mechanism</a>.</li>
-<li><a href="#concatenate-strings">Ways to concatenate strings</a>.</li>
+<li><a href="#type-with-underlyings">哪些种类型的值可以有间接底层部分？</a></li>
+<li><a href="#have-length-types">哪些种类型的值可以用作内置<code>len</code>（以及<code>cap</code>、<code>close</code>、<code>delete</code>和<code>make</code>）函数调用的实参？</a></li>
+<li><a href="#container-types">各种容器类型比较</a></li>
+<li><a href="#composite-literals-types">哪些种类型的值可以用组合字面形式（<code>T{...}</code>）表示？</a></li>
+<li><a href="#type-sizes">各种类型的尺寸大小</a></li>
+<li><a href="#nil-zero-value-types">哪些种类型的零值使用预声明的<code>nil</code>标识符表示？</a></li>
+<li><a href="#types-can-have-methods">我们可以为什么样的类型声明方法？</a></li>
+<li><a href="#types-can-be-embedded">什么样的类型可以被内嵌在结构体类型中？</a></li>
+<li><a href="#compile-time-evaluation">哪些函数调用将在编译时刻被估值？</a></li>
+<li><a href="#not-addressable">哪些值是可寻址的？</a></li>
+<li><a href="#not-comparable">哪些类型不支持比较？</a></li>
+<li><a href="#declared-but-unused">哪些代码元素允许被声明却不使用？</a></li>
+<li><a href="#groupable-elements">哪些有名代码元素的声明可以用小括号<code>()</code>分组？</a></li>
+<li><a href="#declaration-places">哪些有名代码元素的声明可以被声明在函数内也可以被声明在函数外？</a></li>
+<li><a href="#additional-return">哪些表达式的估值结果可以包含一个额外的可选的值？</a></li>
+<li><a href="#block-forever">几种导致当前协程永久阻塞的方法</a></li>
+<li><a href="#concatenate-strings">几种衔接字符串的方法</a></li>
 </ul>
 
 <p>
 </p>
 
-Besides the current article, there also some other summary articles
-for some special topics, including
+除了当前这篇文章，Golang 101中还有其它几篇总结性的文章，包括：
 <ul>
 <li>
-	<a href="nil.html"><code>nil</code> In Go</a>.
+	<a href="nil.html">Go中的<code>nil</code></a>；
 </li>
 <li>
-	<a href="value-conversions-assignments-and-comparisons.html">value conversion,
-	assignment and comparison rules in Go</a>.
+	<a href="value-conversions-assignments-and-comparisons.html">类型转换、赋值和值比较规则大全</a>；
 </li>
 <li>
-	<a href="exceptions.html">syntax/semantics exceptions in Go</a>.
+	<a href="exceptions.html">Go中的一些语法/语义例外</a>。
 </li>
 </ul>
 </div>
 
 <p class="anchor" id="type-with-underlyings"></p>
 <h3>
-	Types whose values may have indirect underlying parts
+	哪些种类型的值可以有间接底层部分？
 </h3>
 
 <div>
-Types whose values may have indirect underlying parts:
+在Go中，下列种类的类型的值可以有间接底层部分：
 <ul>
-<li>string types</li>
-<li>function types</li>
-<li>slice types</li>
-<li>map types</li>
-<li>channel types</li>
-<li>interface types</li>
+<li>字符串类型</li>
+<li>函数类型</li>
+<li>切片类型</li>
+<li>映射表类型</li>
+<li>数据通道类型</li>
+<li>接口类型</li>
 </ul>
+
 <p>
-<a href="value-part.html">This article</a> lists the
-internal definitions of above types by the standard Go compiler/runtime.
+注意：此答案基于官方标准Go编译器的实现。事实上，函数类型的值是否有间接底层部分是难以证明的。
+另外，字符串和接口类型的值在逻辑上应该被认为是不含间接底层部分。
+请阅读<a href="value-part.html">值部一文</a>获取更多信息。
 </p>
 </div>
 
 <p class="anchor" id="have-length-types"></p>
 <h3>
-	Types which values can be used as arguments of built-in function <code>len</code>
-	(and functions <code>cap</code>, <code>close</code>, <code>delete</code>, <code>make</code>)
+	哪些种类型的值可以用作内置<code>len</code>（以及<code>cap</code>、<code>close</code>、<code>delete</code>和<code>make</code>）函数调用的实参？
 </h3>
 
 <table class="table table-bordered text-center" style="width: auto !important;">
@@ -81,7 +80,7 @@ internal definitions of above types by the standard Go compiler/runtime.
 </thead>
 <tbody>
 	<tr class="active">
-	<th scope="row" class="text-center">string</th>
+	<th scope="row" class="text-center">字符串值</th>
 	<td>Yes</td>
 	<td></td>
 	<td></td>
@@ -89,7 +88,7 @@ internal definitions of above types by the standard Go compiler/runtime.
 	<td></td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center">array<br/>(and array pointer)</th>
+	<th scope="row" class="text-center">数组或者数组指针值</th>
 	<td>Yes</td>
 	<td>Yes</td>
 	<td></td>
@@ -97,7 +96,7 @@ internal definitions of above types by the standard Go compiler/runtime.
 	<td></td>
 	</tr>
 	<tr class="active">
-	<th scope="row" class="text-center">slice</th>
+	<th scope="row" class="text-center">切片值</th>
 	<td>Yes</td>
 	<td>Yes</td>
 	<td></td>
@@ -105,7 +104,7 @@ internal definitions of above types by the standard Go compiler/runtime.
 	<td>Yes</td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center">map</th>
+	<th scope="row" class="text-center">映射表值</th>
 	<td>Yes</td>
 	<td></td>
 	<td></td>
@@ -113,7 +112,7 @@ internal definitions of above types by the standard Go compiler/runtime.
 	<td>Yes</td>
 	</tr>
 	<tr class="active">
-	<th scope="row" class="text-center">channel</th>
+	<th scope="row" class="text-center">数据通道值</th>
 	<td>Yes</td>
 	<td>Yes</td>
 	<td>Yes</td>
@@ -124,33 +123,29 @@ internal definitions of above types by the standard Go compiler/runtime.
 </table>
 
 <p>
-Values of above types can also be ranged over in for-range loops.
-</p>
-
-<p>
-Types which values can be used as arguments of built-in function <code>len</code>
-can be called container types.
+值可以被用作内置函数<code>len</code>调用的参数的类型都可以被称为（广义上的）容器类型。
+这些容器类型的值都可以跟在<code>for-range</code>循环的<code>range</code>关键字后。
 </p>
 
 <p class="anchor" id="container-types"></p>
 <h3>
-	Comparison of built-in container types
+	各种容器类型比较
 </h3>
 
 <table class="table table-bordered text-center" style="width: auto !important;">
 <thead>
 	<tr>
-	<th class="text-center">Type</th>
-	<th class="text-center">Can New Elements Be Added Into Values?</th>
-	<th class="text-center">Are Elements Of Values Replaceable?</th>
-	<th class="text-center">Are Elements Of Values Addressable?</th>
-	<th class="text-center">Will Element Accessments Modify Value Lengths?</th>
-	<th class="text-center">May Values Have Underlying Parts</th>
+	<th class="text-center">类型</th>
+	<th class="text-center">容器值是否支持添加新的元素？</th>
+	<th class="text-center">容器值中的元素是否可以被替换？</th>
+	<th class="text-center">容器值中的元素是否可寻址？</th>
+	<th class="text-center">访问容器值元素是否会更改容器长度？</th>
+	<th class="text-center">容器值是否可以有间接底层部分？</th>
 	</tr>
 </thead>
 <tbody>
 	<tr class="active">
-	<th scope="row" class="text-center">string</th>
+	<th scope="row" class="text-center" style="white-space: nowrap;">字符串</th>
 	<td>No</td>
 	<td>No</td>
 	<td>No</td>
@@ -158,7 +153,7 @@ can be called container types.
 	<td>Yes<sup>(1)</sup></td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center">array</th>
+	<th scope="row" class="text-center" style="white-space: nowrap;">数组</th>
 	<td>No</td>
 	<td>Yes<sup>(2)</sup></td>
 	<td>Yes<sup>(2)</sup></td>
@@ -166,7 +161,7 @@ can be called container types.
 	<td>No</td>
 	</tr>
 	<tr class="active">
-	<th scope="row" class="text-center">slice</th>
+	<th scope="row" class="text-center" style="white-space: nowrap;">切片</th>
 	<td>No<sup>(3)</sup></td>
 	<td>Yes</td>
 	<td>Yes</td>
@@ -174,7 +169,7 @@ can be called container types.
 	<td>Yes</td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center">map</th>
+	<th scope="row" class="text-center" style="white-space: nowrap;">映射表</th>
 	<td>Yes</td>
 	<td>Yes</td>
 	<td>No</td>
@@ -182,7 +177,7 @@ can be called container types.
 	<td>Yes</td>
 	</tr>
 	<tr class="active">
-	<th scope="row" class="text-center">channel</th>
+	<th scope="row" class="text-center" style="white-space: nowrap;">数据通道</th>
 	<td>Yes<sup>(4)</sup></td>
 	<td>No</td>
 	<td>No</td>
@@ -193,150 +188,156 @@ can be called container types.
 </table>
 
 <p>
-<sup>(1)</sup> for the standard Go compiler/runtime.
+<sup>(1)</sup> 对于官方标准Go编译器和运行时来说。
 <br/>
-<sup>(2)</sup> for addressable array values only.
+<sup>(2)</sup> 对于可寻址的数组值来说。
 <br/>
-<sup>(3)</sup> slice lengths can be modified by using <code>reflect.SetLen</code> function.
-Increase the length of a slice by this way is kind of adding new elements into the slice.
-The length of a slice value can also be modified by assigning another slice value to it.
+<sup>(3)</sup> 一般说来，一个切片值只能通过将另外一个切片值赋给它以覆盖替换的形式修改，这里我们不视这种情况为“添加新的元素”。
+其实，切片的长度也可以通过调用<code>reflect.SetLen</code>来单独修改。增加切片的长度可以看作是一种变相的向切片添加元素。
+但<code>reflect.SetLen</code>函数的效率很低，因此很少使用。
 <br/>
-<sup>(4)</sup> for buffered channels which are still not full.
+<sup>(4)</sup> 对于带缓冲并且缓冲未满的数据通道来说。
 </p>
 
 <p class="anchor" id="composite-literals-types"></p>
 <h3>
-	Types which values can be represented with composite literals (<code>T{...}</code>)
+	哪些种类型的值可以用组合字面形式（<code>T{...}</code>）表示？
 </h3>
 
 <p>
-Values of following types can be represented with composite literals:
+下面在四种类型的值可以用组合字面形式表示。
 </p>
 
 <table class="table table-bordered text-center" style="width: auto !important;">
 <thead>
 	<tr>
-	<th class="text-center">Type (<code>T</code>)</th>
-	<th class="text-center">Is <code>T{}</code> A Zero Value Of <code>T</code>?</th>
+	<th class="text-center">类型（<code>T</code>）</th>
+	<th class="text-center"><code>T{}</code>是类型<code>T</code>的零值？</th>
 	</tr>
 </thead>
 <tbody>
 	<tr class="active">
-	<th scope="row" class="text-center">struct</th>
+	<th scope="row" class="text-center">结构体类型</th>
 	<td>Yes</td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center">array</th>
+	<th scope="row" class="text-center">数组类型</th>
 	<td>Yes</td>
 	</tr>
 	<tr class="active">
-	<th scope="row" class="text-center" style="vertical-align: middle">slice</th>
-	<td>No<br/>(zero value is <code>nil</code>)</td>
+	<th scope="row" class="text-center" style="vertical-align: middle">切片类型</th>
+	<td>No<br/>（零值用<code>nil</code>表示）</td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center" style="vertical-align: middle">map</th>
-	<td>No<br/>(zero value is <code>nil</code>)</td>
+	<th scope="row" class="text-center" style="vertical-align: middle">映射表类型</th>
+	<td>No<br/>（零值用<code>nil</code>表示）</td>
 	</tr>
 </tbody>
 </table>
 
-<p class="anchor" id="nil-zero-value-types"></p>
+<p class="anchor" id="type-sizes"></p>
 <h3>
-	Types which zero values can be represented with <code>nil</code>
+	各种类型的尺寸大小
 </h3>
 
 <p>
-The zero values of the following types can be represented with <code>nil</code>.
+详见<a href="value-copy-cost.html">值复制成本</a>一文。
+</p>
+
+<p class="anchor" id="nil-zero-value-types"></p>
+<h3>
+	哪些种类型的零值使用预声明的<code>nil</code>标识符表示？
+</h3>
+
+<p>
+下面这些类型的零值可以用预声明的<code>nil</code>标识符表示。
 </p>
 
 <table class="table table-bordered text-center" style="width: auto !important;">
 <thead>
 	<tr>
-	<th class="text-center">Type (<code>T</code>)</th>
-	<th class="text-center">Size Of <code>T(nil)</code></th>
+	<th class="text-center">类型（<code>T</code>）</th>
+	<th class="text-center"><code>T(nil)</code>的尺寸</th>
 	</tr>
 </thead>
 <tbody>
 	<tr class="active">
-	<th scope="row" class="text-center">pointer</th>
+	<th scope="row" class="text-center">指针</th>
 	<td>1 word</td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center">slice</th>
+	<th scope="row" class="text-center">切片</th>
 	<td>3 words</td>
 	</tr>
 	<tr class="active">
-	<th scope="row" class="text-center">map</th>
+	<th scope="row" class="text-center">映射表</th>
 	<td>1 word</td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center">channel</th>
+	<th scope="row" class="text-center">数据通道</th>
 	<td>1 word</td>
 	</tr>
 	<tr class="active">
-	<th scope="row" class="text-center">function</th>
+	<th scope="row" class="text-center">函数</th>
 	<td>1 word</td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center">interface</th>
+	<th scope="row" class="text-center">接口</th>
 	<td>2 words</td>
 	</tr>
 </tbody>
 </table>
 
-<p><i>
-(One word means 4 bytes on 32bits OSes and 8 bytes on 64bits OSes.
-and <a href="value-part.html">the indirect underlying parts</a>
-of a value don't contribute to the size of the value.)
-</i></p>
+<p>
+上表列出的尺寸为官方标准Go编译器的结果。
+一个word在32位的架构中为4个字节，在64位的架构中为8个字节。
+一个Go值的<a href="value-part.html">间接底层部分</a>未统计在尺寸中。
+</p>
 
 <p>
-The size of a zero value of a type is the same as any other values of the same type.
+一个类型的零值的尺寸和其它非零值的尺寸是一致的。
 </p>
 
 <p class="anchor" id="types-can-have-methods"></p>
 <h3>
-	Types we can implement methods for
+	我们可以为什么样的类型声明方法？
 </h3>
 
 <p>
-Please read <a href="unofficial-faq.html#types-can-have-methods">this
-question</a> for details.
+详见<a href="method.html">方法</a>一文。
 </p>
 
 <p class="anchor" id="types-can-be-embedded"></p>
 <h3>
-	Types which can be anonymously embedded in other types
+	什么样的类型可以被内嵌在结构体类型中？
 </h3>
 
 <p>
-Please read <a href="type-embedding.html#embeddable-types">which types
-can be embedded</a> for details.
+详见<a href="type-embedding.html#embeddable-types">类型内嵌</a>一文。
 </p>
 
 <p class="anchor" id="compile-time-evaluation"></p>
 <h3>
-	Functions whose calls will/may be evaluated at compile time
+	哪些函数调用将在编译时刻被估值？
 </h3>
 
 <p>
-If a function call is evaluated at compile time,
-its return results must be constants.
+如果一个函数调用在编译时刻被估值，则估值结果为一个常量。
 </p>
 
 <table class="table table-bordered text-center" style="width: auto !important;">
 <thead>
 	<tr>
-	<th class="text-center">Function</th>
-	<th class="text-center">Return Type</th>
-	<th class="text-center">Are Calls Always Evaluated At Compile Time?</th>
+	<th class="text-center">函数</th>
+	<th class="text-center">返回类型</th>
+	<th class="text-center">其调用是否总是在编译时刻估值？</th>
 	</tr>
 </thead>
 <tbody>
 	<tr class="active">
 	<th scope="row" class="text-center">unsafe.Sizeof</th>
 	<td rowspan="3" style="vertical-align: middle"><code>uintptr</code></td>
-	<td rowspan="3" style="vertical-align: middle">Yes, always.</td>
+	<td rowspan="3" style="vertical-align: middle">是</td>
 	</tr>
 	<tr class="active">
 	<th scope="row" class="text-center" style="vertical-align: middle">unsafe.Alignof</th>
@@ -348,19 +349,16 @@ its return results must be constants.
 	<th scope="row" class="text-center" style="vertical-align: middle">len</th>
 	<td rowspan="2" style="vertical-align: middle"><code>int</code></td>
 	<td rowspan="2">
-		Not always.
+		否
 		<br/><br/>
 		<div class="text-left">
-		From <a href="https://golang.org/ref/spec#Length_and_capacity">Go spec</a>:
+		<a href="https://golang.org/ref/spec#Length_and_capacity">Go语言白皮书</a>中提到：
 		<ul>
 		<li>
-		the expression <code>len(s)</code> is constant if <code>s</code> is a string constant.
+		如果表达式<code>s</code>表示一个字符串常量，则表达式<code>len(s)</code>将在编译时刻估值；
 		</li>
 		<li>
-		the expressions <code>len(s)</code> and <code>cap(s)</code> are constants
-		if the type of <code>s</code> is an array or pointer to an array
-		and the expression <code>s</code> does not contain channel receives or (non-constant) function calls
-		(in other words, <code>s</code> can be array variables and arry pointer variables).
+		如果表达式<code>s</code>表示一个数组或者数组的指针，并且<code>s</code>中不含有数据接收操作和估值结果为非常量的函数调用，则表达式<code>len(s)</code>和<code>cap(s)</code>将在编译时刻估值。
 		</li>
 		</ul>
 		</div>
@@ -371,14 +369,13 @@ its return results must be constants.
 	</tr>
 	<tr class="active">
 	<th scope="row" class="text-center" style="vertical-align: middle">real</th>
-	<td rowspan="2" style="vertical-align: middle"><code>float64</code><br/>(default type)</td>
+	<td rowspan="2" style="vertical-align: middle"><code>float64</code><br/>（默认类型）</td>
 	<td rowspan="2">
-		Not always.
+		否
 		<br/><br/>
 		<div class="text-left">
-		From <a href="https://golang.org/ref/spec#Constants">Go spec</a>:
-		the expressions <code>real(s)</code> and <code>imag(s)</code> are constants
-		if <code>s</code> is a complex constant.
+		<a href="https://golang.org/ref/spec#Constants">Go语言白皮书</a>提到：
+		表达式<code>real(s)</code>和<code>imag(s)</code>在<code>s</code>为一个复数常量表达式时才在编译时刻估值。
 		</div>
 	</td>
 	</tr>
@@ -387,14 +384,13 @@ its return results must be constants.
 	</tr>
 	<tr>
 	<th scope="row" class="text-center" style="vertical-align: middle">complex</th>
-	<td style="vertical-align: middle"><code>complex128</code><br/>(default type)</td>
+	<td style="vertical-align: middle"><code>complex128</code><br/>（默认类型）</td>
 	<td>
-		Not always.
+		否
 		<br/><br/>
 		<div class="text-left">
-		From <a href="https://golang.org/ref/spec#Constants">Go spec</a>:
-		the expression <code>complex(sr, si)</code> is constant
-		if both <code>sr</code> and <code>si</code> are numeric constants.
+		<a href="https://golang.org/ref/spec#Constants">Go语言白皮书</a>提到：
+		表达式<code>complex(sr, si)</code>只有在<code>sr</code>和<code>si</code>都为常量表达式的时候才在编译时刻估值。
 		</div>
 	</td>
 	</tr>
@@ -403,276 +399,258 @@ its return results must be constants.
 
 <p class="anchor" id="not-addressable"></p>
 <h3>
-	Values that can't be taken addresses
+	哪些值是可寻址的？
 </h3>
 
-<div>
-Following values can't be taken addresses:
-<ul>
-<li>bytes in strings</li>
-<li>map elements</li>
-<li>dynamic values of interface values (exposed by type assertions)</li>
-<li>constant values</li>
-<li>literal values</li>
-<li>package-level functions</li>
-<li>methods (used as function values)</li>
-<li>intermediate values
-	<ul>
-	<li>function calls</li>
-	<li>explicit value conversions</li>
-	<li>all sorts of operations, except pointer dereference operations, but including:
-		<ul>
-		<li>channel receive operations</li>
-		<li>sub-string operations</li>
-		<li>sub-slice operations</li>
-		<li>addition, subtraction, multiplication, and division, etc.</li>
-		</ul>
-	</li>
-	</ul>
-</li>
-</ul>
-</div>
-
-<div class="alert alert-success">
-Please note, there is a syntax sugar, <code>&T{}</code>, in Go.
-It is a short form of <code>tmp := T{}; (&tmp)</code>,
-so <code>&T{}</code> is legal doesn't mean
-<code>T{}</code> is addressable.
-</div>
-<p></p>
-
-<div>
-BTW, following values can be taken addresses:
-<ul>
-<li>variables</li>
-<li>fields of addressable structs</li>
-<li>elements of addressable arrays</li>
-<li>elements of any slices (whether the slices are addressable or not)</li>
-<li>pointer dereference operations</li>
-</ul>
-</div>
+<p>
+请阅读<a href="unofficial-faq.html#unaddressable-values">此条问答</a>获取详情。
+</p>
 
 <p class="anchor" id="not-comparable"></p>
 <h3>
-	Types which don't support comparisons
+	哪些类型不支持比较？
 </h3>
 
-<div>
-Following types don't support comparisons:
-<ul>
-<li>map</li>
-<li>slice</li>
-<li>function</li>
-<li>
-struct types containing uncomparable fields
-</li>
-<li>
-array types with uncomparable elements
-</li>
-</ul>
 <p>
-Types which don't support comparisons can't be used as the key type of map types.
+请阅读<a href="unofficial-faq.html#uncomparable-types">此条问答</a>获取详情。
 </p>
-</div>
-
-<div>
-Please note,
-<ul>
-<li>
-although map, slice and function types don't support comparisons,
-their values can be compared to the bare <code>nil</code> identifier.
-</li>
-<li>
-comparing interface values with uncomparable dynamic types will panic at run time,
-except the danymic value of one of the compared interfaces is untyped <code>nil</code>.
-</li>
-</ul>
-
-</div>
 
 <p class="anchor" id="declared-but-unused"></p>
 <h3>
-	Which code elements are allowed to be declared but not used
+	哪些代码元素允许被声明却不使用？
 </h3>
 
 <table class="table table-bordered text-center" style="width: auto !important;">
 <thead>
 	<tr>
 	<th class="text-center"></th>
-	<th class="text-center">Allowed To Be Declared But Not Used</th>
+	<th class="text-center">允许被声明却不使用？</th>
 	</tr>
 </thead>
 <tbody>
 	<tr class="active">
-	<th scope="row" class="text-center">import</th>
-	<td>No</td>
+	<th scope="row" class="text-center">包引入</th>
+	<td>不允许（对于官方标准编译器）</td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center">type</th>
-	<td>Yes</td>
+	<th scope="row" class="text-center">类型</th>
+	<td>允许</td>
 	</tr>
 	<tr class="active">
-	<th scope="row" class="text-center">variable</th>
+	<th scope="row" class="text-center">变量</th>
 	<td>
-		Yes for package-level variables.
-		<br/>
-		No for local variables.
+		包级全局变量允许，但局部变量不允许（对于官方标准编译器）。
 	</td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center">constant</th>
-	<td>Yes</td>
+	<th scope="row" class="text-center">常量</th>
+	<td>允许</td>
 	</tr>
 	<tr class="active">
-	<th scope="row" class="text-center">function</th>
-	<td>Yes</td>
+	<th scope="row" class="text-center">函数</th>
+	<td>允许</td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center">label</th>
-	<td>No</td>
+	<th scope="row" class="text-center">跳转标签</th>
+	<td>不允许（对于官方标准编译器）</td>
 	</tr>
 </tbody>
 </table>
 
 <p class="anchor" id="groupable-elements"></p>
 <h3>
-	Named source code elements which declarations can be grouped with <code>()</code>
+	哪些有名代码元素的声明可以用小括号<code>()</code>分组？
 </h3>
 
 <div>
-Following named source code element declarations can be grouped with <code>()</code>:
+下面这些代码元素的声明可以用小括号<code>()</code>分组：
 <ul>
-<li>import</li>
-<li>type</li>
-<li>variable</li>
-<li>constant</li>
+<li>包引入</li>
+<li>类型</li>
+<li>变量</li>
+<li>常量</li>
 </ul>
 </div>
 <p>
-Functions and labels can't be grouped with <code>()</code>.
+函数和跳转标签是不能分组的。
 </p>
 
 <p class="anchor" id="declaration-places"></p>
 <h3>
-	Named source code elements which can be declared both inside functions and outside any functions
+	哪些代码元素的声明可以被声明在函数内也可以被声明在函数外？
 </h3>
 
 <div>
-Following named source code elements can be declared both inside functions and outside any functions:
+下面这些代码元素的声明既可以被声明在函数内也可以被声明在函数外：
 <ul>
-<li>type</li>
-<li>variable</li>
-<li>constant</li>
+<li>类型</li>
+<li>变量</li>
+<li>常量</li>
 </ul>
 </div>
 <p>
-Imports must be declared before declarations of other elements (and after the package clause).
+包引入必须被声明在其它种类的代码元素的声明之前。
 </p>
 <p>
-Functions can only be declared outside any functions.
-Anonymous functions can be defined inside other function bodies,
-but they are not declared.
+函数必须声明在任何函数体之外。匿名函数可以定义在函数体内，它那不属于声明。
 </p>
 <p>
-Labels must declared inside functions.
+跳转标签必须声明在函数体内。
 </p>
 
 <p class="anchor" id="additional-return"></p>
 <h3>
-	Expressions which can return an optional additional bool return value
+	哪些表达式的估值结果可以包含一个额外的可选的值？
 </h3>
 
 <p>
-Following expressions can return an optional additional bool return value:
+下列表达式的估值结果可以包含一个额外的可选的值：
 </p>
 
 <table class="table table-bordered text-center" style="width: auto !important;">
 <thead>
 	<tr>
 	<th class="text-center"></th>
-	<th class="text-center">Meaning Of The Optional Return</th>
-	<th class="text-center">Will Omitting The Optional Return Affect Program Behavior?</th>
+	<th class="text-center">语法</th>
+	<th class="text-center">额外的可选的值（语法示例中的<code>ok</code>）的含义</th>
+	<th class="text-center">舍弃额外的可选的值会对估值行为发生影响吗？</th>
 	</tr>
 </thead>
 <tbody>
 	<tr class="active">
-	<th scope="row" class="text-center" style="vertical-align: middle">map element access</th>
-	<td>whether or not the accessed key is present in the map</td>
-	<td>No</td>
+	<th scope="row" class="text-center" style="vertical-align: middle">映射表元素访问</th>
+	<td style="vertical-align: middle; white-space: nowrap;" class="text-center">
+		<code>e, ok = aMap[key]</code>
+	</td>
+	<td>键值<code>key</code>对应的条目是否存储在映射表值中</td>
+	<td>否</td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center" style="vertical-align: middle">channel value receive</th>
-	<td>whether or not the received value was sent before the channel was closed</td>
-	<td>No</td>
+	<th scope="row" class="text-center" style="vertical-align: middle">数据接收</th>
+	<td style="vertical-align: middle; white-space: nowrap;" class="text-center">
+		<code>e, ok = &lt;- aChannel</code>
+	</td>
+	<td>被接收到的值<code>e</code>是否在数据通道关闭之前发送的</td>
+	<td>否</td>
 	</tr>
 	<tr class="active">
-	<th scope="row" class="text-center" style="vertical-align: middle">type assertion</th>
-	<td>whether or not the dynamic type of the interface value matches the asserted type</td>
-	<td>Yes<br/>(when the optional bool return is omitted,
-		a panic is created if the asserted type is not an ok type)</td>
+	<th scope="row" class="text-center" style="vertical-align: middle">类型断言</th>
+	<td style="vertical-align: middle; white-space: nowrap;" class="text-center">
+		<code>v, ok = anInterface.(T)</code>
+	</td>
+	<td>接口值的动态类型是否为类型<code>T</code></td>
+	<td>是<br/>（当可选的值被舍弃并且断言失败的的时候，将产生一个恐慌。）</td>
 	</tr>
 </tbody>
 </table>
 
 <p class="anchor" id="block-forever"></p>
 <h3>
-	Ways to block current goroutine ‎forever by using the channel mechanism
+	几种导致当前协程永久阻塞的方法
 </h3>
 
 <div>
-Following ways can be used to block current goroutine ‎forever:
+无需引入任何包，我们可以使用下面几种方法使当前协程永久阻塞：
 <ol>
-<li>receive from a channel which no values will be sent to
-<div>
-<pre><code class="language-go"><-make(chan struct{})
-// or
-<-make(<-chan struct{})
-</code></pre></div>
-</li>
-<li>send value to a channel which no ones will receive values from
-<div>
+<li>向一个永不会被接收数据的数据通道发送数据。
+	<div>
 <pre><code class="language-go">make(chan struct{}) <- struct{}{}
 // or
 make(chan<- struct{}) <- struct{}{}
-</code></pre></div>
+</code></pre>
+	</div>
 </li>
-<li>receive value from a nil channel
-<div>
-<pre><code class="language-go"><-chan struct{}(nil)
+<li>从一个未被并且将来也不会被发送数据的（并且保证永不会被关闭的）数据通道读取数据。
+	<div>
+<pre><code class="language-go"><-make(chan struct{})
+// or
+<-make(<-chan struct{})
+// or
+for range make(<-chan struct{}) {}
+</code></pre>
+	</div>
+</li>
+<li>从一个nil数据通道读取或者发送数据。
+	<div>
+<pre><code class="language-go">chan struct{}(nil) <- struct{}{}
+// or
+<-chan struct{}(nil)
 // or
 for range chan struct{}(nil) {}
-</code></pre></div>
+</code></pre>
+	</div>
 </li>
-<li>send value to a nil channel
-<div>
-<pre><code class="language-go">chan struct{}(nil) <- struct{}{}
-</code></pre></div>
-</li>
-<li>use a bare select block
-<div>
+<li>使用一个不含任何分支的<code>select</code>流程控制代码块。
+	<div>
 <pre><code class="language-go">select{}
-</code></pre></div>
+</code></pre>
+	</div>
 </li>
 </ol>
 </div>
 
 <p class="anchor" id="concatenate-strings"></p>
 <h3>
-	Ways to concatenate strings
+	几种衔接字符串的方法
 </h3>
 
 <p>
-Please read <a href="string.html#string-concatenation">strings in Go</a> for details.
+详见<a href="string.html#string-concatenation">字符串</a>一文。
 </p>
 
 
 <!--
 
+Fatal errors which can be recovered:
+* https://play.golang.org/p/bYrfLTzXpc_o bad Mutex.Unlock call
+* create goroutine with nil function
+* memory allcaotion fails
+
+The optimizations made by gc
+* len([]rune(str)) // since Go 1.11
+* string ...
+  []byte <-> stirng
+  len([]rune(string))
+  string + string
+* since Go 1.11, https://github.com/golang/go/issues/21266#issuecomment-384706868
+  possible future append(s, make([]T)) optimiation
+  https://docs.google.com/presentation/d/1tpeJZFObkeick4CF-mx0L3CeCgvT15B96aJeRpxEPcE/preview#slide=id.g3bc6fcf60c_0_62
+* memclr
+* interface copy
+* interface dynamic pointer value
+* 4 fields struct is much faster than more field struct
+  https://docs.google.com/presentation/d/1tpeJZFObkeick4CF-mx0L3CeCgvT15B96aJeRpxEPcE/preview#slide=id.g3bc6fcf60c_0_157
+* BCE
+  https://docs.google.com/presentation/d/1tpeJZFObkeick4CF-mx0L3CeCgvT15B96aJeRpxEPcE/preview#slide=id.g3bc6fcf60c_0_169
+
+
 short and standard variable declaration comparison
 
 differences between built-in functions and custom functions.
+  * generic
+  * built-in function returns can't be omitted
+  * builtin-in functions can't be used as values, they have no types.
+  * built-in doon't need to be imported before using them, even their identifiers starts with lower..
+  * 
 
 built-in function list
+
+	"append":  predeclaredFunction,
+	"cap":     predeclaredFunction,
+	"close":   predeclaredFunction,
+	"complex": predeclaredFunction,
+	"copy":    predeclaredFunction,
+	"delete":  predeclaredFunction,
+	"imag":    predeclaredFunction,
+	"len":     predeclaredFunction,
+	"make":    predeclaredFunction,
+	"new":     predeclaredFunction,
+	"panic":   predeclaredFunction,
+	"print":   predeclaredFunction,
+	"println": predeclaredFunction,
+	"real":    predeclaredFunction,
+	"recover": predeclaredFunction,
+
 
 #returns-discardable
 return results of calls to which built-in functions can be discarded.
@@ -682,6 +660,8 @@ values of which kinds of types can be for-ranged.
 ways to return a function: naturally return, return keyword, panic, runtime.Goexit()
 
 the form <code>v[k]</code> can be used to access element of value of which kinds of types?
+
+
 
 -->
 
