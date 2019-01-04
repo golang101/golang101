@@ -559,26 +559,27 @@ case 1: fmt.Println("n == 1")
 
 </div>
 
-<h3><code>goto</code>跳转语句和标签声明</h3>
+<h3><code>goto</code>跳转语句和跳转标签声明</h3>
 
 <div>
 
 <p>
 和很多其它语言一样，Go也支持<code>goto</code>跳转语句。
-在一个<code>goto</code>跳转语句中，<code>goto</code>关键字后必须跟随一个表明跳转到何处的标签。
-我们使用<code>LabelName:</code>这样的形式来声明一个名为<code>LabelName</code>的标签，
-其中<code>LabelName</code>必须为一个标识符。一个不为空标识符的标签声明后必须被使用至少一次。
+在一个<code>goto</code>跳转语句中，<code>goto</code>关键字后必须跟随一个表明跳转到何处的跳转标签。
+我们使用<code>LabelName:</code>这样的形式来声明一个名为<code>LabelName</code>的跳转标签，其中<code>LabelName</code>必须为一个标识符。
+一个不为空标识符的跳转标签声明后必须被使用至少一次。
 </p>
 
 <p>
-一条标签声明之后必须立即跟随一条语句。如果此声明的标签使用在一条<code>goto</code>语句中，则当此条<code>goto</code>语句被执行的时候，执行将跳转到此标签声明后跟随的语句。
+一条跳转标签声明之后必须立即跟随一条语句。
+如果此声明的跳转标签使用在一条<code>goto</code>语句中，则当此条<code>goto</code>语句被执行的时候，执行将跳转到此跳转标签声明后跟随的语句。
 </p>
 
 <p>
-一个标签必须声明在一个函数体内，此标签的使用可以在此标签的声明之后或者之前，但是此标签的使用不能出现在此标签声明所处的最内层代码块之外。
+一个跳转标签必须声明在一个函数体内，此跳转标签的使用可以在此跳转标签的声明之后或者之前，但是此跳转标签的使用不能出现在此跳转标签声明所处的最内层代码块之外。
 </p>
 
-下面这个例子使用标签声明和<code>goto</code>跳转语句来实现了一个循环：
+下面这个例子使用跳转标签声明和<code>goto</code>跳转语句来实现了一个循环：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -587,7 +588,7 @@ import "fmt"
 func main() {
 	i := 0
 
-Next: // 标签声明
+Next: // 跳转标签声明
 	fmt.Println(i)
 	i++
 	if i < 5 {
@@ -599,7 +600,7 @@ Next: // 标签声明
 <p>
 </p>
 
-上面刚提到了一个标签的使用不能出现在此标签声明所处的最内层代码块之外，所以下面的代码片段中的标签使用都是不合法的。
+上面刚提到了一个跳转标签的使用不能出现在此跳转标签声明所处的最内层代码块之外，所以下面的代码片段中的跳转标签使用都是不合法的。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -619,7 +620,7 @@ goto Label1 // error
 </p>
 
 <p>
-另外要注意的一点是，如果一个标签声明在某个变量的作用域内，则此标签的使用不能出现在此变量的声明之前。
+另外要注意的一点是，如果一个跳转标签声明在某个变量的作用域内，则此跳转标签的使用不能出现在此变量的声明之前。
 （关于变量的作用域，请阅读后面的文章<a href="blocks-and-scopes.html">代码块和作用域</a>）
 </p>
 
@@ -689,28 +690,28 @@ Exit:
 
 </div>
 
-<h3>跟随着标签的<code>break</code>和<code>continue</code>跳转语句</h3>
+<h3>跟随着跳转标签的<code>break</code>和<code>continue</code>跳转语句</h3>
 
 <p>
-一个<code>goto</code>语句必须包含一个标签名。
-一个<code>break</code>或者<code>continue</code>语句也可以包含一个标签名，但此标签名是可选的。
-包含标签名的<code>break</code>语句一般用于嵌套可跳出流程控制代码块中。
-包含标签名的<code>continue</code>语句一般用于嵌套循环流程控制代码块中。
+一个<code>goto</code>语句必须包含一个跳转标签名。
+一个<code>break</code>或者<code>continue</code>语句也可以包含一个跳转标签名，但此跳转标签名是可选的。
+包含跳转标签名的<code>break</code>语句一般用于嵌套可跳出流程控制代码块中。
+包含跳转标签名的<code>continue</code>语句一般用于嵌套循环流程控制代码块中。
 </p>
 
 <p>
-如果一条<code>break</code>语句中包含一个标签名，则此标签必须刚好声明在一个包含此<code>break</code>语句的可跳出流程控制代码块之前。
-我们可以把此标签名看作是其后紧跟随的可跳出流程控制代码块的名称。
+如果一条<code>break</code>语句中包含一个跳转标签名，则此跳转标签必须刚好声明在一个包含此<code>break</code>语句的可跳出流程控制代码块之前。
+我们可以把此跳转标签名看作是其后紧跟随的可跳出流程控制代码块的名称。
 此<code>break</code>语句将立即结束此可跳出流程控制代码块的执行。
 </p>
 
 <p>
-如果一条<code>continue</code>语句中包含一个标签名，则此标签必须刚好声明在一个包含此<code>continue</code>语句的循环流程控制代码块之前。
-我们可以把此标签名看作是其后紧跟随的循环流程控制代码块的名称。
+如果一条<code>continue</code>语句中包含一个跳转标签名，则此跳转标签必须刚好声明在一个包含此<code>continue</code>语句的循环流程控制代码块之前。
+我们可以把此跳转标签名看作是其后紧跟随的循环流程控制代码块的名称。
 此<code>continue</code>语句将提前结束结束此循环流程控制代码块的执行。
 </p>
 
-下面是一个使用了包含标签名的<code>break</code>和<code>continue</code>语句的例子。
+下面是一个使用了包含跳转标签名的<code>break</code>和<code>continue</code>语句的例子。
 
 <pre class="line-numbers"><code class="language-go">package main
 

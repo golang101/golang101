@@ -1,65 +1,40 @@
-﻿<h1>Syntax/Semantics Exceptions In Go</h1>
-
-<!--
-possible titles:
-* Go doesn't support exception, in syntax. Go has many exceptions, in syntax.
-* Rules and Sugars in Go
-* Go: rule or sugar?
--->
+﻿<h1>Go中的一些语法/语义例外</h1>
 
 <p>
-This article will list the syntax/semantics sugars and exceptions in Go.
-Sugars are special syntax/semantics exceptions to make programming convenient.
+本篇文章将列出Go中的各种语法和语义例外。
+这些例外中的一些属于方便编程的语法糖，一些属于内置范型特权，一些源于历史原因或者其它各种逻辑原因。
 </p>
 
 <p class="anchor" id="nest-function-calls"></p>
-<h3>Nested Function Calls</h3>
+<h3>嵌套函数调用</h3>
 
 <div>
-The basic rule:
+基本规则：
 <div class="alert alert-info">
-If the return results of a function call exactly match the input parameters
-of another function call and the number of the return results is not zero,
-then the first call can be nested in the second one.
-When nested in the second call, the first call can't mix up with
-other parameters of the second call.
+如果一个函数调用的返回值个数不为零，并且它的返回值列表可以用作另一个函数调用的实参列表，则此前者调用可以被内嵌在后者调用之中，但是此前者调用不可和其它的实参混合出现在后者调用的实参列表中。
 </div>
 
-Sugar:
+语法糖：
 <div class="alert alert-success">
-If the number of the return results of a function call is exactly one,
-then the function call can be nested in another function call,
-as long as the other function call need at least one argument,
-and the single-return function call can mix up with other arguments of the other function call.
+如果一个函数调用刚好返回一个结果，则此函数调用总是可以被当作一个单值实参用在其它函数调用中，并且此函数调用可以和其它实参混合出现在其它函数调用的实参列表中。
 </div>
 
-Exception:
+例外：
 <div class="alert alert-success">
-The basic rule doesn't apply to calls of some built-in functions with multiple input parameters,
-including <code>copy</code>, <code>delete</code>, <code>print</code> and <code>println</code> functions.
-A calls to any of these functions can't take a solo multi-return function call as the only argument.
+上述基本规则不适用于内置函数<code>copy</code>、<code>delete</code>、<code>print</code>和<code>println</code>。
+这几个函数的调用不能内嵌多返回值函数调用。
 </div>
 
 <p><i>
-(The basic rule may <a href="https://github.com/golang/go/issues/15992">apply to</a>
-<code>copy</code> functions later,
-but will <a href="https://github.com/golang/go/issues/20656">never apply to</a>
-<code>print</code> and <code>println</code> functions.)
+（注意：此基本规则<a href="https://github.com/golang/go/issues/15992">今后可能会适用于</a>内置<code>copy</code>，但<a href="https://github.com/golang/go/issues/20656">不大可能会适用于</a><code>print</code>和<code>println</code>函数。）
 </i></p>
-
-The basic rule applies to the calls of built-in <code>append</code> and <code>complex</code> functions,
-with one exception scenario (for the standard Go compiler):
-<div class="alert alert-success">
-Calls to the <code>complex</code> function can't take a solo method call
-on an interface value receiver as the only argument.
-</div>
 
 <p><i>
-(This exception scenario may be a bug of the standard Go compiler.
-At present, Go 1.10, the bug still exists.)
+（虽然上述基本规则在大多数情况下都适用于内置函数<code>complex</code>，但有<a href="https://github.com/golang/go/issues/15992#issuecomment-337673303">一个小例外</a>：当一个属主实参为接口类型的方法调用被用做一个<code>complex</code>调用的唯一实参时，官方标准编译器将报错。
+这可能是一个bug，此bug仍旧存在于Go SDK 1.11中。）
 </i></p>
 
-Example:
+例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
@@ -70,13 +45,15 @@ func f0() float64 {return 1}
 func f1() (float64, float64) {return 1, 2}
 func f2(float64, float64) {}
 func f3(float64, float64, float64) {}
+func f4()(x, y []int) {return}
+func f5()(x map[int]int, y int) {return}
 
 type I interface {m()(float64, float64)}
 type T struct{}
 func (T) m()(float64, float64) {return 1, 2}
 
 func main() {
-	// These lines compile okay.
+	// 这些行编译没问题。
 	f2(f0(), 123)
 	f2(f1())
 	fmt.Println(f1())
@@ -84,10 +61,12 @@ func main() {
 	_ = complex(T{}.m())
 	f2(I(T{}).m())
 	
-	// These lines don't compile.
+	// 这些行编译不通过。
 	/*
 	f3(123, f1())
 	f3(f1(), 123)
+	copy(f4())
+	delete(f5())
 	println(f1())
 	_ = complex(I(T{}).m())
 	*/
@@ -95,6 +74,7 @@ func main() {
 </code></pre>
 </div>
 
+<!--
 <h3>Unused Variables</h3>
 
 <div>
@@ -111,21 +91,22 @@ which can also be viewed as local variables,
 are allowed to be not used.
 </div>
 </div>
+-->
 
 <h3>Access Struct Fields</h3>
 
 <div>
-The basic rule:
+基本规则：
 <div class="alert alert-info">
-Pointer values have no fields.
+指针类型和值没有字段。
 </div>
 
-Sugar:
+语法糖：
 <div class="alert alert-success">
-Pointers of a struct value can access the fields of the struct value.
+我们可以通过一个结构体值的指针来访问此结构体的字段。
 </div>
 
-Example:
+例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 type T struct {
@@ -137,27 +118,26 @@ func main() {
 	var p = &t
 	
 	p.x *= 2
-	// above line is a sugar for
+	// 上一行是下一行的语法糖。
 	(*p).x *= 2
 }
 </code></pre>
 </div>
 
-<h3>Method Receivers</h3>
+<h3>方法调用的属主实参</h3>
 
 <div>
-The basic rule:
+基本规则：
 <div class="alert alert-info">
-The methods explicitly defined on type <code>*T</code> are not methods of type <code>T</code>.
+为类型<code>*T</code>显式声明的方法肯定不是类型<code>T</code>的方法。
 </div>
 
-Sugar:
+语法糖：
 <div class="alert alert-success">
-Although the methods explicitly defined on type <code>*T</code> are not methods of type <code>T</code>,
-addressable values of type <code>T</code> can call these methods.
+尽管为类型<code>*T</code>显式声明的方法肯定不是类型<code>T</code>的方法，但是可寻址的<code>T</code>值可以用作这些方法的调用的属主实参。
 </div>
 
-Example:
+例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 type T struct {
@@ -169,78 +149,59 @@ func (pt *T) Double() {
 }
 
 func main() {
+	// T{3}.Double() // error: T值没有Double方法。
+	
 	var t = T{3}
 	
-	t.Double() // t.x == 6 now
-	// above line is a sugar for
-	(&t).Double()
+	t.Double() // 现在：t.x == 6
+	// 上一行是下一行的语法糖。
+	(&t).Double() // 现在：t.x == 12
 }
 </code></pre>
 </div>
 
-<h3>Take Addresses Of Composite Literal Values</h3>
+<h3>取组合字面形式的地址</h3>
 
 <div>
-The basic rule:
+基本规则：
 <div class="alert alert-info">
-Literal values are not addressable and can't be taken addresses.
+组合字面形式是不可寻址的，并且是不可寻址的值是不能被取地址的。
 </div>
 
-Sugar:
+语法糖：
 <div class="alert alert-success">
-Although composite literal values are not addressable, they can be taken addresses explicitly.
-</div>
-
-Example:
-<pre class="line-numbers"><code class="language-go">package main
-
-type T struct {
-	x int
-}
-
-func (pt *T) Double() {
-	pt.x *= 2
-}
-
-func main() {
-	// T{3}.Double() // error: T{3} is not addressable
-	                 // The last sugar doesn't work here.
-	
-	var pt = &T{3} // sugar: explicitly take address of
-	               // unaddressable composite literal.
-	pt.Double()
-}
-</code></pre>
-</div>
-
-<h3>Selectors On Defined One-Level Pointers</h3>
-
-<div>
-The basic rule:
-<div class="alert alert-info">
-Generally, selectors can be used on values of <b>defined</b> pointer types.
-</div>
-
-<div>
-Sugar:
-<div class="alert alert-info">
-If <code>x</code> is a value of a defined <b>one-level</b> pointer type,
-and selector <code>(*x).f</code> is a valid selector,
-the <code>x.f</code> is a legal shorthand (sugar) for <code>(*x).f</code>.
+尽管组合字面形式是不可寻址的，它们仍可以被显式地取地址。
 </div>
 
 <p>
-Selectors can never be used on values of <b>multi-level</b> pointer types,
-no matter whether the multi-level pointer types are defined or not.
+请阅读<a href="struct.html#take-composite-literal-address">结构体</a>和<a href="container.html#take-composite-literal-address">内置容器类型</a>两篇文章获取详情。
 </p>
-
-Exception of the sugar:
-<div class="alert alert-success">
-The sugar is only valid if <code>f</code> denotes a struct field,
-it is not valid if <code>f</code> denotes a method.
 </div>
 
-Example:
+<h3>指针值和选择器</h3>
+
+<div>
+基本规则：
+<div class="alert alert-info">
+一般说来，<a href="type-system-overview.html#underlying-type">定义</a>指针类型的值不能使用在选择器语法形式中。
+</div>
+
+<div>
+语法糖：
+<div class="alert alert-info">
+如果值<code>x</code>的类型为一个一级定义指针类型，并且<code>(*x).f</code>是一个合法的选择器，则<code>x.f</code>也是合法的。
+</div>
+
+<p>
+多级指针均不能出现在选择器语法形式中。
+</p>
+
+上述语法糖的例外：
+<div class="alert alert-success">
+上述语法糖只对<code>f</code>为字段的情况才有效，对于<code>f</code>为方法的情况无效。
+</div>
+
+例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 type T struct {
@@ -251,23 +212,23 @@ func (T) y() {
 }
 
 type P *T
-type PP **T // a multi-level pointer type
+type PP **T // 一个多级指针类型
 
 func main() {
 	var t T
 	var p P = &t
-	var pt = &t   // type of pt is *T
-	var ppt = &pt // type of ppt is **T
+	var pt = &t   // pt的类型为*T
+	var ppt = &pt // ppt的类型为**T
 	var pp PP = ppt
 	_ = pp
 	
-	_ = (*p).x // valid
-	_ = p.x    // legal
+	_ = (*p).x // 合法
+	_ = p.x    // 合法
 	
-	_ = (*p).y // valid
-	// _ = p.y // illegal
+	_ = (*p).y // 合法
+	// _ = p.y // 不合法
 	
-	// Following ones are all illegal.
+	// 下面的选择器均不合法。
 	/*
 	_ = ppt.x
 	_ = ppt.y
@@ -278,6 +239,7 @@ func main() {
 </code></pre>
 </div>
 
+<!--
 <h3>Precedences Of Unary Operators</h3>
 
 <div>
@@ -332,68 +294,59 @@ func main() {
 }
 </code></pre>
 </div>
+-->
 
-<h3>The Addressability Of Container Elements</h3>
+<h3>容器和容器元素的可寻址性</h3>
 
 <div>
-The basic rule:
+基本规则：
 <div class="alert alert-info">
-Container elements are addressable if their values can be overwritten.
+如果一个容器值是可寻址的，则它的元素也是可寻址的。
 </div>
 
-Exception:
+例外：
 <div class="alert alert-success">
-Map elements are always not addressable, even if they can be overwritten.
+一个映射表值的元素总是不可寻址的，即使此映射表本身是可寻址的。
 </div>
 
-Sugar:
+语法糖：
 <div class="alert alert-success">
-Elements of a slice are always addressable, even if the slice itself is not addressable.
+一个切片值的元素总是可寻址的，即使此切片值本身是不可寻址的。
 </div>
-
-Example:
+例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 func main() {
-	var s = []int{123, 789}
-	var p = &s[0] // ok
-	_ = p
-	
 	var m = map[string]int{"abc": 123}
-	_ = m
+	_ = &m // okay
 	
-	// The exception:
-	// p = &m["abc"] // error: cannot take addresses of map elements
+	// 例外。
+	// p = &m["abc"] // error: 映射表元素不可寻址
 	
-	// The sugar:
-	f := func() []int { // return results are not addressable
+	// 语法糖。
+	f := func() []int {
 		return []int{0, 1, 2}
 	}
-	_ = &f()[2] // ok
+	// _ = &f() // error: 函数调用是不可寻址的
+	_ = &f()[2] // okay
 }
 </code></pre>
 </div>
 
-<h3>Modify Unaddressable Values</h3>
+<h3>修改值</h3>
 
 <div>
-The basic rule:
+基本规则：
 <div class="alert alert-info">
-Unaddressable values can't be modified.
-In other words, unaddressable values should appear in assignments
-as destination values.
+不可寻址的值不可修改。
 </div>
 
-Exception:
+例外：
 <div class="alert alert-success">
-Although map element values are unaddressable, they can be modified
-and appear in assignments as destination values.
-(But map elements can't be modified partially,
-they can only be overwritten wholly, a.k.a., replaced.)
+尽管映射表元素是不可寻址的，但是它们可以被修改（但是它们必须被整个覆盖修改）。
 </div>
 
-
-Example:
+例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 func main() {
@@ -402,155 +355,145 @@ func main() {
 	}
 	
 	var mt = map[string]T{"abc": {123}}
-	mt["abc"] = T{x: 789} // replacement is ok.
-	// Partial modification is not allowed.
-	/*
-	mt["abc"].x = 456
-	*/
+	// _ = &mt["abc"]     // error
+	// mt["abc"].x = 456  // 部分修改是不允许的。
+	mt["abc"] = T{x: 789} // 整体覆盖修改是可以的。
 }
 </code></pre>
 </div>
 
-<h3>Generic</h3>
+<h3>范型</h3>
 
 <div>
-The basic rule:
+基本规则：
 <div class="alert alert-info">
-Go doesn't support generic.
+Go不支持范型。
 </div>
 
-Exception:
+例外：
 <div class="alert alert-success">
-Most built-in functions, which declared in the <code>builtin</code> and <code>unsafe</code>
-standard packages, support generic.
-And type compositions with all kinds of composite types in Go is kinda of generic.
+大多数的内置函数支持范型。各种一等公民容器类型的也支持范型。
 </div>
 
 </div>
 
-<h3>Function Names In One Package</h3>
+<h3>同一个代码包中的函数命名</h3>
 
 <div>
-The basic rule:
+基本规则：
 <div class="alert alert-info">
-Names of declared functions can't be duplicated in one pacakge.
+同一个代码包中声明的函数的名称不能重复。
 </div>
 
-Exception:
+例外：
 <div class="alert alert-success">
-There can be multiple functions declared with names as <code>init</code>.
+同一个代码包中可以声明若干个名为<code>init</code>原型为<code>func()</code>的函数。
 </div>
 
-<h3>Function Calls</h3>
+<h3>函数调用</h3>
 
 <div>
-The basic rule:
+基本规则：
 <div class="alert alert-info">
-Functions can be called by user code.
+名称为非空标识符的函数可以被调用。
 </div>
 
-Exception:
+例外：
 <div class="alert alert-success">
-<code>init</code> functions can't be called by user code.
+<code>init</code>函数不可被调用。
 </div>
 
-<h3>Functions Being Used As Values</h3>
+<h3>函数值</h3>
 
 <div>
-The basic rule:
+基本规则：
 <div class="alert alert-info">
-Declard functions can be used as function values.
+声明的函数可以被用作函数值。
 </div>
 
-Exception 1:
+例外1：
 <div class="alert alert-success">
-None of the built-in functions, which declared in the <code>builtin</code> and <code>unsafe</code>
-standard packages, can be used as function values,
-including the non-generic <code>panic</code> and <code>recover</code> functions.
+内置函数（声明在<code>builtin</code>和<code>unsafe</code>标准库包中的函数）不可被用作函数值。
 </div>
 
-Exception 2:
+例外2：
 <div class="alert alert-success">
-<code>init</code> functions can not be used as function values.
+<code>init</code>函数不可被用作函数值。
 </div>
 
-Example:
+例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 import "unsafe"
 
+func init() {}
+
 func main() {
-	// These ones are okay.
+	// 这两行编译没问题。
 	var _ = main
 	var _ = fmt.Println
 	
-	// These ones fail to compile.
+	// 这几行编译不通过。
 	var _ = panic
 	var _ = unsafe.Sizeof
+	var _ = init
 }
 </code></pre>
 </div>
 
-<h3>Absence Of Return Values Of Function Calls</h3>
+<h3>舍弃函数调用返回值</h3>
 
 <div>
 
-The basic rule:
+基本规则：
 <div class="alert alert-info">
-The return values of a function call can be all absent.
+一个函数调用的所有返回值可以被一并忽略舍弃。
 </div>
 
-Exception:
+例外：
 <div class="alert alert-success">
-The return values of a call to the built-in functions
-which declared in the <code>builtin</code> and <code>unsafe</code>
-standard packages, can't be absent, if the calld function has return results.
+内置函数（声明在<code>builtin</code>和<code>unsafe</code>标准库包中的函数）调用的返回值不能被舍弃。
 </div>
 
-Exception in exception:
+例外中的例外：
 <div class="alert alert-success">
-The return values of a call to the built-in
-<code>copy</code> and <code>recover</code> functions
-can be all absent, even if the two functions have return results.
+内置函数<code>copy</code>和<code>recover</code>的调用的返回值可以被舍弃。
 </div>
 
 </div>
 
-<h3>Declared Varialbes</h3>
+<h3>声明的变量</h3>
 
 <div>
-The basic rule:
+基本规则：
 <div class="alert alert-info">
-Declared variables are always addressable.
+声明的变量总是可寻址的。
 </div>
 
-Exception:
+例外：
 <div class="alert alert-success">
-The <a href="https://golang.org/pkg/builtin/#pkg-variables">predeclared <code>nil</code></a> variable is not addressable.
+<a href="https://golang.org/pkg/builtin/#pkg-variables">预声明的<code>nil</code></a>变量是不可寻址的。
 </div>
 
-So, <code>nil</code> is an immutable varialbe.
+所以，预声明的<code>nil</code>是一个不可更改的变量。
 </div>
 
-<h3>Argument Consistency Of The Built-in <code>copy</code> and <code>append</code> Functions</h3>
+<h3>传参</h3>
 
 <div>
-The basic rule:
+基本规则：
 <div class="alert alert-info">
-The type of the second slice argument of a <code>copy</code> or <code>append</code> function call
-must be consistent with the first slice argument.
-(For <code>append</code> call, assume the second argument is passed with the form <code>aSlice...</code>.)
+当一个实参被传递给对应的形参时，此实参必须能够赋值给此形参类型。
 </div>
 
-Sugar:
+语法糖：
 <div class="alert alert-success">
-If the type of the first slice argument of a <code>copy</code> and <code>append</code> function call
-is <code>[]byte</code>, then the second argument type can be <code>string</code>.
-(For <code>append</code> call, assume the second argument is passed with the form <code>aSlice...</code>.)
+如果内置函数<code>copy</code>和<code>append</code>的一个调用的第一个形参为一个字节切片（这时，一般来说，第二形参也应该是一个字节切片），则第二个形参可以是一个字符串，即使字符串不能被赋给一个字节切片。
+（假设<code>append</code>函数调用的第二个形参使用<code>arg...</code>形式传递。）
 </div>
 
-Example:
+例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 func main() {
@@ -558,33 +501,27 @@ func main() {
 	var s = "xyz"
 	
 	copy(bs, s)
-	// above line is a sugar (and an optimization) for
+	// 上一行是下一行的语法糖和优化。
 	copy(bs, []byte(s))
 	
 	bs = append(bs, s...)
-	// above line is a sugar (and an optimization) for
+	// 上一行是下一行的语法糖和优化。
 	bs = append(bs, []byte(s)...)
 }
 </code></pre>
 </div>
 
-<h3>Comparison</h3>
+<h3>比较</h3>
 
 <div>
-The basic rule:
-<div class="alert alert-info">
-Most types in Go support comparison.
+基本规则：
+<div class="alert alert-success">
+映射表、切片和函数类型是不支持比较的。
 </div>
 
-<div>
-Exception:
+例外：
 <div class="alert alert-success">
-Map, slice and function types don't support comparison.
-</div>
-
-Exception in exception:
-<div class="alert alert-success">
-Map, slice and function values can be compared to the <code>nil</code> identifier.
+映射表、切片和函数值可以和预定义标识符<code>nil</code>比较。
 </div>
 
 Example:
@@ -593,25 +530,44 @@ Example:
 func main() {
 	var s1 = []int{1, 2, 3}
 	var s2 = []int{7, 8, 9}
-	//_ = s1 == s2 // error: slice values can't be compared
-	_ = s1 == nil // ok
-	_ = s2 == nil // ok
+	//_ = s1 == s2 // error: 切片值不可比较。
+	_ = s1 == nil  // ok
+	_ = s2 == nil  // ok
 	
 	var m1 = map[string]int{}
 	var m2 = m1
-	// _ = m1 == m2 // error: map values can't be compared
-	_ = m1 == nil
-	_ = m2 == nil
+	// _ = m1 == m2 // error: 映射表值不可比较。
+	_ = m1 == nil   // ok
+	_ = m2 == nil   // ok
 	
 	var f1 = func(){}
 	var f2 = f1
-	// _ = f1 == f2 // error: function values can't be compared
-	_ = f1 == nil
-	_ = f2 == nil
+	// _ = f1 == f2 // error: 函数值不可比较。
+	_ = f1 == nil   // ok
+	_ = f2 == nil   // ok
 }
 </code></pre>
 </div>
 
+<h3>比较二</h3>
+
+<div>
+基本规则：
+<div class="alert alert-info">
+如果一个值可以被赋给另一个值，则这两个值可以用<code>==</code>和<code>!=</code>比较符来做比较。
+</div>
+
+<div>
+例外：
+<div class="alert alert-success">
+一个不可比较类型（一定是一个非接口类型）的值不能和一个接口类型的值比较，即使此不可比较类型实现了此接口类型（从而此不可比较类型的值可以赋给此接口类型的值）。
+</div>
+</div>
+
+请阅读<a href="value-conversions-assignments-and-comparisons.html#comparison-rules">值比较规则</a>获取详情。
+</div>
+
+<!--
 <h3>Comparing Interface Values</h3>
 
 <div>
@@ -640,32 +596,32 @@ func main() {
 	//_ = x == x // will panic
 	//_ = y == y // will panic
 	_ = x == z // false, will not panic
-	_ = x == y   // false, will not panic
+	_ = x == y // false, will not panic
 }
 </code></pre>
 </div>
+-->
 
-<h3>The Blank Composite Literals</h3>
+<h3>空组合字面值</h3>
 
 <div>
-The basic rule:
+基本规则：
 <div class="alert alert-info">
-If a type <code>T</code> support composite literal values, then <code>T{}</code> is its zero value.
+如果一个类型<code>T</code>的值可以用组合字面形式表示，则<code>T{}</code>表示此类型的零值。
 </div>
 
-Exception:
+例外：
 <div class="alert alert-success">
-For a map or a slice type <code>T</code>, <code>T{}</code> isn't its zero value.
-Its zero value is represented with <code>nil</code>.
+对于一个映射表或者切片类型<code>T</code>，<code>T{}</code>不是它的零值，它的零值使用预声明的<code>nil</code>表示。
 </div>
 
-Example:
+例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
 func main() {
-	// new(T) will return the address of a zero value of type T
+	// new(T)返回类型T的一个零值的地址。
 	
 	type T0 struct {
 		x int
@@ -682,50 +638,48 @@ func main() {
 </code></pre>
 </div>
 
-<h3>Container Element Iterations</h3>
+<h3>容器元素遍历</h3>
 
 <div>
-The basic rule:
+基本规则：
 <div class="alert alert-info">
-Only container values can be ranged, the iterated values are container elements.
-The element key/index will also be returned alongside of each iterated element.
+只有容器值可以跟在<code>range</code>关键字后，<code>for-range</code>循环遍历出来的是容器值的各个元素。
+每个容器元素对对应的键值（或者索引）也将被一并遍历出来。
 </div>
 
-Exception 1:
+例外1：
 <div class="alert alert-success">
-The iterated values are runes if the ranged containers are strings, instead of the byte elements of strings.
+当<code>range</code>关键字后跟的是字符串时，遍历出来的是码点值，而不是字符串的各个元素byte值。
 </div>
 
-Exception 2:
+例外2：
 <div class="alert alert-success">
-The element index (order) will not be returned alongside of each iterated element when iterating channels.
+当<code>range</code>关键字后跟的是数据通道时，数据通道的元素的键值（次序）并未被一同遍历出来。
 </div>
 
-Exception 3:
+语法糖：
 <div class="alert alert-success">
-Array pointers can also be ranged to iterate array elements.
+尽管数组指针不属于容器，但是<code>range</code>关键字后可以跟数组指针来遍历数组元素。
 </div>
 
-BTW, accessing array elements on array pointers (<code>pArray[index]</code>)
-and deriving slices from array pointers (<code>pArray[start : end]</code>)
-are also legal.
 </div>
 
-<h3>Built-in Types</h3>
+<h3>内值类型的方法</h3>
 
 <div>
-The basic rule:
+基本规则：
 <div class="alert alert-info">
-Generally, built-in types have no methods.
+内值类型都没有方法。
 </div>
 
-Exception:
+例外：
 <div class="alert alert-success">
-The built-in <code>error</code> type has a <code>Error() string</code> method.
+内置类型<code>error</code>有一个<code>Error() string</code>方法。
 </div>
 </div>
 
-<h3>Exported Identifiers</h3>
+<!--
+<h3>Identifier Visibility</h3>
 
 <div>
 The basic rule:
@@ -739,106 +693,84 @@ Identifiers starting with Unicode lower case letter in the <code>builtin</code> 
 can be exported.
 </div>
 </div>
+-->
 
-<h3>Types Of Values</h3>
-
-<div>
-The basic rule:
-<div class="alert alert-info">
-Values should have either a type or a default type.
-</div>
-
-Exception:
-<div class="alert alert-success">
-Untyped <code>nil</code> has neither a type nor a default type.
-</div>
-
-For the reason of this exception, untyped <code>nil</code> can't be
-assigned to a new declared variable which type is not specified.
-And although untyped <code>nil</code> can be used as dynamic values
-of interface values, it doesn't implement any interface type.
-<pre class="line-numbers"><code class="language-go">package main
-
-import "fmt"
-
-func main() {
-	const x = 123 // for untyped constant x, its default type is int.
-	
-	fmt.Printf("type of %v is %T \n", x, x) // type of 123 is int
-	
-	var y = x // compile okay, the type of y is int
-	_ = y
-	var _ float64 = x    // compile okay
-	var _ int32 = x      // compile okay
-	var _ complex128 = x // compile okay
-	
-	// var _ = nil // compile error: use of untyped nil
-	
-	var v interface{}
-	fmt.Printf("type of %v is %T \n", v, v) // type of &lt;nil&gt; is &lt;nil&gt;
-	var _ interface{} = v.(interface{}) // will panic
-}
-</code></pre>
-</div>
-
-<h3>Constant Values</h3>
+<h3>值的类型</h3>
 
 <div>
-The basic rule:
+基本规则：
 <div class="alert alert-info">
-Constant values never change.
-Constant can be assigned to variables.
+每个值要么有一个确定的类型要么有一个默认类型。
 </div>
 
-Exception:
+例外：
 <div class="alert alert-success">
-<code>iota</code> is a built-in constant predeclared as <code>0</code>,
-but its value is not constant. Its value will start from <code>0</code>
-and increase one line by line in a constant declaration group,
-though the increasements happen at compile time.
-And <code>iota</code> can only be used in constant declarations.
-It can't be used in variable declarations and many other places where
-general constants can show up.
+类型不确定的<code>nil</code>值既没有确定的类型也没有默认类型。
+</div>
+
+</div>
+
+<h3>常量值</h3>
+
+<div>
+基本规则：
+<div class="alert alert-info">
+常量值的值固定不变。常量值可以被赋给变量值。
+</div>
+
+例外1：
+<div class="alert alert-success">
+预声明的<code>iota</code>是一个绑定了<code>0</code>的常量，但是它的值并不固定。
+在一个常量声明组中，如果一个<code>iota</code>的值出现在一个常量描述中，则它的值将被自动调整为此常量描述在此常量声明组中次序值，尽管此调整发生在编译时刻。
+</div>
+
+例外2：
+<div class="alert alert-success">
+<code>iota</code>只能被用于常量声明中，它不能被赋给变量。
 </div>
 
 </div>
 
 <p class="anchor" id="behaviors-on-missing-optional-result"></p>
-<h3>Behaviors Of Missing The OK Optional Return Values</h3>
+<h3>舍弃表达式中可选的结果值对程序行为的影响</h3>
 
 <div>
-The basic rule:
+基本规则：
 <div class="alert alert-info">
-Whether or not the ok return value is present will not affect program behavior.
+表达式中可选的结果值是否被舍弃不会对程序行为产生影响。
 </div>
 
-Exception:
+例外：
 <div class="alert alert-success">
-Missing the ok optional return value will make current goroutine panic if a type assertion fails.
+当一个失败的类型断言表达式的可选的第二个结果值被舍弃时，当前协程将产生一个恐慌。
 </div>
 
-Example:
+例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 func main() {
 	var ok bool
 	
 	var m = map[int]int{}
-	_, ok = m[123] // will not panic
-	_ = m[123]     // will not panic
+	_, ok = m[123]
+	_ = m[123] // 不会产生恐慌
 	
 	var c = make(chan int, 2)
 	c <- 123
 	close(c)
-	_, ok = <-c // will not panic
-	_ = <-c     // will not panic
+	_, ok = <-c
+	_ = <-c // 不会产生恐慌
 	
 	var v interface{} = "abc"
-	_, ok = v.(int) // will not panic
-	_ = v.(int)     // will panic!
+	_, ok = v.(int)
+	_ = v.(int) // 将产生一个恐慌！
 }
 </code></pre>
 </div>
 
 </div>
+
+<!--
+https://github.com/golang/go/issues/27451
+-->
 

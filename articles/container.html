@@ -1081,7 +1081,7 @@ baseContainer[low : high : max] // 三下标形式
 
 上面所示的双下标形式等价于下面的三下标形式：
 
-<pre class="line-numbers"><code class="language-go">baseContainer[low : high : cap(baseContainer)]
+<pre><code class="language-go">baseContainer[low : high : cap(baseContainer)]
 </code></pre>
 
 <p>
@@ -1093,23 +1093,20 @@ baseContainer[low : high : max] // 三下标形式
 <p>
 
 上面所示的取子切片表达式的语法形式中得下标必须满足下列关系，否则代码要么编译不通过，要么在运行时刻将造成恐慌。
-<ul>
-<li>
-	<code>0 &lt;= low &lt;= high &lt;= max &lt;= cap(baseContainer)</code>.
-</li>
-<li>
-	<code>low &lt;= len(baseContainer)</code>.
-</li>
-</ul>
+<pre><code class="language-go">0 <= low <= high <= max <= cap(baseContainer)</code>
+</code></pre>
+
+<p>
+</p>
 
 注意：
 <ul>
 <li>
-	下标<code>high</code>可以大于<code>len(baseContainer)</code>，但是它一定不能大于<code>cap(baseContainer)</code>。
+	只要上述关系均满足，下标<code>low</code>和<code>high</code>都可以大于<code>len(baseContainer)</code>。但是它们一定不能大于<code>cap(baseContainer)</code>。
 </li>
 <li>
 	如果<code>baseContainer</code>是一个零值nil切片，只要上面所示的子切片表达式中下标的值均为<code>0</code>，则此这两个子切片表达式不会造成恐慌。
-	在这种情况下，结果切片也是nil切片。
+	在这种情况下，结果切片也是一个nil切片。
 </li>
 </ul>
 
@@ -1118,7 +1115,7 @@ baseContainer[low : high : max] // 三下标形式
 派生出来的结果切片的长度可能大于基础切片的长度，但结果切片的容量绝不可能大于基础切片的容量。
 </p>
 
-在实践中，我们常常在子切片表达式中省略若干下标，以使代码看上去更加整洁。省略规则如下：
+在实践中，我们常常在子切片表达式中省略若干下标，以使代码看上去更加简洁。省略规则如下：
 <ul>
 <li>
 	如果下标<code>low</code>为零，则它可被省略。此条规则同时适用于双下标形式和三下标形式。
@@ -1185,12 +1182,13 @@ func main() {
 当这个函数中开辟的内存块今后不再被任何切片所引用，此内存块将被回收，这时内存才不再继续泄漏。
 
 <pre class="line-numbers"><code class="language-go">func f() []int {
-	s := make([]int, 100)
-	return s[50:]
+	s := make([]int, 10, 100)
+	return s[50:60]
 }
 </code></pre>
 
 <p>
+请注意，在上面这个函数中，子切片表达式中的起始下标（<code>50</code>）比<code>s</code>的长度（<code>10</code>）要大，这是允许的。
 </p>
 
 </div>
