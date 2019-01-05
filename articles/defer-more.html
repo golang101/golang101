@@ -1,33 +1,24 @@
-﻿<h1>More About Deferred Function Calls</h1>
+﻿<h1>更多关于延迟函数调用的知识点</h1>
 
 <p>
-Deferred function calls have been
-<a href="control-flows-more.html#defer">introduced before</a>.
-Due to the limited knowledge at that time,
-some more details and use cases of deferred functions calls
-are not touched in that article.
-These details and use cases will be touched in the remaining of this article.
+延迟调用函数已经<a href="control-flows-more.html#defer">在前面介绍过了</a>。
+限于当时对Go了解程度，很多延迟调用函数相关的细节和用例并没有之前的文章中提及。
+这些细节和用例将在本中列出。
 </p>
 
-<h3>Calls To Many Built-in Functions With Return Results Can't Be Deferred</h3>
+<h3>很多有返回值的内置函数是不能被延迟调用的</h3>
 
 <div>
 <p>
-In Go, the result values of a call to custom functions can be all absent (discarded).
-However, for built-in functions with non-blank return result lists,
-the result values of their calls mustn't be absent (up to Go 1.10), except
-the calls to the built-in <code>copy</code> and <code>recover</code> functions.
-We have learned that <a href="control-flows-more.html#defer">the result values
-of a deferred function call must be discarded</a>,
-so the calls to many built-in functions can't be deferred.
+在Go中，自定义函数的调用的返回结果都可以被舍弃。
+但是，<a href="exceptions.html#discard-return-results">大多数内置函数（除了<code>copy</code>和<code>recover</code>）的调用的返回结果都不可以舍弃</a>。
+另一方便，我们已经了解到延迟函数调用的所有返回结果必须都舍弃掉。
+所以，很多内置函数是不能被延迟调用的。
 </p>
 
-Fortunately, the needs to defer built-in function calls
-(with non-blank return result lists) are rare.
-As far as I know, only the calls to the built-in <code>append</code> function
-may be needed to defer sometimes.
-For this case, we can defer a call to an anonymous function
-which wrapps the <code>append</code> call.
+幸运的是，在实践中，延迟调用内置函数的需求很少见。
+根据我的经验，只有<code>append</code>函数有时可能会需要被延迟调用。
+对于这种情形，我们可以延迟调用一个调用了<code>append</code>函数的匿名函数来满足这个需求。
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -35,7 +26,7 @@ import "fmt"
 func main() {
 	s := []string{"a", "b", "c", "d"}
 	defer fmt.Println(s) // [a x y d]
-	// defer append(s[:1], "x", "y") // error
+	// defer append(s[:1], "x", "y") // 编译错误
 	defer func() {
 		_ = append(s[:1], "x", "y")
 	}()
@@ -43,21 +34,21 @@ func main() {
 </code></pre>
 </div>
 
-<h3>The Evaluation Moment Of Deferred Function Values</h3>
+<h3>延迟调用的函数值的估值时刻</h3>
 
 <div>
-The called function in a deferred function call may be a nil function value.
-For such a case, the panic will occur before the deferred call is
-pushed into the deferred call stack of the currrent goroutine. An example:
+一个被延迟调用的函数值可能是一个nil函数值。这种情形将导致一个恐慌。
+对于这种情形，恐慌产生在此延迟调用被准备推入延迟调用堆栈之前。
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
 func main() {
 	defer fmt.Println("reachable")
-	var f func() // f is nil by default
-	defer f()    // panic here
-	// The following lines are dead code.
+	var f func() // f == nil
+	defer f()    // 将产生一个恐慌
+	// 下面的代码不会被执行。
 	fmt.Println("not reachable")
 	f = func() {}
 }
@@ -67,17 +58,14 @@ func main() {
 </p>
 
 <p>
-The argumnts of a deferred function call are
-<a href="#argument-evaluation-moment">also evaluated before</a>
-the deferred call is pushed into the deferred call stack
-of the currrent goroutine.
+一个延迟调用的实参<a href="control-flows-more.html#argument-evaluation-moment">也是在此调用被推入延迟调用堆栈之前估值的</a>。
 </p>
 </div>
 
-<h3>Deferred Calls Make Code Cleaner And Less Bug Prone</h3>
+<h3>延迟调用是的代码更简洁和鲁棒</h3>
 
 <div>
-Example:
+一个例子：
 
 <pre class="line-numbers"><code class="language-go">import "os"
 
@@ -141,17 +129,15 @@ https://joeshaw.org/dont-defer-close-on-writable-files/
 -->
 
 <p>
-Which one looks cleaner? apparently, the one with the deferrd calls,
-though a little. And it is less bug prone,
-what about if any if <code>f.Close()</code> calls in the other one is missed? ;)
+上面哪个函数看上去更简洁？显然，第二个使用了延迟调用的函数，虽然只是简洁了些许。
+第二个函数的写法将导致更少的bug，因为第一个函数中含有太多的<code>f.Close()</code>调用，从而有较高的几率漏掉其中一个。
 </p>
 
-The following is another example to show deferred calls can make code less bug prone.
-If the <code>doSomething</code> calls panic in the following example,
-the function <code>f2</code> will exit by leaving the Metex unlocked.
-So the function <code>f1</code> is less bug prone.
+下面是另外一个延迟调用使得代码更鲁棒的例子。
+如果<code>doSomething</code>函数产生恐慌一个恐慌，则函数<code>f2</code>在退出时将导致互斥锁未解锁。
+所以函数<code>f1</code>更鲁棒。
 
-<pre class="line-numbers"><code class="language-go">var m sync.Metex
+<pre class="line-numbers"><code class="language-go">var m sync.Mutex
 
 func f1() {
 	m.Lock()
@@ -168,19 +154,14 @@ func f2() {
 
 </div>
 
-<h3>Performance Losses Caused By Deferring Function Calls</h3>
+<h3>延迟调用可能会导致性能损失</h3>
 
 <div>
 <p>
-It is not always good to use defered function calls.
-Up to now (Go 1.10), for the offical Go compiler,
-deferred function calls will cause some performance losses at run time,
-in particular for deferred function calls within loop code blocks.
+延迟调用并非没有缺点。到目前为止（Go 1.11），对于官方标准编译器来说，延迟调用将导致一些性能损失。
 </p>
 
-For example, in the following example, the methods <code>CounterB</code>
-and <code>IncreaseB</code> are much more efficient than the methods
-<code>CounterA</code> and <code>IncreaseA</code>.
+比如，下面的例子中的<code>CounterB</code>和<code>IncreaseB</code>方法比<code>CounterA</code>和<code>IncreaseA</code>方法的效率要高。
 
 <pre class="line-numbers"><code class="language-go">import "sync"
 
@@ -216,13 +197,21 @@ func (t *T) IncreaseB() {
 </code></pre>
 
 <p>
+在上面的俩个B版本方法中，我们必须确保<code>Lock</code>和<code>Unlock</code>调用之间的代码不会产生恐慌。
+一般说来，A版本方法推荐使用，尽管它们的效率略低一点，因为它们更鲁棒。
+我们只应该在确实很在意这点性能损失的情况下才使用B版本方法。
 </p>
 
-A very large deferred call stack may also consume much memory.
-Sometimes, we can make some deferred function calls get executed earlier
-to avoid accumulating too many deferred calls.
-For example,
-<pre class="line-numbers"><code class="language-go">func writeManyFile(files []File) error {
+</div>
+
+<p class="anchor" id="kind-of-resource-leaking"></p>
+<h3>延迟调用导致的暂时性内存泄露</h3>
+
+<div>
+一个较大的延迟调用堆栈可能会消耗很多内存，而且延迟调用堆栈中尚未执行的延迟调用可能会导致某些资源未被及时释放。
+比如，如果下面的例子中的函数需要处理大量的文件，则在此函数推出之前，将有大量的文件句柄得不到释放。
+
+<pre class="line-numbers"><code class="language-go">func writeManyFiles(files []File) error {
 	for _, file := range files {
 		f, err := os.Open(file.path)
 		if err != nil {
@@ -245,9 +234,9 @@ For example,
 }
 </code></pre>
 
-can be rewrittn and optimized as
+对于这种情形，我们应该使用一个匿名函数将需要即使执行延迟调用包裹起来。比如，上面的函数可以改进为如下：
 
-<pre class="line-numbers"><code class="language-go">func writeManyFile(files []File) error {
+<pre class="line-numbers"><code class="language-go">func writeManyFiles(files []File) error {
 	for _, file := range files {
 		if err := func() error {
 			f, err := os.Open(file.path)
@@ -272,11 +261,6 @@ can be rewrittn and optimized as
 </code></pre>
 
 <p>
-</p>
-
-<p>
-Currently, if you really care about the performance of your programs,
-you can try to avoid using unnecessary deferred function calls.
 </p>
 
 </div>

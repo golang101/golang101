@@ -1,20 +1,15 @@
-<h1>The Right Places To Call The <code>recover</code> Function</h1>
+<h1>在正确的位置调用内置<code>recover</code>函数</h1>
 
 <p>
-Panic and recover mechanism has been
-<a href="control-flows-more.html#panic-recover">introduced before</a>,
-and several panic/recover use cases are shown in
-<a href="panic-and-recover-use-cases.html">the last article</a>.
-We know that a <code>recover</code> call can only take effect
-if it is invoked in a deferred function call.
-However, not all <code>recover</code> calls in deferred function calls
-can catch alive panics.
-Below of this atticle will show some useless <code>recover</code> function calls
-and explain what are the right places to call the <code>recover</code> function.
+恐慌/恢复机制已经<a href="control-flows-more.html#panic-recover">在前面的文章中介绍了</a>，
+另外<a href="panic-and-recover-use-cases.html">上一篇文章</a>也介绍了一些恐慌/恢复用例。
+通过这些介绍，我们得知一个<code>recover</code>调用只能在一个延迟函数调用中起作用。
+但是，并非所有的处于延迟函数调用中的<code>recover</code>调用都能起作用。
+本文下面将展示一些不起作用的<code>recover</code>调用，并解释它们为什么不起作用。
 </p>
 
 <div>
-Let's view an example:
+我们先看一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -22,12 +17,12 @@ import "fmt"
 func main() {
 	defer func() {
 		defer func() {
-			fmt.Println("6:", recover())
+			fmt.Println("7:", recover())
 		}()
 	}()
 	defer func() {
 		func() {
-			fmt.Println("5:", recover())
+			fmt.Println("6:", recover())
 		}()
 	}()
 	func() {
@@ -42,49 +37,47 @@ func main() {
 		fmt.Println("3:", recover())
 	}()
 	fmt.Println("4:", recover())
-	panic(1)
+	defer fmt.Println("5:", recover())
+	panic(789)
 	defer func() {
-		fmt.Println("0:", recover()) // never go here
+		fmt.Println("0:", recover())
 	}()
 }
 </code></pre>
 
-Run it, we will find that
-none of the 7 <code>recover</code> calls in above program recovers the program.
-The program crashes with printing out the following panic stack traces.
+运行之，我们将发现上例中的7个<code>recover</code>函数调用都没有恢复程序中产生的恐慌。
+此程序的输出结果如下：
 <pre class="output"><code>1: &lt;nil&gt;
 2: &lt;nil&gt;
 3: &lt;nil&gt;
 4: &lt;nil&gt;
 5: &lt;nil&gt;
 6: &lt;nil&gt;
-panic: 1
+7: &lt;nil&gt;
+panic: 789
 
 goroutine 1 [running]:
 ...
 </code></pre>
 
-Obviously, the 0th <code>recover</code> call (the last one) is not reachable.
-For others, let's check the rules specified
-in <a href="https://golang.org/ref/spec#Handling_panics">Go specification</a> firstly.
+显然地，标号为0的<code>recover</code>调用（代码中最后一个）是执行不到的。
+其它6个均执行到了，但是它们的返回值都是<code>nil</code>。为什么呢？让我们先阅读一下<a href="https://golang.org/ref/spec#Handling_panics">Go白皮书中列出的规则</a>：
 
 <div class="alert alert-success">
-The return value of recover is <code>nil</code> if any of the following conditions holds:
+在下面的情况下，<code>recover</code>函数调用的返回值为<code>nil</code>：
 <ul>
-<li> panic's argument was nil;</li>
-<li> the goroutine is not panicking;</li>
-<li> recover was not called directly by a deferred function.</li>
+<li>传递给相应<code>panic</code>函数调用的实参为nil；</li>
+<li>当前协程并没有处于恐慌状态；</li>
+<li><code>recover</code>函数并未直接在一个延迟函数调用中调用。</li>
 </ul>
 </div>
 
 <p>
-Let's ignore the first condition.
-The second condition covers the 1st/2nd/3rd and 4th recover calls.
-The third one covers the 5th recover call.
-However, none of the three conditions covers the 6th recover call.
+这里我们忽略第一种情况。上例中标号为1/2/3/4的<code>recover</code>调用都属于第二种情况，标号为5和6的<code>recover</code>调用都属于第三种情况。
+但是，白皮书中列出的三种情况都没有解释为什么标号为7的<code>recover</code>调用也没有恢复程序中的恐慌。
 </p>
 
-We know the following <code>recover</code> call will catch the panic.
+我们知道下面的程序中的<code>recover</code>调用将捕获到<code>panic</code>调用抛出的恐慌。
 <pre class="line-numbers"><code class="language-go">// example2.go
 package main
 
@@ -102,48 +95,43 @@ func main() {
 </code></pre>
 
 <p>
-But, what is differences between it and the above <code>recover</code> calls?
-What is the principal rule to make a <code>recover</code> call take effect?
+但是，这个小程序中的<code>recover</code>调用和前面的例子中的标号为7的<code>recover</code>调用有和本质区别呢？
 </p>
 
 <p>
-Firstly, let's learn some concepts and facts.
+首先，让我们了解一些概念和事实。
 </p>
 </div>
 
-<h3>Concept: Function Call Depth, Goroutine Execution Depth &amp; Panic Depth</h3>
+<h3>概念：函数调用深度、协程执行深度和恐慌深度</h3>
 
 <div>
 <p>
-Each function call corresponds to a call depth, which is related
-the entry function of a goroutine.
-For the main gorotuine, the call depth of a function call
-is related to the program <b><i>main</i></b> entry function.
-For a goroutine other than the main goroutine, the call depth of
-a function call is related to the starting function call of the goroutine.
+每个函数调用都对应着一个相对于当前协程的入口调用的调用深度。
+对于主协程中的一个函数调用，它的调用深度相对于<b><i>main</i></b>入口函数调用。
 </p>
 
-For example example:
+用一个例子说明：
 <pre class="line-numbers"><code class="language-go">package main
 
-func main() { // depth 0
-	go func() { // depth 0
-		func() { // depth 1
+func main() { // 深度为0
+	go func() { // 深度为0
+		func() { // 深度为1
 		}()
 
-		defer func() { // depth 1
-			defer func() { // depth 2
+		defer func() { // 深度为1
+			defer func() { // 深度为2
 			}()
 		}()
 	}()
 
-	func () { // depth 1
-		func() { // depth 2
-			go func() { // depth 0
+	func () { // 深度为1
+		func() { // 深度为2
+			go func() { // 深度为0
 			}()
 		}()
 
-		go func() { // depth 0
+		go func() { // 深度为0
 		}()
 	}()
 }
@@ -151,44 +139,42 @@ func main() { // depth 0
 </div>
 
 <p>
-The depth of the call to the function containing the current execution point
-of a goroutine is called the execution depth of the goroutine.
+如果一个协程中的当前执行位置处于某个调用中，则我们说此协程的当前执行深度为此调用的深度。
 </p>
 
 <p>
-The depth of a panic is the functon call depth the panic has propagated to.
-Please read the next section for a better understanding.
+一个协程的某个恐慌的深度为此恐慌已经传播到的函数调用深度。
+请阅读下一节以对恐慌传播有一个清晰的认识。
 </p>
 
-<h3>Fact: Panics Can Only Propagate To The function Calls With Shadow Depths</h3>
+<h3>事实：恐慌只能向更浅的函数深度传播</h3>
 
 <div>
-Yes, panics can only propagate to its callers.
-Panics never propagate downwards into a deeper function call.
+是的，恐慌只会从一个函数传播到它的调用函数，而从不会传播到深度更深的函数调用。
 
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
-func main() { // call depth 0
-	defer func() { // call depth 1
-		fmt.Println("Now, the panic is still in call depth 0")
-		func() { // call depth 2
-			fmt.Println("Now, the panic is still in call depth 0")
-			func() { // call depth 3
-				fmt.Println("Now, the panic is still in call depth 0")
+func main() { // 调用深度为0
+	defer func() { // 调用深度为1
+		fmt.Println("当前恐慌深度为0（执行深度为1）")
+		func() { // 调用深度为2
+			fmt.Println("当前恐慌深度为0（执行深度为2）")
+			func() { // 调用深度为3
+				fmt.Println("当前恐慌深度为0")
 			}()
 		}()
 	}()
 
-	defer fmt.Println("Now, the panic is in call depth 0")
+	defer fmt.Println("当前恐慌深度为0（执行深度为0）")
 
-	func() { // call depth 1
-		defer fmt.Println("Now, the panic is in call depth 1")
-		func() { // call depth 2
-			defer fmt.Println("Now, the panic is in call depth 2")
-			func() { // call depth 3
-				defer fmt.Println("Now, the panic is in call depth 3")
+	func() { // 调用深度为1
+		defer fmt.Println("当前恐慌深度为1（执行深度为1）")
+		func() { // 调用深度为2
+			defer fmt.Println("当前恐慌深度为2")
+			func() { // 调用深度为3
+				defer fmt.Println("当前恐慌深度为3")
 				panic(1)
 			}()
 		}()
@@ -201,112 +187,103 @@ func main() { // call depth 0
 </div>
 
 <p>
-So the depth of a panic is monotonically decreasing, it never increases.
-And, the depth of an alive panic will never
-be larger than the execution depth of the goroutine.
+所以，一个恐慌的深度总是单调递减的，它从不增加。另外，一个协程的恐慌深度从不会小于它的执行深度。
 </p>
 
-<h3>Fact: Panics Will Suppress Old Panics At The Same Depth</h3>
+<h3>事实：新生成的恐慌将压制同一深度的老的恐慌</h3>
 
 <div>
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
 func main() {
-	defer fmt.Println("program will not crash")
+	defer fmt.Println("程序退出时未崩溃")
 
 	defer func() {
 		fmt.Println( recover() ) // 3
 	}()
 
-	defer fmt.Println("now, panic 3 suppresses panic 2")
+	defer fmt.Println("恐慌3将压制恐慌2")
 	defer panic(3)
-	defer fmt.Println("now, panic 2 suppresses panic 1")
+	defer fmt.Println("恐慌2将压制恐慌1")
 	defer panic(2)
 	panic(1)
 }
 </code></pre>
 
-Outputs:
-<pre class="output"><code>now, panic 2 suppresses panic 1
-now, panic 3 suppresses panic 2
+输出：
+<pre class="output"><code>恐慌2将压制恐慌1
+恐慌3将压制恐慌2
 3
-program will not crash
+程序退出时未崩溃
 </code></pre>
 </div>
 
 <p>
-In this exanple, panic 1 is suppressed by panic 2,
-and then panic 2 is suppressed by panic 3.
-So, in the end, there is only one active panic, which is panic 3.
-Panic 3 is recovered, hence the program will not crash.
+在此例中，恐慌1被恐慌2压制了，恐慌2又被恐慌3压制了。所以，最后被捕获的恐慌值为3。
 </p>
 
 <p>
-In one goroutine, there will be at most one active panic at the same call depth at any time,
-especially when the execution point runs at the call depth 0 of a goroutine,
-there will be at most one active panic in the goroutine.
+在一个协程中，任何调用深度上最多只能有一个活动的恐慌共存。
+特别地，当一个协程的当前执行深度为0时，此协程中只能存在一个活动的恐慌。
 </p>
 
-<h3>Fact: Multiple Active Panics May Coexist In A Goroutine</h3>
+<h3>事实：一个协程中可以有多个恐慌共存</h3>
 
 <div>
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
-func main() { // call depth 0
-	defer fmt.Println("program will crash, for panic 3 is stll active")
+func main() { // 调用深度为0
+	defer fmt.Println("程序崩溃了，因为退出时恐慌3依然未恢复")
 
-	defer func() { // call depth 1
-		defer func() { // call depth 2
+	defer func() { // 调用深度为1
+		defer func() { // 调用深度为2
 			fmt.Println( recover() ) // 6
 		}()
 
-		// The depth of panic 3 is 0, and the depth of panic 6 is 1.
-		defer fmt.Println("now, there are two active panics: 3 and 6")
-		defer panic(6) // will suppress panic 5
-		defer panic(5) // will suppress panic 4
-		panic(4) // will not suppress panic 3,
-		         // for they have differrent depths.
-		         // The depth of panic 3 is 0.
-		         // The depth of panic 4 is 1.
+		// 恐慌3的深度为0，恐慌6的深度为1。
+		defer fmt.Println("现在，恐慌3和恐慌6共存")
+		defer panic(6) // 将压制恐慌5
+		defer panic(5) // 将压制恐慌4
+		panic(4) // 不会压制恐慌3，因为恐慌4和恐慌3的深度不同。
+		         // 恐慌3为0，而恐慌4的深度为1。
 	}()
 
-	defer fmt.Println("now, only panic 3 is active")
-	defer panic(3) // will suppress panic 2
-	defer panic(2) // will suppress panic 1
+	defer fmt.Println("现在，只存在恐慌3")
+	defer panic(3) // 将压制恐慌2
+	defer panic(2) // 将压制恐慌1
 	panic(1)
 }
 </code></pre>
 
 <p>
-In this exanple, panic 6, one of the two active panics, is recovered.
-But the other active panic, panic 3, is still active at the end of main call,
-so the program will crash.
+在这个例子中，两个曾经共存过的恐慌之一，恐慌6，被恢复了。
+但是恐慌3在程序退出时仍然没有被恢复，所以此程序在退出时崩溃了。
 </p>
 
-The output:
-<pre class="output"><code>now, only panic 3 is active
-now, there are two active panics: 3 and 6
+输出
+<pre class="output"><code>现在，只存在恐慌3
+现在，恐慌3和恐慌6共存
 6
-program will crash, for panic 3 is stll active
+程序崩溃了，因为退出时恐慌3依然未恢复
 panic: 1
 	panic: 2
 	panic: 3
 
-goroutine 1 [running]
+goroutine 1 [running]:
 ...
 </code></pre>
 </div>
 
-<h3>Fact: Highest Depth Panics May Be Recovered At First Or Not</h3>
+<h3>事实：更深的恐慌可能被先恢复也可能被后恢复</h3>
 
 <div>
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -315,18 +292,18 @@ func demo(recoverHighestPanicAtFirst bool) {
 	fmt.Println("====================")
 	defer func() {
 		if !recoverHighestPanicAtFirst{
-			// recover panic 1
-			defer fmt.Println("panic", recover(), "is recovered")
+			// 恢复恐慌1
+			defer fmt.Println("恐慌", recover(), "被恢复了")
 		}
 		defer func() {
-			// recover panic 2
-			fmt.Println("panic", recover(), "is recovered")
+			//  恢复恐慌2
+			fmt.Println("恐慌", recover(), "被恢复了")
 		}()
 		if recoverHighestPanicAtFirst {
-			// recover panic 1
-			defer fmt.Println("panic", recover(), "is recovered")
+			//  恢复恐慌1
+			defer fmt.Println("恐慌", recover(), "被恢复了")
 		}
-		defer fmt.Println("now, two active panics coexist")
+		defer fmt.Println("现在有两个恐慌共存")
 		panic(2)
 	}()
 	panic(1)
@@ -340,34 +317,28 @@ func main() {
 
 The output:
 <pre class="output"><code>====================
-now, two active panics coexist
-panic 1 is recovered
-panic 2 is recovered
+现在有两个恐慌共存
+恐慌 1 被恢复了
+恐慌 2 被恢复了
 ====================
-now, two active panics coexist
-panic 2 is recovered
-panic 1 is recovered
+现在有两个恐慌共存
+恐慌 2 被恢复了
+恐慌 1 被恢复了
 </code></pre>
 </div>
 
-<h3>Then, What Is The Principal Rule To Make A <code>recover</code> Call Take Effect?</h3>
+<h3>那么，一个<code>recover</code>调用发挥作用的基本规则是什么呢？</h3>
 
 <div>
-The rule is simple.
+基本规则很简单：
 
 <div class="alert alert-info">
-In a goroutine,
-if the caller function of a <code>recover</code> call is <code>f</code>
-and the depth of the <code>f</code> call is <code>d</code>,
-then, to make the <code>recover</code> call take effect,
-the <code>f</code> call must be a deferred call and
-there must be an active panic at depth <code>d-1</code>.
-Whether or not the <code>recover</code> call is deferred is not important.
+在一个协程中，假设一个<code>recover</code>调用的调用者函数是<code>f</code>并且此<code>f</code>调用的深度为<code>d</code>，
+则此<code>recover</code>调用只有在此<code>f</code>调用是一个延迟调用并且有一个深度为<code>d-1</code>的恐慌存在的情况下才会发挥作用。
+此<code>recover</code>调用本身是否是延迟的无关紧要。
 </div>
 
 <p>
-That is it. I think It is better described than Go specification.
-Now you can page up to check why the 6th recover call in the first example
-doesn't take effect, and some others do in some other examples.
+我认为此规则描述比Go白皮书中的描述更准确。现在，你可以回过头重新看看为什么第一个例子中的标号为7的<code>recover</code>调用没发挥作用。
 </p>
 </div>

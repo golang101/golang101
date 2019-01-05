@@ -1,22 +1,19 @@
-<h1>Some Panic/Recover Use Cases</h1>
+<h1>一些恐慌/恢复用例</h1>
 
 <p>
-Panic and recover have been
-<a href="control-flows-more.html#panic-recover">introduced before</a>.
-The following of the current article will introduce some (good and bad)
-panic/recover use cases.
+恐慌和恢复（panic和recover）已经<a href="control-flows-more.html#panic-recover">在之前的文章中介绍过了</a>。
+下面将展示一些恐慌/恢复用例。
 </p>
 
-<h3>Use Case 1: Avoid Panics Crashing Programs</h3>
+<h3>用例1：避免恐慌导致程序崩溃</h3>
 
 <div>
 <p>
-This may be the mose popular use case of panic/recover.
-The use case is used commonly in concurrent programs,
-especially client-server programs.
+这可能是panic/recover的最常见用例了。
+此用例广泛地使用于并发程序中，尤其是响应大量用户请求的应用。
 <p>
 
-An example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "errors"
@@ -33,7 +30,7 @@ func main() {
 		if err != nil {
 			log.Println(err)
 		}
-		// Handle each client connection in a new goroutine.
+		// 在一个新协程中处理客户端连接。
 		go ClientHandler(conn)
 	}
 }
@@ -41,33 +38,30 @@ func main() {
 func ClientHandler(c net.Conn) {
 	defer func() {
 		if v := recover(); v != nil {
-			log.Println("client handler panic:", v)
+			log.Println("捕获了一个恐慌：", v)
+			log.Println("防止了程序崩溃")
 		}
 		c.Close()
 	}()
-	panic(errors.New("just a demo.")) // a demo-purpose panic
+	panic("未知错误") // 演示目的产生的一个恐慌
 }
 </code></pre>
 
 <p>
-If we don't recover the potential panic in each client handler goroutine,
-the potential panic will crash the program.
+运行此服务器程序，并在另一个终端窗口运行<code>telnet localhost 12345</code>，我们可以观察到服务器程序不会因为客户连接处理协程中的恐慌而导致崩溃。
 </p>
 
 <p>
-Start the server and run <code>telnet localhost 12345</code> in another terminal,
-we can observe that the server will not crash down
-for the panics created in each client handler goroutine.
+如果我们在上例中不捕获客户连接处理协程中的潜在恐慌，则这样的恐慌将使整个程序崩溃。
 </p>
 
 </div>
 
-<h3>Use Case 2: Automatically Restart A Crashed Goroutine</h3>
+<h3>用例2：自动重启因为恐慌而退出的协程</h3>
 
 <div>
-
-When a panic is detected in a goroutine, we can create a new goroutine for it.
-An example:
+当在一个协程将要退出时，程序侦测到此协程是因为一个恐慌而导致此次退出时，我们可以立即重新创建一个相同功能的协程。
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "log"
@@ -75,8 +69,8 @@ import "time"
 
 func shouldNotExit() {
 	for {
-		time.Sleep(time.Second) // simulate a workload
-		// Simultate an unexpected panic.
+		time.Sleep(time.Second) // 模拟一个工作负载
+		// 模拟一个未预料到的恐慌。
 		if time.Now().UnixNano() & 0x3 == 0 {
 			panic("unexpected situation")
 		}
@@ -85,9 +79,9 @@ func shouldNotExit() {
 
 func NeverExit(name string, f func()) {
 	defer func() {
-		if v := recover(); v != nil { // a panic is detected.
-			log.Println(name, "is crashed. Restart it now.")
-			go NeverExit(name, f) // restart
+		if v := recover(); v != nil { // 侦测到一个恐慌
+			log.Printf("协程%s崩溃了，准备重启一个", name)
+			go NeverExit(name, f) // 重启一个同功能协程
 		}
 	}()
 	f()
@@ -97,25 +91,20 @@ func main() {
 	log.SetFlags(0)
 	go NeverExit("job#A", shouldNotExit)
 	go NeverExit("job#B", shouldNotExit)
-	select{} // blocks here for ever
+	select{} // 永久阻塞主线程
 }
 </code></pre>
 </div>
 
-<h3>Use Case 3: Use Panic/Recover To Simulate Long Jump Statements</h3>
+<h3>用例3：使用<code>panic</code>/<code>recover</code>函数调用模拟长程跳转</h3>
 
 <div>
 <p>
-Somtimes, we can use panic/recover as a way to
-simulate crossing-function long jump statements
-and crossing-function returns,
-though generally this way is not recommended to use.
-This way does harm for both code readibilty and execution efficiency.
-The only benefit is sometimes it can make code look less verbose.
+有时，我们可以使用<code>panic</code>/<code>recover</code>函数调用来模拟跨函数跳转，尽管一般这种方式并不推荐使用。
+这种跳转方式的可读性不高，代码效率也不是很高，唯一的好处是它有时可以使代码看上去不是很啰嗦。
 </p>
 
-In the following example, once a panic is created in an inner function,
-the exection will jump to the defer <code>recover</code> call.
+在下面这个例子中，一旦一个恐慌在一个内嵌函数中产生，当前协程中的执行将会跳转到延迟调用处。
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -134,7 +123,7 @@ func main() {
 			func () {
 				func () {
 					// ...
-					panic(123) // panic on succeeded
+					panic(123) // 用恐慌来表示成功返回
 				}()
 				// ...
 			}()
@@ -147,11 +136,11 @@ func main() {
 </code></pre>
 </div>
 
-<h3>Use Case 4: Use Panic/Recover To Reduce Error Checkings</h3>
+<h3>用例4：使用<code>panic</code>/<code>recover</code>函数调用来减少错误检查</h3>
 
 <div>
 
-An example:
+一个例子：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -159,7 +148,7 @@ import "fmt"
 
 func doTask(n int) {
 	if n%2 != 0 {
-		// Create a demo-purpose panic.
+		// 产生一个演示目的的恐慌。
 		panic(fmt.Errorf("bad number: %v", n))
 	}
 	return
@@ -167,8 +156,8 @@ func doTask(n int) {
 
 func doSomething() (err error) {
 	defer func() {
-		// The ok return must be present here, otherwise,
-		// a panic will be created if no errors occur.
+		// 这里第二个可选结果可以忽略但不能省略，否则如果
+		// recover调用返回nil，则类型断言将产生一个新的恐慌。
 		err, _ = recover().(error)
 	}()
 
@@ -185,7 +174,7 @@ func main() {
 </code></pre>
 
 <p>
-The above code is less verbose than the following one.
+下面这段同功能的代码比上面这段代码看上去要啰嗦一些。
 </p>
 
 <pre class="line-numbers"><code class="language-go">func doTask(n int) error {
@@ -217,18 +206,7 @@ func doSomething() (err error) {
 </code></pre>
 
 <p>
-However, usually, this panic/recover use case is not recommended to use.
-It is less readable and less efficient.
-</p>
-
-<p>
-Generally, panics are for logic errors, such as human careless errors.
-Logic errors are the errors which should never happen at run time.
-If they are happen, there must be bugs in the code.
-On the other hand, non-logic errors are the errors
-which are hard to absolutely avoid at run time.
-In other words, they are errors happening in reality.
-Such errors should be explicitly returned and handled properly.
+但是，这种<code>panic</code>/<code>recover</code>函数调用的使用方式一般并不推荐使用，因为它的可读性相对要低一些，效率也略低一些。
 </p>
 </div>
 

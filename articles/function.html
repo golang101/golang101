@@ -395,7 +395,7 @@ func main() {
 	AddSub(AddSub(HalfAndNegative(6)))
 	Dummy(HalfAndNegative(6))
 	_, _ = AddSub(7, 5)
-	
+
 	// 下面这几行编译不通过。
 	/*
 	_, _, _ = 6, AddSub(7, 5)
@@ -421,7 +421,7 @@ func main() {
 
 <p>
 当我们声明了一个函数的时候，我们实际上同时声明了一个不可修改的函数值。
-此函数值用此函数的名称来标识。此函数值的类型的文字形式为此函数的原型刨去函数名部分。
+此函数值用此函数的名称来标识。此函数值的类型的字面表示形式为此函数的原型刨去函数名部分。
 </p>
 
 <p>
@@ -460,7 +460,7 @@ func main() {
 	f = Double
 	g := Apply
 	fmt.Printf("%T\n", g) // func(int, func(int) int) int
-	
+
 	fmt.Println(f(9))         // 18
 	fmt.Println(g(6, Double)) // 12
 	fmt.Println(Apply(6, f))  // 12
@@ -484,14 +484,14 @@ func main() {
 			return n%x == 0
 		}
 	}
-	
+
 	var isMultipleOf3 = isMultipleOfX(3)
 	var isMultipleOf5 = isMultipleOfX(5)
 	fmt.Println(isMultipleOf3(6))  // true
 	fmt.Println(isMultipleOf3(8))  // false
 	fmt.Println(isMultipleOf5(10)) // true
 	fmt.Println(isMultipleOf5(12)) // false
-	
+
 	isMultipleOf15 := func(n int) bool {
 		return isMultipleOf3(n) && isMultipleOf5(n)
 	}
