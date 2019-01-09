@@ -107,7 +107,7 @@ func StatRandomNumbers(numRands int) (int, int) { // 一个函数声明
 func main() {
 	var num = 100
 	// 调用上面声明的StatRandomNumbers和另外两个内置函数。
-	x, y := StatRandomNumbers(num) // 一个短变量声明语句
+	x, y := StatRandomNumbers(num) // 一个变量短声明语句
 	print("Result: ", x, " + ", y, " = ", num, "? ")
 	println(x+y == num)
 }
@@ -144,7 +144,7 @@ Go中的其它类型（均为组合类型）将在以后的其它文章中介绍
 第<i>5</i>行声明了有名常量，叫做<code>MaxRand</code>。
 第<i>12</i>行和第<i>26</i>行使用标准变量声明语句声明了三个变量。
 第<i>13</i>行的变量<code>i</code>以及第<i>28</i>行的变量<code>x</code>和<code>y</code>是
-使用短变量声明语句声明的。
+使用变量短声明语句声明的。
 变量<code>a</code>和<code>b</code>在声明的时候被指定为<code>int</code>类型。
 编译器会自动推导出变量<code>i</code>、<code>num</code>、<code>x</code>和<code>y</code>的
 类型均为<code>int</code>类型，因为它们的初始值都是整型字面值表示的。

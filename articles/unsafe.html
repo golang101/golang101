@@ -287,7 +287,7 @@ func foo() {
 	*p0 = 1
 	*(*int)(p1) = 2
 	*(*int)(unsafe.Pointer(p2))) = 3 // 转危为安！
-	
+
 	runtime.KeepAlive(z) // 确保z所引用的值仍在使用中
 }
 </code></pre>
@@ -311,12 +311,12 @@ func foo() {
 func bar() {
 	t := T{y: new([1<<23]byte)}
 	p := uintptr(unsafe.Pointer(&t.y[0]))
-	
+
 	... // 使用t.x和t.y
-	
+
 	// 一个聪明的编译器能够觉察到值t.y将不会再被用到，
 	// 所以认为t.y值所占的内存块可以被回收了。
-	
+
 	*(*byte)(unsafe.Pointer(p))) = 1 // 危险操作！
 
 	println(t.x) // 继续使用值t，但只使用t.x字段。
@@ -768,7 +768,7 @@ func main() {
 
 <p>
 我们只应该在不得不使用非安全机制的时候才使用它们。
-特别得，当我们使用非安全机制时，请务必遵循上面列出的使用模式。
+特别地，当我们使用非安全机制时，请务必遵循上面列出的使用模式。
 </p>
 
 <p>

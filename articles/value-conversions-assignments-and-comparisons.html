@@ -179,7 +179,7 @@ func main() {
 	var _ = C1(ca) // compile error
 	var _ = C2(ca) // compile error
 	*/
-	
+
 	// 但是类型C的值间接转换为类型C1或C2。
 	var _ = C1((chan<- string)(ca)) // ok
 	var _ = C2((<-chan string)(ca)) // ok
@@ -544,7 +544,7 @@ https://github.com/golang/go/issues/28164#issuecomment-430733364
 </div>
 
 <p>
-注意，尽管切片/映射表/函数类型为比可比较类型，但是它们的值可以和类型不确定的预定义<code>nil</code>标识符比较。
+注意，尽管切片/映射表/函数类型为比可比较类型，但是它们的值可以和类型不确定的预声明<code>nil</code>标识符比较。
 </p>
 
 上述规则并未覆盖所有的情况。如果两个值均为类型不确定值，它们可以比较吗？这种情况的规则比较简单：

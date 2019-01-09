@@ -213,11 +213,11 @@ var _ = [5]int{a: 100} // error: index must be non-negative integer constant
 </p>
 
 <p>
-和指针一样，所有切片和映射表类型的零值均用预定义的标识符<code>nil</code>来表示。
+和指针一样，所有切片和映射表类型的零值均用预声明的标识符<code>nil</code>来表示。
 </p>
 
 <p>
-顺便说一句，除了刚提到的三种类型，以后将介绍的函数、数据通道和接口类型的零值也用预定义的标识符<code>nil</code>来表示。
+顺便说一句，除了刚提到的三种类型，以后将介绍的函数、数据通道和接口类型的零值也用预声明的标识符<code>nil</code>来表示。
 </p>
 
 <p>
@@ -378,7 +378,7 @@ var _ = map[LangCategory]map[string]int{
 </p>
 
 <p>
-尽管个映射表值和切片值是不能比较的，但是一个映射表值或者切片值可以和预定义的<code>nil</code>标识符进行比较以检查此映射表值或者切片值是否为一个零值。
+尽管个映射表值和切片值是不能比较的，但是一个映射表值或者切片值可以和预声明的<code>nil</code>标识符进行比较以检查此映射表值或者切片值是否为一个零值。
 </p>
 
 <p>
@@ -476,6 +476,7 @@ func main() {
 <div>
 <p>
 一个容器值<code>v</code>中存储的对应着键值<code>k</code>的元素用语法形式<code>v[k]</code>来表示。
+今后我们称<code>v[k]</code>为一个元素访问或者元素索引表达式。
 </p>
 
 假设<code>v</code>是一个数组或者切片，在<code>v[k]</code>中，
@@ -496,13 +497,13 @@ func main() {
 假设<code>v</code>是一个映射表值，在<code>v[k]</code>中，<code>k</code>的类型必须为（或者可以隐式转换为）<code>v</code>的类型的元素类型。另外，
 <ul>
 <li>
-	如果<code>k</code>的<a href="type-system-overview.html#concrete-type">具体类型</a>是一个不可比较类型，则在运行时刻将产生一个恐慌。
+	如果<code>k</code>是一个动态类型为不可比较类型的接口值，则<code>v[k]</code>在运行时刻将造成一个恐慌；
 </li>
 <li>
-	如果<code>k</code>的具体类型是不是一个不可比较类型，则<code>v[k]</code>仅在它被用做一个赋值中的目标值并且<code>v</code>是一个零值映射表时才会产生一个恐慌。
+	如果<code>v[k]</code>被用作一个赋值语句中的目标值并且<code>v</code>是一个零值nil映射表，则<code>v[k]</code>在运行时刻将造成一个恐慌；
 </li>
 <li>
-	如果<code>v[k]</code>用来表示取出映射表值<code>v</code>中键值<code>k</code>对应的元素，则它无论如何都不会产生一个恐慌，即使<code>v</code>是一个零值映射表（假设<code>k</code>的估值没有造成恐慌）。
+	如果<code>v[k]</code>用来表示取出映射表值<code>v</code>中键值<code>k</code>对应的元素，则它无论如何都不会产生一个恐慌，即使<code>v</code>是一个零值nil映射表（假设<code>k</code>的估值没有造成恐慌）；
 </li>
 <li>
 	如果<code>v[k]</code>用来表示取出映射表值<code>v</code>中键值<code>k</code>对应的元素，并且映射表值<code>v</code>中并不含有此元素，则<code>v[k]</code>返回一个此映射表值的类型的元素类型的零值。

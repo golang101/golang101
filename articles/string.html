@@ -103,6 +103,10 @@ func main() {
 </li>
 </ul>
 
+<p>
+注意：如果在<code>aString[i]</code>和<code>aString[start:end]</code>中，<code>aString</code>和各个下标均为常量，则编译器将在编译时刻验证这些下标的合法性，但是这样的元素访问和子切片表达式的估值结果总是非常量。
+</p>
+
 一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 

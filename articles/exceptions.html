@@ -60,7 +60,7 @@ func main() {
 	_ = complex(f1())
 	_ = complex(T{}.m())
 	f2(I(T{}).m())
-	
+
 	// 这些行编译不通过。
 	/*
 	f3(123, f1())
@@ -116,7 +116,7 @@ type T struct {
 func main() {
 	var t T
 	var p = &t
-	
+
 	p.x *= 2
 	// 上一行是下一行的语法糖。
 	(*p).x *= 2
@@ -150,9 +150,9 @@ func (pt *T) Double() {
 
 func main() {
 	// T{3}.Double() // error: T值没有Double方法。
-	
+
 	var t = T{3}
-	
+
 	t.Double() // 现在：t.x == 6
 	// 上一行是下一行的语法糖。
 	(&t).Double() // 现在：t.x == 12
@@ -221,13 +221,13 @@ func main() {
 	var ppt = &pt // ppt的类型为**T
 	var pp PP = ppt
 	_ = pp
-	
+
 	_ = (*p).x // 合法
 	_ = p.x    // 合法
-	
+
 	_ = (*p).y // 合法
 	// _ = p.y // 不合法
-	
+
 	// 下面的选择器均不合法。
 	/*
 	_ = ppt.x
@@ -277,16 +277,16 @@ func main() {
 	// The above two lines are equivalent.
 	var c = (*t).M()
 	fmt.Printf("%T %T %T\n", a, b, c) // int int *int
-	
+
 	var s = [...]int{0, 1, 2}
 	var u = &s[0]
 	var v = &(s[0])
 	// The above two lines are equivalent.
 	var w = (&s)[0]
 	fmt.Printf("%T %T %T\n", u, v, w) // *int *int int
-	
+
 	// sugar
-	
+
 	var x = new(int)
 	*x++ // *x == 1 now
 	// The Above line is a sugar for
@@ -319,10 +319,10 @@ func main() {
 func main() {
 	var m = map[string]int{"abc": 123}
 	_ = &m // okay
-	
+
 	// 例外。
 	// p = &m["abc"] // error: 映射表元素不可寻址
-	
+
 	// 语法糖。
 	f := func() []int {
 		return []int{0, 1, 2}
@@ -353,7 +353,7 @@ func main() {
 	type T struct {
 		x int
 	}
-	
+
 	var mt = map[string]T{"abc": {123}}
 	// _ = &mt["abc"]     // error
 	// mt["abc"].x = 456  // 部分修改是不允许的。
@@ -433,7 +433,7 @@ func main() {
 	// 这两行编译没问题。
 	var _ = main
 	var _ = fmt.Println
-	
+
 	// 这几行编译不通过。
 	var _ = panic
 	var _ = unsafe.Sizeof
@@ -500,11 +500,11 @@ func main() {
 func main() {
 	var bs = []byte{1, 2, 3}
 	var s = "xyz"
-	
+
 	copy(bs, s)
 	// 上一行是下一行的语法糖和优化。
 	copy(bs, []byte(s))
-	
+
 	bs = append(bs, s...)
 	// 上一行是下一行的语法糖和优化。
 	bs = append(bs, []byte(s)...)
@@ -522,7 +522,7 @@ func main() {
 
 例外：
 <div class="alert alert-success">
-映射表、切片和函数值可以和预定义标识符<code>nil</code>比较。
+映射表、切片和函数值可以和预声明标识符<code>nil</code>比较。
 </div>
 
 Example:
@@ -534,13 +534,13 @@ func main() {
 	//_ = s1 == s2 // error: 切片值不可比较。
 	_ = s1 == nil  // ok
 	_ = s2 == nil  // ok
-	
+
 	var m1 = map[string]int{}
 	var m2 = m1
 	// _ = m1 == m2 // error: 映射表值不可比较。
 	_ = m1 == nil   // ok
 	_ = m2 == nil   // ok
-	
+
 	var f1 = func(){}
 	var f2 = f1
 	// _ = f1 == f2 // error: 函数值不可比较。
@@ -623,14 +623,14 @@ import "fmt"
 
 func main() {
 	// new(T)返回类型T的一个零值的地址。
-	
+
 	type T0 struct {
 		x int
 	}
 	fmt.Println( T0{} == *new(T0) ) // true
 	type T1 [5]int
 	fmt.Println( T1{} == *new(T1) ) // true
-	
+
 	type T2 []int
 	fmt.Println( T2{} == nil ) // false
 	type T3 map[int]int
@@ -751,17 +751,17 @@ can be exported.
 
 func main() {
 	var ok bool
-	
+
 	var m = map[int]int{}
 	_, ok = m[123]
 	_ = m[123] // 不会产生恐慌
-	
+
 	var c = make(chan int, 2)
 	c <- 123
 	close(c)
 	_, ok = <-c
 	_ = <-c // 不会产生恐慌
-	
+
 	var v interface{} = "abc"
 	_, ok = v.(int)
 	_ = v.(int) // 将产生一个恐慌！

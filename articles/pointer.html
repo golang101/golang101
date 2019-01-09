@@ -24,13 +24,13 @@
 <h3>值的地址</h3>
 
 <p>
-一个值的地址是指此值的直接部分占据的内存的其实地址。在Go中，每个值都包含一个直接部分，但有些值可能还包含一个或多个间接部分，<a href="type-system-overview.html#value-part">下下篇</a>文章将对此详述。
+一个值的地址是指此值的直接部分占据的内存的起始地址。在Go中，每个值都包含一个直接部分，但有些值可能还包含一个或多个间接部分，<a href="type-system-overview.html#value-part">下下篇</a>文章将对此详述。
 </p>
 
 <h3>什么是指针？</h3>
 
 <p>
-指针是Go中的一种类型分类（Kind）。一个指针是某个指针类型的一个值。一个指针可以存储一个内存地址。
+指针是Go中的一种类型分类（kind）。一个指针是某个指针类型的一个值。一个指针可以存储一个内存地址。
 事实上，我们经常称一个指针为一个内存地址，或者称一个内存地址为一个指针。
 </p>
 
@@ -70,7 +70,7 @@ type PP *Ptr  // PP是一个定义的多级指针类型，它的基类型为Ptr�
 </p>
 
 <p>
-指针类型的零值的字面形式使用预定义的<code>nil</code>来表示。一个nil指针（常称为空指针）中不存储任何地址。
+指针类型的零值的字面形式使用预声明的<code>nil</code>来表示。一个nil指针（常称为空指针）中不存储任何地址。
 </p>
 
 <p>
@@ -129,7 +129,7 @@ type PP *Ptr  // PP是一个定义的多级指针类型，它的基类型为Ptr�
 <h3>指针（地址）解引用</h3>
 
 <p>
-我们可以使用前置解引用操作符<code>*</code>来访问存储在一个指针所表示的地址处的值。
+我们可以使用前置解引用操作符<code>*</code>来访问存储在一个指针所表示的地址处的值（即此指针所引用着的值）。
 比如，对于一个类型为<code>T<sub>p</sub></code>的指针<code>p</code>，我们可以用<code>*p</code>来表示地址<code>p</code>处的值。
 此值的类型为类型<code>T<sub>p</sub></code>的基类型。<code>*p</code>称为的指针<code>p</code>的解引用。解引用是取地址的逆过程。
 </p>
@@ -157,6 +157,7 @@ func main() {
 	fmt.Println(p1 == p2) // true
 	fmt.Println(p0 == p1) // false
 	p3 := &*p0            // <=> p3 := &(*p0)
+	                      // <=> p3 := p0
 	                      // p3和p0中存储的地址是一样的。
 	fmt.Println(p0 == p3) // true
 	*p0, *p1 = 123, 789
@@ -311,7 +312,7 @@ func main() {
 <ol>
 <li>
 	类型<code>T1</code>和<code>T2</code>的底层类型必须一致（忽略结构体字段的标签）。
-	特别得，如果类型<code>T1</code>中<code>T2</code>只要有一个是<a href="type-system-overview.html#non-defined-type">非定义类型</a>并且它们的底层类型一致（考虑结构体字段的标签），则此转换可以使隐式的。
+	特别地，如果类型<code>T1</code>中<code>T2</code>只要有一个是<a href="type-system-overview.html#non-defined-type">非定义类型</a>并且它们的底层类型一致（考虑结构体字段的标签），则此转换可以使隐式的。
 	（关于结构体，请参阅<a href="struct.html">下一篇文章</a>。）
 </li>
 <li>

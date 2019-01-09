@@ -35,9 +35,9 @@ type ReadWriter interface {
 	Write(buf []byte) (n int, err error)
 }
 
-// Comparable是一个有名接口类型。它是一个别名类型。
-type Comparable = interface {
-	IsEqualTo(another Comparable) bool
+// Runnable是一个有名接口类型。它是一个别名类型。
+type Runnable = interface {
+	Run()
 }
 </code></pre>
 
@@ -154,6 +154,7 @@ type DatabaseStorer interface {
 <div>
 <p>
 每个接口值都可以看作是一个用来包裹一个非接口值的盒子。
+欲将一个非接口值包裹在一个接口值中，此非接口值的类型必须实现了此接口值的类型。
 </p>
 
 在Go中，如果类型<code>T</code>实现了一个接口类型<code>I</code>，则类型<code>T</code>的值都可以隐式转换到类型<code>I</code>。
