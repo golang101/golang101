@@ -1,160 +1,174 @@
-﻿<h1>Expression Evaluation Orders</h1>
+﻿<h1>表达式估值顺序规则</h1>
 
 <p>
-This article will explain <a href="expressions-and-statements.html">expression</a>
-evaluation orders in all kinds of scenarios.
+本文将解释各种情形下<a href="expressions-and-statements.html">表达式</a>的估值顺序。
 </p>
 
-<h3>The Usual Order</h3>
+<h3>一个表达式将在其所依赖的其它表达式估值之后进行估值</h3>
 
 <div>
+这属于常识，没什么好解释的。一个显然的例子是一个表达式中将在组成它的子表达式都估值之后进行估值。
+比如，在一个函数调用<code>f(x, y[n])</code>中，
+<ul>
+<li>
+	<code>f()</code>将在它所依赖的子表达式<code>f</code>、<code>x</code>和<code>y[n]</code>估值之后进行估值；
+</li>
+<li>
+	表达式<code>y[n]</code>将在它所依赖的子表达式<code>n</code>和<code>y</code>估值之后进行估值。
+</li>
+</ul>
+
 <p>
-Before learning expression evaluation orders under all kinds of scenarios,
-let's learn what is <b><i>the usual order</i></b>.
+另外，<a href="packages-and-imports.html#initialization-order">程序资源初始化顺序</a>章节中提供了一个关于包级变量初始化顺序的例子。
 </p>
 
-Go specification describes <b><i>the usual order</i></b> as
+</div>
+
+<h3>通常估值顺序（The Usual Order）</h3>
+
+<div>
+Go白皮书这样描述<b>通常估值顺序</b>：
 
 <div class="alert alert-success">
-...,
-when evaluating the operands of an expression, assignment, or return statement,
-all function calls, method calls, and (channel) communication operations
-are evaluated in lexical left-to-right order. 
+...，当估值一个表达式、赋值语句或者函数返回语句中的操作书时，所有的函数调用、方法调用和数据通道操作将按照它们在代码中的出现顺序进行估值。
 </div>
 
 <p>
-Please note that an explicit conversion <code>T(x)</code> is not a function call.
+注意：一个显式类型转换<code>T(v)</code>不属于函数调用。
 </p>
 
-<p>
-In addition, from common sense, 
-an <a href="expressions-and-statements.html#expressions">expression</a>
-is guaranteed to be evaluated after all the evaluations of its sub-expressions,
-for the expression depends on its sub-expressions.
-</p>
+举个例子，在表达式<code>[]int{x, fa(), fb(), y}</code>中，假设<code>x</code>和<code>y</code>是两个变量，<code>fa</code>和<code>fb</code>是两个函数，则调用<code>fa()</code>保证在调用<code>fb()</code>之前执行。
+但是，下面这两个估值顺序没有在Go白皮书中指定：
+<ul>
+<li>
+	变量<code>x</code>（或者<code>y</code>）和调用<code>fa()</code>（或者<code>fb()</code>）的相对估值顺序；
+</li>
+<li>
+	变量<code>x</code>、变量<code>y</code>、函数值<code>fa</code>和函数值<code>fb</code>的相对估值顺序。
+</li>
+</ul>
 
-In the following assignment, assume <code>z</code> is an expression and
-<code>f</code> is one of its method.
+下面是Go白皮书中提到的另一个例子：
 
 <pre><code class="language-go">y[z.f()], ok = g(h(a, b), i()+x[j()], <-c), k()
 </code></pre>
 
-Compilers should guarantee the following orders.
+在此赋值语句中，
 <ul>
 <li>
-	The function calls, method calls and channel communication operations
-	happen in the order <code>z.f()</code>, <code>h()</code>, <code>i()</code>,
-	<code>j()</code>, <code>&lt;-c</code>, <code>g()</codE>, and <code>k()</code>.
+	<code>c</code>是一个数据通道表达式，它将被估值为一个数据通道值；
 </li>
 <li>
-	<code>h()</code> is evaluated after the evaluations of expressions <code>a</code> and <code>b</code>.
+	<code>g</code>、<code>h</code>、<code>i</code>、<code>j</code>和<code>k</code>是一些函数表达式，它们将被估值为一些函数值；
 </li>
 <li>
-	<code>y[]</code> is evaluated after the evaluations of <code>z.f()</code>.
-</li>
-<li>
-	<code>z.f()</code> is evaluated after the evaluations of expression <code>z</code>.
-</li>
-<li>
-	<code>x[]</code> is evaluated after the evaluations of <code>j()</code>.
+	<code>f</code>是表达式<code>z</code>值的一个方法。
 </li>
 </ul>
 
-However, the following orders are not specified.
+综合考虑上一节和本节上面已经提到的规则，编译器应该保证下列在运行时刻的估值顺序：
 <ul>
 <li>
-	The relative evaluation order of expressions <code>a</code> and <code>b</code>.
+	此赋值中涉及到的函数调用、方法调用和数据通道操作必须按照这样的顺序执行：<code>z.f()</code>→<code>h()</code>→<code>i()</code>→<code>j()</code>→<code>&lt;-c</code>→<code>g()</codE>→<code>k()</code>；
 </li>
 <li>
-	The relative evaluation order of expressions <code>x[]</code> and <code>&lt;-c</code>.
+	到用<code>h()</code>在表达式<code>h</code>、<code>a</code>和<code>b</code>估值之后调用；
 </li>
 <li>
-	The relative evaluation order of expression <code>y</code> and any of
-	the followings: <code>h()</code>, <code>i()</code>, <code>j()</code>,
-	<code>&lt;-c</code>, <code>g()</codE>, <code>k()</code>.
+	<code>y[]</code>在方法调用<code>z.f()</code>执行之后被估值；
+</li>
+<li>
+	方法调用<code>z.f()</code>表达式<code>z</code>估值之后调用；
+</li>
+<li>
+	<code>x[]</code>在调用<code>j()</code>之后估值。
 </li>
 </ul>
 
+然而，下列次序在Go白皮书中未指定，它们依赖于具体编译器实现。
+<ul>
+<li>
+	表达式<code>y</code>、<code>z</code>、<code>g</code>、<code>h</code>、<code>a</code>、<code>b</code>、<code>x</code>、<code>i</code>、<code>j</code>、<code>c</code>和<code>k</code>之间的相对估值顺序；
+</li>
+<li>
+	表达式<code>y[]</code>、<code>x[]</code>和<code>&lt;-c</code>之间的相对估值顺序。
+</li>
+</ul>
+
+根据上述通常估值顺序规则，我们知道下面声明的变量<code>x</code>、<code>m</code>和<code>n</code>的初始值可能将出现歧义。
+
+<pre class="line-numbers"><code class="language-go">	a := 1
+	f := func() int { a++; return a }
+
+	// x可能初始化为[1, 2]或者[2, 2]，因为a和f()的相对估值顺序未指定。
+	x := []int{a, f()}
+
+	// m可能初始化为{2: 1}或者{2: 2}，因为两个映射表元素的赋值顺序未指定。
+	m := map[int]int{a: 1, a: 2}
+
+	// n可能初始化为{2: 3}或者{3: 3}，因为a和f()的相对估值顺序未指定。
+	n := map[int]int{a: f()}
+</code></pre>
+
+<p>
+</p>
 
 </div>
 
-<h3>Evaluation Orders In Assignment Statements</h3>
+<h3>赋值语句中的表达式估值和赋值执行顺序</h3>
 
 <div>
+
+除了上面介绍的规则，Go白皮书对赋值语句中的表达式估值和各个单值赋值执行顺序进行了更多描述（原英文描述不是十分精确，在翻译过程中对之略加改进）：
+
+<div class="alert alert-success">
+一条赋值语句的执行分为两个阶段。
+首先，做为目标值的元素索引表达式中的容器值表达式和索引值表达式、做为目标值的指针解引用表达式中的指针值表达式，以及此赋值语句中的其它非目标值表达式将按照上述通常估值顺序估值。
+然后，各个单值赋值将按照从左到右的顺序执行。
+</div>
+
 <p>
-We know that multiple values can be assigned in one assignment in Go.
-Each left-hand side item in a <code>=</code> assignment must be addressable,
-a map index expression, or the blank identifier.
-In most cases, we don't need to care about the evaluation order rules
-of the expressions involved in multi-valued assignments.
-But for some special cases, we really should understand the rules
-to get the the expected assignment results.
+以后，我们将称第一个阶段为估值阶段，称第二个阶段为实施阶段。
 </p>
 
 <p>
-Each assignment will experience two phases at run time,
-the preparation phase and the carry-out phase.
-At the preparation phase, all expressions involved in that assignment
-are evaluated in the usual order mentioned above.
+Go白皮书并没有清楚地指定赋值语句中左边的做为目标值的表达式在细节上该如何估值，此举造成<a href="https://github.com/golang/go/issues/23188#issuecomment-403951267">一些</a><a href="https://github.com/golang/go/issues/15620">争议</a>。
+所以，这里下面将对赋值语句中的表达式估值顺序做出一些补充解释。
+<p>
+
+<p>
+为了方便下面的解释，对于一个赋值语句，我们假设一个做为目标值的映射表元素索引表达式中的映射表值总是可寻址的。
+如果它是不可寻址的，我们可以认为在此赋值语句之前，此映射表值已经被赋给了一个临时变量（可寻址的）并且在此赋值语句中此映射表值已经被此临时变量取代。
 </p>
 
-Just after the preparation phase and before the carry-out phase of an assignment,
-the assignment is rewritten as the following elementary form:
-
-<pre><code class="language-go">L0, L1, ..., Ln = R0, R1, ..., Rn
-</code></pre>
-
-where each <code>Lx</code> may be
+在估值阶段结束之后、实施阶段开始之前的时刻，赋值语句中的每个目标值表达式已经被估值为它的最基本形式。
+不同风格的目标值表达式有着不同的最基本形式：
 <ul>
 <li>
-	the blank identifier <code>_</code>,
-	if the corresponding left side item is also the blank identifier.
+	如果一个目标值表达式是一个空标识符，则它的最基本形式依旧是一个空标识符；
 </li>
 <li>
-	a form of <code>Mx[Kx]</code>,
-	if the corresponding left side item is a map index expression.
-	<code>Mx</code> is a map value and <code>Kx</code> is a value
-	of the key type of the map value.
+	如果一个目标值表达式是一个映射表元素索引表达式<code>m[k]</code>，则它的最基本形式为<code>(*maddr)[k]</code>，其中<code>maddr</code>为指向<code>m</code>的指针；
 </li>
 <li>
-	a form of <code>*Px</code>, if the corresponding left side item
-	is neither a map index expression nor the blank identifier.
-	<code>Px</code> is a (pointer) value of a certain pointer type.
-	If for any reason, an address can't be retrieved from the
-	corresponding left side item, <code>Px</code> is a nil pointer.
+	对于其它情形的一个目标值表达式，它必然是可寻址的，则它的最基本形式为它的地址的解引用形式。
 </li>
 </ul>
 
-<p>
-and, every <code>Px</code>, <code>Mx</code>, <code>Kx</code> and
-<code>Rx</code> is an elementary value which can't be evaluated further.
-They are all hidden temporary values which are only referenced
-in the elementary form of the assignment.
-</p>
-
-<p>
-In the carry-out phase, solo assignments, <code>L0 = R0</code>,
-<code>L1 = R1</code>, ..., <code>Ln = Rn</code>,
-are carried out in left-to-right order.
-Whenever a nil <code>Mx</code> or a nil <code>Px</code> is encountered,
-the assignment exection is terminated and a panic occurs.
-<p/>
-
-Assume <code>a</code> and <code>b</code> are two addressable
-elementary values, the following assignment
+假设<code>a</code>和<code>b</code>为两个可寻址的同类型变量，则下面的赋值语句
 
 <pre class="line-numbers"><code class="language-go">	a, b = b, a
 </code></pre>
 
-will go through the the following two phases.
+将按照如下步骤执行：
 
-<pre class="line-numbers"><code class="language-go">// The preparation phase:
+<pre class="line-numbers"><code class="language-go">// 估值阶段
 P0 := &a; P1 := &b
 R0 := a; R1 := b
 
-// The elementary form: *P0, *P1 = R0, R1
+// 最基本形式：*P0, *P1 = R0, R1
 
-// The carry-out phase:
+// 实施阶段
 *P0 = R0
 *P1 = R1
 </code></pre>
@@ -162,8 +176,7 @@ R0 := a; R1 := b
 <p>
 </p>
 
-Here is another example, in which <code>x[0]</code> instead of
-<code>x[1]</code> is modified.
+下面是另外一个例子，其中<code>x[0]</code>而不是<code>x[1]</code>被修改了。
 
 <pre class="line-numbers"><code class="language-go">	x := []int{0, 0}
 	i := 0
@@ -171,15 +184,15 @@ Here is another example, in which <code>x[0]</code> instead of
 	fmt.Println(x) // [2 0]
 </code></pre>
 
-The phases for the assignment at line <i>3</i> are shown below.
+上例中的第<i>3</i>行的分解执行步骤如下：
 
-<pre class="line-numbers"><code class="language-go">// The preparation phase:
+<pre class="line-numbers"><code class="language-go">// 估值阶段
 P0 := &i; P1 := &x[0];
 R0 := 1; R1 := 2
 
-// The elementary form: *P0, *P1 = R0, R1
+// 最基本形式：*P0, *P1 = R0, R1
 
-// The carry-out phase:
+// 实施阶段
 *P0 = R0
 *P1 = R1
 </code></pre>
@@ -187,7 +200,7 @@ R0 := 1; R1 := 2
 <p>
 </p>
 
-An example which is a little complex.
+下面是一个略为复杂一点的例子。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -204,16 +217,19 @@ func main() {
 }
 </code></pre>
 
-The phases for the assignment at line <i>10</i> are shown below.
+<p>
+</p>
 
-<pre class="line-numbers"><code class="language-go">// The preparation phase:
+上例中的第<i>10</i>行的分解执行步骤如下：
+
+<pre class="line-numbers"><code class="language-go">// 估值阶段
 P0 := &s; PM1 := &m; K1 := "Go"; P2 := p; P3 := &s[2]
 R0 := []int{2, 2, 2}; R1 := s[1]; R2 := m["Go"]; R3 := 5
 // now, R1 == 1, R2 == 0
 
-// The elementary form: *P0, (*PM1)[K1], *P2, *P3 = R0, R1, R2, R3
+// 最基本形式：*P0, (*PM1)[K1], *P2, *P3 = R0, R1, R2, R3
 
-// The carry-out phase:
+// 实施阶段
 *P0 = R0
 (*PM1)[K1] = R1
 *P2 = R2
@@ -223,7 +239,7 @@ R0 := []int{2, 2, 2}; R1 := s[1]; R2 := m["Go"]; R3 := 5
 <p>
 </p>
 
-The following example rotates all elements in a slice for one index.
+下面这个例子将一个切片中的所有元素循环顺移了一位。
 
 <pre class="line-numbers"><code class="language-go">	x := []int{2, 3, 5, 7, 11}
 	t := x[0]
@@ -236,19 +252,23 @@ The following example rotates all elements in a slice for one index.
 <p>
 </p>
 
-Another example:
+另一个例子：
 
 <pre class="line-numbers"><code class="language-go">	x := []int{123}
-	x, x[0] = nil, 456        // will not panic
-	x, x[0] = []int{123}, 789 // will panic
+	x, x[0] = nil, 456        // 此句不会发生恐慌
+	x, x[0] = []int{123}, 789 // 此句将产生恐慌
 </code></pre>
 
 <p>
 </p>
 
-In the following example, the relative order of the expression
-<code>x+1</code> and <code>f(&x)</code> is not specified.
-The example may output <code>100 99</code> or <code>1 99</code>.
+<p>
+尽管使用复杂的多值赋值语句是合法的，但是在实践中并不推荐使用，因为复杂多值赋值语句的可读性不高，编译速度较慢，并且执行效率相对略低。
+</p>
+
+上面已经提到了，并非所有的估值顺序都在Go白皮书中指定清楚了，所以不同的Go编译器对这些未指定的估值顺序有着自己的规则。
+一些跨编译器兼容性不好的代码将导致使用不同的编译器编译的程序的运行结果不同。
+在下面这个例子中，表达式<code>x+1</code>和<code>f(&x)</code>的估值顺序是编译器相关的，所以此程序输出<code>100 99</code>或者<code>1 99</code>都是合理的。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -269,66 +289,7 @@ func main() {
 <p>
 </p>
 
-</div>
-
-<h3>Evaluation Orders In <code>op=</code> Assignments</h3>
-
-<p>
-The expression evaluation rules of an assignment <code>x op= y</code>
-is almost the same as the general assignment <code>x = x op y</code>.
-The only difference is the expression <code>x</code> is only evaluated once.
-<p>
-
-<p>
-Both the left- and right-hand expression lists of an <code>op=</code> assignment
-must contain exactly one single-valued expression,
-and the left-hand expression must not be the blank identifier.
-</p>
-
-<h3>Evaluation Orders In composite Literals</h3>
-
-<div>
-Each composite literal is an expression, so the sub-expressions
-in a composite literal are evaluated in the usual order mentioned above.
-Several examples from Go specification:
-
-<pre class="line-numbers"><code class="language-go">	a := 1
-	f := func() int { a++; return a }
-
-	// x may be [1, 2] or [2, 2]: evaluation order 
-	// between a and f() is not specified.
-	x := []int{a, f()}
-
-	// m may be {2: 1} or {2: 2}: evaluation order
-	// between the two map assignments is not specified.
-	m := map[int]int{a: 1, a: 2}
-
-	// n may be {2: 3} or {3: 3}: evaluation order
-	// between the key and the value is not specified.
-	n := map[int]int{a: f()}
-</code></pre>
-
-</div>
-
-<h3>Evaluation Orders Of Function Arguments</h3>
-
-<div>
-
-<p>
-Each function call is an expression, so the argument list of a function call
-are evaluated in the usual order mentioned above.
-</p>
-
-<p>
-For example, in the following example, the first argument, <code>f()</code>,
-of the function call <code>fmt.Println()</code> is guaranteed to be evaluated
-before the last <code>f()</code>. But the relative evaluation order
-of the second argument <code>y</code> and the two <code>f()</code>
-is not specified.
-<p>
-
-<code>1 7 2</code>, <code>1 8 2</code> and <code>1 9 2</code> are
-all legal outputs for the following program.
+下面是另一个可能输出不同结果的程序。它可能输出<code>1 7 2</code>、<code>1 8 2</code>或者<code>1 9 2</code>，取决于不同的编译器实现。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -350,16 +311,11 @@ func main() {
 
 </div>
 
-<h3>Expression Evaluation Orders In <code>switch-case</code> Code Blocks</h3>
+<h3><code>switch-case</code>流程控制代码块中的表达式估值顺序</h3>
 
 <div>
-
-The expression evaluation order in a <code>switch-case</code> code block
-has been <a href="control-flows.html#switch-case">described before</a>.
-Here just shows an example.
-Simply speaking, before a branch is entered,
-the expressions in a <code>switch-case</code> code block
-are evaluated in source order.
+<code>switch-case</code>流程控制代码块中的表达式估值顺序已经<a href="control-flows.html#switch-case">在前面的文章中大致描述过了</a>。
+这里仅仅展示一个例子。简单来说，在进入一个分支代码块之前，各个<code>case</code>关键字后跟随的表达式将按照从上到下和从左到右的顺序进行估值，直到某个比较结果为<code>true</code>为止。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -381,14 +337,11 @@ func main() {
 </code></pre>
 
 <p>
-At run time, the <code>f()</code> calls will be evaluated by the order
-from top to bottom and from left to right,
-until a comparison results <code>true</code>.
-So <code>f(8)</code>, <code>f(9)</code> and <code>f(10)</code>
-will be not evaluated in this example.
+在运行时刻，各个<code>f()</code>调用将按照传给它们参数大小顺序进行估值，则待和调用<code>f(7)</code>的比较结果为<code>true</code>为止。
+所以调用<code>f(8)</code>、<code>f(9)</code>和<code>f(10)</code>将不会被估值。
 </p>
 
-The output:
+输出结果：
 <pre class="output"><code>f(3) is called.
 f(4) is called.
 f(5) is called.
@@ -401,74 +354,59 @@ f(7) is called.
 
 </div>
 
-<h3>Expression Evaluation Orders In <code>select-case</code> Code Blocks</h3>
+<h3><code>select-case</code>流程控制代码块中的表达式估值结果</h3>
 
 <div>
 
 <p>
-For all the cases in a <code>select-case</code> code block,
-the channel operands of receive operations and the channel and
-right-hand-side expressions of send statements are evaluated exactly once,
-in source order, upon starting executing the <code>select</code> statement.
+当执行一个<code>select-case</code>流程控制代码块时，各个<code>case</code>关键值后跟随的所有数据通道操作中的数据通道表达式和所有数据通道发送操作中的发送值表达式都将被按照它们在代码中的出现次序（从上到下从左到右）估值一次。
 </p>
 
 <p>
-Whether or not the <code>select-case</code> code block will make
-the current goroutine enter blocking state, or which branch is selected,
-doesn't affect the just described expression evaluation order rule.
+一个数据通道接收操作的结果将要被赋值给的目标值表达式只有在此数据通道接收操作被选中之后才会被估值。
+如果一个数据通道接收操作没有被选中，则它的假设估值结果将被赋值给的目标值表达式永远不会得到估值。
 </p>
 
-<p>
-The left-hand-side expression of each receive statement will not be evaluated
-before executing the <code>select</code> statement.
-It will be evaluated if that receive statement is selected later.
-The left-hand-side expressions of the unselected receive statements
-will never be evaluated.
-</p>
-
-In the following example, the calls <code>fp("abc")</code>
-and <code>fp("def")</code> will never be evaluated.
+比如，在下面这个例子中，表达式<code>*fptr("aaa")</code>将永不会得到估值，因为它对应的数据通道接收操作<code>fchan("bbb", nil)</code>是个不可能被选中的阻塞操作。
 
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
 func main() {
-	fc := func(info string) chan int {
-		fmt.Println("fc:", info)
-		c := make(chan int, 1)
-		c <- 456
+	c := make(chan int, 1)
+	c <- 0
+	fchan := func(info string, c chan int) chan int {
+		fmt.Println(info)
 		return c
 	}
-	fv := func(n int) int {
-		fmt.Println("fv:", n)
-		return n
-	}
-	fp := func(info string) *int {
-		fmt.Println("fp:", info)
+	fptr := func(info string) *int {
+		fmt.Println(info)
 		return new(int)
 	}
 	
 	select {
-	case *fp("abc") = <-fc("ijk"):
-	case fc("pqr") <- fv(123):
-	case fc("xyz") <- fv(789):
+	case *fptr("aaa") = <-fchan("bbb", nil): // blocking
+	case *fptr("ccc") = <-fchan("ddd", c):   // non-blocking
+	case fchan("eee", nil) <- *fptr("fff"):  // blocking
+	case fchan("ggg", nil) <- *fptr("hhh"):  // blocking
 	}
 }
 </code></pre>
 
-The output of the above program:
-<pre class="output"><code>fc: ijk
-fc: pqr
-fv: 123
-fc: xyz
-fv: 789
-fp: abc
+上例的输出结果：
+<pre class="output"><code>bbb
+ddd
+eee
+fff
+ggg
+hhh
+ccc
 </code></pre>
 
 <p>
-If the first case is never selected in the above example,
-then the expression <code>*fp("abc")</code> will never get evaluated.
+注意，表达式<code>*fptr("ccc")</code>时上例中最后一个被估值的表达式。
+它在对应的数据接收操作<code>&lt;-fchan("ddd", c)</code>被选中之后才会进行估值。
 </p>
 
 </div>

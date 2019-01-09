@@ -1,12 +1,11 @@
-﻿<h1>Code Blocks And Identifier Scopes</h1>
+﻿<h1>代码块和标识符作用域</h1>
 
 <p>
-This article will explain the code blocks and declaration scopes in Go.
+本文将解释代码块和标识符的作用域。
 </p>
 
 <p><i>
-(Please note, the definitions of code blocks and declaration scopes in this article
-are a little different from the ones in <a href="https://golang.org/ref/spec">Go specification</a>.)
+（注意：本文中描述的代码块的层级关系和Go白皮书中有所不同。）
 </i></p>
 
 <!--
@@ -14,80 +13,63 @@ https://github.com/golang/go/issues/7429#issuecomment-282480782
 -->
 
 <p class="anchor" id="block"></p>
-<h3>Code Blocks</h3>
+<h3>代码块</h3>
 
 <div>
-
-In a Go project, there are four kinds of code blocks:
+Go代码中有四种代码块。
 <ul>
-<li>the <b>universe block</b> contains all project source code.</li>
-<li>each package has a <b>package block</b> containing all source code,
-	excluding the package import declarations in that package.</li>
-<li>each file has a <b>file block</b> containing all the source code,
-	including the package import declarations, in that file.</li>
-<li>generally, a pair of braces <code>{}</code> opens and encloses a <b>local block</b>.
-	The local blocks enclosed in <code>{}</code> are called explicit local blocks.
-	The <code>{}</code> in composite literals and type definitions don't form
-	local blocks.
+<li>万物代码块（the universe code block）。一个程序只有一个万物代码块，它包含着一个程序中所有的代码；</li>
+<li>包代码块（package code block）。一个包代码块含着一个代码包中的所有代码，但不包括此代码包中所有的包引入声明。</li>
+<li>文件代码块（file code block）。一个文件代码块包含着一个源文件中的所有代码，包括此文件中的包引入声明。</li>
+<li>局部代码块（local code block）。一般说来，一对大括号<code>{}</code>其中的代码形成了一个局部代码块。
+	但是也有一些局部代码块并不包含在一对大括号中，这样的代码块称为隐式代码块，而包含在一对大括号中的局部代码块称为显式代码块。
+	组合字面形式中的大括号和代码块无关。
 </li>
 </ul>
 
-Some keywords will open some implicit code blocks.
+各种控制流程中的一些关键字跟随着一些隐式局部代码块：
 <ul>
 <li>
-	the input parameters and output results of a function are viewed as being
-	declared in the local block enclosed by the pair of braces
-	<code>{}</code> of the function definition, even if they stay out of
-	the pair of braces.
+	一个<code>if</code>、<code>switch</code>或者<code>for</code>关键字跟随着两个内嵌在一起的局部代码块。
+	其中一个代码块是隐式的，另一个是显式的，此显式的代码块内嵌在此隐式代码块之中。
+	如果这样的一个关键字跟随着一个变量短声明形式，则被声明的变量声明在此隐式代码块中。
 </li>
 <li>
-	an <code>if</code>, <code>switch</code> or <code>for</code> keyword
-	will open two nested local blocks. One is implicit, the other is explicit.
-	The explicit one is nested in the implicit one.
-	The variables declared with short declaration forms in the simple statements closely
-	following the <code>if</code>, <code>switch</code> or <code>for</code> keyword
-	is declared in the implicit block.
+	一个<code>else</code>关键字可以跟随着一个显式或者隐式代码块。此显式或者隐式代码块内嵌在跟随在对应<code>if</code>关键字后的隐式代码块中。
+	如果，此<code>else</code>关键字立即跟随着另一个<code>if</code>关键字，则跟随在此<code>else</code>关键字后的代码块可以为隐式的，否则，此代码块必须为显式的。
 </li>
 <li>
-	an <code>else</code> keyword will open one explicit or implicit block,
-	which is nested in the implicit block opened by its <code>if</code> counterpart keyword.
-	If the <code>else</code> keyword is followed by another <code>if</code> keyword,
-	then the code block opened by the <code>else</code> keyword is implicit.
+	一个<code>select</code>关键字跟随着一个显式局部代码块。
 </li>
 <li>
-	each <code>case</code> and <code>default</code> keyword opens one implicit block,
-	which is nested in the explicit block opened by its corresponding
-	<code>switch</code> or <code>select</code> keyword.
+	每个<code>case</code>和<code>default</code>关键字后跟随着一个隐式代码块，此隐式代码块内嵌在对应的<code>switch</code>或者<code>select</code>关键字后跟随的显式代码块。
 </li>
 </ul>
 
 <p>
-The local blocks which aren't nested in any other local blocks are called top level
-(or package level) local blocks.
-Top level local blocks are all function bodies.
+不内嵌在任何其它局部代码块中的局部代码块称为顶层（或者包级）局部代码块。顶层局部代码块肯定都是函数体。
+</p>
+
+<p>
+注意，一个函数中输入参数和输出结果变量都被看作是声明在此函数体代码块内，虽然看上去它们声明在函数体代码块之外。
 </p>
 </div>
 
 
 <div>
-Block hierarchies:
+各种代码块的层级关系：
 <ul>
-<li>package blocks are nested in the universe block.</li>
-<li>file blocks are also directly nested in the universe block, instead of package blocks.
-	(This explanation is different from Go specification and the <code>go/*</code> standard packages.)
-</li>
-<li>each top level local block is nested in both a package block and a file block.
-	(This explanation is also different from Go specification and the <code>go/*</code> standard packages.)
-</li>
-<li>a non-top local block must be nested in another local block.</li>
+<li>所有的包代码块均直接内嵌在万物代码块中；</li>
+<li>所有的文件代码块也均直接内嵌在万物代码块中；（注意，Go白皮书和<code>go/*</code>标准库认为文件代码块内嵌在包代码中。）</li>
+<li>每个顶层局部代码块同时直接内嵌在一个包代码块和一个文件代码块中；（注意：Go白皮书和<code>go/*</code>标准库认为顶层局部代码块内嵌在文件代码中。）</li>
+<li>一个非顶层局部代码块肯定直接内嵌在另一个局部代码块中。</li>
 </ul>
 
 <p><i>
-(The differences to Go specification are to make the explanation of identifier shadowing
-simpler below.)
+（本文和Go白皮书及<code>go/*</code>标准库的解释有所不同的原因是为了下面的标识符遮挡解释简单清楚。）
 </i></p>
 
-Here is a picture shows the block hierarchies in a program:
+下面是一张展示上述代码块层级关系的图片：
 <div class="text-center">
 	<img src="./res/blocks.png">
 </div>
@@ -97,223 +79,203 @@ Here is a picture shows the block hierarchies in a program:
 </div>
 
 <p>
-Code blocks are mainly used to explain scopes of declared source code element identifiers.
+代码块主要是用来解释各种代码元素声明中的标识符的可声明位置和作用域。
 </p>
 
 <p class="anchor" id="declaration"></p>
-<h3>Source Code Element Declaration Places</h3>
+<h3>各种代码元素声明的可声明位置</h3>
 
 <div>
-There are six kinds of source code elements which can be declared:
+我们可以声明六种代码元素：
 <ul>
-<li>package imports.</li>
-<li>types.</li>
-<li>constants.</li>
-<li>variables.</li>
-<li>functions.</li>
-<li>labels.</li>
+<li>包引入；</li>
+<li>有名类型；</li>
+<li>有名常量；</li>
+<li>变量；</li>
+<li>函数；</li>
+<li>跳转标签。</li>
 </ul>
-<p>
-Labels are used in the <code>break</code>, <code>continue</code>, and <code>goto</code> statements.
-</p>
-</div>
 
-<div>
-The following table shows which code blocks all sorts of source code elements can be directly declared in:
+<p>
+在一个代码元素的声明中，一个标识符和一个代码元素绑定在了一起。
+或者说，在此声明中，被声明的代码元素将被赋予此标识符做为它的名称。
+此后，我们就可以用此标识符来代表此代码元素。
+</p>
+
+下标展示了各种代码元素可以被直接声明在何种代码块中：
 <table class="table table-bordered text-center" style="width: auto !important;">
 <thead>
 	<tr>
 	<th class="text-center"></th>
-	<th class="text-center">the universe block</th>
-	<th class="text-center">package blocks</th>
-	<th class="text-center">file blocks</th>
-	<th class="text-center">local blocks</th>
+	<th class="text-center">万物代码块</th>
+	<th class="text-center">包代码块</th>
+	<th class="text-center">文件代码块</th>
+	<th class="text-center">局部代码块</th>
 	</tr>
 </thead>
 <tbody>
 	<tr class="active">
-	<th scope="row" class="text-center">predeclared (built-in elements) <sup>(1)</sup></th>
-	<td>Yes</td>
+	<th scope="row" class="text-center">预声明的（即内置的）代码元素<sup>(1)</sup></th>
+	<td>可以</td>
 	<td></td>
 	<td></td>
 	<td></td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center">package imports</th>
+	<th scope="row" class="text-center">包引入</th>
 	<td></td>
 	<td></td>
-	<td>Yes</td>
+	<td>可以</td>
 	<td></td>
 	</tr>
 	<tr class="active">
-	<th scope="row" class="text-center">types (non-builtin)</th>
+	<th scope="row" class="text-center">有名类型（不含内置类型）</th>
 	<td></td>
-	<td>Yes</td>
-	<td>Yes</td>
-	<td>Yes</td>
+	<td>可以</td>
+	<td>可以</td>
+	<td>可以</td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center">constants (non-builtin)</th>
+	<th scope="row" class="text-center">有名常量（不含内置常量）</th>
 	<td></td>
-	<td>Yes</td>
-	<td>Yes</td>
-	<td>Yes</td>
+	<td>可以</td>
+	<td>可以</td>
+	<td>可以</td>
 	</tr>
 	<tr class="active">
-	<th scope="row" class="text-center">variables (non-builtin) <sup>(2)</sup></th>
+	<th scope="row" class="text-center">变量（不含内置变量）<sup>(2)</sup></th>
 	<td></td>
-	<td>Yes</td>
-	<td>Yes</td>
-	<td>Yes</td>
+	<td>可以</td>
+	<td>可以</td>
+	<td>可以</td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center">functions (non-builtin) <sup>(3)</sup></th>
+	<th scope="row" class="text-center">函数（不含内置函数）</th>
 	<td></td>
-	<td>Yes</td>
-	<td>Yes</td>
+	<td>可以</td>
+	<td>可以</td>
 	<td></td>
 	</tr>
 	<tr class="active">
-	<th scope="row" class="text-center">labels</th>
+	<th scope="row" class="text-center">跳转标签</th>
 	<td></td>
 	<td></td>
 	<td></td>
-	<td>Yes</td>
+	<td>可以</td>
 	</tr>
 </tbody>
 </table>
-</div>
 
 <p>
-<sup>(1)</sup> predeclared elements are documented in <code>builtin</code> package.
+<sup>(1)</sup> 预声明代码元素声明在<a href="https://golang.org/pkg/builtin/"><code>builtin</code>标准库</a>中。
 <br/>
-<sup>(2)</sup> excluding struct field variables.
-<br/>
-<sup>(3)</sup> excluding type methods.
+<sup>(2)</sup> 不包括结构体字段变量声明。
 </p>
 
-<div>
-Please note,
+所以，
+<ul>
+<li>包引入不能声明在包代码块和局部代码块中；</li>
+<li>函数不能被声明在局部代码块中；（匿名函数可以定义在局部代码块中，但它们不属于元素声明。）</li>
+<li>跳转标签只能被声明在局部代码块中。</li>
+</ul>
+
+请注意：
 <ul>
 <li>
-package imports will never be declared in package and local blocks.
+不考虑跳转标签，只要两个代码元素声明各自的最内层包含代码块不同，则这两个代码元素的标识符（即名称）可以相同；
 </li>
 <li>
-functions can't be declared in local blocks
-(anonymous functions can be enclosed in local blocks but there is no way to declare them).
+如果包含两个跳转标签的最内层函数体为同一个，则这两个标签不能同名；
 </li>
 <li>
-labels can only be declared in local blocks.
-And the intermost function block containing a label declaration
-and the references of the label must be the same.
+一个跳转标签的所有引用必须处于包含此跳转标签的声明的最内层函数体代码块内；
 </li>
 <li>
-some special protions in all kinds of implicit local blocks have special requirements:
+各种控制流程中的隐式代码块对元素声明有特殊的要求。
+一般说来，声明语句不允许出现在这样的隐式代码块中，除了一些变量短声明：
 	<ul>
 	<li>
-	if the statement following a <code>if</code>, <code>switch</code> or <code>for</code> keyword
-	is a declaration, it must be the short form of a variable declaration.
-	No declarations can be contained directly in other protions of	the implicit blocks opened by these keywords.
+	每个<code>if</code>、<code>switch</code>或者<code>for</code>关键字后可以紧跟着一条变量短声明语句；
 	</li>
 	<li>
-	if the statement following a <code>case</code> keyword in a <code>select</code> block
-	is a declaration, it must be the short form of a variable declaration.
+	一个<code>select</code>控制流程中的每个<code>case</code>关键字后可以紧跟着一条变量短声明语句。
 	</li>
 	</ul>
 </li>
-<li>
-if the innermost containing function blocks of the two label declarations are the same one,
-then the names of two labels can't be duplicated.
-</li>
-<li>
-except labels, if the innermost containing blocks of two declared identifiers are the same one,
-then the two identifiers can't be identical.
-</li>
 </ul>
+
 <p><i>
-(BTW, the <code>go/*</code> standard packages think file code blocks can only contain package import declarations.)
+（顺便说一下，<code>go/*</code>标准库代码包认为文件代码块中只能包含包引入声明。）
 </i></p>
 </div>
 
 <p>
-The source code elements declared in package blocks but outside any local blocks are called package-level source code elements.
-Package-level source code elements can be constants, types, variables, or functions, but not labels and package imports.
-</p>
-
-<p>
-Each package-level source code element identifier is directly contained
-both in a package block and a file block.
+声明在包代码块中并且在所有局部代码块之外的代码元素称为包级（package-level）元素。
+包级元素可以是有名常量、有名类型、变量或者函数。
 </p>
 
 <p class="anchor" id="scope"></p>
-<h3>Scopes Of Declared Source Code Elements</h3>
+<h3>代码元素标识符的作用域</h3>
 
 <div>
-The scope of an declared identifier is the identifiable range of the identifier.
-Here are <a href="https://golang.org/ref/spec#Declarations_and_scope">the scope definitions</a>
-for all kinds of source code element identifiers:
+<p>
+一个代码元素标识符的作用域是指此标识符可被识别的代码范围（或可见范围）。
+</p>
+
+不考虑本文最后一节将要解释的标识符遮挡，Go白皮书<a href="https://golang.org/ref/spec#Declarations_and_scope">这样描述</a>各种代码元素的标识符的作用域：
 <ul>
 <li>
-	the scope of a predeclared/built-in identifier is the universe block.
+	内置代码元素标识符的作用域为整个万物代码块；
 </li>
 <li>
-	the scope of a package import identifier is the file block containing the identifier.
+	一个包引入声明标识符的作用域为包含它的声明的文件代码块；
 </li>
 <li>
-	the scope of an identifier denoting a constant, type, variable, or function
-	(but not method) declared at package level is the package block.
-	In particular, if the identifier denotes a constant or a variable,
-	its scope doesn't include the line the identifier is declared at.
+	直接声明在一个包代码块中的一个常量、类型、变量或者函数（不包括方法）的标识符的作用域为此包代码块；
 </li>
 <li>
-	the scope of an identifier denoting a method receiver, function parameter,
-	or result variable is the corresponding function body (a local block).
+	一个函数参数（包括副方法属主）和结果标识符的作用域为其对应函数体局部代码块；
 </li>
 <li>
-	the scope of a constant or variable identifier declared inside a local block
-	begins at the end of its declaration statement and ends at the end of the innermost containing block.
+	在函数体中声明的一个常量或者变量的标识符的作用域起始于此常量或者变量的描述（specification）的结尾（对于变量短声明，为此变量声明的结尾），并终止于包含此常量或者变量的声明的最内层代码块的结尾；
 </li>
 <li>
-	the scope of a type identifier defined inside a local block begins at the start
-	of its definition and ends at the end of the innermost containing block.
+	在函数体中声明的一个<a href="type-system-overview.html#type-definition">定义类型</a>的标识符起始于此类型的描述中它的标识符的结尾，并终止于包含此类型的声明的最内层代码块的结尾；
 </li>
 <li>
-	the scope of a type alias identifier declared inside a local block begins at the end
-	of its declaraion and ends at the end of the innermost containing block.
+	在函数体中声明的一个<a href="type-system-overview.html#type-alias">别名类型</a>的标识符起始于此类型的声明的结尾，并终止于包含此类型的声明的最内层代码块的结尾；
 </li>
 <li>
-	the scope of a label is the body of the innermost function local block containing the label declaration
-	but excludes all the bodies of anonymous functions nested in the containing function.
-	In other words, labels can't be referenced crossing function bodies.
+	一个跳转标签的标识符的作用域为包含此标签的声明的最内层函数体代码块，但要排除掉此内嵌在最内层函数体代码块中各个匿名函数体代码块。
 </li>
 </ul>
 </div>
 
 <p>
-The elements declared with the blank identifier are not really declared and have no scopes.
+空标识符没有作用域。
 </p>
 
 <p><i>
-(The predeclared <code>iota</code> is only visible in constant declarations.)
+（注意，预声明的<code>iota</code>标识符只能使用在常量声明中。）
 </i></p>
 
 <p class="anchor" id="scope-difference-detail"></p>
 <div>
-Yoy may have noticed the minor difference of declared identifiers between local type definitions
-and local variable/constant/alias declarations. The difference means a defined type may be able to
-reference itself in its definition body. Here is an example to show it more clearly:
+你可能已经注意到了局部定义类型的作用域和其它局部元素（变量、常量和类型别名）的作用域的定义有微小的差别。
+此差别体现在一个定义类型的声明中中可以立即使用此定义类型的标识符。
+下面这个例子展示了这一差异：
 <pre class="line-numbers"><code class="language-go">package main
 
 func main() {
-	// var v int = v   // error: undefined: v
-	// const C int = C // error: undefined: C
+	// var v int = v   // error: v未定义
+	// const C int = C // error: C未定义
 	/*
 	type T = struct {
-		*T // invalid recursive type alias T
+		*T // error: 不可循环引用
 	}
 	*/
 
-	// Following type definitions are all valid.
+	// 下面所有的类型定义声明都是合法的。
 	type T struct {
 		*T
 		x []T
@@ -340,29 +302,32 @@ func main() {
 }
 </code></pre>
 
-And the scope difference between package-level and local declarations:
+<p>
+</p>
+
+下面是一个展示了包级声明和局部声明的标识符的作用域差异的例子：
+
 <pre class="line-numbers"><code class="language-go">package main
 
-// Here the two identifiers at each line are the same one.
-// They are all not the predeclcared identifiers.
+// 下面这两行中各自等号左边和右边的标识符表示同一个代码元素。
+// 右边的标识符不是预声明的标识符。
 /*
-const iota = iota // error: constant definition loop
-var true = true   // error: typechecking loop
+const iota = iota // error: 循环引用
+var true = true   // error: 循环引用
 */
 
-var a = b   // can reference variables declared later
+var a = b // 可以使用其后声明变量标识符
 var b = 123
 
 func main() {
-	// The right identifiers in the next two lines
-	// are the predecalred ones.
+	// 下面两行中右边的标识符为预声明的标识符。
 	const iota = iota // ok
 	var true = true   // ok
 	_ = true
 
-	// The following lines fail to compile.
+	// 下面几行编译不通过。
 	/*
-	var c = d // can't reference variables declared later
+	var c = d // 不能使用其后声明变量标识符
 	var d = 123
 	_ = c
 	*/
@@ -371,27 +336,23 @@ func main() {
 </div>
 
 <p class="anchor" id="shadow"></p>
-<h3>Identifier Shadowing</h3>
+<h3>标识符遮挡</h3>
 
 <div>
 <p>
-Except labels, an identifier declared in an outer code blocks can be
-shadowed by the same identifier declared
-in code blocks nested in the outer code block.
+不考虑跳转标签，一个在外层代码块直接声明的标识符将被在内层代码块直接声明的相同标识符所遮挡。
 </p>
 
 <p>
-Labels can’t be shadowed.
+跳转标签标识符不会被遮挡。
 </p>
 
 <p>
-If an identifier is shadowed, its scope will exclude the scopes of its shadowing identifiers.
+如果一个标识符被遮挡了，它的作用域将不包括遮挡它的标识符的作用域。
 </p>
 
-Below is an interesting example.
-The code contains 4 declared variables named <code>x</code>.
-A <code>x</code> declared in a deeper block will shadow
-the <code>x</code>s declared in shallower blocks.
+下面是一个有趣的例子。在此例子中，有6个变量均被声明为<code>x</code>。
+一个在更深层代码块中声明的<code>x</code>遮挡了外层声明的<code>x</code>。
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -421,11 +382,9 @@ func main() {
 <p>
 </p>
 
-For some circumstances, when identifier shadowings meet short variable declarations,
-some new gophers may get confused on whether or not a variable
-in a short variable declaration is new declared.
-The following example (which has bugs) shows the famous trap in Go.
-Almost every gopher has ever fallen into the trap in the early days using Go.
+在某些情况下，当一些标识符被内层的一个变量短声明中声明的变量所遮挡时，一些新手Go程序员会搞不清楚此变量短声明中声明的哪些变量是新声明的变量。
+这面这个例子（含有bug）展示了Go编程中一个比较有名的陷阱。
+几乎每个Go程序员在刚开始使用Go的时后都曾经掉入过此陷阱。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -435,17 +394,17 @@ import "strconv"
 func parseInt(s string) (int, error) {
 	n, err := strconv.Atoi(s)
 	if err != nil {
-		// Some new gophers may think err is an already declared
-		// variabled in the following short variable declaration.
-		// However, both b and err are new declared here in fact.
+		// 一些新手Go程序员会认为下一行中声明的err变量已经在外层
+		// 声明过了。然而其实下一行中的b和err都是新声明的变量。
+		// 此新声明的err遮挡了外层声明的err。
 		b, err := strconv.ParseBool(s)
 		if err != nil {
 			return 0, err
 		}
-		// If exection goes here, a nil error is expected to be
-		// returned. But in fact, the outer non-nil error will be
-		// returned. The scope of the inner "err" ends at the end
-		// of the if clause.
+
+		// 如果代码运行到这里，一些新手Go程序员期望着内层的nil err
+		// 将被返回。但是其实返回是外层的非nil err。因为内层的err
+		// 的作用域到第一个if代码块结尾节就结束了。
 		if b {
 			n = 1
 		}
@@ -454,7 +413,7 @@ func parseInt(s string) (int, error) {
 }
 
 func main() {
-	// Output: 1 strconv.Atoi: parsing "TRUE": invalid syntax
+	// 输出：1 strconv.Atoi: parsing "TRUE": invalid syntax
 	fmt.Println(parseInt("TRUE"))
 }
 </code></pre>
@@ -462,65 +421,64 @@ func main() {
 <p>
 </p>
 
+<!--
 <p>
 We can use the <code>go vet -shadow</code> command to list
 possible mis-shadowing uses.
 </p>
 
+https://github.com/golang/go/issues/29260#issuecomment-447694762
+-->
+
 <p class="anchor" id="weird-shadowing"></p>
 
-Go only has <a href="keywords-and-identifiers.html#keyword">25 keywords</a>.
-Keywords can't be used as identifiers.
-Many familiar words in Go are not keywords, such as <code>int</code>, <code>bool</code>,
-<code>string</code>, <code>len</code>, <code>cap</code>, <code>nil</code>, etc.
-They are just predeclared (built-in) identifiers.
-These predeclared idenfitiers are declared in the universe block,
-so custom defined identifiers can shadow them.
-Here is a werid example in which many predeclared idenfitiers are shadowed.
-Its compiles and runs okay.
+Go语言目前只有<a href="keywords-and-identifiers.html#keyword">25个关键字</a>。
+关键字不能被用作标识符。Go中很多常见的名称，比如<code>int</code>、<code>bool</code>、<code>string</code>、<code>len</code>、<code>cap</code>、<code>nil</code>等，并不是关键字，它们是预声明标识符。
+这些预声明的标识符声明在万物代码块中，所以它们可以被声明在内层的相同标识符所遮挡。
+下面是一个展示了预声明标识符被遮挡的古怪的例子。它编译和运行都没有问题。
+
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
 	"fmt"
 )
 
-const len = 3      // shadows the built-in function identifier "len"
-var true = 0       // shadows the built-in const identifier "true"
-type nil struct {} // shadows the built-in variable identifier "nil"
-func int(){}       // shadows the built-in type identifier "int"
+const len = 3      // 遮挡了内置函数len
+var true = 0       // 遮挡了内置常量true
+type nil struct {} // 遮挡了内置变量nil
+func int(){}       // 遮挡了内置类型int
 
 func main() {
 	fmt.Println("a weird program")
 	var print = fmt.Println
 
-	var fmt = [len]nil{{}, {}, {}} // shadows the package import "fmt".
-	// var n = len(fmt) // sorry, "len" is a constant.
-	var n = cap(fmt)    // use built-in cap function instead, :(
+	var fmt = [len]nil{{}, {}, {}} // 遮挡了包引入fmt
+	// var n = len(fmt) // error: len是一个常量
+	var n = cap(fmt)    // 我们只好使用内置cap函数
 
-	// the "for" keyword will open one implicit local code block and
-	// one explicit local code block.
+	// for关键字跟随着一个隐式代码块和一个显式代码块。
+	// 变量短声明中的true遮挡了全局变量true。
 	for true := 0; true < n; true++ {
-		var false = fmt[true] // shadows the built-in const
-		                      // the built-in identifier "false".
-		var true = true+1 // the new declared "true" variable
-		                  // shadows the iteration variable "true".
-		// fmt.Println(true, false) // sorry, "fmt" is an array.
+		// 下面声明的false遮挡了内置常量false。
+		var false = fmt[true]
+		// 下面声明的true遮挡了循环变量true。
+		var true = true+1
+		// 下一行编译不通过，因为fmt是一个数组。
+		// fmt.Println(true, false)
 		print(true, false)
 	}
 }
+</code></pre>
 
-/* output:
-a weird program
+输出结果：
+<pre class="output"><code>a weird program
 1 {}
 2 {}
 3 {}
-*/
 </code></pre>
 
 <p>
-Yes, this example is extreme.
-It contains many bad practices.
-Identifier shadowing is useful, but please don't abuse it.
+是的，此例子是一个极端的例子。标识符遮挡是一个有用的特性，但是千万不要滥用之。
 </p>
 
 </div>
