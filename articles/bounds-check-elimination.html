@@ -1,88 +1,82 @@
-﻿<h1>Bounds Check Elimination</h1>
+﻿<h1>边界检查消除</h1>
 
 <p>
-Since <a href="https://blog.golang.org/go1.7">Go 1.7</a>, the standard Go compiler
-has used a new compiler back end, which based on static single-assignment form (SSA).
-SSA makes go compiler generate more efficient code with optimizations like
-<a href="https://en.wikipedia.org/wiki/Bounds-checking_elimination">bounds check elimination (BCE)</a>
-and <a href="https://en.wikipedia.org/wiki/Common_subexpression_elimination">common subexpression elimination (CSE)</a>.
+Go是一个内存安全的语言。在数组和切片的索引和子切片操作中，Go运行时将检查操作中使用的下标是否越界。
+如果下标越界，一个恐慌将产生，以防止这样的操作破坏内存安全。这样的查称为边界检查。
+边界检查使得我们的代码能够安全地运行，但是另一方面，也使得我们的代码运行效率略微降低。
 </p>
 
 <p>
-This article will show some examples how BCE works in the standard Go compiler 1.7+.
+从Go SDK 1.7开始，官方标准编译器使用了一个新的基于SSA（single-assignment form，静态单赋值形式）的后端。
+SSA使得Go编译器可以有效使用诸如<a href="https://en.wikipedia.org/wiki/Bounds-checking_elimination">BCE</a>（bounds check elimination，边界检查消除）和<a href="https://en.wikipedia.org/wiki/Common_subexpression_elimination">CSE</a>（common subexpression elimination，公共子表达式消除）等优化。
+BCE可以避免很多不必要的边界检查,CSE可以避免很多重复表达式的计算，从而使得编译器编译出的程序效率更高。有时候这些优化的效果非常明显。
 </p>
 
 <p>
-In Go 1.7+, one can run <b>go build <i>-gcflags="-d=ssa/check_bce/debug=1"</i></b> to
-show which code lines still need bounds checking.
+本文将展示一些例子来解释边界检查消除在官方标准编译器1.7+中是如何工作的。
 </p>
 
-<h3>Example 1</h3>
+<p>
+对于Go SDK 1.7+，我们可以运行<b>go build <i>-gcflags="-d=ssa/check_bce/debug=1"</i></b>来列出哪些代码行仍然需要边界检查。
+</p>
+
+<h3>例子1</h3>
 
 <div>
 <pre class="line-numbers"><code class="language-go">// example1.go
 package main
 
 func f1(s []int) {
-	_ = s[0] // line 5: bounds check
-	_ = s[1] // line 6: bounds check
-	_ = s[2] // line 7: bounds check
+	_ = s[0] // line 5: 需要边界检查
+	_ = s[1] // line 6: 需要边界检查
+	_ = s[2] // line 7: 需要边界检查
 }
 
 func f2(s []int) {
-	_ = s[2] // line 11: bounds check
-	_ = s[1] // line 12: bounds check eliminated!
-	_ = s[0] // line 13: bounds check eliminated!
+	_ = s[2] // line 11: 需要边界检查
+	_ = s[1] // line 12: 边界检查消除了！
+	_ = s[0] // line 13: 边界检查消除了！
 }
 
 func f3(s []int, index int) {
-	_ = s[index] // line 17: bounds check
-	_ = s[index] // line 18: bounds check eliminated!
+	_ = s[index] // line 17: 需要边界检查
+	_ = s[index] // line 18: 边界检查消除了！
 }
 
 func f4(a [5]int) {
-	_ = a[4] // line 22: bounds check eliminated!
+	_ = a[4] // line 22: 边界检查消除了！
 }
 
 func main() {}
 </code></pre>
 
-<pre>
-$ go build -gcflags="-d=ssa/check_bce/debug=1" example1.go
+<pre class="output"><code>$ go build -gcflags="-d=ssa/check_bce/debug=1" example1.go
 ./example1.go:5: Found IsInBounds
 ./example1.go:6: Found IsInBounds
 ./example1.go:7: Found IsInBounds
 ./example1.go:11: Found IsInBounds
 ./example1.go:17: Found IsInBounds
-</pre>
+</code></pre>
 
 <p>
-We can see that there are no needs to do bounds checking for line <i>12</i>
-and line <i>13</i> in function <code>f2</code>,
-for the bounds check at line <i>11</i> ensures that the indexes in
-line <i>12</i> and line <i>13</i> will not be out of range.
+我们可以看到函数<code>f2</code>中的第<i>12</i>行和第<i>13</i>行不再需要边界检查了，因为第<i>11</i>行的检查确保了第<i>12</i>行和第<i>13</i>行中使用的下标肯定不会越界。
 </p>
 
 <p>
-But in function <code>f1</code>, bounds check must be performed for all three lines.
-The bounds check at line <i>5</i> can't ensure line <i>6</i>
-and line <i>7</i> are safe,
-and the bounds check at line <i>6</i> can't ensure line <i>7</i> is safe.
+但是，函数<code>f1</code>中的三行仍然都需要边界检查，因为第<i>5</i>行中的边界检查不能保证第<i>6</i>行和第<i>7</i>行中的下标没有越界，因为第<i>6</i>行中的边界检查也不能保证第第<i>7</i>行中的下标没有越界。
 </p>
 
 <p>
-For function <code>f3</code>, Go 1.7+ compiler knows the second
-<code>s[index]</code> is absolutely safe if the first <code>s[index]</code>
+在函数<code>f3</code>中，编译器知道如果第一个<code>s[index]</code>是安全的，则第二个<code>s[index]</code>也一定是安全的。
 is safe.
 </p>
 
 <p>
-Go 1.7+ compiler also correctly thinks the only line (line <i>22</i>)
-in function <code>f4</code> is safe.
+编译器也正确地认为函数<code>f4</code>中的唯一一行（第<i>22</i>行）是安全的。
 </p>
 </div>
 
-<h3>Example 2</h3>
+<h3>例子2</h3>
 
 <div>
 <pre class="line-numbers"><code class="language-go">// example2.go
@@ -127,22 +121,20 @@ func f9(s []int) {
 func main() {}
 </code></pre>
 
-<pre>
-$ go build -gcflags="-d=ssa/check_bce/debug=1" example2.go
-</pre>
+<pre class="output"><code>$ go build -gcflags="-d=ssa/check_bce/debug=1" example2.go
+</code></pre>
 
 <p>
-Cool! The standard compiler removes all bound checking in this program.
+酷！官方标准编译器消除了上例程序中的所有边界检查。
 </p>
 
 <p>
-Note: before Go 1.11, the standard compiler is not smart enough to detect
-line <i>22</i> is safe.
+注意：在Go SDK 1.11之前，官方标准编译器没有足够聪明到认为第<i>22</i>行是不需要边界检查的。
 </p>
 
 </div>
 
-<h3>Example 3</h3>
+<h3>例子3</h3>
 
 <div>
 <pre class="line-numbers"><code class="language-go">// example3.go
@@ -153,49 +145,47 @@ import "math/rand"
 func fa() {
 	s := []int{0, 1, 2, 3, 4, 5, 6}
 	index := rand.Intn(7)
-	_ = s[:index] // line 9: bounds check
-	_ = s[index:] // line 10: bounds check eliminated!
+	_ = s[:index] // line 9: 需要边界检查
+	_ = s[index:] // line 10: 边界检查消除了！
 }
 
 func fb(s []int, index int) {
-	_ = s[:index] // line 14: bounds check
-	_ = s[index:] // line 15: bounds check, not smart enough?
+	_ = s[:index] // line 14: 需要边界检查
+	_ = s[index:] // line 15: 需要边界检查（编译器不够智能？）
 }
 
 func fc() {
 	s := []int{0, 1, 2, 3, 4, 5, 6}
 	s = s[:4]
 	index := rand.Intn(7)
-	_ = s[:index] // line 22: bounds check
-	_ = s[index:] // line 23: bounds check, not smart enough?
+	_ = s[:index] // line 22: 需要边界检查
+	_ = s[index:] // line 23: 需要边界检查（编译器不够智能？）
 }
 
 func main() {}
 </code></pre>
 
-<pre>
-$ go build -gcflags="-d=ssa/check_bce/debug=1" example3.go
+<pre class="output"><code>$ go build -gcflags="-d=ssa/check_bce/debug=1" example3.go
 ./example3.go:9: Found IsSliceInBounds
 ./example3.go:14: Found IsSliceInBounds
 ./example3.go:15: Found IsSliceInBounds
 ./example3.go:22: Found IsSliceInBounds
 ./example3.go:23: Found IsSliceInBounds
-</pre>
+</code></pre>
 
 <p>
-Oh, so many places still need to do bounds check!
+噢，仍然有这么多的边界检查！
 </p>
 
 <p>
-But wait, why does the Go standard compiler 1.7+ think line <i>10</i>
-is safe but line <i>15</i> and line <i>23</i> are not?
-Is the compiler still not smart enough or is it a bug?
+但是等等，为什么官方标准编译器认为第<i>10</i>行不需要边界检查，却认为第<i>15</i>和第<i>23</i>行仍旧需要边界检查呢？
+是官方标准Go编译器不够智能吗？
 </p>
 
 <p>
-In fact, the compiler is right here! Why?
-The reason is the length of a sub-slice may be larger than the original slice.
-For example:
+事实上，这里官方标准Go编译器做得对！为什么呢？
+原因是一个子切片表达式中的起始下标可能会大于基础切片的长度。
+让我们先看一个简单的使用了子切片的例子：
 </p>
 
 <pre class="line-numbers"><code class="language-go">package main
@@ -205,33 +195,28 @@ func main() {
 
 	index := 8
 
-	// In Go, for the subslice syntax s[a:b], the relations
-	// 0 <= a <= b <= cap(s) must be ensured to avoid panicking.
-	
-	// So, this line is no problem.
+	// 在Go中，对于一个子切片表达式s[a:b]，a和b必须满足
+	// 0 <= a <= b <= cap(s)，否则，将产生一个恐慌。
+
 	_ = s0[:index]
-	// But, the above line is safe can't ensure the following
-	// line is also safe. In fact, the following line will panic.
-	// The reason is "index > len(s0)".
+	// 上一行是安全的不能保证下一行也是安全的。事实上，下一行将产生
+	// 一个恐慌，因为起始下标index大于终止下标（即切片s0的长度）。
 	_ = s0[index:] // panic
 }
 </code></pre>
 
 <p>
-So the statement <b>if <code>s[:index]</code> is safe then <code>s[index:]</code>
-is also safe</b> is only true when <code>len(s)</code> is equal to <code>cap(s)</code>.
-This is why the code lines in function <code>fb</code> and <code>fc</code>
-of example 3 still need to do bounds checking.
+所以论述<b>如果<code>s[:index]</code>是安全的则<code>s[index:]</code>也是安全的</b>只有在<code>len(s)</code>和<code>cap(s)</code>相等的情况下才正确。
+这就是为什么函数<code>fb</code>和<code>fc</code>中的代码仍旧需要边界检查的原因。
 </p>
+
 <p>
-Go standard compiler 1.7+ successfully detects <code>len(s)</code> is equal to
-<code>cap(s)</code> in function <code>fa</code>.
-Great work! Go team!
+官方标准Go编译器成功地检测到在函数<code>fa</code>中<code>len(s)</code>和<code>cap(s)</code>是相等的。干得漂亮！Go语言开发团队！
 </p>
 
 </div>
 
-<h3>Example 4</h3>
+<h3>例子4</h3>
 
 <div>
 <pre class="line-numbers"><code class="language-go">// example4.go
@@ -240,50 +225,48 @@ package main
 import "math/rand"
 
 func fb2(s []int, index int) {
-	_ = s[index:] // line 7: bounds check
-	_ = s[:index] // line 8: bounds check // not smart enough?
+	_ = s[index:] // line 7: 需要边界检查
+	_ = s[:index] // line 8: 边界检查消除了！
 }
 
 func fc2() {
 	s := []int{0, 1, 2, 3, 4, 5, 6}
 	s = s[:4]
 	index := rand.Intn(7)
-	_ = s[index:] // line 15 bounds check
-	_ = s[:index] // line 16: bounds check eliminated!
+	_ = s[index:] // line 15 需要边界检查
+	_ = s[:index] // line 16: 边界检查消除了！
 }
 
 func main() {}
 </code></pre>
 
-<pre>
+<pre class="output"><code>
 $ go build -gcflags="-d=ssa/check_bce/debug=1" example4.go
 ./example4.go:7:7: Found IsSliceInBounds
 ./example4.go:15:7: Found IsSliceInBounds
-</pre>
+</code></pre>
 
-In this example, The standard Go compiler successfully concludes
+在此例子中，官方标准Go编译器成功推断出：
 <ul>
 <li>
-	line <i>8</i> is also safe if line <i>7</i> is safe in function <code>fb2</code>.
+	在函数<code>fb2</code>中，如果第<i>7</i>行是安全的，则第<i>8</i>行也是安全的；
 </li>
 <li>
-	line <i>16</i> is also safe if line <i>15</i> is safe in function <code>fc2</code>.
+	在函数<code>fc2</code>中，如果第<i>15</i>行是安全的，则第<i>16</i>行也是安全的。
 </li>
 </ul>
 
-<p><i>
-(Before Go SDK 1.9, the standard Go compiler failed to
-detect line <code>16</code> doesn't need bounds checking.)
-</i></p>
+<p>
+注意：在Go SDK 1.9之前，官方标准Go编译器并没有推断出第<i>8</i>行不需要边界检查。
+</p>
 
 </div>
 
-<h3>Example 5</h3>
+<h3>例子5</h3>
 
 <div>
-Although the current version of the standard Go compiler is still not smart
-enough to eliminate some unneccessary bounds checkings,
-but we can make some hints to help the compiler eliminate these unneccessary bounds checkings.
+当前版本的官方标准Go编译器并非足够智能到可以消除到一切应该消除的边界检查。
+有时候，我们可以给编译器一些暗示来帮助编译器将这些不必要的边界检查消除掉。
 
 <pre class="line-numbers"><code class="language-go">// example5.go
 package main
@@ -291,16 +274,16 @@ package main
 func fd(is []int, bs []byte) {
 	if len(is) >= 256 {
 		for _, n := range bs {
-			_ = is[n] // line 7: bounds check, not smart enough
+			_ = is[n] // line 7: 需要边界检查，编译器不够智能
 		}
 	}
 }
 
 func fd2(is []int, bs []byte) {
 	if len(is) >= 256 {
-		is = is[:256] // line 14: to avoid bounds check at line 16
+		is = is[:256] // line 14: 一个暗示
 		for _, n := range bs {
-			_ = is[n] // line 16: bounds check eliminated!
+			_ = is[n] // line 16: 边界检查消除了！
 		}
 	}
 }
@@ -308,19 +291,25 @@ func fd2(is []int, bs []byte) {
 func fe(isa []int, isb []int) {
 	if len(isa) > 0xFFF {
 		for _, n := range isb {
-			_ = isa[n & 0xFFF] // line 24: bounds check, not smart enough
+			_ = isa[n & 0xFFF] // line 24: 需要边界检查，编译器不够智能
 		}
 	}
 }
 
 func fe2(isa []int, isb []int) {
 	if len(isa) > 0xFFF {
-		isa = isa[:0xFFF+1] // line 31: to avoid bounds check at line 33
+		isa = isa[:0xFFF+1] // line 31: 一个暗示
 		for _, n := range isb {
-			_ = isa[n & 0xFFF] // line 33: bounds check eliminated!
+			_ = isa[n & 0xFFF] // line 33: 边界检查消除了！
 		}
 	}
 }
+
+func main() {}
+</code></pre>
+
+<!--
+since Go SDK 1.11, the compiler becomes more smarter
 
 func ff(s []int) []int {
 	s2 := make([]int, len(s))
@@ -338,121 +327,34 @@ func ff2(s []int) []int {
 	}
 	return s2
 }
+-->
 
-func main() {}
-</code></pre>
-
-<pre>
+<pre class="output"><code>
 $ go build -gcflags="-d=ssa/check_bce/debug=1" example5.go
 ./example5.go:7: Found IsInBounds
 ./example5.go:24: Found IsInBounds
 ./example5.go:41: Found IsInBounds
 ./example5.go:48: Found IsSliceInBounds
-</pre>
+</code></pre>
 </div>
 
-<p class="anchor" id="slice-comparison"></p>
-<h3>A Use Case Of BCE: Efficient Slice Comparison</h3>
-
-<p><b><i>
-(Note: as Erik Dubbelboer pointed out, <a href="https://github.com/go101/go101/issues/64">the trick shown in this section
-to optimize slice comparisons is not needed any more since Go SDK 1.11</a>.
-The standard Go compiler 1.11+ becomes even smarter so that this trick is not needed ay more.
-I will remove this section after some time.)
-</i></b></p>
-
-<div>
+<h3>总结</h3>
 
 <p>
-We all know that slice types don't support comparison in Go.
-To compare two slices, we must write custom comparison code,
-or use the <code>DeepEqual</code> function in the <code>reflect</code>
-standard package. But the <code>reflect.DeepEqual</code> function is too slow.
-</p>
-
-The following is a custom slice comparison function.
-
-<pre class="line-numbers"><code class="language-go">func CompareSlices_General(a, b []int) bool {
-	if len(a) != len(b) {
-		return false
-	}
-
-	if (a == nil) != (b == nil) {
-		return false
-	}
-
-	for i, v := range a {
-		if v != b[i] { // here bounds check is needed for b[i]
-			return false
-		}
-	}
-
-	return true
-}
-</code></pre>
-
-Bounds checking is still needed for the <code>b[i]</code> in the
-<code>for-range</code> loop block to avoid index <code>i</code> out of range.
-We can modify the function a bit to remove the bounds checking.
-
-<pre class="line-numbers"><code class="language-go">func CompareSlices_BCE(a, b []int) bool {
-	if len(a) != len(b) {
-		return false
-	}
-
-	if (a == nil) != (b == nil) {
-		return false
-	}
-
-	b = b[:len(a)] // this line is the key.
-	for i, v := range a {
-		if v != b[i] { // no bounds check for b[i] now!
-			return false
-		}
-	}
-
-	return true
-}
-</code></pre>
-
-Let's <a href="https://github.com/go101/go-benchmarks/blob/master/bce/bce_test.go">benchmark the two functions</a>.
-The result:
-
-<pre class="output"><code>Benchmark_SliceComparison/General-4         	 5000000	       287 ns/op
-Benchmark_SliceComparison/BCE-4             	 5000000	       251 ns/op
-</code></pre>
-
-<p>
-The BCE version is about 12.5% faster than the general version.
-Really not bad.
-</p>
-
-</div>
-
-<h3>Summary</h3>
-
-<p>
-There are more BEC optimizations made by the standard Go compiler.
-They might be not as abvious as the above listed ones,
-So this article will not show them all.
+本文上面列出的例子并没有涵盖官方标准Go编译器支持的所有边界检查消除的情形。本文列出的仅仅是一些常见的情形。
 </p>
 
 <p>
-Although the BCE feature in the standard Go compiler is still not perfect,
-it really does well for many common cases.
-It is no doubt that standard Go compiler will do better in later versions.
-
-Thank Go team for adding this wonderful feature!
+尽管官方标准Go编译器中的边界检查消除特性依然不是100%完美，但是对很多常见的情形，它确实很有效。
+自从官方标准Go编译器支持此特性以来，在每个版本更新中，此特性都在不断地改进增强。
+无需质疑，在以后的版本中，官方标准Go编译器会更加得智能。
+谢谢Go语言开发团队出色的工作！
 </p>
 
-<h3>References:</h3>
+<h3>参考：</h3>
 <p>
 <ol>
-<li><a href="https://docs.google.com/document/d/1vdAEAjYdzjnPA9WDOQ1e4e05cYVMpqSxJYZT33Cqw2g">gBounds Checking Elimination</a></li>
+<li><a href="https://docs.google.com/document/d/1vdAEAjYdzjnPA9WDOQ1e4e05cYVMpqSxJYZT33Cqw2g">Bounds Check Elimination</a></li>
 <li><a href="https://klauspost-talks.appspot.com/2016/go17-compiler.slide">Utilizing the Go 1.7 SSA Compiler</a></li>
 </ol>
-</p>
-
-<p class="well well-sm">
-[edit@2016/09/22] added example 5 and refs.
 </p>
