@@ -1,76 +1,45 @@
-﻿<h1>Channel Use Cases</h1>
+﻿<h1>数据通道用例大全</h1>
 
 <div>
 <p>
-Before reading this article, please read the article
-<a href="channel.html">channels in Go</a>,
-which explains channel types and values in detail.
-New gophers may need read that article and the current one several times
-to master Go channel programming.
+在阅读本文之前，请先阅读<a href="channel.html">数据通道</a>一文。
+那篇文章详细地解释了数据通道类型和数据通道值，以及各种数据通道操作的规则细节。
+一个Go新手程序员可能需要反复多次阅读那篇文章和当前这篇文章来精通Go数据通道编程。
 </p>
 
-The remaining of this article will show all kinds of channel use cases.
-I hope this article will convince you that
+本文余下的内容将展示很多数据通道用例。
+希望这篇文章能够说服你接收下面的观点：
 <ul>
 <li>
-	asynchronous and concurrency programming with Go channels is easy and enjoyable.
+	使用数据通道进行异步和并发编程是简单的和惬意的；
 </li>
 <li>
-	the channel synchronization technique has a wider range of uses
-	and has more variations than the asynchronous programming features,
-	such as <a href="https://en.wikipedia.org/wiki/Actor_model">the actor model</a>,
-	used in some other langauges.
+	数据通道同步技术比被很多其它语言采用的其它同步设计（比如<a href="https://en.wikipedia.org/wiki/Actor_model">角色模型</a>和<a href="https://en.wikipedia.org/wiki/Async/await">async/await模式</a>）有着更多的应用场景和更多的使用变种。
 </li>
 </ul>
 
 <p>
-Please note that, the intention of this article is to show
-as many chanel use cases as possible.
-We should know that channel is not the only concurrency synchronization technique supported in Go.
-And for many circumstances, the channel way may be not the best solution.
-Please read <a href="concurrent-atomic-operation.html">atomic operations</a> and
-<a href="concurrent-synchronization-more.html">some other synchronization techniques</a>
-for more concurrency synchronization techniques in Go.
-</p>
-
-<p>
-Many Go channel articles classify channel use cases as some pattern categories,
-such as request-response pattern, event based notification pattern
-and data flow pattern, etc.
-This current article doesn't follow this way,
-for the barriers between those patterns are some blur.
-Many use cases may belong to multiple pattern categories.
-This current article just show all kinds of use cases.
+请注意，本文的目的是展示尽量多的数据通道用例。但是，我们应该知道数据通道并不是Go支持的唯一同步技术，并且数据通道并不是在任何情况下都是最佳的同步技术。
+请阅读<a href="concurrent-atomic-operation.html">原子操作</a>和<a href="concurrent-synchronization-more.html">其它并发同步技术</a>来了解更多的Go支持的同步技术。
 </p>
 
 </div>
 
 <p class="anchor" id="future-promise"></p>
-<h3>Use Channels As Futures/Promises</h3>
+<h3>将数据通道用作Future/Promise</h3>
 
 <p>
-By using goroutines and channels together, we can achieve the same effects of the
-<a href="https://en.wikipedia.org/wiki/Futures_and_promises">future and promise</a>
-asynchronous programming feature supported in many other languages.
+很多其它流行语言支持future/promise来实现异步（并发）编程。
+Future/promise常常用在请求/回应场合。
 </p>
 
-<p>
-Futures and promises are often associated with requests and responses.
-Generally, receive-only channels can be viewed as futures
-(from the request side),
-and send-only channels can be viewed as promises (from the response side).
-</p>
-
-<h4>Return Receive-Only Channels As Results</h4>
+<h4>返回单向接收数据通道做为函数返回结果</h4>
 
 <div>
 <p>
-In the following example, the values of two arguments of the
-<code>sumSquares</code> function call are requested concurrently.
-As the two channels are both unbuffered channels,
-each of the two channel receive operations will block until
-a send operation performs on the corresponding channel.
-It takes about three seconds instead of six seconds to return the final result.
+在下面这个例子中，<code>sumSquares</code>函数调用的两个实参请求并发进行。
+每个数据通道读取操作将阻塞到请求返回结果为止。
+两个实参总共需要3秒钟（而不是6秒钟）准备完毕。
 </p>
 
 <pre class="line-numbers"><code class="language-go">package main
@@ -84,13 +53,12 @@ import (
 func longTimeRequest() <-chan int32 {
 	r := make(chan int32)
 
-	// This goroutine treats the channel r as a promise.
 	go func() {
 		time.Sleep(time.Second * 3) // simulate a workload
 		r <- rand.Int31n(100)
 	}()
 
-	return r // return r as a future
+	return r
 }
 
 func sumSquares(a, b int32) int32 {
@@ -110,16 +78,12 @@ func main() {
 
 </div>
 
-<h4>Pass Send-Only Channels As Arguments</h4>
+<h4>将单向发送数据通道类型用作函数实参</h4>
 
 <div>
 <p>
-Same as the last example,
-in the following example, the values of two arguments of the
-<code>sumSquares</code> function call are requested concurrently.
-Different to the last example, the <code>longTimeRequest</code> function
-takes a send-only channel as parameter instead of
-returning a receive-only channel result.
+和上例一样，在下面这个例子中，<code>sumSquares</code>函数调用的两个实参的请求也是并发进行的。
+和上例不同的是<code>longTimeRequest</code>函数接收一个单向发送数据通道类型参数而不是返回一个单向接收数据通道结果。
 </p>
 
 <pre class="line-numbers"><code class="language-go">package main
@@ -130,7 +94,6 @@ import (
 	"fmt"
 )
 
-// Channel r is viewed as a promise by this function.
 func longTimeRequest(r chan<- int32)  {
 	time.Sleep(time.Second * 3)
 	r <- rand.Int31n(100)
@@ -154,9 +117,7 @@ func main() {
 <p>
 </p>
 
-In fact, for the above specified example,
-we don't need two channels to transfer results.
-Using one channel is okay.
+对于上面这个特定的例子，我们可以只使用一个数据通道来接收回应结果，因为两个参数的作用时对等的。
 
 <pre class="line-numbers"><code class="language-go">...
 
@@ -169,33 +130,28 @@ Using one channel is okay.
 </code></pre>
 
 <p>
-This is kind of data aggregation which will be introduced specially below.
+这可以看作是后面将要提到的数据聚合的一个应用。
 </p>
 
 </div>
 
 <p class="anchor" id="first-response-wins"></p>
-<h4>The First Response Wins</h4>
+<h4>采用最快回应</h4>
 
 <div>
 
 <p>
-This is an enhancement for the last use case.
+本用例可以看作是上例中只使用一个数据通道变种的增强。
 </p>
 
 <p>
-Sometimes, a piece of data can retrieved from several sources.
-For a lot of factors, the response durations of these sources may vary much.
-Even for a specified source, its response durations are also not constant.
-To make the response duration as short as possible,
-we can send a request to every source in a seperated goroutine.
-Only the first response will be used, other slower ones will be disgarded.
+有时候，一份数据可能同时从多个数据源获取。这些数据源将返回相同的数据。
+因为各种因素，这些数据源的回应速度参差不一，甚至某个特定数据源的多次回应速度之间也可能相差很大。
+同时从多个数据源获取一份相同的数据可以有效保障低延迟。我们只需采用最快的回应并舍弃其它回应。
 </p>
 
 <p>
-Note, If there are <code>n</code> sources, the capacity of
-the communication channel must be at least <code>n-1</code>,
-to avoid the goroutines corresponding the disgarded responses blocking for ever.
+注意：如果有<i>N</i>个数据源，为了防止被舍弃的回应对应的协程永久阻塞，则传输数据用的数据通道必须为一个容量至少为<i>N-1</i>的缓冲数据通道。
 </p>
 
 <pre class="line-numbers"><code class="language-go">package main
@@ -208,7 +164,7 @@ import (
 
 func source(c chan<- int32) {
 	ra, rb := rand.Int31(), rand.Intn(3) + 1
-	time.Sleep(time.Duration(rb) * time.Second) // sleep 1s, 2s or 3s
+	time.Sleep(time.Duration(rb) * time.Second) // 睡眠1秒/2秒/3秒
 	c <- ra
 }
 
@@ -216,77 +172,58 @@ func main() {
 	rand.Seed(time.Now().UnixNano())
 
 	startTime := time.Now()
-	c := make(chan int32, 5) // need a buffered channel
+	c := make(chan int32, 5) // 必须用一个缓冲通道
 	for i := 0; i < cap(c); i++ {
 		go source(c)
 	}
-	rnd := <- c // only the first response is used
+	rnd := <- c // 只有第一个回应被使用了
 	fmt.Println(time.Since(startTime))
 	fmt.Println(rnd)
 }
 </code></pre>
 
 <p>
-There are some other ways to implement the first-reponse-win use case,
-by using the select mechanism and a buffered channel
-which capacity is one. The other ways will be introduced below.
+“采用最快回应”用例还有一些其它实现方式，本文后面将会谈及。
 </p>
 
 </div>
 
-<h4>More Request-Response Variants</h4>
+<h4>更多“请求/回应”用例变种</h4>
 
 <p>
-The parameter and result channels can be buffered so that
-the response sides don't need to wait the request sides
-to take out the transferred values.
+做为函数参数和返回结果使用的数据通道可以是缓冲的，从而使得请求协程不需阻塞到它所发送的数据被接收为止。
 </p>
 
 <p>
-Sometimes, a request is not guarenteed to be responsed back a normal value.
-For all kinds of reasons, an error may be returned instead.
-For such scenarios, we can use a struct type like
-<code>struct{v T; err error}</code> or a blank interface type
-as the channel element type.
+有时，一个请求可能并不保证返回一份有效的数据。对于这种情形，我们可以使用一个形如<code>struct{v T; err error}</code>的结构体类型或者一个空接口类型做为数据通道的元素类型以用来区分回应的值是否有效。
 </p>
 
 <p>
-Sometimes, for some reasons, the response may need
-much longer time than the expected to arrive, or will nerver arrive.
-We can use the timeout mechanism introduced below
-to handle such circumstances.
+有时，一个请求可能需要比预期更长的用时才能回应，甚至永远都得不到回应。
+我们可以使用本文后面将要介绍的超时机制来应对这样的情况。
 </p>
 
 <p>
-Sometimes, a sequence of values may be returned from the response side,
-this is kind of the data flow mechanism mentioned later below.
+有时，回应方可能会不断地返回一系列值，这也同时属于后面将要介绍的数据流的一个用例。
 </p>
 
 <p class="anchor" id="notification"></p>
-<h3>Use Channels For Notifications</h3>
+<h3>使用数据通道实现通知</h3>
 
 <p>
-Notifications can be viewed as special requests/reponses
-in which the values sent to or received from channels are not important.
-Generally, we use the blank struct type <code>struct{}</code>
-as the element types of the notification channels,
-for the size of type <code>struct{}</code> is zero,
-hence values of <code>struct{}</code> doesn't consume memory.
+通知可以被看作是特殊的请求/回应用例。在一个通知用例中，我们并不关心回应的值，我们只关心回应是否已发生。
+所以我们常常使用空结构体类型<code>struct{}</code>来做为数据通道的元素类型，因为空结构体类型的尺寸为零，能够节省一些内存（虽然常常很少量）。
 </p>
 
-<h4>1-To-1 Notification By Sending A Value To A Channel</h4>
+<h4>向一个数据通道发送一个值来实现单对单通知</h4>
 
 <div>
 <p>
-If there are no values to receive from a channel,
-then the next channel receive operation on the channel will block
-until another goroutine send a value to the channel.
-So we can send a value to a channel to notify another goroutine
-which is waiting to receive a value from the same channel.
+我们已知道，如果一个数据通道中无值可接收，则此数据通道上的下一个接收操作将阻塞到另一个协程发送一个值到此数据通道为止。
+所以一个协程可以向此数据通道发送一个值来通知另一个等待着从此数据通道接收数据的协程。
 </p>
 
-In the following example, the channel <code>done</code>
-is used as a signal channel to do notifications.
+在下面这个例子中，数据通道<code>done</code>被用来做为一个信号通道来实现单对单通知。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -305,16 +242,16 @@ func main() {
 	}
 
 	done := make(chan struct{})
-	go func() { // the sorting goroutine
+	go func() {
 		sort.Slice(values, func(i, j int) bool {
 			return values[i] < values[j]
 		})
-		done <- struct{}{} // notify sorting is done
+		done <- struct{}{} // 通知排序已完成
 	}()
 
-	// do some other things ...
+	// 并发地做一些其它事情...
 
-	<- done // waiting here for notification
+	<- done // 等待通知
 	fmt.Println(values[0], values[len(values)-1])
 }
 </code></pre>
@@ -323,21 +260,16 @@ func main() {
 </p>
 </div>
 
-<h4>1-To-1 Notification By Receiving A Value From A Channel</h4>
+<h4>从一个数据通道接收一个值来实现单对单通知</h4>
 
 <div>
 <p>
-If the value buffer queue of a channel is full,
-a send operation on the channel will block
-until another goroutine receive a value from the channel.
-So we can receive a value from a channel to notify another goroutine
-which is waiting to send a value to the same channel.
-Generally, the channel should be an unbuffered channel.
+如果一个数据通道的数据缓冲队列已满（非缓冲的数据通道的数据缓冲队列总是满的）但它的发送协程队列为空，则向此数据通道发送一个值将阻塞，直到另外一个协程从此数据通道接受一个值为止。
+所以我们可以通过从一个数据通道接收数据来实现单对单通知。一般我们使用非缓冲通道来实现这样的通知。
 </p>
 
 <p>
-This notification way is used much less common than
-the way introduced in the last example.
+这种通知方式不如上例中介绍的方式使用得广泛。
 </p>
 
 <pre class="line-numbers"><code class="language-go">package main
@@ -348,36 +280,34 @@ import (
 )
 
 func main() {
-	done := make(chan struct{}, 1) // the signal channel
-	done <- struct{}{}             // fill the channel
-	// Now the channel done is full. A new send will block.
+	// 为了演示目的，这里是用了一个缓冲通道。实际上我们不必使用缓冲通道。
+	done := make(chan struct{}, 1) // 信号通道
+	done <- struct{}{}             // 填满数据缓冲队列
+	// 现在数据缓冲队列已满，主协程中下一个发送将阻塞。
 
 	go func() {
 		fmt.Print("Hello")
-		time.Sleep(time.Second * 2) // simulate a workload
-		<- done // receive a value from the done channel, to
-		        // unblock the second send in main goroutine.
+		time.Sleep(time.Second * 2) // 模拟一个工作负载
+		<- done // 使用一个接收操作来通知主协程
 	}()
 
-	// do some other things ...
+	// 并发地做一些事...
 
-	done <- struct{}{} // block here until a receive is made.
+	done <- struct{}{} // 阻塞在此，等待通知
 	fmt.Println(" world!")
 }
 </code></pre>
 
 <p>
-In fact, the channel in the above example acts as a one-time binary semaphore,
-which will be introduced specially below.
+实际上，上例中的数据通道被用作了一个一次性的二元信号量。信号量将在下面介绍。
 </p>
 
 </div>
 
-<h4>N-To-1 And 1-To-N Notifications</h4>
+<h4>多对单和单对多通知</h4>
 
 <div>
-By extending the above two use cases a little,
-it is easy to do N-To-1 and 1-To-N notifications.
+略微扩展一下上面两个用例，我们可以很轻松地实现多对单和单对多通知。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -385,11 +315,11 @@ import "log"
 import "time"
 
 func worker(id int, ready <-chan struct{}, done chan<- struct{}) {
-	<-ready // wait until ready is closed
-	log.Print("Worker#", id, " started to process.")
-	time.Sleep(time.Second) // simulate a workload
-	log.Print("Worker#", id, " finished its job.")
-	done <- struct{}{} // notify the main goroutine (N-to-1)
+	<-ready // 阻塞在此，等待通知
+	log.Print("Worker#", id, "开始工作")
+	time.Sleep(time.Second) // 模拟一个工作负载
+	log.Print("Worker#", id, "工作完成")
+	done <- struct{}{} // 通知主协程（N-to-1）
 }
 
 func main() {
@@ -400,72 +330,52 @@ func main() {
 	go worker(1, ready, done)
 	go worker(2, ready, done)
 
-	time.Sleep(time.Second * 2) // simulate an initialzation phase
-	// 1-to-N notifications.
+	time.Sleep(time.Second * 2) // 模拟一个初始化过程
+	// 单对多通知
 	ready <- struct{}{}; ready <- struct{}{}; ready <- struct{}{}
-	// Being N-to-1 notified.
+	// 等待被通知
 	<-done; <-done; <-done
 }
 </code></pre>
 
 <p>
-In fact, the ways to do 1-to-N and N-to-1 notifications introduced
-in ths sub-section are not used commonly in practice.
-In pratice, we often use <code>sync.WaitGroup</code> to do N-to-1 notifications,
-and we do 1-to-N notifications by close channels.
-Please read the next sub-section for details.
+事实上，上例中展示的多对单和单对多通知实现方式在实践中用的并不多。
+在实践中，我们多使用<code>sync.WaitGroup</code>来实现多对单通知，使用关闭一个通道的方式来实现单对多通知（详见下一个用例）。
 </p>
 </div>
 
-<h4>Broadcast (1-To-N) Notifications by Closing A Channel</h4>
+<h4>通过关闭一个数据通道来实现群发通知</h4>
 
 <div>
 
 <p>
-The way to do 1-to-N notifications shown in the last sub-section
-is seldom used in practice, for there is a better way.
-By making using of the feature that infinite values can be received from
-a closed channel, we can close a channel to broadcast notifications.
+上一个用例中的单对多通知实现在实践中很少用，因为通过关闭一个通道的方式在来实现单对多通知的方式更简单。
+我们已经知道，从一个已关闭的数据通道可以接收到无穷个值，我们可以利用这一特性来实现群发通知。
 </p>
 
-By the example in the last sub-section,
-we can replace the three channel send operations
-<code>ready &lt;- struct{}{}</code> in the last example
-with one channel close opeartion <code>close(ready)</code>
-to do an 1-to-N notifications.
+我们可以把上一个例子中的三个数据发送操作<code>ready &lt;- struct{}{}</code>替换为一个通道关闭操作<code>close(ready)</code>来达到同样的单对多通知效果。
 
 <pre class="line-numbers"><code class="language-go">...
-
 	// ready <- struct{}{}; ready <- struct{}{}; ready <- struct{}{}
-	close(ready) // broadcast notifications
+	close(ready) // 群发通知
 ...
 </code></pre>
 
 <p>
-Surely, we can also close a channel to do an 1-to-1 notification.
-In fact, this is the most used notification way in Go.
-The feature that infinite values can be received from a closed channel
-will be utilized in many other use cases introduced below.
+当然，我们也可以通过关闭一个通道来实现单对单通知。事实上，关闭通道来是实践中用得最多通知实现方式。
+<p>
+
+<p>
+从一个已关闭的数据通道可以接收到无穷个值这一特性也将被用很多其它在后面介绍的用例中。
 </p>
 </div>
 
-<h4>Use One Channel To Notify Multiple Times</h4>
-
-<p>
-Same as a response can return a sequence of results,
-we can also use a channel to do multiple 1-to-1 notifications.
-The logic is simple, so no examples are provided for such use case.
-</p>
-
 <p class="anchor" id="timer"></p>
-<h4>Timer: Scheduled Notification</h4>
+<h4>定时通知（timer）</h4>
 
 <div>
-<p>
-It is easy to use channels to implement one-time timers.
-<p>
-
-A custom one-time timer implementaion:
+用数据通道实现一个一次性的定时通知器是很简单的。
+下面是一个自定义实现：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -493,65 +403,56 @@ func main() {
 </code></pre>
 
 <p>
-In fact, the <code>After</code> function in the <code>time</code> standard
-package provides the same functionality, with a much more efficient implementaion.
-We should use that function instead to make code look clean and run efficiently.
+事实上，<code>time</code>标准库包中的<code>After</code>函数提供了和上例中<code>AfterDuration</code>同样的功能。
+在实践中，我们应该尽量使用<code>time.After</code>函数以使代码看上去更干净。
 </p>
 
 <p>
-Please note, <code>&lt;-time.After(aDuration)</code> will make the current goroutine
-enter blocking state, but a <code>time.Sleep(aDuration)</code> functon call will not.
+注意，操作<code>&lt;-time.After(aDuration)</code>将使当前协程进入阻塞状态，而一个<code>time.Sleep(aDuration)</code>函数调用不会如此。
 </p>
 
 <p>
-The use of <code>&lt;-time.After(aDuration)</code> is often used
-in the timeout mechanism which will be introduced below.
+<code>&lt;-time.After(aDuration)</code>经常被使用在后面将要介绍的超时机制实现中。
 </p>
 
 </div>
 
 <p class="anchor" id="mutex"></p>
-<h3>Use Channels As Mutex Locks</h3>
+<h3>将数据通道用作互斥锁（mutex）</h3>
 
 <div>
 <p>
-One of the above examples has shown that one-capacity buffered channels
-can be used as one-time
-<a href="https://en.wikipedia.org/wiki/Semaphore_(programming)">binary semaphore</a>.
-In fact, such channels can also be used as multi-time binary semaphores,
-a.k.a., mutex locks, though such mutex locks are not efficient as
-the mutexes provided in the <code>sync</code> standard package.
+上面的某个例子提到了容量为1的缓冲通道可以用作一次性<a href="https://en.wikipedia.org/wiki/Semaphore_(programming)">二元信号量</a>。
+事实上，容量为1的缓冲通道也可以用作多次性二元信号量，即互斥锁，尽管这样的互斥锁效率不如<code>sync</code>标准库包中提供的互斥锁高效。
 </p>
 
-There are two styles to use one-capacity buffered channels as mutex locks.
+有两种方式将一个容量为1的缓冲通道用作互斥锁：
 <ol>
 <li>
-	Lock through a send, unlock through a receive.
+	通过发送操作来加锁，通过接收操作来解锁；
 </li>
 <li>
-	Lock through a receive, unlock through a send.
+	通过接收操作来加锁，通过发送操作来解锁。
 </li>
 </ol>
 
 <p>
 </p>
 
-Here, only a lock-through-send example is shown.
-Please note that, the capacity of the channel
-which is used as a mutex must be one.
+下面是一个通过发送操作来加锁的例子。
 
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
 func main() {
-	mutex := make(chan struct{}, 1) // the capacity must be one
+	mutex := make(chan struct{}, 1) // 容量必须为1
 
 	counter := 0
 	increase := func() {
-		mutex <- struct{}{} // lock
+		mutex <- struct{}{} // 加锁
 		counter++
-		<-mutex // unlock
+		<-mutex // 解锁
 	}
 
 	increase1000 := func(done chan<- struct{}) {
@@ -572,36 +473,53 @@ func main() {
 <p>
 </p>
 
+下面是一个通过接收操作来加锁的例子，其中只显示了相对于上例而修改了的部分。
+
+<pre class="line-numbers"><code class="language-go">...
+func main() {
+	mutex := make(chan struct{}, 1)
+	mutex <- struct{}{} // 此行是必需的
+
+	counter := 0
+	increase := func() {
+		<-mutex // 加锁
+		counter++
+		mutex <- struct{}{} // 解锁
+	}
+...
+</code></pre>
+
+<p>
+</p>
+
 </div>
 
 <p class="anchor" id="semaphore"></p>
-<h3>Use Channels As Counting Semaphores</h3>
+<h3>将数据通道用作计数信号量（counting semaphore）</h3>
 
 <div>
 <p>
-Buffered channels with capacity larger than one can be used as
-<a href="https://en.wikipedia.org/wiki/Semaphore_(programming)">counting semaphores</a>.
-Counting semaphores can be viewed as multi-owner locks.
-If the capacity of a channel is <code>N</code>, then it can viewed as
-a semaphore which can have most <code>N</code> owners at any time.
-Binary semaphores (mutexes) are special counting semaphores,
-each of binary semaphores can has at most one owner at any time.
-Counting semaphores are often used to limit throughput and ensure resource quotas.
+缓冲数据通道可以被用作<a href="https://en.wikipedia.org/wiki/Semaphore_(programming)">计数信号量</a>。
+计数信号量可以被视为多主锁。如果一个缓冲数据通道的容量为<code>N</code>，那么它可以被看作是一个在任何时刻最多可有<code>N</code>个主人的锁。
+上面提到的二元信号量是特殊的计数信号量，每个二元信号量在任一时刻最多只能有一个主人。
 </p>
 
-Like using channels as mutexes,
-there are also two styles to acquire one piece of ownerships
-of a channel semaphore.
+<p>
+计数信号量经常被使用于限制最大并发数。
+</p>
+
+和将数据通道用作互斥锁一样，也有两种方式用来获取一个用作计数信号量的通道的一份所有权。
+
 <ol>
 <li>
-	Acquire ownership through a send, release through a receive.
+	通过发送操作来获取所有权，通过接收操作来释放所有权；
 </li>
 <li>
-	Acquire ownership through a receive, release through a send.
+	通过接收操作来获取所有权，通过发送操作来释放所有权。
 </li>
 </ol>
 
-An example of acquiring ownerships through receiving values from a channel.
+下面是一个通过接收操作来获取所有权的例子：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -615,83 +533,77 @@ type Seat int
 type Bar chan Seat
 
 func (bar Bar) ServeConsumer(customerId int) {
-	log.Print("-> consumer#", customerId, " enters the bar")
-	seat := <- bar // need a seat to drink
-	log.Print("consumer#", customerId, " drinks at seat#", seat)
+	log.Print("顾客#", customerId, "进入酒吧")
+	seat := <- bar // 需要一个位子来喝酒
+	log.Print("++ 顾客#", customerId, "在第", seat, "个座位开始饮酒")
 	time.Sleep(time.Second * time.Duration(2 + rand.Intn(6)))
-	log.Print("<- consumer#", customerId, " frees seat#", seat)
-	bar <- seat // free the seat and leave the bar
+	log.Print("-- 顾客#", customerId, "离开了第", seat, "个座位")
+	bar <- seat // 释放座位，离开酒吧
 }
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
 
-	bar24x7 := make(Bar, 10) // the bar has 10 seats
-	// Place seats in an bar.
+	bar24x7 := make(Bar, 10) // 此酒吧有10个座位
+	// 摆放10个座位。
 	for seatId := 0; seatId < cap(bar24x7); seatId++ {
-		bar24x7 <- Seat(seatId) // none of the sends will block
+		bar24x7 <- Seat(seatId) // 均不会阻塞
 	}
 
 	for customerId := 0; ; customerId++ {
 		time.Sleep(time.Second)
 		go bar24x7.ServeConsumer(customerId)
 	}
-	for {time.Sleep(time.Second)} // sleeping != blocking
+	for {time.Sleep(time.Second)} // 睡眠 != 阻塞
 }
 </code></pre>
 
 <p>
-In the above example, only the consumers each of who get a seat can drink.
-So there will be most ten consumers are drinking at any given time.
+在上例中，只有获得一个座位的顾客才能开始饮酒。
+所以在任一时刻同时在喝酒的顾客数不会超过座位数10。
 </p>
 
 <p>
-The last <code>for</code> loop in the <code>main</code> function
-is to avoid the program exiting.
-There is a better way, which will be introduced below, to do the job.
+上例<code>main</code>函数中的最后一行<code>for</code>循环是为了防止程序退出。
+后面将介绍一种更好的实现此目的的方法。
 </p>
 
-Although there will be most ten consumers are drinking at any given time,
-there may be more than ten consumers are served at the bar at the same time.
-Some consumers are waiting for free seats.
-Although each consumer goroutine consumes much less resources than a system thread,
-the total resources consumed by a large quantity of goroutines are not neglectable.
-So it is best to create a consumer goroutine until a free seat is available.
+在上例中，尽管在任一时刻同时在喝酒的顾客数不会超过座位数10，但是在某一时刻可能有多于10个顾客进入了酒吧，因为某些顾客在排队等位子。
+在上例中，每个顾客对应着一个协程。虽然协程的开销比系统线程小得多，但是如果协程的数量很多，它们的总体开销还是不能忽略不计的。
+所以，最好当有空位的时候才创建顾客协程。
 
-<pre class="line-numbers"><code class="language-go">... // same code as the above example
+<pre class="line-numbers"><code class="language-go">... // 省略了和上例相同的代码
 
 func (bar Bar) ServeConsumerAtSeat(customerId int, seat Seat) {
-	log.Print("consumer#", customerId, " drinks at seat#", seat)
+	log.Print("++ 顾客#", customerId, "在第", seat, "个座位开始饮酒")
 	time.Sleep(time.Second * time.Duration(2 + rand.Intn(6)))
-	log.Print("<- consumer#", customerId, " frees seat#", seat)
-	bar <- seat // free the seat and leave the bar
+	log.Print("-- 顾客#", customerId, "离开了第", seat, "个座位")
+	bar <- seat // 释放座位，离开酒吧
 }
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
 
-	bar24x7 := make(Bar, 10) // the bar has 10 seats
-	// Place seats in an bar.
+	bar24x7 := make(Bar, 10)
 	for seatId := 0; seatId < cap(bar24x7); seatId++ {
-		bar24x7 <- Seat(seatId) // none of the sends will block
+		bar24x7 <- Seat(seatId)
 	}
 
+	// 这个for循环和上例不一样。
 	for customerId := 0; ; customerId++ {
 		time.Sleep(time.Second)
-		seat := <- bar24x7 // need a seat to serve next consumer
+		seat := <- bar24x7 // 需要一个空位招待顾客
 		go bar24x7.ServeConsumerAtSeat(customerId, seat)
 	}
-	for {time.Sleep(time.Second)} // sleeping != blocking
+	for {time.Sleep(time.Second)}
 }
 </code></pre>
 
 <p>
-There will be most about ten live consumer goroutines
-coexisting in the above optimized version.
+在上面这个修改后的例子中，在任一时刻最多只有10个顾客协程在运行。
 </p>
 
-The style of acquiring ownership through sending is simpler comparatively.
-There is no the step of placing seats.
+通过发送操作来获取所有权的实现相对简单一些，省去了摆放座位的步骤。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -705,10 +617,10 @@ type Consumer struct{id int}
 type Bar chan Consumer
 
 func (bar Bar) ServeConsumer(c Consumer) {
-	log.Print("-> consumer#", c.id, " starts drinking")
+	log.Print("++ 顾客#", c.id, "开始饮酒")
 	time.Sleep(time.Second * time.Duration(10 + rand.Intn(10)))
-	log.Print("<- consumer#", c.id, " leaves the bar")
-	<- bar // leaves the bar and save a space
+	log.Print("-- 顾客#", c.id, "离开酒吧")
+	<- bar // 离开酒吧，腾出位子
 }
 
 func main() {
@@ -718,7 +630,7 @@ func main() {
 	for customerId := 0; ; customerId++ {
 		time.Sleep(time.Second)
 		consumer := Consumer{customerId}
-		bar24x7 <- consumer // try to enter the bar
+		bar24x7 <- consumer // 等待进入酒吧
 		go bar24x7.ServeConsumer(consumer)
 	}
 	for {time.Sleep(time.Second)}
@@ -728,6 +640,7 @@ func main() {
 <p>
 </p>
 
+<!--
 <p>
 There is a variant of the channel semaphore use case.
 In the above two examples, although the throughput is limited,
@@ -736,18 +649,14 @@ This is not always a good idea, sometimes it would be better to
 suggest queuing consumers go to other bars,
 by using the try-receive or try-send mechanisms introduced below.
 </p>
+-->
 </div>
 
-<h3>Ping-Pong (Dialogue)</h3>
-
-<p>
-Sometimes, a piece of data will be processed, or messages will be communicated,
-between two goroutines back and forth.
-It is some like a ping-pong game or the goroutines are dialoguing.
-</p>
+<h3>对话（或称乒乓）</h3>
 
 <div>
-An example which will print a series of Fibonacci numbers.
+两个协程可以通过一个数据通道进行对话，整个过程宛如打乒乓球一样。
+下面是一个这样的例子，它将打印出一系列斐波那契（Fibonacci）数。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -760,14 +669,14 @@ type Ball uint64
 func Play(playerName string, table chan Ball) {
 	var lastValue Ball = 1
 	for {
-		ball := <- table // get the ball
+		ball := <- table // 接球
 		fmt.Println(playerName, ball)
 		ball += lastValue
-		if ball < lastValue { // overflow
+		if ball < lastValue { // 溢出结束
 			os.Exit(0)
 		}
 		lastValue = ball
-		table <- ball // bat back the ball
+		table <- ball // 回球
 		time.Sleep(time.Second)
 	}
 }
@@ -775,7 +684,7 @@ func Play(playerName string, table chan Ball) {
 func main() {
 	table := make(chan Ball)
 	go func() {
-		table <- 1 // throw ball on table
+		table <- 1 // （裁判）发球
 	}()
 	go Play("A:", table)
 	Play("B:", table)
@@ -786,29 +695,28 @@ func main() {
 </p>
 </div>
 
-<h3>Channel Encapsulated In Channel</h3>
+<h3>使用数据通道传送传输数据通道</h3>
 
 <div>
-Sometimes, we can use a channel type as the element type of another channel type.
-In the following example, <code>&lt;-chan chan&lt;- int</code> is a receive-only channel type
-which element type is a send-only channel type <code>chan&lt;- int</code>.
+一个数据通道类型的元素类型可以是另一个数据通道类型。
+在下面这个例子中， 单向接收数据通道类型<code>chan&lt;- int</code>是另一个单向发送数据通道类型<code>&lt;-chan chan&lt;- int</code>的元素类型。
 
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
-var counter = func (n int) chan<- chan<- int { // chan<- (chan<- int)
-	requests := make(chan chan<- int) // chan (chan<- int)
+var counter = func (n int) chan<- chan<- int {
+	requests := make(chan chan<- int)
 	go func() {
 		for request := range requests {
 			if request == nil {
-				n++ // increase
+				n++ // 递增计数
 			} else {
-				request <- n // retrieve
+				request <- n // 返回当前计数
 			}
 		}
 	}()
-	return requests // implicitly converted to chan<- (chan<- int)
+	return requests // 隐式转换到类型chan<- (chan<- int)
 }(0)
 
 func main() {
@@ -831,49 +739,33 @@ func main() {
 </code></pre>
 
 <p>
-Although here the encapsulation implementaion may be not
-the most efficient way for the above specified example,
-the use case may be useful for some other scenarios.
+尽管对于上面这个用例来说，使用数据通道传送传输数据通道这种方式并非是最有效的实现方式，但是这种方式肯定有最适合它的用武之地。
 </p>
 </div>
 
-<h3>Check Lengths And Capacities Of Channels</h3>
+<h3>检查数据通道的长度和容量</h3>
 
 <div>
 <p>
-We can use the built-in functions <code>len</code> and <code>cap</code>
-to check the length and capacity of a channel,
-though we seldom do this in practice.
-The reason for we seldom use the <code>len</code> function to check the length
-of a channel is the length of the channel may have changed after the
-<code>len</code> function call returns.
-The reason for we seldom use the <code>cap</code> function to check the capacity
-of a channel is the capacity of the channel is often known or not important.
+我们可以使用内置函数<code>cap</code>和<code>len</code>来查看一个数据通道的容量和当前长度。
+但是在实践中我们很少这样做。我们很少使用内置函数<code>cap</code>的原因是一个数据通道的容量常常是已知的或者不重要的。
+我们很少使用内置函数<code>len</code>的原因是一个<code>len</code>调用的结果并不能总能准确地反映出的一个数据通道的当前长度。
 </p>
 
-<p>
-However, there do have some scenarios we need to use the two functions.
-</p>
-
-For example, sometimes, we want to receive all the values buffered in
-a non-closed channel <code>c</code> which no ones will send values to any more,
-then we can use the following code to receive remaining values.
+但有时确实有一些场景需要调用这两个函数。比如，有时一个协程欲将一个非关闭的并且不会在有数据被发送到的缓冲通道中的所有数据接收出来，
+在确保只有此一个协程从此数据通道接收数据的情况下，我们可以用下面的代码来实现之：
 
 <pre class="line-numbers"><code class="language-go">for len(c) > 0 {
 	value := <-c
-	// use value ...
+	// 使用value ...
 }
 </code></pre>
 
 <p>
-We can also use the try-receive mechanism introduced below to do the same job.
-The efficiencies of the two ways are almost the same.
+我们也可以用本文后面将要介绍的尝试接收机制来实现这一需求。两者的运行效率差不多，但尝试接收机制的优点是多个协程可以并发地进行读取操作。
 </p>
 
-Sometimes, a goroutine may want to write some values to a buffered channel
-<code>c</code> until it is full without entering blocking state at the end,
-and the goroutine is the only sender of the channel,
-then we can use the following code to do this job.
+有时一个协程欲将一个缓冲数据通道写满而又不阻塞，在确保只有此一个协程向此数据通道发送数据的情况下，我们可以用下面的代码实现这一目的：
 
 <pre class="line-numbers"><code class="language-go">for len(c) < cap(c) {
 	c <- aValue
@@ -881,46 +773,43 @@ then we can use the following code to do this job.
 </code></pre>
 
 <p>
+当然，我们也可以使用后面将要介绍的尝试发送机制来实现这一需求。
 </p>
 
 </div>
 
-<h3>Block The Current Goroutine For Ever</h3>
+<h3>使当前协程永久阻塞</h3>
 
 <p>
-The select mechanism is a unique feature in Go.
-It brings many patterns and tricks for concurrent programming.
-About the code execution rules of the select mechanism,
-please read the article <a href="channel.html#select">channels in Go</a>.
+Go中的<a href="channel.html#select">选择机制（select）</a>是一个非常独特的特性。它给并发编程带来了很多新的模式和技巧。
 </p>
 
 <div>
 <p>
-We can use a blank select block <code>select{}</code>
-to block the current goroutine for ever.
-This is the simplest use case of the select mechanism.
-In fact, some uses of <code>for {time.Sleep(time.Second)}</code>
-in some above examples can be replaced with <code>select{}</code>.
+我们可以用一个无分支的<code>select</code>流程控制代码块使当前协程永久处于阻塞状态。
+这是<code>select</code>流程控制的最简单的一个应用。
+事实上，上面很多例子中的<code>for {time.Sleep(time.Second)}</code>都可以换为<code>select{}</code>。
 </p>
 
 <p>
-Generally, <code>select{}</code> is used to prevent the main goroutine from
-exiting, for if the main goroutine exits, the whole program will also exit.
+一般，<code>select{}</code>用在主协程中以防止程序退出。
 </p>
 
-An example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
-import "time"
+import "runtime"
 
 func DoSomething() {
 	for {
-		// do something ...
-		time.Sleep(time.Hour) // sleeping is not blocking
+		// 做点什么...
+		
+		runtime.Gosched() // 防止本协程霸占CPU不放
 	}
 }
 
 func main() {
+	go DoSomething()
 	go DoSomething()
 	select{}
 }
@@ -930,52 +819,36 @@ func main() {
 </p>
 
 <p>
-By the way, there are <a href="summaries.html#block-forever">some other ways</a>
-to make a goroutine stay in blocking state for ever.
-But the <code>select{}</code> way is the simplest one.
+顺便说一句，另外还有<a href="summaries.html#block-forever">一些使当前协程永久阻塞的方法</a>，但是<code>select{}</code>是最简单的方法。
 </p>
 </div>
 
 <p class="anchor" id="try-operation"></p>
-<h3>Try-Send And Try-Receive</h3>
+<h3>尝试发送和尝试接收</h3>
 
 <div>
-In Go, a select block with one <code>default</code> branch
-and only one <code>case</code> branch
-is called a try-send or try-receive channel operation,
-depending on whether the channel operation following the <code>case</code>
-keyword is a channel send or receive operation.
+含有一个<code>default</code>分支和一个<code>case</code>分支的<code>select</code>代码块可以被用作一个尝试发送或者尝试接收操作，取决于<code>case</code>关键字后跟随的是一个发送操作还是一个接收操作。
 
 <ul>
 <li>
-	If the operation following the <code>case</code> keyword is a send operation,
-	then the select block is called as try-send operation.
-	If the send operation would block,
-	then the <code>default</code> branch will get executed (fail to send),
-	otherwise, the send succeeds and
-	the only <code>case</code> branch will get executed.
+	如果<code>case</code>关键字后跟随的是一个发送操作，则此<code>select</code>代码块为一个尝试发送操作。
+	如果<code>case</code>分支的发送操作是阻塞的，则<code>default</code>分支将被执行，发送失败；否则发送成功，<code>case</code>分支得到执行。
 </li>
 <li>
-	If the operation following the <code>case</code> keyword is a receive operation,
-	then the select block is called as try-receive operation.
-	If the receive operation would block,
-	then the <code>default</code> branch will get executed (fail to receive),
-	otherwise, the receive succeeds and
-	the only <code>case</code> branch will get executed.
+	如果<code>case</code>关键字后跟随的是一个接收操作，则此<code>select</code>代码块为一个尝试接收操作。
+	如果<code>case</code>分支的接收操作是阻塞的，则<code>default</code>分支将被执行，接收失败；否则接收成功，<code>case</code>分支得到执行。
 </li>
 </ul>
 
 <p>
-Try-send and try-receive operations never block.
+尝试发送和尝试接收代码块永不阻塞。
 </p>
 
 <p>
-The standard Go compiler makes special optimations for try-send
-and try-receive select blocks, their execution efficiencies are
-much higher than multi-case select blocks.
+官方标准Go编译器对尝试发送和尝试接收代码块做了特别的优化，使得它们的执行效率比多<code>case</code>分支的普通<code>select</code>代码块执行效率高得多。
 </p>
 
-The following is an example shows how try-send and try-receive work.
+下例演示了尝试发送和尝试接收代码块的工作原理。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -988,54 +861,51 @@ func main() {
 	for i := 0; i < cap(bookshelf) * 2; i++ {
 		select {
 		case bookshelf <- Book{id: i}:
-			fmt.Println("succeed to put book", i)
+			fmt.Println("成功将书放在书架上", i)
 		default:
-			fmt.Println("failed to put book")
+			fmt.Println("书架已经被占满了")
 		}
 	}
 
 	for i := 0; i < cap(bookshelf) * 2; i++ {
 		select {
 		case book := <-bookshelf:
-			fmt.Println("succeed to get book", book.id)
+			fmt.Println("成功从书架上取下一本书", book.id)
 		default:
-			fmt.Println("failed to get book")
+			fmt.Println("书架上已经没有书了")
 		}
 	}
 }
 </code></pre>
 
-The output of the above program:
+输出结果：
 
-<pre class="output"><code>succeed to put book 0
-succeed to put book 1
-succeed to put book 2
-failed to put book
-failed to put book
-failed to put book
-succeed to get book 0
-succeed to get book 1
-succeed to get book 2
-failed to get book
-failed to get book
-failed to get book
+<pre class="output"><code>成功将书放在书架上 0
+成功将书放在书架上 1
+成功将书放在书架上 2
+书架已经被占满了
+书架已经被占满了
+书架已经被占满了
+成功从书架上取下一本书 0
+成功从书架上取下一本书 1
+成功从书架上取下一本书 2
+书架上已经没有书了
+书架上已经没有书了
+书架上已经没有书了
 </code></pre>
 
 <p>
 </p>
 
 <p>
-The following sub-sections will show more try-send and try-receive use cases.
+后面的很多用例还要用到尝试发送和尝试接收代码块。
 </p>
 </div>
 
-<h4>Check If An Unbuffered Channel Is Closed Without Blocking The Current Goroutine</h4>
+<h4>无阻塞地检查一个非缓冲通道是否已经关闭</h4>
 
 <div>
-Assume it is guaranteed that no values were ever sent to an unbuffered channel,
-We can use the following code to check whether or not then unbuffered channel
-is closed without blocking the current goroutine,
-where <code>T</code> the element type of the corresponding channel type.
+假设没有其它协程向一个非缓冲通道发送过数据，我们可以使用下面的代码来检查此通道是否已经关闭，此检查不会阻塞当前协程。
 
 <pre class="line-numbers"><code class="language-go">func IsClosed(c chan T) bool {
 	select {
@@ -1048,36 +918,32 @@ where <code>T</code> the element type of the corresponding channel type.
 </code></pre>
 
 <p>
-The way to check if an unbuffered channel is closed is used popularly
-in Go concurrent programming.
+此方法常用来查看某个期待中的通知是否已经来临。此通知将由另一个协程通过关闭此通道来发送。
 </p>
 </div>
 
-<h4>Peak Limiting</h4>
+<p class="anchor" id="peak-limiting"></p>
+<h4>峰值限制（peak/burst limiting）</h4>
 
 <div>
 
 <p>
-At the end of the <a href="#semaphore">use channels as counting semaphores</a>
-section above, it is mentioned that it would be better to suggest
-that new coming consumers go to other bars
-if there are no available seats in the current bar.
-This is call peak limiting.
+将<a href="#semaphore">将数据通道用作计数信号量</a>用例和尝试通道操作结合起来可用实现峰值限制。
+峰值限制的目的是防止过大的并发请求数。
 </p>
 
-The following is a modified version of the last example in the
-<a href="#semaphore">use channels as counting semaphores</a> section.
+下面是对<a href="#semaphore">将数据通道用作计数信号量</a>一节中的最后一个例子的简单修改，从而使得顾客不再等待而是离去或者寻找其它酒吧。
 
 <pre class="line-numbers"><code class="language-go">...
-	bar24x7 := make(Bar, 10) // can serve most 10 consumers
+	bar24x7 := make(Bar, 10) // 此酒吧只能同时招待10个顾客
 	for customerId := 0; ; customerId++ {
 		time.Sleep(time.Second)
 		consumer := Consumer{customerId}
 		select {
-		case bar24x7 <- consumer: // try to enter the bar
+		case bar24x7 <- consumer: // 试图进入此酒吧
 			go bar24x7.ServeConsumer(consumer)
 		default:
-			log.Print("consumer#", customerId, " goes elsewhere")
+			log.Print("顾客#", customerId, "不愿等待而离去")
 		}
 	}
 ...
@@ -1089,13 +955,11 @@ The following is a modified version of the last example in the
 </div>
 
 <p class="anchor" id="first-response-wins-2"></p>
-<h4>Another Way to Implement The First-Response-Wins Use Case</h4>
+<h4>另一种“采用最快回应”的实现方式</h4>
 
 <div>
-
-As above has mentioned, we can use the select mechanism (try-send)
-with a buffered channel which capacity is one (at least) to implement
-the first-response-wins use case. For example,
+在上面的“采用最快回应”用例一节已经提到，我们也可以使用选择机制来实现“采用最快回应”用例。
+每个数据源协程只需使用向一个缓冲为1的数据通道尝试发送回应数据即可。示例代码如下：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1107,7 +971,7 @@ import (
 
 func source(c chan<- int32) {
 	ra, rb := rand.Int31(), rand.Intn(3)+1
-	time.Sleep(time.Duration(rb) * time.Second) // sleep 1s, 2s or 3s
+	time.Sleep(time.Duration(rb) * time.Second) // 休眠1秒/2秒/3秒
 	select {
 	case c <- ra:
 	default:
@@ -1117,29 +981,27 @@ func source(c chan<- int32) {
 func main() {
 	rand.Seed(time.Now().UnixNano())
 
-	c := make(chan int32, 1) // the capacity should be at least 1
+	c := make(chan int32, 1) // 此通道容量必须至少为1
 	for i := 0; i < 5; i++ {
 		go source(c)
 	}
-	rnd := <-c // only the first response is used
+	rnd := <-c // 只采用第一个成功发送的回应数据
 	fmt.Println(rnd)
 }
 </code></pre>
 
 <p>
-Please note, the capacity of the channel used in the above example
-must be at least one, so that the first send will not get missed
-if the receiver/request side has not get ready in time.
+注意，使用选择机制来实现“采用最快回应”的代码中使用的数据通道的容量必须至少为1，以保证最快回应总能够发送成功。
+否则，如果数据请求者因为种种原因未及时准备好接收，则所有回应者的尝试发送都将失败，从而所有回应的数据都将被错过。
 </p>
 </div>
 
 <p class="anchor" id="first-response-wins-3"></p>
-<h4>The Third Way to Implement The First-Response-Wins Use Case</h4>
+<h4>第三种“采用最快回应”的实现方式</h4>
 
 <div>
-For a first-response-wins use case, if the number of sources are small,
-for example, two or three, we can use a <code>select</code> code block
-to receive the source responses at the same time. For example,
+如果一个“采用最快回应”用例中的数据源的数量很少，比如两个或三个，我们可以让每个数据源使用一个单独的缓冲通道来回应数据，然后使用一个<code>select</code>代码块来同时接收这三个通道。
+示例代码如下：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1150,7 +1012,7 @@ import (
 )
 
 func source() <-chan int32 {
-	c := make(chan int32, 1) // must be a buffered channel
+	c := make(chan int32, 1) // 必须为一个缓冲通道
 	go func() {
 		ra, rb := rand.Int31(), rand.Intn(3)+1
 		time.Sleep(time.Duration(rb) * time.Second)
@@ -1163,6 +1025,7 @@ func main() {
 	rand.Seed(time.Now().UnixNano())
 
 	var rnd int32
+	// 阻塞在此直到某个数据源率先回应。
 	select{
 	case rnd = <-source():
 	case rnd = <-source():
@@ -1173,35 +1036,31 @@ func main() {
 </code></pre>
 
 <p>
-The two ways introduced in this and the last sub-sections
-can also be used to do any-to-1 notifications.
+本节和上一小节中展示的两种方法也可以用来实现多对单通知。
 </p>
 
 </div>
 
-<h4>Timeout</h4>
+<h4>超时机制（timeout）</h4>
 
 <div>
 <p>
-In some request-response scenarios,
-for all kinds of reasons, a request may need a long time to response,
-sometimes even will never response.
-For such circumstances, we should return an error message to the client side
-by using a timeout solution.
-Such a timeout solution can be implemented with the select mechanism.
+在一些请求/回应用例中，一个请求可能因为种种原因导致需要超出预期的时长才能得到回应，有时甚至永远得不到回应。
+对于这样的情形，我们可以使用一个超时方案给请求者返回一个错误信息。
+使用选择机制可以很轻松地实现这样的一个超时方案。
 </p>
 
-The following code shows how to make a request with timeout.
+下面这个例子展示了如何实现一个支持超时设置的请求：
 
 <pre class="line-numbers"><code class="language-go">func requestWithTimeout(timeout time.Duration) (int, error) {
 	c := make(chan int)
-	go doRequest(c) // may need a long time to response
+	go doRequest(c) // 可能需要超出预期的时长回应
 
 	select {
 	case data := <-c:
 		return data, nil
 	case <-time.After(timeout):
-		return 0, errors.New("timeout")
+		return 0, errors.New("超时了！")
 	}
 }
 </code></pre>
@@ -1211,11 +1070,11 @@ The following code shows how to make a request with timeout.
 
 </div>
 
-<h4>Ticker</h4>
+<h4>定时器（ticker）</h4>
 
 <div>
 
-We can use a buffered channel and try-send mechanism to implement a ticker.
+我们可以使用尝试发送操作来实现一个每隔一定时间发送一个信号的定时器。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1223,7 +1082,7 @@ import "fmt"
 import "time"
 
 func Tick(d time.Duration) <-chan struct{} {
-	c := make(chan struct{}, 1) // the capacity should be exactly one
+	c := make(chan struct{}, 1) // 容量必须严格为1
 	go func() {
 		for {
 			time.Sleep(d)
@@ -1248,78 +1107,82 @@ func main() {
 </p>
 
 <p>
-In fact, there is a <code>Tick</code> function in the <code>time</code>
-standard package provides the same functionality, with a much more efficient implementaion.
-We should use that function instead to make code look clean and run efficiently.
+事实上，<code>time</code>标准库包中的<code>Tick</code>函数提供了同样的功能，但效率更高。
+我们应该尽量使用标准库包中的实现。
 </p>
 </div>
 
 <p class="anchor" id="rate-limiting"></p>
-<h4>Rate Limiting</h4>
+<h4>速率限制（rate limiting）</h4>
 
 <div>
-One of above section has shown how to use try-send to do peak limiting.
-We can also use try-send to do rate limiting.
-The following shows such an example borrowed from
-<a href="https://github.com/golang/go/wiki/RateLimiting">the official Go wiki</a>.
-In this example, the average number of handled requests per second in a long
-period is no more than 10. But sometimes, in a short period, there may be
-a burst of most 5 requests being handled parrellelly.
+<p>
+上面已经展示了如何使用尝试发送实现<a href="#peak-limiting">峰值限制</a>。
+同样地，我们也可以使用使用尝试机制来实现速率限制，但需要前面刚提到的定时器实现的配合。
+速率限制常用来限制吞吐和确保资源使用不会超标。
+</p>
 
-<pre class="line-numbers"><code class="language-go">import "time"
+下面的例子借鉴了<a href="https://github.com/golang/go/wiki/RateLimiting">官方Go百科中的例子</a>。
+在此例中，任何一分钟时段内处理的请求数不会超过200。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import "fmt"
+import "time"
 
 type Request interface{}
-func handle(Request) {/* do something */}
+func handle(r Request) {fmt.Println(r.(int))}
 
-const RateLimit = 10
-const BurstLimit = 5 // 1 means bursts are not supported.
+const RateLimitPeriod = time.Minute
+const RateLimit = 200 // most 200 requests in one minute
 
 func handleRequests(requests <-chan Request) {
-	throttle := make(chan time.Time, BurstLimit)
+	quotas := make(chan time.Time, RateLimit)
 
 	go func() {
-		tick := time.NewTicker(time.Second / RateLimit)
+		tick := time.NewTicker(RateLimitPeriod / RateLimit)
 		defer tick.Stop()
 		for t := range tick.C {
 			select {
-			case throttle <- t:
+			case quotas <- t:
 			default:
 			}
 		}
 	}()
 
-	for reqest := range requests {
-		<-throttle
-		go handle(reqest)
+	for r := range requests {
+
+		<-quotas
+		go handle(r)
 	}
+}
+
+func main() {
+	requests := make(chan Request)
+	go handleRequests(requests)
+	// time.Sleep(time.Minute)
+	for i := 0; ; i++ {requests <- i}
 }
 </code></pre>
 
 <p>
+上例的代码虽然可以保证任何一分钟时段内处理的请求数不会超过200，但是如果在开始的一分钟内没有任何请求，则接下来的某个瞬时时间点可能会同时处理最多200个请求（试着将<code>time.Sleep</code>行的注释去掉看看）。
+这可能会造成卡顿情况。我们可以将速率限制常常和峰值限制一并使用来避免着这样的情况。
 </p>
+
 
 </div>
 
-<h4>Switches</h4>
+<h4>开关</h4>
 
 <div>
 <p>
-From the article <a href="channel.html">channels in Go</a>,
-we have learned that a goroutine will block for ever if it tries to
-send a value to or receive from a nil channel.
-By making use of this fact, we can change the involved channels in a
-<code>select</code> code block to affect the branch selection
-in the <code>select</code> code block.
+<a href="channel.html">数据通道</a>一文提到了向一个nil通道发送数据或者从中接收数据都属于阻塞操作。
+利用这一事实，我们可以将一个<code>select</code>流程控制中的<code>case</code>操作中涉及的通道设置为不同的值，以使此<code>select</code>流程控制选择执行不同的分支。
 </p>
 
-The following is another ping-pong example which is implemented
-by using the select mechanism.
-In this example, one of the two channel variables involved
-in the select block is <code>nil</code>.
-The <code>case</code> branch corresponding the nil channel will not get selected for sure.
-We can think such <code>case</code> branchs are in off status.
-In the end of each loop step,
-the on/off statuses of the two <code>case</code> branchs are switched.
+下面是另一个乒乓模拟游戏的实现。此实现使用了选择机制。在此例子中，两个<code>case</code>操作中的数据通道有且只有一个为nil，所以只能是不为nil的通道对应的分支被选中。
+每个循环步将对调这两个<code>case</code>操作中的数据通道，从而改变两个分支的可被选中状态。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1342,12 +1205,12 @@ func Play(playerName string, table chan Ball, serve bool) {
 		case value := <- receive:
 			fmt.Println(playerName, value)
 			value += lastValue
-			if value < lastValue { // overflow
+			if value < lastValue { // 溢出了
 				os.Exit(0)
 			}
 			lastValue = value
 		}
-		receive, send = send, receive // switch on/off
+		receive, send = send, receive // 开关切换
 		time.Sleep(time.Second)
 	}
 }
@@ -1364,22 +1227,21 @@ func main() {
 
 </div>
 
-<h4>Control Code Exection Possibility Weights</h4>
+<h4>控制代码被执行的几率</h4>
 
 <div>
 <p>
-We can duplicate a <code>case</code> branch in a <code>select</code> code block
-to increase the exection possibility weigh of the corresponding code snippet.
+我们可以通过在一个<code>select</code>流程控制中使用重复的<code>case</code>操作来增加对应分支中的代码的执行几率。
 </p>
 
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
 func main() {
 	foo, bar := make(chan struct{}), make(chan struct{})
-	close(foo); close(bar) // for demo purpose
+	close(foo); close(bar) // 仅为演示目的
 	x, y := 0.0, 0.0
 	f := func(){x++}
 	g := func(){y++}
@@ -1390,59 +1252,47 @@ func main() {
 		case <-bar: g()
 		}
 	}
-	fmt.Println(x/y) // about 2
+	fmt.Println(x/y) // 大致为2
 }
 </code></pre>
 
 <p>
-The possibility of the <code>f</code> function being called
-is about the double of the <code>g</code> function being called.
+在上面这个例子中，函数<code>f</code>的执行几率大致为函数<code>g</code>的两倍。
 </p>
 </div>
 
-<h4>Select From Dynamic Number Of Cases</h4>
+<h4>从动态数量的分支中选择</h4>
 
 <p>
-We can use the functionalities provided in the <code>reflect</code>
-standard package to construct a select block at run time.
-The dynamically created select block can have arbitrary number of case branches.
-But please note, the reflection way is less efficient than the fixed way.
+每个<code>select</code>控制流程中的分支数量在运行中是固定的，但是我们可以使用<code>reflect</code>标准库包中提供的功能在运行时刻来构建动态分支数量的<code>select</code>控制流程。
+但是请注意：一个<code>select</code>控制流程中的分支越多，此<code>select</code>控制流程的执行效率就越低（这是为什么我们常常只使用不多于三个分支的<code>select</code>控制流程的原因）。
 </p>
 
 <p>
-The <code>reflect</code> standard package also provides
-<code>TrySend</code> and <code>TryRecv</codE> functions to
-implement one-case-plus-default select blocks.
+<code>reflect</code>标准库包中也提供了模拟尝试发送和尝试接收代码块的<code>TrySend</code>和<code>TryRecv</code>函数。
 </p>
 
-<h3>Data Flow Manipulations</h3>
+<h3>数据流操纵</h3>
 
 <div>
 <p>
-This section will introduce some use cases in which long life channels
-are used for data flow manipulations.
-There are many data flow related application scenarios in practice,
-such as message queue (pub/sub), big data processing (map/reduce),
-load balancer, and division of labour, etc.
+本节将介绍一些使用数据通道进行数据流处理的用例。
 </p>
 
-Generally, a data flow application is composed of many modules.
-Different modules do different jobs.
-Each module may own one or a group of workers (goroutines),
-which concurrently do the same job specified for that module.
-Here is a list of some module job examples in practice:
+一般来说，一个数据流处理程序由多个模块组成。不同的模块执行分配给它们的不同的任务。
+每个模块由一个或者数个并行工作的协程组成。实践中常见的工作任务包括：
 <ul>
 <li>
-	data generation/collecting/loading.
+	数据生成/搜集/加载；
 </li>
 <li>
-	data serving/saving.
+	数据服务/存盘；
 </li>
 <li>
-	data calculation/analyzation.
+	数据计算/处理；
 </li>
 <li>
-	data validation/filtering.
+	数据验证/过滤；
 </li>
 <!-- // general duty of modules
 <li>
@@ -1450,59 +1300,55 @@ Here is a list of some module job examples in practice:
 </li>
 -->
 <li>
-	data aggregation/division
+	数据聚合/分流；
 </li>
 <li>
-	data composition/decomposition.
+	数据组合/拆分；
 </li>
 <li>
-	data duplication/proliferation.
+	数据复制/增殖；
+</li>
+<li>
+	等等。
 </li>
 </ul>
 
 <p>
-A worker in a module group may receive data from several other modules
-as inputs and send data to serve other modules as outputs.
-In other words, a module can be both a data consumer and a data producer.
-A module which only sends data to some other modules but never
-receives data from other modules is called a producer-only module.
-A module which only receives data from some other modules but never
-sends data to other modules is called a consumer-only module.</p>
-
-<p>
-Many modules together compose a data flow system.
+一个模块中的工作协程从一些其它模块接收数据做为输入，并向另一些模块发送输出数据。
+换句话数，一个模块可能同时兼任数据消费者和数据产生着的角色。
 </p>
 
 <p>
-Following will show some data flow module worker implementations.
-These implementations are for education purpose,
-so they may be neither efficient nor flexible.
+多个模块一起组成了一个数据流处理系统。
+</p>
+
+<p>
+下面将展示一些模块工作协程的实现。这些实现仅仅是为了解释目的，所以它们都很简单，并且它们可能并不高效。
 </p>
 
 </div>
 
-<h4>Data Generation/Collecting/Loading</h4>
+<h4>数据生成/搜集/加载</h4>
 
 <div>
-There are all kinds of producer-only modules.
-A producer-only moudle worker may produce data stream
+一个数据产生者可能通过以下途径生成数据：
 <ul>
 <li>
-	by loading a file, reading a database, or crawling the web.
+	加载一个文件、或者读取一个数据库、或者用爬虫抓取网页数据；
 </li>
 <li>
-	by collecting all kinds of metrics from all kinds of hardwards.
+	从一个软件或者硬件系统搜集各种数据；
 </li>
 <li>
-	by generating random numbers.
+	产生一系列随机数；
 </li>
 <li>
-	etc.
+	等等。
 </li>
 </ul>
 
-Here, we use a random number generator as an example.
-The generator function returns one result but takes no parameters.
+这里，我们使用一个随机数产生器做为一个数据产生者的例子。
+此数据产生者函数没有输入，只有输出。
 
 <pre class="line-numbers"><code class="language-go">import (
 	"crypto/rand"
@@ -1526,31 +1372,25 @@ func RandomGenerator() <-chan uint64 {
 </code></pre>
 
 <p>
-In fact, the random number generator is a multi-return future
-which has been introudced at the starting of the current article.
+事实上，此随机数产生器是一个多返回值的future/promise。
 </p>
 
 <p>
-A data producer may close the output stream channel at any time
-to end data generating.
+一个数据产生者可以在任何时刻关闭返回的数据通道以结束数据生成。
 </p>
 
 </div>
 
-<h4>Data Aggregation</h4>
+<h4>数据聚合</h4>
 
 <div>
-
-A data aggregation module worker aggregates several data streams
-of the same data type into one stream.
-Assume the data type is <code>int64</code>,
-the following function will aggregate arbitrary
-number of data streams into one.
+一个数据聚合模块的工作协程将多个数据流合为一个数据流。
+假设数据类型为<code>int64</code>，下面这个函数将任意数量的数据流合为一个。
 
 <pre class="line-numbers"><code class="language-go">func Aggregator(inputs ...<-chan uint64) <-chan uint64 {
 	output := make(chan uint64)
 	for _, in := range inputs {
-		in := in // this line is important
+		in := in // 此行是必要的
 		go func() {
 			for {
 				output <- <-in // <=> output <- (<-in)
@@ -1564,32 +1404,41 @@ number of data streams into one.
 <p>
 </p>
 
-A better implementation should consider whether or not
-an input stream has been closed.
-(Also valid for the following other module worker implementations.)
+一个更完美的实现需要考虑一个输入数据流是否已经关闭。（下面要介绍的其它工作协程同理。）
 
-<pre class="line-numbers"><code class="language-go">...
-		in := in // this line is important
+<pre class="line-numbers"><code class="language-go">import "sync"
+
+func Aggregator(inputs ...<-chan uint64) <-chan uint64 {
+	output := make(chan uint64)
+	var wg sync.WaitGroup
+	for _, in := range inputs {
+		wg.Add(1)
+		in := in // 此行是必要的
 		go func() {
 			for {
 				x, ok := <-in
 				if ok {
 					output <- x
 				} else {
-					close(output)
+					wg.Done()
 				}
 			}
 		}()
-...
+	}
+	go func() {
+		wg.Wait()
+		close(output)
+	}()
+	return output
+}
 </code></pre>
 
 <p>
 </p>
 
-If the number of aggregated data streams are very few (two or three),
-we can use <code>select</code> block to aggregate these data streams.
+如果被聚合的数据流的数量很小，我们也可以使用一个<code>select</code>控制流程代码块来聚合这些数据流。
 
-<pre class="line-numbers"><code class="language-go">// Assume the number of input stream is two.
+<pre class="line-numbers"><code class="language-go">// 假设数据流的数量为2。
 ...
 	output := make(chan uint64)
 	go func() {
@@ -1609,18 +1458,15 @@ we can use <code>select</code> block to aggregate these data streams.
 
 </div>
 
-<h4>Data Division</h4>
+<h4>数据分流</h4>
 
 <div>
 
-A data division module worker does the opposite of
-a data aggregation module worker.
-It is easy to implement a division worker,
-but in practice, division workers are not very useful and seldom used.
+数据分流是数据聚合的逆过程。数据分流的实现很简单，但在实践中用的并不多。
 
 <pre class="line-numbers"><code class="language-go">func Divisor(input <-chan uint64, outputs ...chan<- uint64) {
 	for _, out := range outputs {
-		out := out // this line is important
+		out := out // 此行是必要的
 		go func() {
 			for {
 				out <- <-input // <=> out <- (<-input)
@@ -1635,22 +1481,15 @@ but in practice, division workers are not very useful and seldom used.
 
 </div>
 
-<h4>Data Composition</h4>
+<h4>数据合成</h4>
 
 <div>
 <p>
-Data composition is like data aggregation, but a data composition worker
-merges data streams of different data types.
-For data aggregation, two pieces of data are still two pieces of data.
-But for data composition, several pieces of data compose one piece of new data.
+数据合成将多个数据流中读取的数据合成一个。
 </p>
 
-The following is a composition worker example, in which two <code>uint64</code>
-values from one stream and one <code>uint64</code> value from another stream
-compose one new <code>uint64</code> value.
-Generally these stream channel element types are different in parctice.
-Here they are the same in the following example is to
-make the data flow system assembling explanations below simpler.
+下面是一个数据合成工作函数的实现中，从两个不同数据流读取的两个<code>uint64</code>值组成了一个新的<code>uint64</code>值。
+当然，在实践中，数据的组合比这复杂得多。
 
 <pre class="line-numbers"><code class="language-go">func Composor(inA <-chan uint64, inB <-chan uint64) <-chan uint64 {
 	output := make(chan uint64)
@@ -1669,27 +1508,24 @@ make the data flow system assembling explanations below simpler.
 
 </div>
 
-<h4>Data Decomposition</h4>
+<h4>数据分解</h4>
 
 <div>
 
-Data decomposition is the inverse process of data composition.
-A decomposition worker function implementation takes one
-input data stream parameter and returns several data stream results.
+数据分解是数据合成的逆过程。一个数据分解者从一个数据通道读取一份数据，并将此数据分解为多份数据。
+这里就不举例了。
 
 </div>
 
-<h4>Data Duplication/Proliferation</h4>
+<h4>数据复制/增殖</h4>
 
 <div>
 
 <p>
-Data duplications (proliferations) can be viewed as special data decompositions.
-One piece of data will be duplicated and each of the duplicated data will
-be send to different output data streams.
+数据复制（增殖）可以看作是特殊的数据分解。一份输入数据将被复制多份并输出给多个数据流。
 </p>
 
-An example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">func Duplicator(in <-chan uint64) (<-chan uint64, <-chan uint64) {
 	outA, outB := make(chan uint64), make(chan uint64)
 	go func() {
@@ -1708,21 +1544,20 @@ An example:
 
 </div>
 
-<h4>Data Calculation/Analyzation</h4>
+<h4>数据计算/分析</h4>
 
 <div>
 <p>
-The functionalities of data calculation and analuzation modules vary much
-and are very specfic each.
-Generally, a worker function of such modules transforms each piece of input data
-into another piece of output data.
+数据计算和数据分析模块的功能因具体程序不同而有很大的差异。
+一般来说，数据分析者接收一份数据并对之加工处理后转换为另一份数据。
 </p>
 
-For simple demo purpose, here shows a worker example
-which inverts every bit of each transferred <code>uint64</code> value.
+下面的简单示例中，每个输入的<code>uint64</code>值将被进行位反转后输出。
 
-<pre class="line-numbers"><code class="language-go">func Calculator(input <-chan uint64) (<-chan uint64) {
-	output := make(chan uint64)
+<pre class="line-numbers"><code class="language-go">func Calculator(input <-chan uint64, output chan uint64) (<-chan uint64) {
+	if output == nil {
+		output = make(chan uint64)
+	}
 	go func() {
 		for {
 			x := <-input
@@ -1738,18 +1573,19 @@ which inverts every bit of each transferred <code>uint64</code> value.
 
 </div>
 
-<h4>Data Validation/Filtering</h4>
+<h4>数据验证/过滤</h4>
 
 <div>
 
-A data validation or filtering module discards
-some transferred data in a stream.
-For example, the following worker function discards all non-prime numbers.
+一个数据验证或过滤者的任务是检查输入数据的合理性并抛弃不合理的数据。
+比如，下面的工作者协程将抛弃所有的非素数。
 
 <pre class="line-numbers"><code class="language-go">import "math/big"
 
-func Filter(input <-chan uint64) (<-chan uint64) {
-	output := make(chan uint64)
+func Filter(input <-chan uint64, output chan uint64) <-chan uint64 {
+	if output == nil {
+		output = make(chan uint64)
+	}
 	go func() {
 		bigInt := big.NewInt(0)
 		for {
@@ -1769,14 +1605,12 @@ func Filter(input <-chan uint64) (<-chan uint64) {
 
 </div>
 
-<h4>Data Serving/Saving</h4>
+<h4>数据服务/存盘</h4>
 
 <p>
 
-Generally, a data serving or saving module is the last or final outout module
-in a data flow system.
-Here just provides a simple worker which prints each piece of data
-received from the input stream.
+一般，一个数据服务或者存盘模块为一个数据流系统中的最后一个模块。
+这里的实现值是简单地将数据输出到终端。
 
 <pre class="line-numbers"><code class="language-go">import "fmt"
 
@@ -1795,20 +1629,18 @@ func Printer(input <-chan uint64) {
 <p>
 </p>
 
-<h4>Data Flow System Assembling</h4>
+<h4>组装数据流系统</h4>
 
 <div>
 <p>
-Now, let's use the above module worker functions
-to assemble several data flow systems.
-Assembling a data flow system is just to create some workers
-of different modules, and specify the input streams for every workers.
+现在，让我们使用上面的模块工作者函数实现来组装一些数据流系统。
+组装数据流仅仅是创建一些工作者协程函数调用，并为这些调用指定输入数据流和输出数据流。
 </p>
 
-Data flow system example 1 (a linear pipeline):
+数据流系统例子一（一个流线型系统）：
 <pre class="line-numbers"><code class="language-go">package main
 
-... // the worker functions declared above.
+... // 上面的模块工作者函数实现
 
 func main() {
 	Printer(
@@ -1825,17 +1657,17 @@ func main() {
 </p>
 
 <p>
-The above data flow system is depicted in the following diagram.
+上面这个流线型系统描绘在下图中：
 
 <br/>
 <img src="res/data-flow-linear.png">
 <br/>
 </p>
 
-Data flow system example 2 (a directed acyclic graph pipeline):
+数据流系统例子二（一个单向无环图系统）：
 <pre class="line-numbers"><code class="language-go">package main
 
-... // the worker functions declared above.
+... // 上面的模块工作者函数实现
 
 func main() {
 	filterA := Filter(RandomGenerator())
@@ -1853,7 +1685,7 @@ func main() {
 </p>
 
 <p>
-The above data flow system is depicted in the following diagram.
+上面这个单向无环图系统描绘在下图中：
 
 <br/>
 <img src="res/data-flow-dag.png">
@@ -1861,29 +1693,49 @@ The above data flow system is depicted in the following diagram.
 </p>
 
 <p>
-More complex data flow topologies may be arbitrary graphs.
-For example, a data flow system may have multiple final outputs.
-But data flow systems with cyclic-graph topologies are seldom used in reality.
+更复杂的数据流系统可以表示为任何拓扑结构的图。比如一个复杂的数据流系统可能有多个输出模块。
+但是有环拓扑结构的数据流系统在实践中很少用。
 </p>
 
 <p>
-From the above two examples, we can find that it is very easy
-and intuitive to build data flow systems with channels.
+从上面两个例子可以看出，使用数据通道来构建数据流系统是很简单和直观的。
 </p>
 
 <p>
-From the last example, we can find that, in a data system, if we aggregate
-the respective output streams of all the workers in a module,
-then we can use the aggregated result stream as the respective input streams
-of the all the workers in the next module.
-By using this way, it is easy to do fan-in and fan-out the number of
-workers for a specified module.
+从上例可以看出，通过使用数据聚合模块，我们可以很轻松地实现各个模块的工作协程数量的扇入（fan-in）和扇出（fan-out）。
+</p>
+
+事实上，我们也可以使用一个简单的数据通道来代替数据聚合的角色。比如，下面的代码使用两个数据通道代替了上例中的两个数据聚合器。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+... // the worker functions declared above.
+
+func main() {
+	c1 := make(chan uint64, 100)
+	Filter(RandomGenerator(), c1) // filterA
+	Filter(RandomGenerator(), c1) // filterB
+	Filter(RandomGenerator(), c1) // filterC
+	c2 := make(chan uint64, 100)
+	Calculator(c1, c2) // calculatorA
+	Calculator(c1, c2) // calculatorB
+	Printer(c2)
+}
+</code></pre>
+
+<p>
 </p>
 
 <p>
-The above explanations for data flow systems don't consider much on
-how to close data streams. Please read <a href="channel-closing.html">this
-article</a> for explanations on how to gracefully close channels.
+修改后的数据流的拓扑结构如下图所示：
+
+<br/>
+<img src="res/data-flow-dag-2.png">
+<br/>
+</p>
+
+<p>
+上面的代码示例并没有太多考虑如何关闭一个数据流。请阅读<a href="channel-closing.html">此篇文章</a>来了解如何优雅地关闭数据通道。
 </p>
 
 </div>
