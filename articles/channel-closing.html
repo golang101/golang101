@@ -1,28 +1,21 @@
-﻿<h1>How To Gracefully Close Channels</h1>
-
-<!--
-https://groups.google.com/forum/#!msg/golang-nuts/pZwdYRGxCIk/qpbHxRRPJdUJ
--->
+﻿<h1>如何优雅地关闭数据通道</h1>
 
 <div>
 <p>
-Several days ago, I wrote an article which explains
-<a href="channel.html">the channel rules in Go</a>.
-That article got many votes
-on <a href="https://www.reddit.com/r/golang/comments/5k489v/the_full_list_of_channel_rules_in_golang/">reddit</a>
-and <a href="https://news.ycombinator.com/item?id=13252416">HN</a>.
+在本文发表数日前，我曾写了一篇文章来解释<a href="channel.html">数据通道的规则</a>。
+那篇文章在<a href="https://www.reddit.com/r/golang/comments/5k489v/the_full_list_of_channel_rules_in_golang/">reddit</a>和<a href="https://news.ycombinator.com/item?id=13252416">HN</a>上获得了很多点赞，但也有很多人对Go数据通道的细节设计提出了一些批评意见。
 </p>
 
-I collected some criticisms on the following designs and rules of Go channels:
+这些批评主要针对于数据通道设计中的下列细节：
 <ol>
 <li>
-no easy and universal ways to check whether or not a channel is closed without modifying the status of the channel.
+没有一个简单和通用的方法用来在不改变一个数据通道的状态的情况下检查这个通道是否已经关闭。
 </li>
 <li>
-closing a closed channel will panic, so it is dangerous to close a channel if the closers don't know whether or not the channel is closed.
+关闭一个已经关闭的数据通道将产生一个恐慌，所以在不知道一个数据通道是否已经关闭的时候关闭此数据通道是很危险的。
 </li>
 <li>
-sending values to a closed channel will panic, so it is dangerous to send values to a channel if the senders don't know whether or not the channel is closed.
+向一个已关闭的数据通道发送数据将产生一个恐慌，所以在不知道一个数据通道是否已经关闭的时候向此数据通道发送数据是很危险的。
 </li>
 </ol>
 <p>
@@ -30,14 +23,13 @@ sending values to a closed channel will panic, so it is dangerous to send values
 </div>
 
 <p>
-The criticisms look reasonable (in fact not).
-Yes, there is not a built-in function to check whether or not a channel has been closed.
+这些批评看上去有几分道理（实际上属于对数据通道的不正确使用导致的偏见）。
+是的，Go语言中并没有提供一个内置函数来检查一个数据通道是否已经关闭。
 </p>
 
 <div>
-There is indeed a simple method to check whether or not a channel is closed
-if you can make sure no values were ever sent to the channel
-(this method will be often used in other examples in this article):
+在Go中，如果，我们能够保证从不会向一个数据通道发送过数据，那么有一个简单的方法来判断此数据通道是否已经关闭。
+（此方法将在下面的多个示例中使用。）
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -62,79 +54,61 @@ func main() {
 }
 </code></pre>
 <p>
-As above mentioned, this is not a universal way to check whether a channel is closed.
+如前所述，此方法并不是一个通用的检查数据通道是否已经关闭的方法。
 </p>
 </div>
 
 <p>
-However, even if there is a simple <code>closed(chan T) bool</code> function
-to check whether or not a channel has been closed,
-its usefulness would be very limited, just like the built-in <code>len</code>
-function for checking the current number of values stored in the value buffer of a channel.
-The reason is the status of the checked channel may have changed
-just after a call to such functions returns,
-so that the returned value has already not be able to
-reflect the latest status of the just checked channel.
-Although it is okay to stop sending values to a channel <code>ch</code> if the
-call <code>closed(ch)</code> returns <code>true</code>,
-it is not safe to close the channel or continue sending values to the channel if the
-call <code>closed(ch)</code> returns <code>false</code>.
+事实上，即使有一个函数<code>closed(chan T) bool</code>可以用来检查一个数据通道是否已经关闭，它的有用性也是十分有限的。
+原因是当此函数的一个调用的结果返回时，被查询的数据通道的状态可能已经又改变了，导致此调用结果并不能反映出被查询的数据通道的最新状态。
+虽然我们可以根据一个调用<code>closed(ch)</code>的返回结果为<code>true</code>而得出我们不应该再向通道<code>ch</code>发送数据的结论，
+但是我们不能根据一个调用<code>closed(ch)</code>的返回结果为<code>false</code>而得出我们可以继续向通道<code>ch</code>发送数据的结论。
 </p>
 
-<h3>The Channel Closing Principle</h3>
+<h3>数据通道关闭原则</h3>
 
 <p>
-One general principle of using Go channels is
-<b><i>don't close a channel from the receiver side
-and don't close a channel if the channel has multiple concurrent senders</i></b>.
-In other words, you should only close a channel in a sender goroutine
-if the sender is the only sender of the channel.
+一个常用的使用Go数据通道的原则是<b>不要在数据接收方或者在有多个发送者的情况下关闭数据通道</b>。
+换句话说，我们只应该让一个数据通道唯一的发送者关闭一个此数据通道。
 </p>
 
 <p>
-<i>(Below, we will call the above principle as <b>channel closing principle</b>.)</i>
+下面我们将称此原则为<b>数据通道关闭原则</b>。
 </p>
 
 <p>
-Surely, this is not a universal principle to close channels.
-The universal principle is <i>don't send values to (or close) closed channels</i>.
-If an arbitrary goroutine can guarantee that no goroutines will send to
-(or close) a non-closed non-nil channel any more,
-then that goroutine can close the channel safely.
-However, making such guarantees by a receiver or by one of many senders of a channel
-usually needs much effort, and often makes code complicated.
-On the contrary, it is much easy to hold the <b>channel closing principle</b> mentioned above.
+当然，这并不是一个通用的关闭数据通道的原则。通用的原则是<b>不要关闭已关闭的数据通道</b>。
+如果我们能够保证从某个时刻之后，再没有协程将向一个未关闭的非nil数据通道发送数据，则一个协程可以安全地关闭此通道。
+然而，做出这样的保证常常需要很大的努力，从而导致代码过度复杂。
+另一方面，遵循<b>数据通道关闭原则</b>是一件相对简单的事儿。
 </p>
 
-<h3>Solutions Which Close Channels Rudely</h3>
+<h3>粗鲁地关闭数据通道的方法</h3>
 
 <div>
-If you would close a channel from the receiver side or in one of the multiple senders
-of the channel anyway, then you can use the recover mechanism to prevent
-the possible panic from crashing your program.
-Here is an example (assume the channel element type is <code>T</code>).
+如果由于某种原因，你一定非要从数据接收方或者让众多发送者中的一个关闭一个数据通道，你可以使用<a href="control-flows-more.html#panic-recover">恢复机制</a>来防止可能产生的恐慌导致程序崩溃。
+下面就是这样的一个实现（假设数据通道的元素类型为<code>T</code>）。
 <pre class="line-numbers"><code class="language-go">func SafeClose(ch chan T) (justClosed bool) {
 	defer func() {
 		if recover() != nil {
-			// The return result can be altered
-			// in a defer function call.
+			// 一个函数的返回结果可以在defer调用中修改。
 			justClosed = false
 		}
 	}()
 	
-	// assume ch != nil here.
-	close(ch)   // panic if ch is closed
+	// 假设ch != nil。
+	close(ch)   // 如果ch已关闭，则产生一个恐慌。
 	return true // <=> justClosed = true; return
 }
 </code></pre>
 
 <p>
-This solution obviously breaks the <b>channel closing principle</b>.
+此方违反了<b>数据通道关闭原则</b>。
 </p>
 </div>
 
 <div>
-The same idea can be used for sending values to a potential closed channel:
+同样的方法可以用来粗鲁地向一个关闭状态未知的数据通道发送数据。
 <pre class="line-numbers"><code class="language-go">func SafeSend(ch chan T, value T) (closed bool) {
 	defer func() {
 		if recover() != nil {
@@ -142,17 +116,18 @@ The same idea can be used for sending values to a potential closed channel:
 		}
 	}()
 	
-	ch <- value  // panic if ch is closed
+	ch <- value  // 如果ch已关闭，则产生一个恐慌。
 	return false // <=> closed = false; return
 }
 </code></pre>
 <p></p>
 </div>
 
-<h3>Solutions Which Close Channels Politely</h3>
+<h3>礼貌地关闭数据通道的方法</h3>
 
 <div>
-Many people prefer using <code>sync.Once</code> to close channels:
+很多Go程序员喜欢使用<code>sync.Once</code>来关闭数据通道。
+
 <pre class="line-numbers"><code class="language-go">type MyChannel struct {
 	C    chan T
 	once sync.Once
@@ -172,7 +147,7 @@ func (mc *MyChannel) SafeClose() {
 </div>
 
 <div>
-Surely, we can also use <code>sync.Mutex</code> to avoid closing a channel multiple times:
+当然，我们也可以使用<code>sync.Mutex</code>来防止多次关闭一个数据通道。
 <pre class="line-numbers"><code class="language-go">type MyChannel struct {
 	C      chan T
 	closed bool
@@ -202,33 +177,26 @@ func (mc *MyChannel) IsClosed() bool {
 </div>
 
 <p>
-We should comprehend that the reason of why Go doesn't support built-in <code>SafeSend</code> and <code>SafeClose</code> functions
-is that it is not recommended to close a channel from the receiver side or from multiple concurrent senders.
-Go even forbids closing receive-only channels.
+我们应该理解为什么Go没有提供这样的内置的<code>SafeClose</code>函数的原因是在从接收方一端或者让众多发送者中的一个关闭一个数据通道常常属于不良的并发程序设计。
+Go甚至从语法上禁止关闭单向接收通道。
 </p>
 
-<h3>Solutions Which Close Channels Gracefully</h3>
+<h3>优雅地关闭数据通道的方法</h3>
 
 <p>
-One drawback of the above <code>SafeSend</code> function is that its calls can't be used as
-send operations which follow the <code>case</code> keyword in select blocks.
-The other drawback of the above <code>SafeSend</code> and  <code>SafeClose</code> functions
-is that many people, including me, would think the above solutions
-by using <code>panic</code>/<code>recover</code> and <code>sync</code> package are not graceful.
-Following, some pure-channel solutions without using <code>panic</code>/<code>recover</code>
-and <code>sync</code> package will be introduced, for all kinds of situations.
+上一节中介绍的<code>SafeSend</code>函数有一个弊端，它的调用不能做为<code>case</code>操作使用在<code>select</code>代码块中。
+另外，很多Go程序员（包括我）认为上面两节展示的关闭数据通道的方法不是很优雅。
+本节下面将介绍一些在各种情形下使用纯数据通道操作来关闭数据通道的方法。
 </p>
 
 <p><i>
-(In the following examples, <code>sync.WaitGroup</code> is used to make the examples complete.
-It may be not always essential to use it in real practice.)
+（为了演示程序的完整性，下面这些例子中使用到了<code>sync.WaitGroup</code>。在实践中，<code>sync.WaitGroup</code>并不是必需的。）
 </i></p>
 
-<h4>1. M receivers, one sender, the sender says "no more sends" by closing the data channel</h4>
+<h4>情形一：M个接收者和一个发送者。发送者通过关闭数据通道来传递发送结束信号</h4>
 
 <div>
-This is the simplest situation, just let the sender close the data channel
-when it doesn't want to send more:
+这是最简单的一种情形。当发送者欲结束发送，让它关闭通讯用的数据通道即可。
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
@@ -252,11 +220,11 @@ func main() {
 	// ...
 	dataCh := make(chan int, 100)
 	
-	// the sender
+	// 发送者
 	go func() {
 		for {
 			if value := rand.Intn(MaxRandomNumber); value == 0 {
-				// The only sender can close the channel safely.
+				// 此唯一的发送者可以安全地关闭此数据通道。
 				close(dataCh)
 				return
 			} else {			
@@ -265,13 +233,12 @@ func main() {
 		}
 	}()
 	
-	// receivers
+	// 接收者
 	for i := 0; i < NumReceivers; i++ {
 		go func() {
 			defer wgReceivers.Done()
 			
-			// Receive values until dataCh is closed and
-			// the value buffer queue of dataCh is empty.
+			// 接收数据直到数据通道dataCh已关闭并且dataCh的缓冲队列已空。
 			for value := range dataCh {
 				log.Println(value)
 			}
@@ -284,14 +251,12 @@ func main() {
 <p></p>
 </div>
 
-<h4>2. One receiver, N senders, the receiver says "please stop sending more" by closing an additional signal channel</h4>
+<h4>情形二：一个接收者和N个发送者。发送者通过关闭一个额外的信号通道来通知发送者不要在发送数据了</h4>
 
 <div>
-This is a situation a little more complicated than the above one.
-We can't let the receiver close the data channel,
-for doing this will break the <b>channel closing principle</b>.
-But we can let the receiver close an additional signal channel to
-notify senders to stop sending values:
+此情形壁上一种情形复杂一些。我们不能让接收者关闭数据通道来停止数据传输，因为这样做违反了<b>数据通道关闭原则</b>。
+但是我们可以让接收者关闭一个额外的信号数据通道来通知发送者不要在发送数据了。
+
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
@@ -315,28 +280,24 @@ func main() {
 	// ...
 	dataCh := make(chan int, 100)
 	stopCh := make(chan struct{})
-		// stopCh is an additional signal channel.
-		// Its sender is the receiver of channel dataCh.
-		// Its reveivers are the senders of channel dataCh.
+		// stopCh是一个额外的信号通道。它的发送者为dataCh数据通道的接收者。
+		// 它的接收者为dataCh数据通道的发送者。
 	
-	// senders
+	// 发送者
 	for i := 0; i < NumSenders; i++ {
 		go func() {
 			for {
-				// The first select is to try to exit the goroutine
-				// as early as possible. In fact, it is not essential
-				// for this specified example, so it can be omitted.
+				// 这里的第一个尝试接收用来让此发送者协程尽早地退出。
+				// 对于这个特定的例子，此select代码块并非必需。
 				select {
 				case <- stopCh:
 					return
 				default:
 				}
 				
-				// Even if stopCh is closed, the first branch in the
-				// second select may be still not selected for some
-				// loops if the send to dataCh is also unblocked.
-				// But this is acceptable for this example, so the
-				// first select block above can be omitted.
+				// 即使stopCh已经关闭，此第二个select代码块中的第一个
+				// 分支仍很有可能在若干个循环步内依然不会被选中。如果这
+				// 是不可接受的，则上面的第一个select代码块是必需的。
 				select {
 				case <- stopCh:
 					return
@@ -346,15 +307,15 @@ func main() {
 		}()
 	}
 	
-	// the receiver
+	// 接收者
 	go func() {
 		defer wgReceivers.Done()
 		
 		for value := range dataCh {
 			if value == MaxRandomNumber-1 {
-				// The receiver of the dataCh channel is
-				// also the sender of the stopCh channel.
-				// It is safe to close the stop channel here.
+				// 此唯一的接收者同时也是stopCh数据通道的唯一发送者。
+				// 尽管它不能安全地关闭dataCh数据通道，它可以安全地】
+				// 关闭stopCh数据通道。
 				close(stopCh)
 				return
 			}
@@ -368,31 +329,25 @@ func main() {
 }
 </code></pre>
 <p>
-As mentioned in the comments, for the additional signal channel,
-its sender is the receiver of the data channel.
-The additional signal channel is closed by its only sender,
-which holds the <b>channel closing principle</b>.
+如此例中的注释所述，对于此额外的信号通道<code>stopCh</code>，它只有一个发送者，即<code>dataCh</code>数据通道的唯一接收者。
+<code>dataCh</code>数据通道的接收者关闭了信号通道<code>stopCh</code>，这是不违反<b>数据通道关闭原则</b>的。
 </p>
 
 <p>
-In this example, the channel <code>dataCh</code> is never closed.
-Yes, channels don't have to be closed.
-A channel will be eventually garbage collected if no goroutines reference it any more,
-whether it is closed or not.
-So the gracefulness of closing a channel here is not to close the channel.
+此此例中，数据通道<code>dataCh</code>并没有被关闭。是的，我们不必关闭它。
+当一个数据通道不再被任何协程所使用后，它将逐渐被垃圾回收掉，无论它是否已经被关闭。
+所以这里的优雅性体现在通过不关闭一个数据通道来停止使用此数据通道。
 </p>
 </div>
 
-<h4>3. M receivers, N senders, random one of them says "let's end the game" by notifying a moderator to close an additional signal channel</h4>
+<h4>情形三：M个接收者和N个发送者。它们中的任何协程都可以让一个中间调解协程帮忙发出停止数据传送的信号</h4>
 
 <div>
-This is a the most complicated situation.
-We can't let any of the receivers and the senders close the data channel.
-And we can't let any of the receivers close an additional signal channel to
-notify all senders and receivers to exit the game.
-Doing either will break the <b>channel closing principle</b>.
-However, we can introduce a moderator role to close the additional signal channel.
-One trick in this example is how to notify the moderator to close the additional signal channel:
+这是最复杂的一种情形。我们不能让接收者和发送者中的任何一个关闭数据通道，我们已不能让多个接收者之一关闭一个额外的信号通道。
+这两种做法都违反了<b>数据通道关闭原则</b>。
+然而，我们可以引入一个中间调解者角色并让其关闭额外的信号通道来通知所有的接收者和发送者结束工作。
+具体实现见下例。注意其中使用了一个尝试发送操作来向中间调解者发送信号。
+
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
@@ -418,54 +373,50 @@ func main() {
 	// ...
 	dataCh := make(chan int, 100)
 	stopCh := make(chan struct{})
-		// stopCh is an additional signal channel.
-		// Its sender is the moderator goroutine shown below.
-		// Its reveivers are all senders and receivers of dataCh.
+		// stopCh是一个额外的信号通道。它的发送者为中间调解者。
+		// 它的接收者为dataCh数据通道的所有的发送者和接收者。
 	toStop := make(chan string, 1)
-		// The channel toStop is used to notify the moderator
-		// to close the additional signal channel (stopCh).
-		// Its senders are any senders and receivers of dataCh.
-		// Its reveiver is the moderator goroutine shown below.
+		// toStop是一个用来通知中间调解者让其关闭信号通道
+		// stopCh的第二个信号通道。此第二个信号通道的发送者为
+		// dataCh数据通道的所有的发送者和接收者，它的接收者
+		// 为中间调解者。它必须为一个缓冲通道。
 	
 	var stoppedBy string
 	
-	// moderator
+	// 中间调解者
 	go func() {
 		stoppedBy = <-toStop
 		close(stopCh)
 	}()
 	
-	// senders
+	// 发送者
 	for i := 0; i < NumSenders; i++ {
 		go func(id string) {
 			for {
 				value := rand.Intn(MaxRandomNumber)
 				if value == 0 {
-					// Here, a trick is used to notify the moderator
-					// to close the additional signal channel.
+					// 为了防止阻塞，这里使用了一个尝试
+					// 发送操作来向中间调解者发送信号。
 					select {
-					case toStop <- "sender#" + id:
+					case toStop <- "发送者#" + id:
 					default:
 					}
 					return
 				}
 				
-				// The first select here is to try to exit the goroutine
-				// as early as possible. This select blocks with one
-				// receive operation case and one default branches will
-				// be specially optimized as a try-receive operation by
-				// the standard Go compiler.
+				// 此处的尝试接收操作是为了让此发送协程尽早退出。
+				// 官方Go标准编译器对尝试接收和尝试发送做了特殊
+				// 的优化，因而它们的速度很快。
 				select {
 				case <- stopCh:
 					return
 				default:
 				}
 				
-				// Even if stopCh is closed, the first branch in the
-				// second select may be still not selected for some
-				// loops (and for ever in theory) if the send to
-				// dataCh is also non-blocking.
-				// This is why the first select block above is needed.
+				// 即使stopCh已关闭，如果这个select代码块中第二个
+				// 分支的发送操作是非阻塞的，则第一个分支仍很有可能在
+				// 若干个循环步内依然不会被选中。如果这是 不可接受的，
+				// 则上面的第一个尝试接收操作代码块是必需的。
 				select {
 				case <- stopCh:
 					return
@@ -475,38 +426,33 @@ func main() {
 		}(strconv.Itoa(i))
 	}
 	
-	// receivers
+	// 接收者
 	for i := 0; i < NumReceivers; i++ {
 		go func(id string) {
 			defer wgReceivers.Done()
 			
 			for {
-				// Same as the sender goroutine, the first select here
-				// is to try to exit the goroutine as early as possible.
-				// This select blocks with one send operation case and
-				// one default branches will be specially optimized as
-				// a try-send operation by the standard Go compiler.
+				// 和发送者协程一样，此处的尝试接收操作是为了让此
+				// 接收协程尽早退出。
 				select {
 				case <- stopCh:
 					return
 				default:
 				}
 				
-				// Even if stopCh is closed, the first branch in the
-				// second select may be still not selected for some
-				// loops (and for ever in theory) if the receive from
-				// dataCh is also non-blocking.
-				// This is why the first select block is needed.
+				// 即使stopCh已关闭，如果这个select代码块中第二个
+				// 分支的接收操作是非阻塞的，则第一个分支仍很有可能
+				// 在若干个循环步内依然不会被选中。如果这是不可接受
+				// 的，则上面尝试接收操作代码块是必需的。
 				select {
 				case <- stopCh:
 					return
 				case value := <-dataCh:
 					if value == MaxRandomNumber-1 {
-						// The same trick is used to notify
-						// the moderator to close the
-						// additional signal channel.
+						// 为了防止阻塞，这里使用了一个尝试
+						// 发送操作来向中间调解者发送信号。
 						select {
-						case toStop <- "receiver#" + id:
+						case toStop <- "接收者#" + id:
 						default:
 						}
 						return
@@ -520,24 +466,21 @@ func main() {
 	
 	// ...
 	wgReceivers.Wait()
-	log.Println("stopped by", stoppedBy)
+	log.Println("被" + stoppedBy + "终止了")
 }
 </code></pre>
 
 <p>
-In this example, the <b>channel closing principle</b> is still held.
+在此例中，<b>数据通道关闭原则</b>依旧得到了遵守。
 </p>
 
 <p>
-Please note that the buffer size (capacity) of channel <code>toStop</code> is one.
-This is to avoid the first notification is missed
-when it is sent before the moderator goroutine gets ready to receive nitification
-from <code>toStop</code>.
+请注意，信号通道<code>toStop</code>的容量必须至少为1。
+如果它的容量为0，则在中间调解者还未准备好的情况下就已经有某个协程向<code>toStop</code>发送信号时，此信号将被抛弃。
 </p>
 
-We can also set the capacity of the <code>toStop</code> channel
-as the sum number of senders and receivers,
-then we don't need a try-send <code>select</code> block to notify the moderator.
+我们也可以不使用尝试发送操作向中间调解者发送信号，但信号通道<code>toStop</code>的容量必须至少为数据发送者和数据接收者的数量之和。
+
 <pre class="line-numbers"><code class="language-go">...
 toStop := make(chan string, NumReceivers + NumSenders)
 ...
@@ -555,27 +498,25 @@ toStop := make(chan string, NumReceivers + NumSenders)
 </code></pre>
 </div>
 
-<h4>4. more situations?</h4>
+<h4>更多情形？</h4>
 
 <p>
-There are more situation variants based on the above three ones.
-For example, one variant based on the most complicated one may require
-the receivers read all the remaining values out of the buffered data channel.
-This would be easy to handle and this article will not cover it.
+实践中存在以上三种情形的更多变种。
+比如，上述第三种情形得一个变种可能要求接收者将<code>dataCh</code>中留存的所有数据读尽。
+本文就不对类似更多变种多加讲解了。
 </p>
 
 <p>
-Although the above three situations can't cover all the Go channel using situations,
-they are the basic ones. Most situations in practice can be classified into the three ones.
+尽管上述三种情形没有覆盖所有的使用情形，但它们是最基本的几种情形。其它很多情形都可以归为这三种情形。
 </p>
 
-<h3>Conclusion</h3>
+<h3>结论</h3>
 
 <p>
-There are no situations which will force you to break the <b>channel closing principle</b>.
-If you encounter such a situation, please rethink your design and rewrite you code.
+并没有什么情况非得逼得我们违反<b>数据通道关闭原则</b>。
+如果你遇到了此情形，请考虑修改你的代码流程和结构设计。
 </p>
 
 <p>
-Programming with Go channels is like making art.
+使用数据通道编程宛如在艺术创作一样！
 </p>
