@@ -1279,11 +1279,12 @@ func Copy(dest, src []T) int {
 </code></pre>
 <p>
 在此语法形式中，<code>key</code>和<code>element</code>称为循环变量。
+如果<code>aContainer</code>是一个切片或者数组（或者数组指针，见后），则<code>key</code>的类型必须为内置类型<code>int</code>。
 </p>
 
 <p>
 上面所示的<code>for-range</code>语法形式中的等号<code>=</code>也可以是一个变量短声明符号<code>:=</code>。
-当短声明符号被使用的时候，<code>key</code>和<code>element</code>总是两个新声明的变量。
+当短声明符号被使用的时候，<code>key</code>和<code>element</code>总是两个新声明的变量，这时如果<code>aContainer</code>是一个切片或者数组（或者数组指针），则<code>key</code>的类型被推断为内置类型<code>int</code>。
 </p>
 
 <p>
@@ -1319,7 +1320,6 @@ func main() {
 </code></pre>
 
 <p>
-如果上例中的循环变量<code>i</code>声明在<code>for-range</code>循环之外，则它的类型必须为内置类型<code>int</code>。
 </p>
 
 <code>for-range</code>循环代码块以一些变种形式：

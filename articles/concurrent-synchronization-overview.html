@@ -1,13 +1,26 @@
-﻿<h1>Concurrency Synchronization Overview</h1>
+﻿<h1>并发同步概述</h1>
 
 <p>
-This article will explain what are synchronizations
-and list the synchronization techniques supported by Go.
+本文将解释什么是并发同步，并列出Go支持的几种并发同步技术。
 </p>
 
-<h3>What Are Synchronizations?</h3>
+<h3>什么是并发同步？</h3>
 
 <div>
+
+并发同步是指如何控制若干并发计算（在Go中，即协程），从而
+<ul>
+<li>
+	避免在它们之间产生数据竞争的现象；
+</li>
+<li>
+	避免在它们无所事事的时候消耗CPU资源。
+</li>
+</ul>
+
+并发同步有时候也称为数据同步。
+
+<!--
 <p>
 Often, at run time, in a concurrent program,
 a value will be accessed by multiple goroutines.
@@ -36,6 +49,10 @@ Here, more specifically, about the ownership of a value,
 </li>
 </ul>
 
+<p>
+is called concurrency synchronization.
+</p>
+
 <p><i>
 (In fact, more precisely, to avoid data races,
 what we care about is the ownerships of some memmory segments.
@@ -46,40 +63,33 @@ But, for explanation simplicity, we will still use
 the "ownerships of values" wording in descriptions throughout Go 101 articles.)
 </i></p>
 </div>
+-->
 
-<h3>What Synchronization Techniques Does Go Support?</h3>
+<h3>Go支持哪些并发同步技术？</h3>
 
 <div>
-The article <a href="channel.html">channels in Go</a>
-has shown that we can use channels to do synchronizations.
-Besides channels, Go also supports some other common synchronization techniques,
-such as mutex and atomic operations.
-Please read the following articles to get how to do synchronizations
-with all kinds of techniques in Go:
+<a href="channel.html">数据通道</a>一文已经解释了如何使用数据通道来做并发同步。
+除了使用数据通道，Go还支持几种通用并发同步技术，比如互斥锁和原子操作。
+请阅读下面的文章来了解各种并发同步技术的使用。
 <ul>
-<li><a href="channel-use-cases.html">Channel Use Cases</a></li>
-<li><a href="channel-closing.html">How To Gracefully Close Channels</a></li>
-<li><a href="concurrent-synchronization-more.html">Concurrency Synchronization Techniques Provided In The <code>sync</code> Standard Package</a></li>
-<li><a href="concurrent-atomic-operation.html">Atomic Operations Provided In The <code>sync/atomic</code> Standard Package</a></li>
+<li><a href="channel-use-cases.html">数据通道用例大全</a></li>
+<li><a href="channel-closing.html">如何优雅地关闭数据通道</a></li>
+<li><a href="concurrent-synchronization-more.html"><code>sync</code>标准库包中提供的并发同步技术</a></li>
+<li><a href="concurrent-atomic-operation.html"><code>sync/atomic</code>标准库包中提供的原子操作技术</a></li>
 </ul>
 </div>
 
 <p>
-We can also do synchronizations by making use of network and file IO.
-But such techniques are very inefficient whthin a single program process.
-Generally, they are used for inter-process and distributed synchronizations.
-Go 101 will not cover such techniques.
+我们也可以利用网络和文件读写来做并发同步，但是这样的并发同步方法使用在一个程序进程内部时效率相对比较低。
+一般来说，这样的方法多适用于多个进程之间或多个主机之间的并发同步。Golang 101中不介绍这样的并发同步方法。
 </p>
 
 <p>
-To understand these synchronization techniques better,
-it is recommended to know the <a href="memory-model.html">memory order guarantees in Go</a>.
+为了更好地理解各种并发同步技术，推荐在适当的时候（具有一定的Go并发编程经验时）阅读<a href="memory-model.html">Go中的内存顺序保证</a>一文。
 </p>
 
 <p>
-The data synchronization techniques in Go will not prevent you from writing
-<a href="concurrent-common-mistakes.html">improper concurrent code</a>.
-However the techniques provided by Go can help you write correct concurrent code easily.
-And the unique channel features make concurrent programming flexible and enjoyable.
+Go中提供的各种并发同步技术并不能阻止Go程序员写出<a href="concurrent-common-mistakes.html">不正确的并发代码</a>。
+但是，这些技术使得Go程序员可以轻松写出正确的并发代码。特别地，Go中提供的独特的数据通道技术使得并发编程变得很轻松和惬意。
 </p>
 

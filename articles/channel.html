@@ -50,7 +50,7 @@
 
 <p>
 这些情形被称为数据竞争（data race）。并发编程的一大任务就是要调度不同计算，控制它们对资源的访问时段，以使数据竞争的情况不会发生。
-此任务常成为并发同步（或者数据同步）。Go支持几种并发同步技术，本文将只介绍它们中的一个：数据通道。
+此任务常称为并发同步（或者数据同步）。Go支持几种并发同步技术，本文将只介绍它们中的一个：数据通道。
 </p>
 
 并发编程中的其它任务包括：
@@ -59,7 +59,7 @@
 	决定需要开启多少计算；
 </li>
 <li>
-	决定何时开启哪些计算；
+	决定何时开启、阻塞、解除阻塞和结束哪些计算；
 </li>
 <li>
 	决定如何在不同的计算中分担工作负载。
@@ -111,7 +111,7 @@ Go提供了一种独特的并发同步技术来实现通过通讯来共享内存
 <p>
 请注意，在这里，数据的所有权是从逻辑上的一个概念。
 和Rust语言不同，在Go中， 数据所有权的转移并非体现在语法上。
-Go数据通道可以帮助程序员轻松地避免数据竞争，但是不能保证程序员会犯错而写出糟烂的代码。
+Go数据通道可以帮助程序员轻松地避免数据竞争，但是不会绝对防止程序员犯错而写出糟烂的代码。
 </p>
 
 <p>
@@ -160,7 +160,7 @@ Go数据通道可以帮助程序员轻松地避免数据竞争，但是不能保
 
 <p>
 每个数据通道值有一个容量属性。此属性将在下一节中得到解释。
-一个容量为0的数据通道值成为一个非缓冲数据通道（unbuffered channel），一个容量不为0的数据通道值成为一个缓冲数据通道（buffered channel）。
+一个容量为0的数据通道值称为一个非缓冲数据通道（unbuffered channel），一个容量不为0的数据通道值称为一个缓冲数据通道（buffered channel）。
 </p>
 
 <p>
@@ -309,21 +309,21 @@ v, sentBeforeClosed = &lt;-ch
 <tbody>
 	<tr>
 	<th scope="row" class="text-center">关闭</th>
-	<td>产生恐慌</td>
-	<td>产生恐慌</td>
-	<td>成功关闭<sup>(C)</sup></td>
+	<td style="vertical-align: middle;">产生恐慌</td>
+	<td style="vertical-align: middle;">产生恐慌</td>
+	<td style="vertical-align: middle;">成功关闭<sup>(C)</sup></td>
 	</tr>
 	<tr>
 	<th scope="row" class="text-center">发送数据</th>
-	<td>永久阻塞</td>
-	<td>产生恐慌</td>
-	<td>阻塞或者成功发送<sup>(B)</sup></td>
+	<td style="vertical-align: middle;">永久阻塞</td>
+	<td style="vertical-align: middle;"">产生恐慌</td>
+	<td style="vertical-align: middle;">阻塞或者成功发送<sup>(B)</sup></td>
 	</tr>
 	<tr>
 	<th scope="row" class="text-center">接收数据</th>
-	<td>永久阻塞</td>
-	<td>永不阻塞<sup>(D)</sup></td>
-	<td>阻塞或者成功接收<sup>(A)</sup></td>
+	<td style="vertical-align: middle;">永久阻塞</td>
+	<td style="vertical-align: middle;">永不阻塞<sup>(D)</sup></td>
+	<td style="vertical-align: middle;">阻塞或者成功接收<sup>(A)</sup></td>
 	</tr>
 </tbody>
 </table>

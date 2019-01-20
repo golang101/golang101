@@ -463,6 +463,53 @@ func main() {
 <p>
 </p>
 
+一些<code>reflect.Value</code>值可能表示着不合法的Go值。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import "reflect"
+import "fmt"
+
+func main() {
+	var z reflect.Value // 一个reflect.Value零值
+	fmt.Println(z)      // &lt;invalid reflect.Value&gt;
+	v := reflect.ValueOf((*int)(nil)).Elem()
+	fmt.Println(v)      // &lt;invalid reflect.Value&gt;
+	fmt.Println(v == z) // true
+	var i = reflect.ValueOf([]interface{}{nil}).Index(0)
+	fmt.Println(i)             // &lt;nil&gt;
+	fmt.Println(i.Elem())      // &lt;invalid reflect.Value&gt;
+	fmt.Println(i.Elem() == z) // true
+}
+</code></pre>
+
+<p>
+上例告诉我们，<code>reflect.Value</code>类型的零值代表着一个不合法的Go值（其实就是不代表任何值的意思）。
+</p>
+
+从上面的例子中，我们知道，使用空接口<code>interface{}</code>值做为中介，一个Go值可以转换为一个<code>reflect.Value</code>值。
+逆过程类似，通过调用一个<code>reflect.Value</code>值的<code>Interface</code>方法得到一个<code>interface{}</code>值，然后将此<code>interface{}</code>断言为原来的Go值。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import "reflect"
+import "fmt"
+
+func main() {
+	vx := reflect.ValueOf(123)
+	vy := reflect.ValueOf("abc")
+	vz := reflect.ValueOf([]bool{false, true})
+	
+	x := vx.Interface().(int)
+	y := vy.Interface().(string)
+	z := vz.Interface().([]bool)
+	fmt.Println(x, y, z) // 123 abc [false true]
+}
+</code></pre>
+
+<p>
+</p>
+
 <p>
 上面这些例子并未触及到所有的和<code>reflect.Value</code>相关的函数和方法，请阅读<code>reflect</code>标准库包的文档以获取如何使用这些函数和方法。
 </p>

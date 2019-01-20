@@ -1,4 +1,4 @@
-﻿<h1>Memory Leaking</h1>
+﻿<h1>Memory Leaking Scenarios</h1>
 
 <p>
 When programming in a langauge supporting garbage collecting,
@@ -9,6 +9,7 @@ which may cause kind-of or real memory leaking.
 The remaining of the current article will list several such scenarios.
 </p>
 
+<p class="anchor" id="substring"></p>
 <h3>Kind-Of Memory Leaking Caused By Substrings</h3>
 
 <div>
@@ -22,7 +23,7 @@ This is a good design, which is both memory and CPU consuming wise.
 But it may cause kind-of memory leaking sometimes.
 </p>
 
-For example, after the following function <code>f</codE> is called,
+For example, after the following function <code>f</code> is called,
 there will be 1M bytes memory leaking (kind of),
 until the package-level variable <code>s0</code> is modified again elsewhere.
 
@@ -89,10 +90,15 @@ func f(s1 string) {
 <p>
 The disadvantage of the third way is a little verbose
 (by comparing to the first two ways).
+A good news is, since Go 1.12 (the next main version to be released at Feb. 2019),
+we can call the <code>Repeat</code> function with the <code>count</code> argument as <code>1</code>
+in the <code>strings</code> standard package to clone a string.
+Since Go 1.12, the underlying implementation of <code>strings.Repeat</code> will make use of <code>strings.Builder</code>.
 </p>
 
 </div>
 
+<p class="anchor" id="subslice"></p>
 <h3>Kind-Of Memory Leaking Caused By Subslices</h3>
 
 <div>
@@ -124,6 +130,7 @@ from being collected.
 
 </div>
 
+<p class="anchor" id="dead-slice-elements"></p>
 <h3>Kind-Of Memory Leaking Caused By Not Resetting Pointers In Dead Slice Elements</h3>
 
 <div>
@@ -264,8 +271,22 @@ finalizers as object destructors</a>.
 </p>
 </div>
 
+<h3>Kind-Of Resource Leaking By Deferring Function Calls</h3>
+
+<div>
+
+<p>
+Please read <a href="defer-more.html#kind-of-resource-leaking">this article</a> for details.
+</p>
+
+</div>
+
 
 <!--
 forgot closing streams
+
+the capacity of the uderlying array of a map will never shrink.
+
+defer in infinite/long-period loop
 -->
 
