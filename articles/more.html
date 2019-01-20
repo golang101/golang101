@@ -1,33 +1,31 @@
 
-<h1>More Go Related Knowledges</h1>
+<h1>更多关于Go的知识</h1>
 
 <p>
-Go 101 articles mainly focus on syntax and semantics in Go.
-There are some other Go related knowledges which are not covered in Go 101.
-The remaining of the current article will make simple introductions
-to those knowledges and provide some web links for readers to digg
-more on them.
+Golang 101中的系列文章主要着墨于Go语法和语义。
+更多和Go相关的话题并没有在Golang 101中详尽解释。
+本文将对这些话题做一个简单的介绍，并提供一些链接供读者自行探索。
 </p>
 
-<h3>Tests And Benchmarks</h3>
+<h3>程序性能分析、单元测试和基准测试</h3>
 
 <div>
-We can use <code>go test</code> command in the official SDK to run tests and benchmarks.
-Test source file names must end with <code>_test.go</code>.
-The official Go SDK also supports profiling Go programs.
-Please read the following articles for more details.
+我们可以使用官方Go SDK中的<code>go test</code>命令来运行单元测试和基准测试。
+测试源文件名必须以<code>_test.go</code>结尾。
+官方Go SDK也支持程序性能分析。
+请阅读下列文章获取详情：
 <ul>
 <li>
-	<a href="https://golang.org/pkg/testing/">package testing</a>.
+	<a href="https://golang.org/pkg/testing/"><code>testing</code>标准库包</a>
 </li>
 <li>
-	<a href="https://blog.golang.org/subtests">Using Subtests and Sub-benchmarks</a>.
+	<a href="https://blog.golang.org/subtests">使用子单元测试和子基准测试</a>
 </li>
 <li>
-	<a href="https://golang.org/cmd/go/#hdr-Test_packages"><code>go test</code> command options</a>.
+	<a href="https://golang.org/cmd/go/#hdr-Test_packages"><code>go test</code>命令选项</a>
 </li>
 <li>
-	<a href="https://github.com/golang/go/wiki/Performance">Profiling Go Programs</a>.
+	<a href="https://github.com/golang/go/wiki/Performance">Go程序性能分析</a>
 </li>
 </ul>
 </div>
@@ -36,136 +34,110 @@ Please read the following articles for more details.
 <h3>gccgo</h3>
 
 <p>
-<b>gccgo</b> is another Go compiler maintained by the Go design team.
-It is mainly used to verify the correctness of the standard Go compiler (gc).
-We can use the <code>-compiler=gccgo</code> build option in several official Go SDK
-commands to use the gccgo compiler instead of the gc compiler.
-For example, <code>go run -compiler=gccgo main.go</code>.
-This option requires the gccgo program is installed.
-Once the gccgo program is installed,
-we can also use the <code>gccgo</code> command directly to compile Go code.
+<a href="https://github.com/golang/gofrontend">gccgo</a>是Go核心团队维护开发的另一款Go编译器。
+它的主要目的是为了验证标准编译器（gc）的正确性。
+我们可以在<code>go run</code>、<code>go build</code>和<code>go install</code>等命令中使用选项<code>-compiler=gccgo</code>来指定使用gccgo编译器。
+此选项需要安装<code>gccgo</code>软件包才能起作用。
+gccgo也可<a href="https://golang.org/doc/install/gccgo#Using_gccgo">单独运行</a>。
 </p>
 
-<p>
-More build options are <a href="https://golang.org/cmd/go/#hdr-Compile_packages_and_dependencies">listed here</a>.
-All <code>go</code> sub-commands are also explained in that article.
-</p>
-
-<h3>Go Assembly</h3>
+<h3>Go汇编</h3>
 
 <p>
-Functions can be implemented with Go assembly language.
-Go assembly language is a cross-architectures (though not 100%) assembly language.
-Go assembly language is often used to implement some functions
-which are critical for Go program execution performances.
+Go函数可以使用Go汇编语言来编写。Go汇编是一种跨平台（尽管并非100%）的汇编语言。
+Go汇编汇编常用来实现一些对性能要求很高的函数。
 <p>
 
 <div>
-For more details, please follow the following links.
+更多详情，请阅读下列文章：
 <ul>
 <li>
-	<a href="https://golang.org/doc/asm">A Quick Guide to Go's Assembler</a>
+	<a href="https://golang.org/doc/asm">Go汇编快速导读</a>
 </li>
 <li>
-	<a href ="https://talks.golang.org/2016/asm.slide">The Design of the Go Assembler</a>
+	<a href ="https://talks.golang.org/2016/asm.slide">Go汇编的设计</a>
 </li>
 </ul>
 
+</div>
+
+<p class="anchor" id="cross-platform-compiling"></p>
+<h3>跨平台编译</h3>
+
+<div>
+标准Go编译器支持跨平台编译。通过设置<code>GOOS</code>和<code>GOARCH</code>两个环境变量，我们可以使用<code>go build</code>命令在Linux系统中编译出Windows和Mac程序，反之亦然。
+请阅读下面的代码获取详情：
+<ul>
+<li>
+	<a href="https://github.com/golang/go/wiki/WindowsCrossCompiling">在Linux上编译Windows程序</a>
+</li>
+<li>
+	<a href="https://golang.org/doc/install/source#environment">目前支持的操作系统和编译架构</a>.
+</li>
+</ul>
+
+特别地，自从G0 1.11，标准Go编译器开始支持WebAssembly座位一种新的架构。请阅读<a href="https://github.com/golang/go/wiki/WebAssembly">此篇维基文章</a>获取详情。
 </div>
 
 <h3>cgo</h3>
 
 <div>
-We can call C code from Go code, and vice versa, through the cgo mechanism.
-Please follow the following links for details.
+通过cgo机制，我们可以在Go代码中调用C代码，或者反之。
+请阅读下列连接获取详情：
 <ul>
 <li>
 	<a href="https://blog.golang.org/c-go-cgo">C? Go? Cgo!</a>
 </li>
 <li>
-	<a href="https://golang.org/cmd/cgo/">Command cgo</a>
-</li>
-<li>
-	<a href="https://github.com/golang/go/wiki/cgo">cgo</a>
+	<a href="https://github.com/golang/go/wiki/cgo">Go维基中的cgo页面</a>
 </li>
 </ul>
 
 <p>
-It is possible to use C++ libraries through cgo by wrapping C++ libraries as C functions.
+通过C代码做为桥梁，我们也可以使C++和Go代码能够相互调用。
 </p>
 
 <p>
-Please note that using cgo in code may make it is hard to maintain
-cross-platform compatibility of Go programs,
-and the calls between Go and C code are much less efficient than Go-Go and C-C calls.
+注意，cgo的使用将给跨平台Go项目的维护开发带来一些麻烦。另外Go和C之间互调不如Go-Go和C-C调用高效。
 </p>
 </div>
 
-<h3>Cross-Platform Compiling</h3>
-
-<div>
-The standard Go compiler supports cross-platform compiling.
-By setting the <code>GOOS</code> and <code>GOARCH</code> enviroments
-before running the <code>go build</code> command, 
-we can build a Windows executable on a Linux machine, and vice versa.
-Please read the following articles for details.
-<ul>
-<li>
-	<a href="https://github.com/golang/go/wiki/WindowsCrossCompiling">Building windows go programs on linux</a>.
-</li>
-<li>
-	<a href="https://golang.org/doc/install/source#environment">The current supported target operating systems and compilation architectures</a>.
-</li>
-</ul>
-</div>
-
-<h3>Build Constraints (Tags)</h3>
+<h3>编译标签（build constraint/tag）</h3>
 
 <p>
-We can use <a href="https://golang.org/pkg/go/build/">build constraints</a>
-to let compilers build source files selectively.
-A build constraint is called called a build tag.
-A build constraint can appear as a comment line like <code>// +build constraints</code>
-or appear as the suffix in the base name of a source file.
+我们可以使用<a href="https://golang.org/pkg/go/build/">编译标签</a>来让编译器选择性地忽略某些源文件。
+选择标签可以出现在源代码文件中的最顶部，也可以出现在源代码文件名（不包含<code>.go</code>后缀）的结尾（并用下划线分割开来）。
 </p>
 
-<h3>Compiler Directives</h3>
+<h3>编译器指示（compiler directive）</h3>
 
 <p>
-The standard Go compiler supports several
-<a href="https://golang.org/cmd/compile/#hdr-Compiler_Directives">compiler directives</a>.
-A directive appears as a comment line like <code>//directive args</code>.
-The most used compiler directive in practice may be the
-<a href="https://blog.golang.org/generate">go:generate</a> directive.
+标准Go编译器支持若干<a href="https://golang.org/cmd/compile/#hdr-Compiler_Directives">编译器指示</a>。
+一个编译器指示以注释的形式<code>//directive args</code>出现。
+我们常常使用<a href="https://blog.golang.org/generate">go:generate</a>编译器指示来生成代码。
 </p>
 
-<h3>System Calls</h3>
+<h3>系统调用</h3>
 
 <p>
-We can make system calls by call the functions exported by the
-<code>syscall</code> standard package.
-Please beware that, different from other standard packages,
-the functions in the <code>syscall</code> standard package are operating system dependent.
+我们可以使用<code>syscall</code>标准库包中的函数来进行系统调用。
+注意此标准库包和其它标准库包不同，它其中的函数是和具体操作系统相关的。
 </p>
 
-<h3>The <code>go/*</code> Standard Packages</h3>
+<h3><code>go/*</code>标准库包</h3>
 
 <p>
-The <code>go/*</code> standard packages provide functionalities of
-parsing Go source files, which are very useful to write custom Go tools.
-Please read <a href="https://github.com/golang/example/tree/master/gotypes"><code>go/types</code>: The Go Type Checker</a>
-and <a href="https://golang.org/pkg/go/">package documentations</a> for how to use these packages.
+<code>go/*</code>标准库包提供Go源文件解析相关的功能。这些库包对于开发各种Go源代码分析工具很有帮助。
+请阅读<a href="https://github.com/golang/example/tree/master/gotypes">Go代码分析</a>和<a href="https://golang.org/pkg/go/">这些库包的文档</a>来获取如何使用这些库包中提供的功能。
 </p>
 
-<h3>More Build Modes</h3>
+<h3>更多的编译模式（build mode）</h3>
 
 <p>
-The <code>go build</code> command in the official Go SDK supports several build modes.
-Please run <code>go help buildmode</code> to show the available build modes
-or read the explanations for <a href="https://golang.org/cmd/go/#hdr-Build_modes">-buildmode option</a> instead.
-Except the <b>default</b> build mode, the most used build mode may be the <b>plugin</b> build mode.
-We can use the functions in <a href="https://golang.org/pkg/plugin/">the <code>plugin</code> standard package</a>
-to load and use the Go plugin files outputted by using the <b>plugin</b> build mode.
+官方Go SDK中的<code>go build</code>命令支持更多的编译模式。
+运行<code>go help buildmode</code>可以列出所有支持的模式，或者查看<a href="https://golang.org/cmd/go/#hdr-Build_modes">官方文档</a>来查看这些模式的解释说明。
+除了最常用的<b>default</b>模式，<b>plugin</b>（插件）模式可能是另一种用的较多的模式。
+我们可以使用<a href="https://golang.org/pkg/plugin/"><code>plugin</code>标准库包</a>中的函数来加载和使用Go插件。
 </p>
 
 
