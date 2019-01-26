@@ -1,45 +1,31 @@
-﻿<h1>Common Concurrent Programming Mistakes</h1>
+﻿<h1>一些常见并发编程错误</h1>
 
 <p>
-Go is a language supporting built-in concurrent programming.
-By using the <code>go</code> keyword to create goroutines (light weight threads)
-and by <a href="channel-use-cases.html">using</a>
-<a href="channel.html">channels</a> and
-<a href="concurrent-atomic-operation.html">other concurrency</a>
-<a href="concurrent-synchronization-more.html">synchronization techniques</a>
-provided in Go, concurrent programming becomes easy, flexible and enjoyable.
+Go语言是一门天然支持并发的编程语言。
+通过使用<code>go</code>关键字，我们可以很轻松地创建协程（绿色线程）；通过<a href="channel-use-cases.html">使用</a><a href="channel.html">数据通道</a>和<a href="concurrent-atomic-operation.html">Go中提供的其它</a><a href="concurrent-synchronization-more.html">各种同步技术</a>，并发编程变得简单、轻松和有趣。
 </p>
 
 <p>
-One the other hand, Go doesn't prevent Go programmers from making some
-concurrent programming mistakes which are caused by either carelessnesses
-or lacking of experiences.
-The remaining of the current article will show some common mistakes
-in Go concurrent programming, to help Go programmers avoid making such mistakes.
+另一方面，Go并不阻止程序员在并发编程中因为粗心或者经验不足而犯错。
+本文的余下部分将展示一些常见的并发错误，来帮助Go程序员在实践中避免这些错误。
 </p>
 
-<h3>No Synchronizations When Synchronizations Are Needed</h3>
+<h3>当需要同步的时候没有同步</h3>
 
 <div>
 <p>
-Code lines may be <a href="memory-model.html">not executed by the appearance orders</a>.
+我们已经知道，源文件中的代码行在运行时刻<a href="memory-model.html">并非按照它们的出现次序被执行</a>。
 </p>
 
-There are two mistakes in the following program.
+下面这个示例程序犯了两个错误：
 <ul>
 <li>
-	First, the read of <code>b</code> in the main goroutine and the write
-	of <code>b</code> in the new goroutine might cause data races.
+	首先，主协程中对变量<code>b</code>的读取和匿名协程中的对变量<code>b</code>的写入可能会产生数据竞争；
 </li>
 <li>
-	Second, the condition <code>b == true</code> can't ensure
-	that <code>a != nil</code> in the main goroutine.
-	Compilers and CPUs may make optimizations by
-	<a href="/article/memory-model.html">reordering instructions</a>
-	in the new goroutine, so the assignment of <code>b</code> may happen
-	before the assignment of <code>a</code> at run time,
-	which makes that slice <code>a</code> is still <code>nil</code>
-	when the elements of <code>a</code> are modified in the main goroutine.
+	其次，在主协程中，条件<code>b == true</code>成立并不能确保条件<code>a != nil</code>也成立。
+	编译器和CPU可能会对<a href="/article/memory-model.html">调整此程序中匿名协程中的某些指令的顺序</a>已获取更快的执行速度，
+	所以，站在主协程的视角看，对变量<code>b</code>的赋值可能会发生在对变量<code>a</code>的赋值之前,这将造成在修改<code>a</code>的元素时<code>a</code>依然为一个nil切片。
 </li>
 </ul>
 
@@ -54,28 +40,25 @@ func main() {
 	var a []int // nil
 	var b bool  // false
 
-	// a new goroutine
+	// 一个匿名协程。
 	go func () {
 		a = make([]int, 3)
-		b = true // write b
+		b = true // 写入b
 	}()
 
-	for !b { // read b
+	for !b { // 读取b
 		time.Sleep(time.Second)
 		runtime.Gosched()
 	}
-	a[0], a[1], a[2] = 0, 1, 2 // might panic
+	a[0], a[1], a[2] = 0, 1, 2 // 可能会发生恐慌
 }
 </code></pre>
 
 <p>
-The above program may run well on one computer, but may panic on another one.
-Or it may run well for <i>N</i> times, but may panic at the <i>(N+1)</i>th time.
+上面这个程序可能在很多计算机上运行良好，但是可能会在某些计算机上因为恐慌而崩溃退出；或者使用某些编译器编译的时候运行良好，但使用另外的某个编译器编译的时候将造成程序运行时崩溃退出。
 </p>
 
-We should use channels or the synchronization techniques provided in
-the <code>sync</code> standard package to ensure the memory orders.
-For example,
+我们应该使用数据通道或者<code>sync</code>标准库包中的同步技术来确保内存顺序。比如：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -83,14 +66,13 @@ func main() {
 	var a []int = nil
 	c := make(chan struct{})
 
-	// a new goroutine
 	go func () {
 		a = make([]int, 3)
 		c <- struct{}{}
 	}()
 
 	<-c
-	a[0], a[1], a[2] = 0, 1, 2
+	a[0], a[1], a[2] = 0, 1, 2 // 绝不会造成恐慌
 }
 </code></pre>
 
@@ -98,11 +80,11 @@ func main() {
 </p>
 </div>
 
-<h3>Use <code>time.Sleep</code> Calls To Do Synchronizations</h3>
+<h3>使用<code>time.Sleep</code>调用来做同步</h3>
 
 <div>
 
-Let's view a simple example.
+让我们看一个简单的例子：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -115,32 +97,27 @@ func main() {
 	var x = 123
 
 	go func() {
-		x = 789 // write x
+		x = 789 // 写入x
 	}()
 
 	time.Sleep(time.Second)
-	fmt.Println(x) // read x
+	fmt.Println(x) // 读取x
 }
 </code></pre>
 
 <p>
-We expect the program to print <code>789</code>.
-If we run it, it really prints <code>789</code>, almost always.
-But is it a program with good syncrhonization?
-No! The reason is Go runtime doesn't guarantee the write of <code>x</code>
-happens before the read of <code>x</code> for sure.
-Under certain conditions, such as most CPU resources are cunsumed by
-other programs running on same OS, the write of <code>x</code>
-might happen after the read of <code>x</code>.
-This is why we should never use <code>time.Sleep</code> calls to do
-synchronizations in formal projects.
+我们期望着此程序打印出<code>789</code>。
+事实上，如果此程序使用官方Go标准编译器1.11版本编译，则其运行结果总是正如我们所期待的。
+但是，此程序中的同步处理得正确吗？否！原因很简单，Go运行时并不能保证对<code>x</code>的写入一定发生在对<code>x</code>的读取之前。
+在某些特定的情形下，比如CPU资源被很一些其它计算密集的程序所占用，则对对<code>x</code>的写入有可能发生在对<code>x</code>的读取之后。
+这是为什么我们不应该在正式的项目中使用<code>time.Sleep</code>调用来做同步的原因。
 </p>
 
 <!--
 https://groups.google.com/forum/#!topic/golang-nuts/J3kXXZivlHA
 -->
 
-Let's view another example.
+让我们看另一个简单的例子：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -149,8 +126,6 @@ import (
 	"time"
 )
 
-var x = 0
-
 func main() {
 	var num = 123
 	var p = &num
@@ -158,7 +133,7 @@ func main() {
 	c := make(chan int)
 
 	go func() {
-		c <- *p + x
+		c <- *p + 0
 	}()
 
 	time.Sleep(time.Second)
@@ -168,35 +143,26 @@ func main() {
 </code></pre>
 
 <p>
-What do you expect the program will output? <code>123</code>, or <code>789</code>?
-In fact, the output is compiler dependent.
-For the standard Go compiler 1.11,
-it is very possible the program will output <code>123</code>.
-But in theory, it might output <code>789</code>, or another unexpected number.
+你觉得此程序会输出什么？<code>123</code>还是<code>789</code>？
+事实上，它的输出是和具体使用的编译器相关的。
+对于官方Go标准编译器1.11版本来说，它很可能输出<code>123</code>。
+但是从理论上说，它输出<code>789</code>或者另外一个预想不到的值也是有可能的。
 </p>
 
 <p>
-Now, let's change <code>c &lt;- *p + x</code> to <code>c &lt;- *p</code>
-and run the program again. You will find the output becomes to <code>789</code>
-(for the standard Go compiler 1.11).
-Again, the output is compiler dependent.
+让我们将此例中的<code>c &lt;- *p + 0</code>一行换成<code>c &lt;- *p</code>，然后重新运行它，你将会发现它的输出变成了<code>789</code>（如果它使用官方Go标准编译器1.11版本编译的话）。
+重申一次，此结果是和具体使用的编译器和编译器的版本相关的。
 </p>
 
 <p>
-Yes, there are data races in the above program.
-The expression <code>*p</code> might be evaluated before, after, or when
-the assignment <code>num = 789</code> is processed.
-The <code>time.Sleep</code> call can't guarantee the evaluation of
-<code>*p</code> happens before the assignment is processed.
+使得，此程序中存在数据竞争。表达式<code>*p</code>的估值可能发生在赋值<code>num = 789</code>之前、之后、或者同时。
+<code>time.Sleep</code>调用并不能保证<code>*p</code>的估值发生在此赋值之后。
 </p>
 
-For this specified example,
-we should store the value to be sent in a temporary value
-before creating the new goroutine and send the temporary value instead
-in the new goroutine to remove the data races.
+对于这个特定的例子，我们应该将欲发送的值在开启新协程之前存储在一个临时变量中来避免数据竞争。
 
 <pre class="line-numbers"><code class="language-go">...
-	tmp := *p + x
+	tmp := *p
 	go func() {
 		c <- tmp
 	}()
@@ -208,55 +174,42 @@ in the new goroutine to remove the data races.
 
 </div>
 
-<h3>Leave Goroutines Hanging</h3>
+<h3>使一些协程永久处于阻塞状态</h3>
 
 <div>
-Hanging goroutines are the goroutines staying in blocking state for ever.
-There are many reasons leading goroutines into hanging. For example,
+有很多原因导致某个协程永久阻塞，比如：
 <ul>
 <li>
-	a goroutine tries to receive a value from a nil channel or
-	from a channel which no more other goroutines will send values to.
+	从一个永远不会有其它协程向其发送数据的通道接收数据；
 </li>
 <li>
-	a goroutine tries to send a value to nil channel or
-	to a channel which no more other goroutines will receive values from.
+	向一个永远不会有其它协程从中读取数据的通道发送数据；
 </li>
 <li>
-	a goroutine is dead locked by itself.
+	被自己死锁了；
 </li>
 <li>
-	a group of goroutines are dead locked by each other.
+	和其它协程相互死锁了；
 </li>
 <li>
-	a goroutine is blocked when executing a <code>select</code> code block
-	without <code>default</code> branch, and all the channel operations
-	following the <code>case</code> keywords in the <code>select</code>
-	code block keep blocking for ever.
+	等等。
 </li>
 </ul>
 
 <p>
-Except sometimes we deliberately let the main goroutine in a program hanging
-to avoid the program exiting, most other hanging goroutine cases are unexpected.
-It is hard for Go runtime to judge whether or not a goroutine
-in blocking state is hanging or stays in blocking state temporarily.
-So Go runtime will never release the resources consumed by a hanging goroutine.
+除了有时我们故意地将主协程永久阻塞以防止程序退出，其它大多数造成协程永久阻塞的情况都不是我们所期待的。
+Go运行时很难分辨出一个处于阻塞状态的协程是否将永久阻塞下去，所以Go运行时不会释放永久处于阻塞状态的协程占用的资源。
 </p>
 
-In the <a href="channel-use-cases.html#first-response-wins">first-response-wins</a>
-channel use case, if the capacity of the channel which is used a future
-is not large enough, some slower response goroutines will hang
-when trying to send a result to the future channel.
-For example, if the following function is called,
-there will be 4 goroutines stay in blocking state for ever.
+在<a href="channel-use-cases.html#first-response-wins">采用最快回应</a>数据通道用例中，如果被当作future/promise来用的通道的容量不足够大，则较慢回应的协程在准备发送回应结果时将永久阻塞。
+比如，下面的例子中，每个请求将导致4个协程永久阻塞。
 
 <pre class="line-numbers"><code class="language-go">func request() int {
 	c := make(chan int)
 	for i := 0; i < 5; i++ {
 		i := i
 		go func() {
-			c <- i // 4 goroutines will hang here.
+			c <- i // 4个协程将永久阻塞在这里
 		}()
 	}
 	return <-c
@@ -264,19 +217,10 @@ there will be 4 goroutines stay in blocking state for ever.
 </code></pre>
 
 <p>
-To avoid the four goroutines hanging, the capacity of channel <code>c</code>
-must be at least <code>4</code>.
+为了防止有四个协程永久阻塞，被当作future/promise使用的通道的容量必须至少为<code>4</code>.
 </p>
 
-In <a href="channel-use-cases.html#first-response-wins-2">the second way
-to implement the first-response-wins</a> channel use case,
-if the channel which is used as a future is an unbuffered channel,
-it is possible that the channel receiver will never get a response and hang.
-For example, if the following function is called in a goroutine,
-the goroutine might hang. The reason is, if the five try-send operations
-all happen before the receive operation <code>&lt;-c</code> is ready,
-then all the five try-send operations will fail to send values
-so that the caller goroutine will never receive a value.
+在<a href="channel-use-cases.html#first-response-wins-2">第二种“采用最快回应”实现方法</a>中，如果被当作future/promise使用的通道是一个非缓冲通道（如下面的代码所示），则有可能导致其通道的接收者可能会错过所有的回应而导致处于永久阻塞状态。
 
 <pre class="line-numbers"><code class="language-go">func request() int {
 	c := make(chan int)
@@ -289,35 +233,32 @@ so that the caller goroutine will never receive a value.
 			}
 		}()
 	}
-	return <-c
+	return <-c // 有可能永久阻塞在此
 }
 </code></pre>
 
 <p>
-Changing the channel <code>c</code> as a buffered channel will guarantee
-at least one of the five try-send operations succeed so that the caller
-goroutine will never hang in the above function.
+接收者协程可能会永久阻塞的原因是如果5个尝试发送操作都发生在接收操作<code>&lt;-c</code>准备好之前，亦即5个个尝试发送操作都失败了，则接收者协程将永远无值可接收（从而将处于永久阻塞状态）。
+</p>
+
+<p>
+将通道<code>c</code>改为一个缓冲通道，则至少会有一个尝试发送将成功，从而接收者协程肯定不会永久阻塞。
 </p>
 
 </div>
 
-<h3>Copy Values Of The Types In The <code>sync</code> Standard Package</h3>
+<h3>复制<code>sync</code>标准库包中的类型的值</h3>
 
 <div>
 <p>
-In practice, values of the types (except the <code>Locker</code> interface values)
-in the <code>sync</code> standard package shouldn't be copied.
-We should only copy pointers of such values.
+在实践中，<code>sync</code>标准库包中的类型（除了<code>Locker</code>接口类型）的值不应该被复制。
+我们只应该复制它们的指针值。
 </p>
 
-The following is bad concurrent programming example.
-In this example, when the <code>Counter.Value</code> method is called,
-a <code>Counter</code> receiver value will be copied.
-As a field of the receiver value, the respective <code>Mutex</code> field
-of the <code>Counter</code> receiver value will also be copied.
-The copy is not synchronized, so the copied  <code>Mutex</code> value might be corrupt.
-Even if it is not corrupt, what it protects is the accessment of
-the copied <code>Counter</code> receiver value, which is meaningless generally.
+下面是一个有问题的并发编程的例子。
+在此例子中，当<code>Counter.Value</code>方法被调用时，一个<code>Counter</code>属主值将被复制，此属主值的字段<code>Mutex</code>也将被一同复制。
+此复制并没有被同步保护，因此复制结果可能是不完整的，并非被复制的属主值的一个快照。
+即使此<code>Mutex</code>字段得以侥幸复制，它的副本所保护的是对字段<code>n</code>的一个副本的访问，因此一般是没有实际价值的。
 
 <pre class="line-numbers"><code class="language-go">import "sync"
 
@@ -326,7 +267,7 @@ type Counter struct {
 	n int64
 }
 
-// This method is okay.
+// 此方法实现是没问题的。
 func (c *Counter) Increase(d int64) (r int64) {
 	c.Lock()
 	c.n += d
@@ -335,8 +276,7 @@ func (c *Counter) Increase(d int64) (r int64) {
 	return
 }
 
-// The method is bad. When it is called, a Counter
-// receiver value will be copied.
+// 此方法的实现是有问题的。当它被调用时，一个Counter属主值将被复制。
 func (c Counter) Value() (r int64) {
 	c.Lock()
 	r = c.n
@@ -346,43 +286,31 @@ func (c Counter) Value() (r int64) {
 </code></pre>
 
 <p>
-We should change the receiver type of the <code>Value</code> method to
-the poiner type <code>*Counter</code> to avoid copying <code>Mutex</code> values.
+我们应该将<code>Value</code>方法的属主参数类型更改为指针类型<code>*Counter</code>来避免复制<code>sync.Mutex</code>值。
 </p>
 
 <p>
-The <code>go vet</code> command provided in the official Go SDK will report
-potential bad value copies.
+官方Go SDK中提供的<code>go vet</code>命令将提示此例中的<code>Value</code>方法的声明肯能是一个潜在的逻辑错误。
 </p>
 
 </div>
 
-<h3>Call Methods Of <code>sync.WaitGroup</code> At Wrong Places</h3>
+<h3>在错误的地方调用<code>sync.WaitGroup.Add</code>方法</h3>
 
 <div>
 
 <p>
-Each <code>sync.WaitGroup</code> value maintains a counter internally,
-The initial value of the counter is zero.
-If the counter of a <code>WaitGroup</code> value is zero,
-a call to the <code>Wait</code> method of the <code>WaitGroup</code> value
-will not block, otherwise, the call blocks until the counter value becomes zero.
+每个<code>sync.WaitGroup</code>值内部维护着一个计数。此计数的初始值为0。
+如果一个<code>sync.WaitGroup</code>值的<code>Wait</code>方法在此计数为0的时候被调用，则此调用不会阻塞，否则此调用将一直阻塞到此计数变为0为止。
 </p>
 
 <p>
-To make the uses of <code>WaitGroup</code> value meaningful,
-when the counter of a <code>WaitGroup</code> value is zero,
-a call to the <code>Add</code> method of the <code>WaitGroup</code> value
-must happen before the corresponding call to the <code>Wait</code> method of
-the <code>WaitGroup</code> value.
+为了让一个<code>WaitGroup</code>值的使用有意义，在此值的计数为0的情况下，对它的下一次<code>Add</code>方法的调用必须出现在对它的下一次<code>Wait</code>方法的调用之前。
 </p>
 
-For example, in the following program, the <code>Add</code> method
-is called at an improper place, which makes that the final printed number
-is not always <code>100</code>. In fact, the final printed number of
-the program may be an arbitrary number in the range <code>[0, 100)</code>.
-The reason is none of the <code>Add</code> method calls are guaranteed to
-happen before the <code>Wait</code> method call.
+比如，在下面的例子中，<code>Add</code>方法的调用位置时不合适的。
+此例子程序的打印结果并不总是<code>100</code>，而可能是<code>0</code>到<code>100</code>间的任何一个值。
+原因是没有任何一个<code>Add</code>方法调用可以确保发生在唯一的<code>Wait</code>方法调用之前，结果导致没有任何一个<code>Done</code>方法调用可以确保发生在唯一的<code>Wait</code>方法调用之前。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -403,7 +331,7 @@ func main() {
 		}()
 	}
 
-	fmt.Println("To wait ...")
+	fmt.Println("等待片刻...")
 	wg.Wait()
 	fmt.Println(atomic.LoadInt32(&x))
 }
@@ -412,9 +340,7 @@ func main() {
 <p>
 </p>
 
-To make the program behave as expected, we should move the <code>Add</code>
-method calls out of the new goroutines created in the <code>for</code> loop,
-as the following code shown.
+我们应该将对<code>Add</code>方法的调用移出匿名协程之外，像下面这样，使得任何一个<code>Done</code>方法调用都确保发生在唯一的<code>Wait</code>方法调用之前。
 
 <pre class="line-numbers"><code class="language-go">...
 	for i := 0; i < 100; i++ {
@@ -432,26 +358,21 @@ as the following code shown.
 
 </div>
 
-<h3>Use Channels As Futures Improperly</h3>
+<h3>不当地使用用作Future/Promise的数据通道</h3>
 
 <div>
 
-
-From the article <a href="channel-use-cases.html">channel use cases</a>,
-we know that some functions will return
-<a href="channel-use-cases.html#future-promise">channels as futures</a>.
-Assume <code>fa</code> and <code>fb</code> are two such functions,
-then the following call uses future arguments improperly.
+从<a href="channel-use-cases.html#future-promise">数据通道用例大全</a>一文中，我们了解到一些函数可以返回用作future/promise的数据通道结果。
+假设<code>fa</code>和<code>fb</code>是这样的两个函数，则下面的调用方式并没有体现出这两个函数的真正价值。
 
 <pre class="line-numbers"><code class="language-go">doSomethingWithFutureArguments(<-fa(), <-fb())
 </code></pre>
 
 <p>
+在上面这行调用中，<code>fa</code>和<code>fb</code>两个函数实际上是串行调用的，future/promise的价值没有体现出来。
 </p>
 
-In the above code line, the two channel receive operations are processed
-sequentially, instead of concurrently.
-We should modify it as the following to process them concurrently.
+我们应该像下面这样调用这两个函数来并发获取两个回应结果：
 
 <pre class="line-numbers"><code class="language-go">ca, cb := fa(), fb()
 doSomethingWithFutureArguments(<-ca, <-cb)
@@ -462,74 +383,55 @@ doSomethingWithFutureArguments(<-ca, <-cb)
 
 </div>
 
-<h3>Close Channels Not From The Last Active Sender Goroutine</h3>
+<h3>没有让最后一个活跃的发送者关闭数据通道</h3>
 
 <div>
 
 <p>
-A common mistake made by Go programmers is closing a channel when there are
-still some other goroutines will potentially send values to the channel later.
-When such a potential send (to the closed channel) really happens,
-a panic will occur.
+Go程序员常犯的一个错误是关闭一个后续可能还会有协程向其发送数据的通道。
+当向一个已关闭的通道发送数据的时候，一个恐慌将产生。
 </p>
 
 <p>
-This mistake was ever made in some famous Go projects, such as
-<a href="https://github.com/kubernetes/kubernetes/pull/45291/files?diff=split">this bug</a>
-and
-<a href="https://github.com/kubernetes/kubernetes/pull/39479/files?diff=split">this bug</a>
-in the kubernetes project.
+这样的错误曾经发生在一些很有名的项目中，比如Kubernetes项目中的<a href="https://github.com/kubernetes/kubernetes/pull/45291/files?diff=split">这个bug</a>和<a href="https://github.com/kubernetes/kubernetes/pull/39479/files?diff=split">这个bug</a>。
 </p>
 
 <p>
-Please read <a href="channel-closing.html">this article</a> for explanations
-on how to safely and gracefully close channels.
+请阅读<a href="channel-closing.html">此篇文章</a>来了解如何安全和优雅地关闭数据通道。
 </p>
 
 </div>
 
 
-<h3>Do 64-bit Atomic Operations On Values Which Are Not Guaranteed To Be 64-bit Aligned</h3>
+<h3>对地址不保证为8字节对齐的值执行64位原子操作</h3>
 
 <div>
 <p>
-Up to now (Go 1.11), for the standard Go compiler, the address of the value
-involved in a 64-bit atomic operation is required to be 64-bit aligned.
-Failure to do so may make the current goroutine panic.
-For the standard Go compiler, such failure can only happen on 32-bit architectures.
-Please read <a href="memory-layout.html">memory layouts</a> to get how to
-guarantee the addresses of 64-bit word 64-bit aligned on 32-bit OSes.
+截至目前（Go 1.11），64位原子操作中涉及到的实参地址必须为8字节对齐的。不满足此条件的64位原子操作将造成一个恐慌。
+对于官方Go标准编译器，这样的情形只<a href="https://golang.google.cn/pkg/sync/atomic/#pkg-note-BUG">可能发生在32位的架构中</a>。
+请阅读<a href="memory-layout.html">内存布局一文</a>来获知如何确保让64位的整数值的地址在32位的架构中8字节对齐。
 </p>
 
 </div>
 
-<h3>Not Pay Attention To Too Many Resources Are Consumed By Calls To The <code>time.After</code> Function</h3>
+<h3>没留意过多的<code>time.After</code>函数调用消耗了大量资源</h3>
 
 <div>
 <p>
-The <code>After</code> function in the <code>time</code> standard package
-returns <a href="channel-use-cases.html#timer">a channel for delay notification</a>.
-The function is convenient, however each of its calls will
-create a new value of the <code>time.Timer</code> type.
-The new created <code>Timer</code> value will keep alive in the duration
-specified by the passed argument to the <code>After</code> function.
-If the function is called many times in the duration,
-there will be many <code>Timer</code> values alive
-and consuming much memory and computation.
+<code>time</code>标准库包中的<code>After</code>函数返回<a href="channel-use-cases.html#timer">一个用作延迟通知的数据通道</a>。
+此函数给并发编程带来了很多便利，但是它的每个调用都需要创建一个<code>time.Timer</code>值，此新创建的<code>Timer</code>值在传递给<code>After</code>函数调用的时长(实参)内肯定不会被垃圾回收。 
+如果此函数在某个时段内被多次频繁调用，则可能导致积累很多尚未过期的<code>Timer</code>值从而造成大量的内存和计算消耗。
 </p>
 
-For example, if the following <code>longRunning</code> function is called
-and there are millions of messages coming in one minute, then there will
-be millions of <code>Timer</code> values alive in a certain period,
-even if most of these <code>Timer</code> values have already become useless.
+比如在下面这个例子中，如果<code>longRunning</code>函数被调用并且在一分钟内有一百万条消息到达，
+那么在某个特定的很小时间段（大概若干秒）内将存在一百万个活跃的<code>Timer</code>值，即使其中只有一个是真正有用的。
 
 <pre class="line-numbers"><code class="language-go">import (
 	"fmt"
 	"time"
 )
 
-// The function will return if a message arrival interval
-// is larger than one minute.
+// 如果某两个连续的消息的间隔大于一分钟，此函数将返回。
 func longRunning(messages <-chan string) {
 	for {
 		select {
@@ -545,8 +447,7 @@ func longRunning(messages <-chan string) {
 <p>
 </p>
 
-To avoid too many <code>Timer</code> values being created in the above code,
-we should use a single <code>Timer</code> value to do the same job.
+为了避免太多的<code>Timer</code>值被创建，我们应该只使用（并复用）一个<code>Timer</code>值，像下面这样：
 
 <pre class="line-numbers"><code class="language-go">func longRunning(messages <-chan string) {
 	timer := time.NewTimer(time.Minute)
@@ -554,52 +455,68 @@ we should use a single <code>Timer</code> value to do the same job.
 
 	for {
 		select {
-		case <-timer.C:
+		case <-timer.C: // 过期了
 			return
 		case msg := <-messages:
 			fmt.Println(msg)
+			
+			// 此if代码块很重要。
 			if !timer.Stop() {
 				<-timer.C
 			}
 		}
 
-		// The above "if" block can also be put here.
-
+		// 必须重置以复用。
 		timer.Reset(time.Minute)
 	}
 }
 </code></pre>
 
 <p>
+注意，此示例中的<code>if</code>代码块用来舍弃一个可能在执行第二个分支代码块的时候发送过来的超时通知。
 </p>
 
 </div>
 
-<h3>Use <code>time.Timer</code> Values Incorrectly</h3>
+<h3>不正确地使用<code>time.Timer</code>值</h3>
 
 <div>
 <p>
-An idiomatic use example of a <code>time.Timer</code> value has been shown
-in the last section.
-One detail which should be noted is that the <code>Reset</code> method
-should always be invoked on stopped or expired <code>time.Timer</code> values.
+一个典型的<code>time.Timer</code>的使用已经在上一节中展示了。
+其中要注意的一个细节是，在一个<code>time.Timer</code>值终止（stopped）之后并且在重置和重用此<code>Timer</code>值之前，我们应该确保此<code>Timer</code>值中肯定不存在过期的通知。
+如果一个<code>Timer</code>值已经过期或者已经被终止（stopped），则它的<code>Stop</code>方法调用返回<code>false</code>。
+这就是上一节中的例子中的<code>if</code>代码块意义所在。
+</p>
+
+
+
+一个典型的<code>time.Timer</code>的使用已经在上一节中展示了。一些解释：
+<ul>
+<li>
+	如果一个<code>Timer</code>值已经过期或者已经被终止（stopped），则它的<code>Stop</code>方法调用返回<code>false</code>。
+</li>
+<li>
+	一个<code>Timer</code>值被终止之后，它的数据通道字段<code>C</code>最多只能含有一个过期的通知。
+</li>
+<li>
+	在一个<code>Timer</code>终止（stopped）之后并且在重置和重用此<code>Timer</code>值之前，我们应该确保此<code>Timer</code>值中肯定不存在过期的通知。
+	这就是上一节中的例子中的<code>if</code>代码块的意义所在。
+</li>
+</ul>
+
+<p>
+一个<code>Timer</code>值的<code>Reset</code>方法必须在此<code>Timer</code>值过期或者终止之后才能被调用；
+否则，此<code>Reset</code>方法调用和一个可能的向此<code>Timer</code>值的<code>C</code>通道字段的发送通知操作产生数据竞争。
 </p>
 
 <p>
-At the end of the first <code>case</code> branch of the <code>select</code> block,
-the <code>time.Timer</code> value has expired, so we don't need to stop it.
-But we must stop the timer in the second branch.
-If the <code>if</code> code block in the second branch is missing,
-it is possible that a send (by the Go runtime) to the channel
-<code>timer.C</code> races with the <code>Reset</code> method call,
-and it is possible that the <code>longRunning</code> function returns earlier
-than expected, for the <code>Reset</code> method will only reset
-the internal timer to zero, it will not clear (drain) the value
-which has been sent to the <code>timer.C</code> channel.
+如果上一节中的例子中的<code>select</code>流程控制代码块中的第一个分支被选中，则这表示相应的<code>Timer</code>值已经过期，所以我们不必终止它。
+但是我们必须在第二个分支中通过终止此<code>Timer</code>以检查此<code>Timer</code>中是否存在一个过期的通知。
+如果确实有一个过期的通知，我们必须在重用这个<code>Timer</code>之前将此过期的通知取出；否则，此过期的通知将下一个循环步导致在第一个分支立即被选中。
 </p>
 
-For example, the following program is very possible to exit in about one second,
-instead of ten seconds. and more importantly, the program is not data race free.
+比如，下面这个程序将在运行后大概一秒钟（而不是十秒钟）后退出。
+而且此程序存在着潜在的数据竞争。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -614,30 +531,23 @@ func main() {
 	select {
 	case <-timer.C:
 	default:
-		time.Sleep(time.Second) // go here
+		time.Sleep(time.Second) // 此分支被选中的可能性较大
 	}
 	timer.Reset(time.Second * 10)
 	<-timer.C
-	fmt.Println(time.Since(start)) // 1.000188181s
+	fmt.Println(time.Since(start)) // 1.000188181s（大约）
 }
 </code></pre>
 
 <p>
-A <code>time.Timer</code> value can be leaved in non-stopping status
-when it is not used any more, but it is recommended to stop it in the end.
+当一个<code>time.Timer</code>值不再被使用后，我们不必（但是推荐）终止之。
 </p>
 
 <p>
-It is bug prone and not recommended to use a <code>time.Timer</code> value
-concurrently in multiple goroutines.
+在多个协程中使用同一个<code>time.Timer</code>值比较容易写出不当的代码，所以尽量不要跨协程使用一个<code>Timer</code>值。
 </p>
 
 <p>
-We should not rely on the return value of a <code>Reset</code> method call.
-The return result of the <code>Reset</code> method exists
-just for compatibility purpose.
+我们不应该依赖于<code>time.Timer</code>的<code>Reset</code>方法的返回值。此返回值只要是为了历史兼容性而存在的。
 </p>
 </div>
-
-
-
