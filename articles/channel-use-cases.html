@@ -902,10 +902,10 @@ func main() {
 </p>
 </div>
 
-<h4>无阻塞地检查一个非缓冲通道是否已经关闭</h4>
+<h4>无阻塞地检查一个通道是否已经关闭</h4>
 
 <div>
-假设没有其它协程向一个非缓冲通道发送过数据，我们可以使用下面的代码来检查此通道是否已经关闭，此检查不会阻塞当前协程。
+假设我们可以保证没有协程会向一个通道发送数据，则我们可以使用下面的代码来检查此通道是否已经关闭，此检查不会阻塞当前协程。
 
 <pre class="line-numbers"><code class="language-go">func IsClosed(c chan T) bool {
 	select {
@@ -1670,12 +1670,12 @@ func main() {
 ... // 上面的模块工作者函数实现
 
 func main() {
-	filterA := Filter(RandomGenerator())
-	filterB := Filter(RandomGenerator())
-	filterC := Filter(RandomGenerator())
+	filterA := Filter(RandomGenerator(), nil)
+	filterB := Filter(RandomGenerator(), nil)
+	filterC := Filter(RandomGenerator(), nil)
 	filter := Aggregator(filterA, filterB, filterC)
-	calculatorA := Calculator(filter)
-	calculatorB := Calculator(filter)
+	calculatorA := Calculator(filter, nil)
+	calculatorB := Calculator(filter, nil)
 	calculator := Aggregator(calculatorA, calculatorB)
 	Printer(calculator)
 }
@@ -1730,7 +1730,7 @@ func main() {
 修改后的数据流的拓扑结构如下图所示：
 
 <br/>
-<img src="res/data-flow-dag-2.png">
+<img src="res/data-flow-dag-b.png">
 <br/>
 </p>
 

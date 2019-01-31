@@ -1,84 +1,63 @@
-﻿<h1>Concurrency Synchronization Techniques Provided In The <code>sync</code> Standard Package</h1>
+﻿<h1><code>sync</code>标准库包中提供的并发同步技术</h1>
 
 <p>
-The <a href="channel-use-cases.html">channel use cases</a> article introduces
-many use cases where channels are used to do data synchronizations among goroutines.
-In fact, channels are not the only synchronization techniques provided in Go.
-There are some other synchronization techniques supported by Go.
-For some specific circumstances, using the synchronization techniques
-other than channel are more efficient and readable than using channels.
-Below will introduce the synchronization techniques provided
-in the <code>sync</code> standard package.
+<a href="channel-use-cases.html">数据通道用例大全</a>一文中介绍了很多通过使用数据通道来实现并发同步的用例。
+事实上，数据通道并不是Go支持的唯一的一种并发同步技术，而且对于一些特定的情形，数据通道并不是最有效和可读性最高的的同步技术。
+本文下面将介绍<code>sync</code>标准库包中提供的各种并发同步技术。
 </p>
 
 <p>
-The <code>sync</code> standard package provides several types
-which can be used to do synchronizations for some specialized circumstances.
-and guarantee some specialized memory orders.
-For the specialized circumstances, these techniques are more efficient,
-and look cleaner, than the channel ways.
+<code>sync</code>标准库包提供了一些用于实现并发同步的类型。这些类型适用于各种不同的内存顺序需求。
+对于这些特定的需求，这些类型使用起来比数据通道效率更高，代码实现更简洁。
 </p>
 
 <p><i>
-(Please note, to avoid abnormal behaviors, it is best never to copy
-the values of the types in the <code>sync</code> standard package.)
+（请注意：为了避免各种异常行为，最好不要复制<code>sync</code>标准库包中提供的类型的值。）
 </i></p>
 
 <p class="anchor" id="waitgroup"></p>
-<h3>The <code>sync.WaitGroup</code> Type</h3>
+<h3><code>sync.WaitGroup</code>（等待组）类型</h3>
 
 <div>
 <p>
-Each <code>sync.WaitGroup</code> value maintains a counter internally.
-The default value of the counter is zero.
+每个<code>sync.WaitGroup</code>值在内部维护着一个计数，此计数的初始默认值为零。
 </p>
 
 <p>
-The <code>*sync.WaitGroup</code> type has
-<a href="https://golang.org/pkg/sync/#WaitGroup">three methods</a>:
-<code>Add(delta int)</code>, <code>Done()</code> and <code>Wait()</code>.
+<code>*sync.WaitGroup</code>类型有<a href="https://golang.org/pkg/sync/#WaitGroup">三个方法</a>：<code>Add(delta int)</code>、<code>Done()</code>和<code>Wait()</code>。
 </p>
 
-For an addressable <code>sync.WaitGroup</code> value <code>wg</code>,
+对于一个可寻址的<code>sync.WaitGroup</code>值<code>wg</code>，
 <ul>
 <li>
-	we can call the <code>wg.Add(delta)</code> method to
-	change the respective counter value of <code>wg</code>.
+	我们可以使用方法调用<code>wg.Add(delta)</code>来改变值<code>wg</code>维护的计数。
 </li>
 <li>
-	the method call <code>wg.Done()</code> is totally equivalent to
-	the method call <code>wg.Add(-1)</code>.
+	方法调用<code>wg.Done()</code>和<code>wg.Add(-1)</code>是完全等价的。
 </li>
 <li>
-	if a call <code>wg.Add(delta)</code> (or <code>wg.Done()</code>) modifies
-	the counter maintained by <code>wg</code> to negative,  panic will happen.
+	如果一个<code>wg.Add(delta)</code>（或者<code>wg.Done()</code>）调用将<code>wg</code>维护的计数更改成一个负数，一个恐慌将产生。
 </li>
 <li>
-	when a goroutine calls <code>wg.Wait()</code>,
+	当一个协程调用了<code>wg.Wait()</code>时，
 	<ul>
 	<li>
-		if the counter maintained by <code>wg</code> is already zero,
-		then the call <code>wg.Wait()</code> can be viewed as a no-op.
+		如果此时<code>wg</code>维护的计数为零，则此<code>wg.Wait()</code>此操作为一个空操作（no-op）；
 	</li>
 	<li>
-		otherwise (the counter is positive), the goroutine will enter blocking state.
-		It will enter running state again (a.k.a., the call <code>wg.Wait()</code> returns)
-		when another goroutine modifies the counter to zero,
-		generally by calling the <code>wg.Done()</code>.
+		否则（计数为一个正整数），此协程将进入阻塞状态。
+		当以后其它某个协程将此计数更改至0时（一般通过调用<code>wg.Done()</code>），此协程将重新进入运行状态（即<code>wg.Wait()</code>将返回）。
 	</li>
 	</ul>
 </li>
 </ul>
 
 <p>
-Please note that <code>wg.Add(delta)</code>, <code>wg.Done()</code> and <code>wg.Wait()</code>
-are shorthands of <code>(&amp;wg).Add(delta)</code>, <code>(&amp;wg).Done()</code>
-and <code>(&amp;wg).Wait()</code>, respectively.
+请注意<code>wg.Add(delta)</code>、<code>wg.Done()</code>和<code>wg.Wait()</code>分别是<code>(&amp;wg).Add(delta)</code>、<code>(&amp;wg).Done()</code>和<code>(&amp;wg).Wait()</code>的简写形式。
 </p>
 
-Generally, a <code>sync.WaitGroup</code> value is used for the scenario that
-one goroutine waits until all of several other goroutines finish their respective jobs.
-An example:
+一般，一个<code>sync.WaitGroup</code>值用来让某个协程等待其它若干协程都先完成它们各自的任务。
+一个例子：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -107,14 +86,14 @@ func main() {
 	}
 	
 	wg.Wait()
-	// All elements are guaranteed to be initialized now.
+	// 所有的元素都保证被初始化了。
 	fmt.Println("values:", values)
 }
 </code></pre>
 
-In the above example, the main goroutine waits until all other <code>N</code> goroutines
-have populated their respective element value in <code>values</code> array.
-Here is one possible output result:
+在此例中，主协程等待着直到其它5个协程已经将各自负责的元素初始化完毕此会打印出各个元素值。
+这里是一个可能的程序执行输出结果：
+
 <pre class="output"><code>Done: 4
 Done: 1
 Done: 3
@@ -123,11 +102,11 @@ Done: 2
 values: [71 89 50 62 60]
 </code></pre>
 
-We can split the only <code>Add</code> method call in the above example into multiple ones.
+我们可以将上例中的<code>Add</code>方法调用拆分成多次调用：
 <pre class="line-numbers"><code class="language-go">...
 	var wg sync.WaitGroup
 	for i := 0; i < N; i++ {
-		wg.Add(1) // will be invoked N times
+		wg.Add(1) // 将被执行5次
 		i := i
 		go func() {
 			values[i] = 50 + rand.Int31n(50)
@@ -137,63 +116,64 @@ We can split the only <code>Add</code> method call in the above example into mul
 ...
 </code></pre>
 
-The <code>Wait</code> method can be called in multiple goroutines.
-When the counter becomes zero, all of them will be notified, in a broadcast way.
+<p>
+</p>
 
-<pre class="line-numbers"><code class="language-go">func() {
-	var wg sync.WaitGroup
-	wg.Add(1)
+一个<code>*sync.WaitGroup</code>值的<code>Wait</code>方法可以在多个协程中调用。
+当对应的<code>sync.WaitGroup</code>值维护的计数降为0，这些协程都将得到一个（广播）通知而结束阻塞状态。
+
+<pre class="line-numbers"><code class="language-go">func main() {
+	rand.Seed(time.Now().UnixNano())
+
+	const N = 5
+	var values [N]int32
+	
+	var wgA, wgB sync.WaitGroup
+	wgA.Add(N)
+	wgB.Add(1)
 
 	for i := 0; i < N; i++ {
 		i := i
 		go func() {
-			wg.Wait()
-			fmt.Printf("values[%v]=%v \n", i, values[i])
+			wgB.Wait() // 等待通知
+			log.Printf("values[%v]=%v \n", i, values[i])
+			wgA.Done()
 		}()
 	}
 
-	// The loop is guaranteed to finish before
-	// any above wg.Wait calls returns.
+	// 下面这个循环保证将在上面的任何一个wg.Wait调用结束之前执行。
 	for i := 0; i < N; i++ {
 		values[i] = 50 + rand.Int31n(50)
 	}
-	wg.Done() // will make a broadcast
+	wgB.Done() // 发出一个广播通知
+	wgA.Wait()
 }
 </code></pre>
 
 </div>
 
 <p class="anchor" id="once"></p>
-<h3>The <code>sync.Once</code> Type</h3>
+<h3><code>sync.Once</code>类型</h3>
 
 <div>
 <p>
-A <code>*sync.Once</code> value has a <code>Do(f func())</code> method,
-which takes a solo parameter with type <code>func()</code>.
+每个<code>*sync.Once</code>有一个<code>Do(f func())</code>方法。
+此方法只有一个类型为<code>func()</code>的参数。
 </p>
 
 <p>
-For an addressable <code>sync.Once</code> value <code>o</code>,
-the method <code>o.Do</code>, which is a shorthand of <code>(&amp;o).Do</code>,
-can be called multiple times, in multiple goroutines.
-The arguments of these <code>o.Do</code> calls should
-(but not are required to) be the same function value.
+对一个可寻址的<code>sync.Once</code>值<code>o</code>，方法<code>o.Do</code>（<code>(&amp;o).Do</code>的简写形式）可以在多个协程中被多次调用，
+这些方法调用的实参应该（但并不强制）为同一个函数值。
+在这些方法调用中，有且只有一个调用的实参函数（值）将被调用。
+此被调用的实参函数保证在任何<code>o.Do</code>方法返回调用之前退出。
+换句话说，被调用的实参函数内的代码将在任何<code>o.Do</code>方法返回调用之前被执行。
 </p>
 
 <p>
-Among these <code>o.Do</code> calls, only exact one argument function will be invoked.
-The invoked argument function is guaranteed to return before
-any <code>o.Do</code> method call returns.
-In other words, the code in the invoked argument function
-is guaranteed to be executed before any <code>o.Do</code> method call returns.
+一般来说，一个<code>sync.Once</code>值被用来确保一段代码在一个并发程序中被执行且仅被被执行一次。
 </p>
 
-<p>
-Generally, an <code>sync.Once</code> value is used to ensure that
-something has been done and only done once in concurrent programming.
-</p>
-
-An example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
@@ -227,107 +207,64 @@ func main() {
 </code></pre>
 
 <p>
-In the above example, <code>Hello</code> will be printed once,
-but <code>world!</code> will be printed five times.
-And <code>Hello</code> is guaranteed to be printed before all five <code>world!</code>.
+在此例中，<code>Hello</code>将仅被输出一次，而<code>world!</code>将被输出5次，并且<code>Hello</code>肯定在所有的5个<code>world!</code>之前输出。
 </p>
 
 </div>
 
 <p class="anchor" id="mutex"></p>
-<h3>The <code>sync.Mutex</code> And <code>sync.RWMutex</code> Types</h3>
+<h3><code>sync.Mutex</code>（互斥锁）和<code>sync.RWMutex</code>（读写锁）类型</h3>
 
 <div>
-
-Both of the <code>*sync.Mutex</code> and <code>*sync.RWMutex</code> types implement
-<a href="https://golang.org/pkg/sync/#Locker">the <code>sync.Locker</code> interface</a>.
-<ul>
-<li>
-	So they both have two methods, <code>Lock()</code> and <code>Unlock()</code>,
-	for general data accessors to do locks and unlocks.
-</li>
-<li>
-	Besides the <code>Lock()</code> and <code>Unlock()</code> methods
-	for general data accessors to do locks and unlocks,
-	the <code>*sync.RWMutex</code> type has two other methods,
-	<code>RLock()</code> and <code>RUnlock()</code>,
-	for data readers <sup>(1)</sup> to do locks and unlocks.
-</li>
-</ul>
-
 <p>
-<sup>(1)</sup> Here the <b><i>data reader</i></b> should not be interpreted from literal.
-Some data readers may modify some data,
-but the modifications made by the data readers don't interference with each other.
+<code>*sync.Mutex</code>和<code>*sync.RWMutex</code>类型都实现了<a href="https://golang.org/pkg/sync/#Locker"><code>sync.Locker</code>接口类型</a>。
+所以这两个类型都有两个方法：<code>Lock()</code>和<code>Unlock()</code>，用来保护一份数据不会被多个访问者同时读取和修改。
 </p>
 
 <p>
-A <code>sync.Mutex</code> value is a general mutual exclusion lock.
-A zero <code>sync.Mutex</code> value is an unlocked mutex.
-A <code>sync.Mutex</code> value can only be locked when it is in unblocked status.
-In other words, a data accessor using a <code>sync.Mutex</code> value
-excludes any other data accessors using the <code>sync.Mutex</code> value.
+除了<code>Lock()</code>和<code>Unlock()</code>这两个方法，<code>*sync.RWMutex</code>类型还有两个另外的方法：<code>RLock()</code>和<code>RUnlock()</code>，用来支持多个读取者并发访问一份数据但防止此份数据被某个数据写入者和其它数据访问者（包括读取者和写入者）同时访问。
 </p>
 
-A <code>sync.RWMutex</code> value is a reader/writer mutual exclusion lock.
-A zero <code>sync.RWMutex</code> value an unlocked mutex.
-At the same time, a <code>sync.RWMutex</code> value
-can be locked by arbitrary number of data readers,
-but can only be locked by at most one general data accessor.
-In other words,
-<ul>
-<li>
-	a data reader using a <code>sync.RWMutex</code> value doesn't
-	exclude other readers using the <code>sync.RWMutex</code> value.
-</li>
-<li>
-	but a data reader using a <code>sync.RWMutex</code> value
-	exclude general data accessors using the <code>sync.RWMutex</code> value.
-</li>
-<li>
-	a general data accessor using a <code>sync.RWMutex</code> value
-	excludes any other general data accessors,
-	including data readers, using the <code>sync.RWMutex</code> value.
-</li>
-</ul>
+<p><i>
+(注意：这里的<b><i>数据读取者</i></b>和<b><i>数据写入者</i></b>不应该从字面上理解。有时候某些数据读取者可能修改数据，而有些数据写入者可能只读取数据。)
+</i></p>
 
-Generally,
-<ul>
-<li>
-	a <code>sync.Mutex</code> value is used to prevent
-	some data from being accessed parallelly.
-</li>
-<li>
-	a <code>sync.RWMutex</code> value is used to prevent
-	some data from being accessed parallelly when the data
-	is being modified by a data writer.
-</li>
-</ul>
+<p>
+一个<code>Mutex</code>值常称为一个互斥锁。
+一个<code>Mutex</code>零值为一个尚未加锁的互斥锁。
+一个<code>Mutex</code>值只有在未加锁状态时才能通过<code>Lock()</code>方法调用被加锁。
+换句话说，一旦一个（可寻址的）<code>Mutex</code>值<code>m</code>被加了锁（亦即某个<code>m.Lock()</code>方法调用成功返回），
+一个新的加锁试图将导致当前协程进入阻塞状态，直到此<code>Mutex</code>值被解锁为止（通过<code>m.Unlock()</code>方法调用）。
+</p>
 
-An example of using <code>sync.Mutex</code>:
+<p>
+注意：<code>m.Lock()</code>和<code>m.Unlock()</code>分别是<code>(&amp;m).Lock()</code>和<code>(&amp;m).Unlock()</code>的简写形式。
+</p>
+
+一个使用<code>sync.Mutex</code>的例子：
 <pre class="line-numbers"><code class="language-go">package main
 
-import "fmt"
-import "sync"
+import (
+	"fmt"
+	"runtime"
+	"sync"
+)
 
 type Counter struct {
-	m sync.RWMutex
+	m sync.Mutex
 	n uint64
+}
+
+func (c *Counter) Value() uint64 {
+	c.m.Lock()
+	defer c.m.Unlock()
+	return c.n
 }
 
 func (c *Counter) Increase(delta uint64) {
 	c.m.Lock()
 	c.n += delta
 	c.m.Unlock()
-}
-
-// The first two lines in this method can be replaced with:
-//    c.m.RLock()
-//    defer c.m.RUnlock()
-func (c *Counter) Value() uint64 {
-	c.m.Lock()
-	defer c.m.Unlock()
-	return c.n
 }
 
 func main() {
@@ -339,72 +276,127 @@ func main() {
 			}
 		}()
 	}
-	
-	for c.Value() < 10000 {}
+
+	// 此循环仅为演示目的。
+	for c.Value() < 10000 {
+		runtime.Gosched()
+	}
 	fmt.Println(c.Value()) // 10000
 }
 </code></pre>
 
 <p>
-In the above example, the <code>Mutex</code> field of any <code>Counter</code> value
-will guarantee that the <code>n</code> field of the <code>Counter</code> value
-will be never accessed by multiple goroutines parallelly.
+在上面这个例子中，一个<code>Counter</code>值使用了一个<code>Mutex</code>字段来确保它的字段<code>n</code>永远不会被多个协程同时访问。
 </p>
 
-An example of using <code>sync.RWMutex</code>:
+<p>
+一个<code>RWMutex</code>值常称为一个读写互斥锁。
+对于一个可寻址的<code>RWMutex</code>值<code>rwm</code>，数据写入者可以通过方法调用<code>rwm.Lock()</code>获取<code>rwm</code>的写锁，或者通过<code>m.RLock()</code>方法调用获取<code>rwm</code>的读锁。
+方法调用<code>rwm.Unlock()</code>和<code>rwm.RUnlock()</code>用来释放<code>rwm</code>的写锁和读锁。
+</p>
+
+<p>
+注意<code>rwm.Lock()</code>、<code>rwm.Unlock()</code>、<code>rwm.RLock()</code>和<code>rwm.RUnlock()</code>分别是<code>(&amp;rwm).Lock()</code>、<code>(&amp;rwm).Unlock()</code>、<code>(&amp;rwm).RLock()</code>和<code>(&amp;rwm).RUnlock()</code>的简写形式。
+</p>
+
+对于一个可寻址的<code>RWMutex</code>值<code>rwm</code>，下列规则存在：
+<ul>
+<li>
+	一个数据写入者只能在<code>rwm</code>的写锁和读锁都尚未被获取持有的情况下才能被成功获取。
+	换句话说，<code>rwm</code>的写锁在任何时刻最多只能被一个数据写入值成功获取和持有，并且<code>rwm</code>的写锁和读锁不能同时被持有。
+</li>
+<li>
+	当<code>rwm</code>的写锁被一个数据写入者所持有的时候，任何新的试图获取它的写锁或者读锁的操作都将导致当前协程进入阻塞状态，直到此写锁被释放，新的获取写锁或者读锁的试图才有机会成功。
+</li>
+<li>
+	当<code>rwm</code>的读锁被某个数据读取者所获取并持有，新的获取它的写锁的试图将导致当前协程进入阻塞状态。
+	但是，一个新的获取它的读锁的试图将成功，除非此试图操作发生在某个被阻塞的获取写锁的试图之后（见下一条规则）。
+	换句话说，一个读写互斥锁的读锁可以同时被多个数据读取者成功获取和持有。
+</li>
+<li>
+	假设<code>rwm</code>的读锁正在被某些数据读取者所持有，为了防止后续数据写入者没有机会成功获取写锁，后续发生在某个被阻塞的获取写锁的试图之后的所有获取读锁的试图将被阻塞。
+</li>
+<li>
+	假设<code>rwm</code>的写锁正在被某个数据写入者所持有，（至少对于官方Go标准编译器来说，）为了防止后续数据读取者没有机会成功获取读锁，发生在此写锁下一次被释放之前的所有获取读锁的试图将在此写锁下一次被释放之后肯定取得成功，即使这些所有获取读锁的试图发生在一些仍被阻塞的获取写锁的试图之后。
+</li>
+</ul>
+
+<!--
+https://github.com/golang/go/issues/17973
+-->
+
+上一个例子中的<code>Counter</code>类型的<code>m</code>字段的类型可以更改为<code>sync.RWMutex</code>，从而使得执行效率更高，如下面的代码所示。
+
+<pre class="line-numbers"><code class="language-go">...
+type Counter struct {
+	//m sync.Mutex
+	m sync.RWMutex
+	n uint64
+}
+
+func (c *Counter) Value() uint64 {
+	//c.m.Lock()
+	//defer c.m.Unlock()
+	c.m.RLock()
+	defer c.m.RUnlock()
+	return c.n
+}
+...
+</code></pre>
+
+<p>
+</p>
+
+根据上面列出的后两条规则，下面这个程序最有可能输出<code>abdc</code>。
+
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
 	"fmt"
+	"time"
 	"sync"
 )
 
 func main() {
-	const N = 10
-	var values [N]string
-
 	var m sync.RWMutex
-	for i := 0; i < N; i++ {
-		i := i
-		go func() {
-			m.RLock()
-			values[i] = string('a' + i)
-			m.RUnlock()
-		}()
-	}
-
-	done := func() bool {
+	go func() {
+		m.RLock()
+		fmt.Print("a")
+		time.Sleep(time.Second)
+		m.RUnlock()
+	}()
+	go func() {
+		time.Sleep(time.Second * 1 / 4)
 		m.Lock()
-		defer m.Unlock()
-		for i := 0; i < N; i++ {
-			if values[i] == "" {
-				return false
-			}
-		}
-		fmt.Println(values) // [a b c d e f g h i j]
-		return true
-	}
-	for !done() {}
+		fmt.Print("b")
+		time.Sleep(time.Second)
+		m.Unlock()
+	}()
+	go func() {
+		time.Sleep(time.Second * 2 / 4)
+		m.Lock()
+		fmt.Print("c")
+		m.Unlock()
+	}()
+	go func () {
+		time.Sleep(time.Second * 3 / 4)
+		m.RLock()
+		fmt.Print("d")
+		m.RUnlock()
+	}()
+	time.Sleep(time.Second * 3)
+	fmt.Println()
 }
 </code></pre>
 
 <p>
-In the above example, there are ten "reader" goroutines created,
-each of them modifies one element of <code>values</code>.
-The ten "reader" goroutines don't interference with each other,
-The <code>done</code> goroutine should be viewed as a general accessor.
+请注意，上例这个程序仅仅是为了解释和验证上面列出的读写锁的后两条加锁规则。
+此程序使用了<code>time.Sleep</code>调用来做协程间的同步。<a href="concurrent-common-mistakes.html#sleep">这种所谓的同步方法不应该被使用在生产代码中</a>。
 </p>
 
-<p>
-Please note that <code>m.Lock()</code>, <code>m.Unlock()</code>,
-<code>m.RLock()</code> and <code>c.RUnlock()</code> in the above two examples
-are shorthands of <code>(&amp;m).Lock()</code>, <code>(&amp;m).Unlock()</code>,
-<code>(&amp;m).RLock()</code> and <code>(&amp;m).RUnlock()</code>, respectively.
-</p>
+<code>sync.Mutex</code>和<code>sync.RWMutex</code>值也可以用来实现通知，尽管这部时Go中最优雅的方法来实现通知。
+下面是一个使用了<code>Mutex</code>值来实现通知的例子。
 
-<code>sync.Mutex</code> values can also be used to make notifications,
-though there are many other better ways to do the same jobs.
-Here is an example which makes a notification by using a <code>sync.Mutex</code> value.
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
@@ -418,85 +410,89 @@ func main() {
 	m.Lock()
 	go func() {
 		time.Sleep(time.Second)
-		fmt.Println("Hi.")
-		m.Unlock() // make a notification
+		fmt.Println("Hi")
+		m.Unlock() // 发出一个通知
 	}()
-	m.Lock() // wait to be notified
-	fmt.Println("Bye.")
+	m.Lock() // 等待通知
+	fmt.Println("Bye")
 }
 </code></pre>
 
 <p>
-In the above example, the text <code>Hi.</code> is guaranteed to
-be printed before the text <code>Bye.</code>.
-About the memory order guarantees made by
-<code>sync.Mutex</code> and <code>sync.RWMutex</code> values,
-please read <a href="memory-model.html#mutex">memory order guarantees in Go</a>.
+在此例中，<code>Hi</code>将确保在<code>Bye</code>之前打印出来。
+关于<code>sync.Mutex</code>和<code>sync.RWMutex</code>值相关的内存顺序保证，请阅读<a href="memory-model.html#mutex">Go中的内存顺序保证</a>一文。
 </p>
 
 </div>
 
 <p class="anchor" id="cond"></p>
-<h3>The <code>sync.Cond</code> Type</h3>
+<h3><code>sync.Cond</code>类型</h3>
 
 <div>
 <p>
-The <code>sync.Cond</code> type provides an efficient way
-to do notifications among goroutines.
+<code>sync.Cond</code>类型提供了一种有效的方式来实现多个协程间的通知。
 </p>
 
 <p>
-Each <code>sync.Cond</code> value holds <code>sync.Locker</code> field with name <code>L</code>.
-The field value is often a value of <code>*sync.Mutex</code> or <code>*sync.RWMutex</code>.
-Each <code>sync.Cond</code> value also meantains a waiting goroutine queue.
+每个<code>sync.Cond</code>值拥有一个<code>sync.Locker</code>类型的名为<code>L</code>的字段。
+此字段的具体值常常为一个<code>*sync.Mutex</code>值或者<code>*sync.RWMutex</code>值。
 </p>
 
 <p>
-The <code>*sync.Cond</code> type has <a href="https://golang.org/pkg/sync/#Cond">three methods</a>,
-<code>Wait</code>, <code>Signal</code> and <code>Broadcast</code>.
+<code>*sync.Cond</code>类型有<a href="https://golang.org/pkg/sync/#Cond">三个方法</a>：<code>Wait()</code>、<code>Signal()</code>和<code>Broadcast()</code>。
 </p>
 
-For an addressable <code>sync.Cond</code> value <code>c</code>,
+每个<code>Cond</code>值维护着一个先进先出等待协程队列。
+对于一个可寻址的<code>Cond</code>值<code>c</code>，
 <ul>
 <li>
-	<code>c.Wait()</code> must be called when <code>c.L</code> is locked.
-	Otherwise, a <code>c.Wait()</code> will cause panic.
-	A <code>c.Wait()</code> call will
+	<code>c.Wait()</code>必须在<code>c.L</code>字段值的锁被成功获取的时候调用；否则，<code>c.Wait()</code>调用将造成一个恐慌。
+	一个<code>c.Wait()</code>调用将
 	<ol>
 	<li>
-		first push the current caller goroutine into
-		the waiting goroutine queue maintained by <code>c</code>,
+		首先将当前协程推入到<code>c</code>所维护的等待协程队列；
 	</li>
 	<li>
-		then call <code>c.L.Unlock()</code> to unhold/release the locker <code>c.L</code>.
+		然后调用<code>c.L.Unlock()</code>释放<code>c.L</code>的锁；
 	</li>
 	<li>
-		then make the current caller goroutine enter blocking state <sup>(1)</sup>.
-		The caller goroutine will be unblocked by another goroutine
-		through calling <code>c.Signal()</code> or <code>c.Broadcast()</code> later.
-		Once the caller goroutine is unblocked (a.ka.a, enter running state again),
-		<code>c.L.Lock()</code> will be called (in the resumed <code>c.Wait()</code> call)
-		to try to hold/acquire the locker <code>c.L</code> again,
-		The <code>c.Wait()</code> call will exits after
-		the <code>c.L.Lock()</code> call returns.
+		<p>
+		然后使当前协程进入阻塞状态；<!--sup>(1)</sup-->
+		</p>
+		
+		<p><i>
+		（当前协程将被另一个协程通过<code>c.Signal()</code>或<code>c.Broadcast()</code>调用唤醒而重新进入运行状态。）
+		</i></p>
+		
+		<p>
+		</p>
+		一旦当前协程重新进入运行状态，<code>c.L.Lock()</code>将被调用来试图重新<code>c.L</code>字段值的锁。
+		此<code>c.Wait()</code>调用将在此<code>c.L.Lock()</code>调用成功之后退出。
 	</li>
 	</ol>
 </li>
 <li>
-	a <code>c.Signal()</code> call will try to unblock the first goroutine in and
-	remove the goroutine from the waiting goroutine queue maintained by <code>c</code>,
-	if the queue is not empty.
+	一个<code>c.Signal()</code>调用将唤醒并移除<code>c</code>所维护的等待协程队列中的第一个协程（如果此队列不为空的话）。
 </li>
 <li>
-	a <code>c.Broadcast()</code> call will try to unblock all the goroutines in and
-	remove the goroutines from the waiting goroutine queue maintained by <code>c</code>,
-	if the queue is not empty.
+	一个<code>c.Broadcast()</code>调用将唤醒并移除<code>c</code>所维护的等待协程队列中的所有协程（如果此队列不为空的话）。
 </li>
 </ul>
 
+<p>
+请注意：<code>c.Wait()</code>、<code>c.Signal()</code>和<code>c.Broadcast()</code>分别为<code>(&amp;c).Wait()</code>、<code>(&amp;c).Signal()</code>和<code>(&amp;c).Broadcast()</code>的简写形式。
+</p>
+
+<p>
+<code>c.Signal()</code>和<code>c.Broadcast()</code>调用常用来通知某个条件的状态发生了变化。
+一般说来，<code>c.Wait()</code>应该在一个检查某个条件是否已经得到满足的循环中调用。
+</p>
+
+<!--
 <sup>(1)</sup> This is for the most common case,
 by assuming that <code>c.Signal()</code> and <code>c.Broadcast()</code> are not called
 in the short period between the step 2 and step 3.
+
 <ul>
 <li>
 If <code>c.Signal()</code> is called in the short period between the step 2 and step 3,
@@ -507,104 +503,111 @@ If <code>c.Broadcast()</code> is called in the short period between the step 2 a
 then the caller goroutine of <code>c.Wait()</code> will not enter blocking state for sure.
 </li>
 </ul>
+-->
 
-<p>
-Please note that <code>c.Wait()</code>, <code>c.Signal()</code> and <code>c.Broadcast()</code>
-are shorthands of <code>(&amp;c).Wait()</code>, <code>(&amp;c).Signal()</code>
-and <code>(&amp;c).Broadcast()</code>, respectively.
-</p>
+下面是一个典型的<code>sync.Cond</code>用例。
 
-In an idiomatic <code>sync.Cond</code> use case, generally,
-one goroutine waits for changes of a certain condition,
-and some other goroutines make codition change notifications.
-Here is an example:
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
 	"fmt"
+	"math/rand"
 	"sync"
 	"time"
 )
 
-var (
-	fooIsDone = false // Here, the user defined condition
-	barIsDone = false // is composed of two parts.
-	cond      = sync.NewCond(&sync.Mutex{})
-)
-
-func doFoo() {
-	time.Sleep(time.Second) // simulate a workload
-	cond.L.Lock()
-	fooIsDone = true
-	cond.Signal() // called when cond.L locker is acquired
-	cond.L.Unlock()
-}
-
-func doBar() {
-	time.Sleep(time.Second * 2) // simulate a workload
-	cond.L.Lock()
-	barIsDone = true
-	cond.L.Unlock()
-	cond.Signal() // called when cond.L locker is released
-}
-
 func main() {
+	rand.Seed(time.Now().UnixNano())
+	
+	const N = 10
+	var values [N]string
+	
+	cond := sync.NewCond(&sync.Mutex{})
 	cond.L.Lock()
 	
-	go doFoo()
-	go doBar()
+	for i := 0; i < N; i++ {
+		d := time.Second * time.Duration(rand.Intn(10)) / 10
+		go func(i int) {
+			time.Sleep(d) // 模拟一个工作负载
+			cond.L.Lock() // 下面的修改必须在cond.L被锁定的时候执行
+			values[i] = string('a' + i)
+			cond.Signal() // 可以在cond.L被锁定的时候发出通知
+			cond.L.Unlock()
+			// 上面的通知也可以在cond.L未锁定的时候发出。
+			//cond.Signal() // 上面的调用也可以放在这里
+		}(i)
+	}
 
+	// 此函数必须在cond.L被锁定的时候调用。
 	checkConditon := func() bool {
-		fmt.Println(fooIsDone, barIsDone)
-		return fooIsDone && barIsDone
+		fmt.Println(values)
+		for i := 0; i < N; i++ {
+			if values[i] == "" {
+				return false
+			}
+		}
+		return true
 	}
 	for !checkConditon() {
-		cond.Wait()
+		cond.Wait() // 必须在cond.L被锁定的时候调用
 	}
-
 	cond.L.Unlock()
 }
 </code></pre>
 
-The output:
-<pre class="output"><code>false false
-true false
-true true
+一个可能的输出：
+<pre class="output"><code>[         ]
+[     f    ]
+[  c   f    ]
+[  c   f  h  ]
+[ b c   f  h  ]
+[a b c   f  h  j]
+[a b c   f g h i j]
+[a b c  e f g h i j]
+[a b c d e f g h i j]
 </code></pre>
 
 <p>
-For there is only one goroutine (the main goroutine) waiting to be unblocked,
-the two <code>cond.Signal()</code> calls can be replaced with <code>cond.Broadcast()</code>.
+因为上例中只有一个协程（主协程）在等待通知，所以其中的<code>cond.Signal()</code>调用也可以换为<code>cond.Broadcast()</code>。
+如上例中的注释所示，<code>cond.Signal()</code>和<code>cond.Broadcast()</code>不必在<code>cond.L</code>的锁被成功获取的时候调用。
 </p>
 
-Some details in the above example.
-<ul>
-<li>
-	To avoid data races,
-	each part of the user defined condition should only be modified
-	by a goroutine when the goroutine has acquired the locker.
-</li>
-<li>
-	To guarantee that the <code>cond.Signal()</code> (or <code>cond.Broadcast()</code>) calls
-	happen before the <code>cond.Wait()</code> in the main goroutine returns,
-	<ol>
-	<li>
-		the <code>doFoo</code> and <code>doBar</code> goroutines
-		should be started when the main goroutine has acquired the locker.
-	</li>
-	<li>
-		<code>cond.Signal()</code> (or <code>cond.Broadcast()</code>)
-		should be called by a goroutine when the goroutine has ever acquired the locker.
-		It is okay to call the two methods either before or after
-		the goroutine released the locker.
-	</li>
-	</ol>
-</li>
-</ul>
+<p>
+为了防止数据竞争，对自定义条件的修改必须在<code>cond.L</code>的锁被成功获取的时候才能执行。
+另外，<code>checkConditon</code>函数和<code>cond.Wait</code>方法也必须在<code>cond.L</code>的锁被成功获取的时候才可被调用。
+</p>
 
-The user defined condition monitored by a <code>sync.Cond</code> value can be a void.
-For such cases, the <code>sync.Cond</code> value is used for notifications purely.
-For example, the following program will print <code>abc</code> or <code>bac</code>.
+<p>
+事实上，对于上面这个特定的例子，<code>cond.L</code>字段的也可以为一个<code>*sync.RWMutex</code>值。
+对条件的十个部分的修改可以在定义<code>RWMutex</code>值的读锁被成功获取的时候执行。这十个修改可以并发进行，因为它们是互不干扰的。
+如下面的代码所示：
+</p>
+
+<pre class="line-numbers"><code class="language-go">...
+	cond := sync.NewCond(&sync.RWMutex{})
+	cond.L.Lock()
+	
+	for i := 0; i < N; i++ {
+		d := time.Second * time.Duration(rand.Intn(10)) / 10
+		go func(i int) {
+			time.Sleep(d)
+			cond.L.(*sync.RWMutex).Lock()
+			values[i] = string('a' + i)
+			cond.L.(*sync.RWMutex).Unlock()
+			cond.Signal()
+		}(i)
+	}
+...
+</code></pre>
+
+<p>
+在上面的代码中，此<code>sync.RWMutex</code>值的用法有些不符常规。
+它的读锁被一些修改数组元素的协程所获取并持有，而它的写锁被主协程获取持有用来读取并检查各个数组元素的值。
+</p>
+
+<code>Cond</code>值所表示的自定义条件可以是一个虚无。对于这种情况，此<code>Cond</code>值纯粹被用来实现通知。
+比如，下面这个程序将打印出<code>abc</code>或者<code>bac</code>。
+
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
@@ -638,7 +641,9 @@ func main() {
 </code></pre>
 
 <p>
-If it needs, multiple <code>sync.Cond</code> values can share the same <code>sync.Locker</code>.
-However, such cases are rare in practice.
+</p>
+
+<p>
+如果需要，多个<code>sync.Cond</code>值可以共享一个<code>sync.Locker</code>值。但是这种情形在实践中并不多见。
 </p>
 </div>

@@ -10,7 +10,7 @@ Index
 	<a href="#make-struct-type-uncomparable">How to make a struct type uncomparable?</a>
 </li>
 <li>
-	<a href="#dont-use-multivalue-assignments-with-dependencies">Don't use multi-value assignments with dependencies between expressions.</a>
+	<a href="#dont-use-assignments-with-expression-dependencies">Don't use value assignments with dependencies between expressions.</a>
 </li>
 <li>
 	<a href="#simulate-loop-from-0-to-n">How to simulate <code>for i in 0..N</code> in some other languages?</a>
@@ -34,10 +34,10 @@ Index
 	<a href="#use-three-index-subslice-form">We should use the three-index subslice form at some scenarios.</a>
 </li>
 <li>
-	<a href="#assert-implementation">Make sure and show a custom defined type implements a specified interface type.</a>
+	<a href="#execute-deferred-calls-earlier">Use anonymous functions to make some deferred function calls be executed earlier.</a>
 </li>
 <li>
-	<a href="#execute-deferred-calls-earlier">Use anonymous functions to make some deferred function calls be executed earlier.</a>
+	<a href="#assert-implementation">Make sure and show a custom defined type implements a specified interface type.</a>
 </li>
 <li>
 	<a href="#assert-at-compile-time">Some compile-time assertion tricks.</a>
@@ -111,9 +111,9 @@ for <a href="unofficial-faq.html#final-zero-size-field">doing so might enlarge t
 <h3>How to make a struct type uncomparable?</h3>
 
 <div>
-Simetimes, we want to avoid a custom struct type being used a map key types,
+Sometimes, we want to avoid a custom struct type being used a map key types,
 then we can put a field of a non-exported zero-size uncomparable type
-in a struct type to make the struc type uncomparable.
+in a struct type to make the struct type uncomparable.
 For example:
 
 <pre class="line-numbers"><code class="language-go">package main
@@ -123,9 +123,11 @@ type T struct {
 	AnotherField int
 }
 
+var x map[T]int // compile error: invalid map key type T
+
 func main() {
 	var a, b T
-	_ = a == b // compile error: invalid operation: a == b
+	_ = a == b // compile error: invalid operation:
 }
 </code></pre>
 
@@ -135,16 +137,50 @@ func main() {
 
 
 
-<p class="anchor" id="dont-use-multivalue-assignments-with-dependencies"></p>
-<h3>Don't use multi-value assignments with dependencies between the involved expressions.</h3>
+<p class="anchor" id="dont-use-assignments-with-expression-dependencies"></p>
+<h3>Don't use value assignments with dependencies between expressions.</h3>
 
 <div>
 
 <p>
 Currently (Go 1.11), there are
-<a href="https://github.com/go101/go101/wiki/Some-evaluation-orders-in-multi-value-assignments-are-unspecified">some evaluation orders in multi value assignments are unspecified</a> and there are <a href="https://github.com/go101/go101/wiki/An-ambiguity-of-%28or-dispute-on%29-the-evaluation-order-of-LHS-%28left-hand-side%29-items-in-a-multi-value-assignment">some disputes and bugs</a> in the standard Go compiler and gccgo compiler when there are dependencies existing between the expressions invloved in a multi-value assignment.
+<a href="https://github.com/go101/go101/wiki/Some-evaluation-orders-in-multi-value-assignments-are-unspecified">some evaluation orders in multi-value assignments are unspecified</a>
+and there are <a href="https://github.com/go101/go101/wiki/An-ambiguity-of-%28or-dispute-on%29-the-evaluation-order-of-LHS-%28left-hand-side%29-items-in-a-multi-value-assignment">some disputes and bugs</a>
+in the standard Go compiler and gccgo compiler when there are dependencies existing between the expressions involved in a multi-value assignment.
 So try to split a multi-value assignment into multiple single value assignments
 if there are, or you can't make sure whether or not there are, dependencies between the involved expressions.
+</p>
+
+In fact, in some bad-written single-value assignments, there are also expression evaluation order ambiguities.
+For example, the following program might print <code>[7 0 9]</code>, <code>[0 8 9]</code>,
+or <code>[7 8 9]</code>, depending on compiler implementations.
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import "fmt"
+
+var a = &[]int{1, 2, 3}
+var i int
+func f() int {
+	i = 1
+	a = &[]int{7, 8, 9}
+	return 0
+}
+
+func main() {
+	// The evaluation order of "a", "i" and "f()" is not specified.
+	(*a)[i] = f()
+	fmt.Println(*a)
+}
+</code></pre>
+
+<p>
+</p>
+
+<p>
+In other words, a function call in a value assignment shouldn't affect
+the evaluation results of the non-function-call expressions in the same assignment.
+Please read <a href="evaluation-orders.html">evaluation orders in Go</a> for details.
 </p>
 
 </div>
@@ -186,7 +222,7 @@ func main() {
 <h3>We should reset the pointers in the element slots which are freed up in all kinds of slice manipulations to avoid memory leaking if we can't make sure if the freed-up element slots will be reused later.</h3>
 
 <p>
-Please read <a href="container.html#memclr">array/slice <code>memclr</code> optimization</a>, how to <a href="container.html#delete-slice-elements">delete slice elements</a> and <a href="memory-leaking.html#dead-slice-elements">kind-of memory leaking caused by not resetting pointers in dead slice elements</a> for details.
+Please read how to <a href="container.html#delete-slice-elements">delete slice elements</a> and <a href="memory-leaking.html#dead-slice-elements">kind-of memory leaking caused by not resetting pointers in dead slice elements</a> for details.
 </p>
 
 
@@ -232,8 +268,8 @@ import "sync"
 
 func f(m sync.Mutex) { // warning: f passes lock by value: sync.Mutex
 	m.Lock()
+	defer m.Unlock()
 	// do something ...
-	m.Unlock()
 }
 </code></pre>
 
@@ -335,7 +371,7 @@ internal default options, then the following implementation is not recommended.
 </code></pre>
 
 <p>
-The reason of the above implementation is not recommended is the
+The reason why the above implementation is not recommended is the
 <code>append</code> call may modify the underlying <code>Option</code>
 sequence of the argument <code>opts</code>.
 For most scenarios, it is not a problem.
@@ -364,6 +400,19 @@ in <a href="https://github.com/go101/go101/wiki/The-capacity-of-the-result-byte-
 One drawback of three-index subslice forms is they are some verbose.
 In fact, I ever made <a href="https://github.com/golang/go/issues/25638">a proposal</a>
 to make it less verbose, but it was declined.
+</p>
+
+</div>
+
+
+
+<p class="anchor" id="execute-deferred-calls-earlier"></p>
+<h3>Use anonymous functions to make some deferred function calls be executed earlier.</h3>
+
+<div>
+
+<p>
+Please read <a href="defer-more.html#kind-of-resource-leaking">this article</a> for details.
 </p>
 
 </div>
@@ -406,7 +455,7 @@ func (mr *MyReader) Read(data []byte) (int, error) {
 	return len(data), io.EOF
 }
 
-// Any of the following three lines assures
+// Any of the following three lines ensures
 // type *MyReader implements io.Reader.
 var _ io.Reader = NewMyReader()
 var _ io.Reader = (*MyReader)(nil)
@@ -419,51 +468,46 @@ func _() {_ = io.Reader(nil).(*MyReader)}
 
 
 
-<p class="anchor" id="execute-deferred-calls-earlier"></p>
-<h3>Use anonymous functions to make some deferred function calls be executed earlier.</h3>
-
-<div>
-
-<p>
-Please read <a href="defer-more.html#kind-of-resource-leaking">this article</a> for details.
-</p>
-
-</div>
-
-
-
 <p class="anchor" id="assert-at-compile-time"></p>
 <h3>Some compile-time assertion tricks.</h3>
 
 <div>
+<p>
+Besides the above one, there are more compile-time assertion tricks.
+</p>
 
 Several ways to guarantee a constant <code>N</code> is not smaller than another constant <code>M</code> at compile time:
 
-<pre class="line-numbers"><code class="language-go">const N, M = 8, 8
-
-// Any of the following line can guarantee N >= M
-var _ [N-M]int
-type _ [N-M]int
-const _ uint = N-M
+<pre class="line-numbers"><code class="language-go">// Any of the following lines can guarantee N >= M
+func _(x []int) {_ = x[N-M]}
+func _(){_ = []int{N-M: 0}}
 func _([N-M]int){}
+var _ [N-M]int
+const _ uint = N-M
+type _ [N-M]int
+
+// If M and N are guarenteed to be positive integers.
+var _ uint = N/M - 1
 </code></pre>
 
 One more way which is stolen from <a href="https://twitter.com/lukechampine/status/1026695476811390976">@lukechampine</a>.
-It makes use of the rule that <a href="container.html#value-literals">duplicated constant keys can't appear in the same composite literal</a>.
+It makes use of the rule that <a href="container.html#value-literals">duplicate constant keys can't appear in the same composite literal</a>.
 
 <pre class="line-numbers"><code class="language-go">var _ = map[bool]struct{}{false: struct{}{}, N>=M: struct{}{}}
 </code></pre>
 
 The above way looks some verbose but it is more general. It can be used to assert any conditions.
-It can be less vervose but needs a little more (negligible) memory:
+It can be less verbose but needs a little more (negligible) memory:
 
-<pre class="line-numbers"><code class="language-go">var _ = map[bool]int{false: 0, M>=N: 1}
+<pre class="line-numbers"><code class="language-go">var _ = map[bool]int{false: 0, N>=M: 1}
 </code></pre>
 
 <p>
+NOTE: currently, <a href="https://github.com/golang/go/issues/28104">gccgo 8.2.0 has a bug</a> which allows duplicate constant keys in composite literals.
+So this trick doesn't work for gccgo now. This bug will be fixed in a later gccgo version.
 </p>
 
-Similarly, ways to assert two integer constants equal to each other:
+Similarly, ways to assert two integer constants are equal to each other:
 
 <pre class="line-numbers"><code class="language-go">var _ [N-M]int; var _ [M-N]int
 type _ [N-M]int; type _ [M-N]int
@@ -472,12 +516,38 @@ func _([N-M]int, [M-N]int) {}
 
 var _ = map[bool]int{false: 0, M==N: 1}
 
+var _ = [1]int{M-N: 0} // the only valid index is 0
+var _ = [1]int{}[M-N]  // the only valid index is 0
+
 var _ [N-M]int = [M-N]int{}
 </code></pre>
 
 <p>
 The last line is also inspired by one of Luke Champine's tweets.
 </p>
+
+How to assert a constant string is not blank.
+
+<pre class="line-numbers"><code class="language-go">type _ [len(aStringConstant)-1]int
+var _ = map[bool]int{false: 0, aStringConstant != "": 1}
+var _ = aStringConstant[:1]
+var _ = aStringConstant[0]
+const _ = 1/len(aStringConstant)
+</code></pre>
+
+<p>
+The last line is stolen from Jan Mercl's <a href="https://groups.google.com/d/msg/golang-nuts/w1-JQMaH7c4/qzBFSPImBgAJ">clever idea</a>.
+</p>
+
+Sometimes, to avoid package-level variables consuming too much memory,
+we can put assertion code in a function declared with the blank identifier.
+For example,
+
+<pre class="line-numbers"><code class="language-go">func _() {
+	var _ = map[bool]int{false: 0, N>=M: 1}
+	var _ [N-M]int
+}
+</code></pre>
 
 </div>
 
@@ -537,8 +607,8 @@ The copy cost depends on the size of the non-interface value. The larger the siz
 So please try to avoid boxing large-size values into interface values.
 </p>
 
-For example, in the following example, the cost of the latter two print calls
-are muich lower than the former two.
+In the following example, the cost of the latter two print calls
+are much lower than the former two.
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -546,11 +616,11 @@ import "fmt"
 
 func main() {
 	var a [1000]int
-	
+
 	// This cost of the two lines is high.
 	fmt.Println(a)                   // a is copied
 	fmt.Printf("Type of a: %T\n", a) // a is copied
-	
+
 	// The cost of the two lines is low.
 	fmt.Printf("%v\n", a[:])
 	fmt.Println("Type of a:", fmt.Sprintf("%T", &a)[1:])
@@ -576,7 +646,7 @@ About value sizes of different types, please read <a href="value-copy-cost.html"
 <p>
 Please read <a href="bounds-check-elimination.html">this article</a> to get
 what is BCE and how well BCE is supported in Go now.
-That article also show some examples on how to making use of BCE to do code optimization.
+That article also shows some examples of how to make using of BCE for code optimization.
 Here, another example is provided:
 
 <pre class="line-numbers"><code class="language-go">package main
@@ -651,12 +721,20 @@ And future gc versions may become smarter so that the trick will become unnecess
 
 <!--
 
+select{}
+
+how to delcared a new type which will not has the same underlying type with other types.
+	type T *T
+
 use named returns, better readibility
+
+define exported error values as constants, or maybe can make using of declared function values
+
+avoid gc too frequently by allocating a large memroy block for a global variable.
 
 try to avoid unnecessary synchronization, for example, make data only be used in one goroutine.
 math/rand.NewSource() are faster but not concurrent safe.
 but Bytes() method is not fast
-
 
 try to avoid using large-sized types as
 * map key and element types,
@@ -666,6 +744,8 @@ try to avoid using large-sized types as
 
 fmt.Print(v) // values referenced by v escape to heap
 
+
+sync.Pool, sync.Map
 
 use types without pointer components as container elements would ... the burden of GC.
 
@@ -678,9 +758,7 @@ use {} to create a nested block to shadow identifiers declared in outer blocks.
 
 intermediate results should be stored out of the benchmark function
 
-
 select may slow: https://twitter.com/melvinodsa/status/1031434710184939522
-
 
 <p class="anchor" id="embed-unexported-alias-of-exported-type"></p>
 <h3>Embedding an unexported alias of an exported type to avoiding the corresponding anonymous field being modified in user packages.</h3>
@@ -690,8 +768,8 @@ try to share Transport for http.Client values. (need a go practice article)
 avoid using the http.Get, ..., functions directly.
 
   http://stackoverflow.com/questions/17948827/reusing-http-connections-in-golang
-  So if you create a new Transport for each request, 
-  it will create new connections each time. 
+  So if you create a new Transport for each request,
+  it will create new connections each time.
   In this case the solution is to share the one Transport instance between clients.
   http://stackoverflow.com/questions/36688633/how-to-release-http-client-in-go
 
@@ -702,7 +780,46 @@ avoid using the http.Get, ..., functions directly.
         // TCP connections between requests to the same hosts, as if
         // Transport.DisableKeepAlives were set.
 
++setting GOMAXPROCS with a value larger than NumCPUs is good for the performance of a program sometimes^M
++https://news.ycombinator.com/item?id=18350362^
 
+simulate subPackages
+	package foo / import "a.b/foo"
+	type SubPkg_ struct{}
+	var SubPkg SubPkg_
+	func (SubPkg_) FunctionX()
+	func (SubPkg_) FunctionY()
+
+	package main
+	import "a.b/foo"
+	func main() {
+		foo.SubPkg.FunctionX()
+	}
+
+req.WithContext(context.WithValue(req.Context(), paramsKeyType{}, Params{path, tokens})) is slow
+https://github.com/golang/go/issues/28737
+
+how to embed an exported type as a non-export field?
+so that package users can modify the field.
+	type embeddedType = ExportedType
+
+use make() instead of composite literals to initilize map and slice
+if the accurate or approiximate number of elements is known.
+
+If the types of some results of a function are identifier,
+it would be better to use named results for "code as docs"
+
+manually adjust struct field positions to save memory.
+
+
+import "sync"
+type T struct {
+	_ [0]sync.Mutex
+}
+func main() {
+	var t T
+	_ = t // go vet: assignment copies lock value to _: main.T contains sync.Mutex
+}
 -->
 
 
