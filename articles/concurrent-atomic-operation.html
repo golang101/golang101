@@ -1,25 +1,20 @@
-﻿<h1>Atomic Operations Provided In The <code>sync/atomic</code> Standard Package</h1>
+﻿<h1><code>sync/atomic</code>标准库包中提供的原子操作</h1>
 
 <p>
-Atomic operations are more primitive than other synchronization techniques.
-They are lockless and generally implemented at hardware level.
-In fact, they are often used in implementing other synchronization techniques.
+原子操作是比其它同步技术更基础的操作。原子操作是无锁的，常常直接通过CPU指令直接实现。
+事实上，其它同步技术的实现常常依赖于原子操作。
 </p>
 
 <p>
-Please note, many examples below are not concurrent programs,
-they are just for demonstration and education purpose, to show how to use the
-atomic functions provided in the <code>sync/atomic</code> standard package.
+注意，本文中的很多例子并非并发程序。它们值是用来演示如何使用<code>sync/atomic</code>标准库包中提供的原子操作。
 </p>
 
 <p class="anchor" id="overview"></p>
-<h3>Overview Of Atomic Operations Provided In Go</h3>
+<h3>Go支持的原子操作概述</h3>
 
 <div>
-
-The <code>sync/atomic</code> standard package provides the following five atomic functions
-for an integer type <code>T</code>, where <code>T</code> must be any of <code>int32</code>,
-<code>int64</code>, <code>uint32</code>, <code>uint64</code> and <code>uintptr</code>.
+对于一个整数类型<code>T</code>，<code>sync/atomic</code>标准库包提供了下列原子操作函数。
+其中<code>T</code>可以是内置<code>int32</code>、<code>int64</code>、<code>uint32</code>、<code>uint64</code>和<code>uintptr</code>类型。
 
 <pre class="line-numbers"><code class="language-go">func AddT(addr *T, delta T)(new T)
 func LoadT(addr *T) (val T)
@@ -28,7 +23,8 @@ func SwapT(addr *T, new T) (old T)
 func CompareAndSwapT(addr *T, old, new T) (swapped bool)
 </code></pre>
 
-For example, the following five functions are provided for type <code>int32</code>.
+比如，下列五个原子操作函数提供给了内置<code>int32</code>类型。
+
 <pre class="line-numbers"><code class="language-go">func AddInt32(addr *int32, delta int32)(new int32)
 func LoadInt32(addr *int32) (val int32)
 func StoreInt32(addr *int32, val int32)
@@ -36,10 +32,11 @@ func SwapInt32(addr *int32, new int32) (old int32)
 func CompareAndSwapInt32(addr *int32, old, new int32) (swapped bool)
 </code></pre>
 
-The following four atomic functions are provided for (safe) pointer types.
-As Go 1 doesn't support custom generic now, these functions are implemented
-through the <a href="unsafe.html">unsafe pointer type</a> <code>unsafe.Pointer</code>
-(the Go counterpart of C <code>void*</code>).
+<p>
+</p>
+
+下列四个原子操作函数提供给了（安全）指针类型。因为Go目前（1.11）并不支持自定义范型，所以这些函数是通过<a href="unsafe.html">非安全指针</a><code>unsafe.Pointer</code>来实现的。
+
 <pre class="line-numbers"><code class="language-go">func LoadPointer(addr *unsafe.Pointer) (val unsafe.Pointer)
 func StorePointer(addr *unsafe.Pointer, val unsafe.Pointer)
 func SwapPointer(addr *unsafe.Pointer, new T) (old unsafe.Pointer)
@@ -47,31 +44,27 @@ func CompareAndSwapPointer(addr *unsafe.Pointer, old, new unsafe.Pointer) (swapp
 </code></pre>
 
 <p>
-There is not the <code>AddPointer</code> function for pointers,
-as Go pointers don't support arithmetic operations.
+因为Go指针不支持算术运算，所以相对于整数类型，指针类型的的原子操作少了一个<code>AddPointer</code>函数。
 </p>
 
-The <code>sync/atomic</code> standard package also provides a type <code>Value</code>.
-Its corresponding pointer type <code>*Value</code> has two methods, <code>Load</code> and <code>Store</code>.
-A <code>Value</code> value can be used to atomically load and store values of any type.
+<code>sync/atomic</code>标准库包也提供了一个<code>Value</code>类型。它的指针类型<code>*Value</code>拥有两个方法：<code>Load</code>和<code>Store</code>。
+<code>Value</code>值用来原子读取和修改任何类型的Go值。
+
 <pre class="line-numbers"><code class="language-go">func (v *Value) Load() (x interface{})
 func (v *Value) Store(x interface{})
 </code></pre>
 
 <p>
-The remaining of this article shows some examples on how to use the atomic operations provided in Go.
+本文的余下部分将通过一些示例来展示如何使用这些原子操作函数。
 </p>
 
 <p class="anchor" id="integer"></p>
-<h3>Atomic Operations For Integers</h3>
+<h3>整数原子操作</h3>
 
 <div>
-The following example shows how to do the <code>add</code> atomic operation
-on an <code>int32</code> value by using the <code>AddInt32</code> function.
-In this example, 1000 new concurrent goroutines are created by the main goroutine.
-Each of the new created goroutine increases the integer <code>n</code> by one.
-Atomic operations guarantee that there are no data races among these goroutines.
-In the end, <code>1000</code> is guaranteed to be printed.
+下面这个例子展示了如何使用<code>add</code>原子操作来并发地递增一个<code>int32</code>值。
+在此例子中，主协程中创建了1000个新协程。每个新协程将整数<code>n</code>的值增加<code>1</code>。
+原子操作保证这1000个新协程之间不会发生数据竞争。此程序肯定打印出<code>1000</code>。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -98,12 +91,10 @@ func main() {
 </code></pre>
 
 <p>
+如果我们将新协程中的语句<code>atomic.AddInt32(&amp;n, 1)</code>替换为<code>n++</code>，则最后的输出结果很可能不是<code>1000</code>。
 </p>
 
-The <code>StoreT</code> and <code>LoadT</code> atomic functions are often used
-to implement the setter and getter methods of (the corresponding pointer type of)
-a type if the values of the type are accessed concurrently.
-For example,
+<code>StoreT</code>和<code>LoadT</code>原子操作函数经常被用来需要并发运行的实现setter和getter方法。下面是一个这样的例子：
 
 <pre class="line-numbers"><code class="language-go">type Page struct {
 	views uint32
@@ -121,23 +112,18 @@ func (page *Page) Views() uint32 {
 <p>
 </p>
 
-For signed types <code>int32</code> and <code>int64</code>,
-the second argument for an <code>AddT</code> function call can be a negative value,
-to do an atomic decrease operation.
-But how to do atomic decrease operations for values of an unsigned type <code>T</code>,
-such as <code>uint32</code>, <code>uint64</code> and <code>uintptr</code>?
-There are two circumstances for the second unsigned arguments.
+如果<code>T</code>是一个有符号整数类型，比如<code>int32</code>或<code>int64</code>，则<code>AddT</code>函数调用的第二个实参可以是一个负数，用来实现原子减法操作。
+但是如果<code>T</code>是一个无符号整数类型，比如<code>uint32</code>、<code>uint64</code>或者<code>uintptr</code>，则<code>AddT</code>函数调用的第二个实参需要为一个非负数，那么如何实现无符号整数类型<code>T</code>值的原子减法操作呢？
+毕竟<code>sync/atomic</code>标准库包没有提供<code>SubstractT</code>函数。
+根据欲传递的第二个实参的特点，我们可以把<code>T</code>为一个无符号整数类型的情况细分为两类：
 <ol>
 <li>
-	For an unsigned variable <code>v</code> of type <code>T</code>,
-	<code>-v</code> is legal in Go.
-	So we can just pass <code>-v</code> as the second argument of an <code>AddT</code> call.
+	第二个实参为类型为<code>T</code>的一个变量值<code>v</code>。
+	因为<code>-v</code>在Go中是合法的，所以<code>-v</code>可以直接被用作<code>AddT</code>调用的第二个实参。
 </li>
 <li>
-	For a positive constant integer <code>c</code>,
-	<code>-v</code> is illegal to be used as the second argument of an <code>AddT</code> call
-	(where <code>T</code> denotes an unsigned integer type).
-	We can used <code>^T(c-1)</code> as the second argument instead.
+	第二个实参为一个正整数常量<code>c</code>，这时<code>-c</code>在Go中是编译不通过的，所以它不能被用作<code>AddT</code>调用的第二个实参。
+	这时我们可以使用<code>^T(c-1)</code>（仍为一个正数）做为<code>AddT</code>调用的第二个实参。
 </li>
 </ol>
 
@@ -145,17 +131,14 @@ There are two circumstances for the second unsigned arguments.
 </p>
 
 <p>
-This <code>^T(c-1)</code> trick also works for an unsigned variable <code>v</code>,
-but <code>^T(v-1)</code> is less efficient than <code>T(-v)</code>.
+此<code>^T(v-1)</code>小技巧对于无符号类型的变量<code>v</code>也是适用的，但是<code>^T(v-1)</code>比<code>T(-v)</code>的效率要低。
 </p>
 
 <p>
-In the trick <code>^T(c-1)</code>, if <code>c</code> is a typed value
-and its type matches the second perameter type of function <code>AddT</code>,
-then the form can shortened as <code>^(c-1)</code>.
+对于这个<code>^T(c-1)</code>小技巧，如果<code>c</code>是一个类型确定值并且它的类型确实就是<code>T</code>，则它的表示形式可以简化为<code>^(c-1)</code>。
 </p>
 
-Example:
+一个例子：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -190,18 +173,17 @@ func main() {
 </code></pre>
 
 <p>
-A <code>SwapT</code> function call is like a <code>StoreT</code> function call,
-but returns the old value.
 </p>
 
 <p>
-A <code>CompareAndSwapT</code> function call only applies the store operation
-when the current value matches the passed old value.
-The <code>bool</code> return result of the <code>CompareAndSwapT</code>
-function call indicates whether or not the store operation is applied.
+<code>SwapT</code>函数调用和<code>StoreT</code>函数调用类似，但是返回修改之前的旧值（因此称为置换操作）。
 </p>
 
-Example:
+<p>
+一个<code>CompareAndSwapT</code>函数调用仅在新值和旧值不相等的情况下才会执行修改操作，并返回<code>true</code>；否则立即返回<code>false</code>。
+</p>
+
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
@@ -224,32 +206,27 @@ func main() {
 </p>
 
 <p>
-Please note, up to now (Go 1.11), atomic operations for 64-bit words,
-a.k.a., <code>int64</code> and <code>uint64</code> values,
-require the 64-bit words are 8-byte aligned in memory.
-Please read <a href="memory-layout.html">memory layout</a> for details.
+请注意，到目前为止（Go 1.11），一个64位字（<code>int64</code>或<code>uint64</code>值）的原子操作要求此64位字的内存地址必须是8字节对齐的。
+请阅读<a href="memory-layout.html">关于Go值的内存布局</a>一文获取详情。
 </p>
 
 </div>
 
 <p class="anchor" id="integer"></p>
-<h3>Atomic Operations For Pointers</h3>
+<h3>指针值的原子操作</h3>
 
 <div>
 <p>
-Above has mentioned that there are four functions provided in the
-<code>sync/atomic</code> standard package to do atomic pointer operations,
-with the help of the <code>unsafe.Pointer</code> type.
+上面已经提到了<code>sync/atomic</code>标准库包为指针值的原子操作提供了四个函数，并且指针值的原子操作是通过非类型安全指针来实现的。
 </p>
 
 <p>
-In Go, values of any pointer type can be explicitly converted to <code>unsafe.Pointer</code>, and vice versa.
-So values of <code>*unsafe.Pointer</code> type can also be explicitly converted to <code>unsafe.Pointer</code>, and vice versa.
+从<a href="unsafe.html">非类型安全指针</a>一文，我们得知，在Go中，
+任何指针类型的值可以被显式转换为非类型安全指针类型<code>unsafe.Pointer</code>，反之亦然。
+所以指针类型<code>*unsafe.Pointer</code>的值也可以被显式转换为类型<code>unsafe.Pointer</code>，反之亦然。
 </p>
 
-The following example is not a concurrent program.
-It just shows how to do atomic pointer operations.
-In this example, <code>T</code> can be any type.
+下面这个程序不是一个并发程序。它仅仅展示了如何使用指针原子操作。在这个例子中，类型<code>T</code>可以为任何类型。
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
@@ -264,15 +241,15 @@ var pT *T
 func main() {
 	var unsafePPT = (*unsafe.Pointer)(unsafe.Pointer(&pT))
 	var ta, tb T
-	// store
+	// 修改
 	atomic.StorePointer(unsafePPT, unsafe.Pointer(&ta))
-	// load
+	// 读取
 	pa1 := (*T)(atomic.LoadPointer(unsafePPT))
 	fmt.Println(pa1 == &ta) // true
-	// swap
+	// 置换
 	pa2 := atomic.SwapPointer(unsafePPT, unsafe.Pointer(&tb))
 	fmt.Println((*T)(pa2) == &ta) // true
-	// compare and swap
+	// 比较置换
 	b := atomic.CompareAndSwapPointer(unsafePPT, pa2, unsafe.Pointer(&tb))
 	fmt.Println(b) // false
 	b = atomic.CompareAndSwapPointer(unsafePPT, unsafe.Pointer(&tb), pa2)
@@ -281,56 +258,43 @@ func main() {
 </code></pre>
 
 <p>
-Yes, it is quite verbose to use the pointer atomic functions.
-In fact, not only are the uses verbose, they are also not protected by
-<a href="https://golang.org/doc/go1compat">the Go 1 compatibility guidelines</a>,
-for these uses require to import the <code>unsafe</code> standard package.
+是的，目前，指针的原子操作使用起来是相当得啰嗦。
+事实上，啰嗦还是次要的，更主要的是，因为指针的原子操作需要引入<code>unsafe</code>标准库包，所以这些操作函数不在<a href="https://golang.org/doc/go1compat">Go 1兼容性保证</a>之列。
 </p>
 
 <p>
-Personally, I think the possibility is small that the legal pointer value
-atomic operations used in the above example will become illegal later.
-Even if they become illegal later, the <code>go fix</code> command in
-the official Go SDK should fix them with a later alternative new legal way.
-But, this is just my opinion, which is not authoritative.
+我个人认为目前支持得这些指针原子操作在今后变为不合法的可能性很小。
+即使它们变得不再合法，官方Go SDK中的<code>go fix</code>命令应该会将它们转换为今后的新的合法形式。
+但是，这只是我的个人观点，它没有任何权威性。
 </p>
 
 <p>
-If you do warry about the future legality of the pointer atomic operations used
-in the above example, you can use the atomic operations introduced in the next
-section for pointers, though the to be introduced operations are less
-efficient than the ones introduced in the current section.
+如果你确实担忧这些指针原子操作在未来的合法性，你可以使用下一节将要介绍的原子操作。
+但是下一节将要介绍的原子操作对于指针值来说比本节介绍的指针原子操作效率要低得多。
 </p>
 </div>
 
 <p class="anchor" id="integer"></p>
-<h3>Atomic Operations For Values Of Arbitrary Types</h3>
+<h3>任何类型值的原子操作</h3>
 
 <div>
 <p>
-The <code>Value</code> type can be used to atomically load and store values of any type.
-Type <code>*Value</code> has two methods, <code>Load</code> and <code>Store</code>.
+<code>sync/atomic</code>标准库包中提供的<code>Value</code>类型可以用来读取和修改任何类型的值。
 </p>
 
 <p>
-<code>Add</code> and <code>Swap</code> methods are not available for type <code>*Value</code>.
+类型<code>*Value</code>有两个方法：<code>Load</code>和<code>Store</code>。
+它没有<code>Add</code>和<code>Swap</code>方法。
 </p>
 
 <p>
-The input parameter type and output result type of the <code>Load</code> and <code>Store</code>
-methods are both <code>interface{}</code>.
-So a call of the <code>Store</code> can take a value of any type.
-But for an addressable <code>Value</code> value <code>v</code>,
-once <code>v.Store</code> (a shorthand of <code>(&amp;v).Store</code>)
-has ever been called,
-then the subsequent <code>v.Store</code> calls must also take argument values
-of the same type as the argument type of the first <code>v.Store</code> call,
-otherwise, panic will occur.
-A <code>nil</code> <code>interface{}</code> argument will also
-make a <code>v.Store</code> call panic.
+<code>Load</code>方法的结果类型和<code>Store</code>方法的参数类型均为<code>interface{}</code>。
+所以<code>Store</code>方法调用的实参可以是任何类型的值。
+但是对于一个可寻址的<code>Value</code>类型的值<code>v</code>，一旦<code>v.Store</code>方法（<code>(&amp;v).Store</code>的简写形式）被曾经调用一次，则传递给此方法的后续调用的实参的具体类型必须和传递给它的第一次调用的实参的具体类型一致；
+否则，将产生一个恐慌。<code>nil</code>接口类型实参也将导致<code>v.Store()</code>方法调用产生恐慌。
 </p>
 
-Example:
+一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
@@ -347,26 +311,22 @@ func main() {
 	fmt.Println(tb)       // {1 2 3}
 	fmt.Println(ta == tb) // true
 	
-	v.Store("hello") // will panic
+	v.Store("hello") // 将导致一个恐慌
 }
 </code></pre>
 
 <p>
-We can also use the atomic pointer functions explained in the last section
-to do atomic operations for values of any type, with one more level indirection.
-Both ways have their respective advantages and disadvantages.
-Which way should be used depends on the requirements in practice.
+事实上，我们也可以使用上一节介绍的指针原子操作来对任何类型的值进行原子读取和修改，不过需要多一级指针的间接引用。
+两种方法有各自的好处和缺点。在实践中需要根据具体需要选择合适的方法。
 </p>
 
 </div>
 
-<h3>Memory Order Guarantee Made By Atomic Operations In Go</h3>
+<h3>原子操作相关的内存顺序保证</h3>
 
 <p>
-For easy using, Go atomic operations provided in the <code>sync/atomic</code>
-standard package are designed without any relations to memory ordering.
-At least the offical documentations don't specify any memory order guarantees
-made by the <code>sync/atomic</code> standard package.
-Please read <a href="memory-model.html#atomic">Go memory model</a> for details.
+为了便于理解和使用简单，Go值的原子操作被设计的和内存顺序保证无关。
+没有任何官方文档规定了原子操作应该保证的内存顺序。
+详见<a href="memory-model.html#atomic">Go中的内存顺序保证</a>一文对此情况的说明。
 </p>
 
