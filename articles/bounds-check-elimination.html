@@ -9,7 +9,7 @@ Go是一个内存安全的语言。在数组和切片的索引和子切片操作
 <p>
 从Go SDK 1.7开始，官方标准编译器使用了一个新的基于SSA（single-assignment form，静态单赋值形式）的后端。
 SSA使得Go编译器可以有效使用诸如<a href="https://en.wikipedia.org/wiki/Bounds-checking_elimination">BCE</a>（bounds check elimination，边界检查消除）和<a href="https://en.wikipedia.org/wiki/Common_subexpression_elimination">CSE</a>（common subexpression elimination，公共子表达式消除）等优化。
-BCE可以避免很多不必要的边界检查,CSE可以避免很多重复表达式的计算，从而使得编译器编译出的程序效率更高。有时候这些优化的效果非常明显。
+BCE可以避免很多不必要的边界检查，CSE可以避免很多重复表达式的计算，从而使得编译器编译出的程序效率更高。有时候这些优化的效果非常明显。
 </p>
 
 <p>

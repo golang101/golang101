@@ -1,45 +1,28 @@
-﻿<h1>Memory Order Guarantees In Go</h1>
+﻿<h1>Go中的内存顺序保证</h1>
 
-<h3>About Memory Ordering</h3>
-
-<p>
-Modern compilers (at compile time) and CPU processors (at run time)
-often make some optimizations by adjusting the instruction orders,
-so that the instruction execution orders may differ from the
-orders presented in code.
-</p>
-
-<p><i>
-(Instruction reordering is also often called
-<a href="https://en.wikipedia.org/wiki/Memory_ordering">memory ordering</a>.)
-</i></p>
+<h3>关于内存顺序</h3>
 
 <p>
-Surely, instruction reorderings are not arbitrary.
-The basic requirement for a reordering inside a specified goroutine is
-the reordering must not be detectable by the gorotuine itself
-if the goroutine doesn't share data with other goroutines.
-In other words, from the perspective of such a goroutine,
-it can think its instruction execution order is always
-the same as the order specified by code,
-even if there are really some instruction reorderings happening inside it.
+很多编译器优化（在编译时刻）和CPU处理器优化（在运行时刻）会常常调整指令执行顺序，从而使得指令执行顺序和代码中指定的顺序不太一致。
+指令顺序也称为<a href="https://en.wikipedia.org/wiki/Memory_ordering">内存顺序</a>。
 </p>
 
 <p>
-However, if some goroutines share some data,
-instruction reorderings happen inside one of these goroutine
-may be observed by the others goroutines,
-and affact the behaviors of all these goroutines.
-Sharing data between goroutines is common in concurrent programming,
-if we ignore the results caused by instruction reordering,
-the behaviors of our concurrent programs might compiler and CPU dependent,
-and often abnormal.
+当然，指令执行顺序的调整规则不是任意的。
+最基本的要求是发生在一个不与其它协程共享数据的协程内部的指令执行顺序调整在此协程内部必须不能被觉察到。
+换句话说，从这样的一个协程的角度看，其中的指令执行顺序和代码中指定的顺序总是一致的，即使确实有一些指令的执行顺序发生了调整。
+</p>
+
+<p>
+然而，如果一些协程之间共享数据，那么在其中一个协程中发生的指令执行顺序调整将有可能被剩余的其它协程觉察到，从而影响到所有这些协程的行为。
+在并发编程中，多个协程之间共享数据是家常便饭。
+如果我们忽视了指令执行顺序调整带来的影响，我们编写的并发程序的行为将依赖于特定编译器和CPU。这样的程序常常表现出异常行为。
 </p>
 
 <div>
-Here is an unprofessional Go program which doesn't consider instruction reordering.
-the program is expanded from an example in
-<a href="https://golang.org/ref/mem">Go 1 memory model</a>.
+下面是一个编写得非常不职业的Go程序。此程序的编写没有考虑指令执行顺序调整带来的影响。
+此程序扩展于<a href="https://golang.org/ref/mem">Go 1 内存模型</a>中的一个例子.
+
 <pre class="line-numbers"><code class="language-go">package main
 
 import "log"
@@ -52,7 +35,7 @@ func setup() {
 	a = "hello, world"
 	done = true
 	if done {
-		log.Println(len(a)) // always 12 once printed.
+		log.Println(len(a)) // 如果被打印出来，它总是12
 	}
 }
 
@@ -62,20 +45,19 @@ func main() {
 	for !done {
 		runtime.Gosched()
 	}
-	log.Println(a) // expected to print: hello, world
+	log.Println(a) // 期待的打印结果：hello, world
 }
 </code></pre>
 
-The behavior of this program is very possible as we expect,
-a <code>hello, world</code> text will be printed.
-However, the behavior of this program is compiler and CPU dependent.
-If the program is compiled with a different compiler,
-or with a later compiler version, or it runs on a different architecture,
-the <code>hello, world</code> text might not be printed,
-or a text different from <code>hello, world</code> might be printed.
-The reason is compilers and CPUs may exchange the execution orders of
-the first two lines in the <code>setup</code> function, 
-so the final effect of the <code>setup</code> function may become to
+<p>
+此程序的行为很可能正如我们所料，<code>hello, world</code>将被打印输出。
+然而，此程序的行为并非跨编译器和跨平台架构兼容的。
+如果此程序使用一个不同的（但符合Go规范的）编译器或者不同的编译器版本编译，它的运行结果可能是不同的。
+即使此程序使用同一个编译器编译，在不同的平台架构上的运行结果也可能是不同的。
+</p>
+
+编译器和CPU可能调整<code>setup</code>函数中的前两条语句的执行顺序，使得<code>setup</code>协程中的指令的执行顺序和下面的代码指定的顺序一致。
+
 <pre class="line-numbers"><code class="language-go">func setup() {
 	done = true
 	a = "hello, world"
@@ -87,103 +69,79 @@ so the final effect of the <code>setup</code> function may become to
 </div>
 
 <p>
-The <code>setup</code> goroutine in the above program is unable to observe the reordering,
-so the <code>log.Println(len(a))</code> line will always print <code>12</code>
-(if this line gets executed before the program exits).
-However, the main goroutine may observe the reordering,
-which is why the printed text might be not <code>hello, world</code>.
+<code>setup</code>协程并不会觉察到此执行顺序调整，所以此协程中的<code>log.Println(len(a))</code>语句将总是打印出<code>12</code>（如果此打印语句在程序退出之前得到了执行的话）。
+但是，此执行顺序调整将被主协程觉察到，所以最终的打印结果很可能是空，而不是<code>hello, world</code>。
 </p>
 
 <p>
-Besides the reordering problem, there are data races in the program.
-There are not any synchronizations made in accessing the variable
-<code>a</code> and <code>done</code>.
-So, the above program is a showcase full of concurrent programming mistakes.
-A professional Go programmer should not make these mistakes.
+除了没有考虑指令执行顺序调整带来的影响，此程序还存在数据竞争的问题。
+变量<code>a</code>和<code>done</code>的访问没有进行同步。
+所以此程序是一个充满了各种并发编程错误的不良例子。
+一个职业的Go程序员不应该写出这样的使用于生产环境中的代码。
 </p>
 
-<h3>Go Memory Model</h3>
+<h3>Go内存模型（Memory Model）</h3>
 
 <p>
-Sometimes, we need to ensure that the execution of some code lines in a goroutine
-must happen before (or after) the execution of some code lines in another goroutine,
-to keep the correctness of a program.
-Instruction reorderings may cause some troubles for such circumstances.
-How should we do to prevent some possible instruction reorderings?
+有时，为了程序的逻辑正确性，我们需要确保一个协程中的一些语句一定要在另一个协程的某些语句之后（或者之前）执行。
+指令执行顺序调整可能会给此需求带来一些麻烦。
+我们应如何防止某些可能发生的指令执行顺序调整呢？
 </p>
 
 <p>
-Different CPU architectures provide different fence instructions
-to prevent different kinds of instruction reorderings.
-Some programming languages provide corresponding functions
-to insert these fence instructions in code.
-However, understanding and correctly using the fence instructions
-raises the bar of concurrent programming.
+不同的CPU架构提供了不同的栅栏（fence）指令来防止各种指令执行顺序调整。
+一些编程语言提供对应的函数来在代码中的合适位置插入各种栅栏指令。
+但是，理解和正确地使用这些栅栏指令极大地提高了并发编程的门槛。
 </p>
 
 <p>
-The design philosophy of Go is to use as fewer features as possible
-to support as more use cases as possible, at the same time to
-ensure a good enough overall code execution efficiency.
-So Go built-in and standard packages don't provide direct ways
-to use the CPU fence instructions.
-In fact, in Go, we can use some kinds of the synchronization methods
-in Go to ensure expected code execution orders.
+Go语言的设计哲学是用尽量少的易于理解的特性来支持尽量多的使用场景，同时还要尽量保证代码的高执行效率。
+所以Go内置和标准库并没有提供直接插入各种栅栏指令的途径。
+事实上，这些栅栏指令被使用在Go中提供的各种数据同步技术的实现中。
+所以，我们应该使用Go中提供数据同步技术来保证我们所期待的代码执行顺序。
 </p>
 
 <p>
-Following will list some guaranteed (and non-guaranteed) code execution orders,
-which are mentioned or not mentioned in
-<a href="https://golang.org/ref/mem">Go 1 memory model</a> and other official Go documentations.
+本文的余下部分将列出Go保证的各种代码执行顺序。
+这些顺序保证可能在<a href="https://golang.org/ref/mem">Go 1 内存模型</a>一文提到了，也可能没有提到。
 </p>
 
 <p>
-In the following descriptions, if we say
-event <code>A</code> is guaranteed to happen before event <code>B</code>,
-it means any of the goroutines involved in the two events will observe that
-any of the statements presented before event <code>A</code> in source code
-will be executed before
-any of the statements presented after event <code>B</code> in source code.
-For other irrelevant goroutines,
-the observed orders may be different from the just described.
+在下面的叙述中，如果我们说事件<code>A</code>保证发生在事件<code>B</code>之前，这意味着这两个事件涉及到的任何协程都将观察到在事件<code>A</code>之前的语句肯定将在事件<code>B</code>之后的语句先执行。
+对于不相关的协程，它们所观察到的顺序并非如此所述。
 </p>
 
-<h4><code>init</code> Functions Related Order Guarantees</h4>
+<h4><code>init</code>函数相关的顺序保证</h4>
 
 <div>
-Go memory model mentions the two <code>init</code> functions related order guarantees:
+<a href="packages-and-imports.html#initialization-order">代码包和包引入</a>一文介绍了一个程序中所有的<code>init</code>函数的执行顺序规则。
+这里列出其中的顺序保证：
 <ul>
 <li>
-	the completion of all the <code>init</code> functions in the dependency packages of a package
-	happens before the start of any <code>init</code> function in the package.
+	一个代码包的所有依赖包中的<code>init</code>函数都将在此代码包中的任何<code>init</code>函数开始执行之前执行完毕。
 </li>
 <li>
-	the completion of all <code>init</code> functions in a program
-	happens before the start of the program <code>main</code> entry function.
+	所有的<code>init</code>函数都将在此程序的<code>main</code>入口函数开始执行之前执行完毕。
 </li>
 </ul>
 
-In fact, there is two other order guarantees:
+事实上，还存在另两个顺序保证：
 <ul>
 <li>
-	the completion of all package-level variable initializations in a package
-	happens before the start of any <code>init</code> function in the package.
+	一个代码包中的所有包级变量都将在此包中的任何一个<code>init</code>函数开始执行之前初始化完毕。
 </li>
 <li>
-	the completion of all the <code>init</code> functions in the dependency packages of a package
-	happens before any package-level variable initialization in the package.
+	一个代码包的所有依赖包中的<code>init</code>函数都将在此代码包中任何包级变量开始初始化之前执行完毕。
 </li>
 </ul>
 
 </div>
 
 <p class="anchor" id="goroutine"></p>
-<h4>The Creation Of A Goroutine Happens Before The Execution Of The Goroutine</h4>
+<h4>一个协程的创建发生在此协程中的任何代码执行之前</h4>
 
 <div>
-In the following function,
-the assignment <code>x, y = 123, 789</code> will be executed before the call <code>fmt.Println(x)</code>,
-and the call <code>fmt.Println(x)</code> will be executed before the call <code>fmt.Println(y)</code>.
+在下面这个函数中，对<code>x</code>和<code>y</code>的赋值保证发生在对它们的打印之前，并且对<code>x</code>的打印肯定发生在对<code>y</code>的打印之前。
 
 <pre class="line-numbers"><code class="language-go">var x, y int
 func f1() {
@@ -197,8 +155,7 @@ func f1() {
 }
 </code></pre>
 
-However, the executon orders of the three in the following function are not deterministic.
-There are data races in this function.
+然而这些顺序在下面这个函数中是得不到任何保证的。此函数存在着数据竞争。
 
 <pre class="line-numbers"><code class="language-go">var x, y int
 func f2() {
@@ -214,91 +171,87 @@ func f2() {
 </div>
 
 <p class="anchor" id="channel"></p>
-<h4>Channel Related Order Guarantees</h4>
+<h4>数据通道操作相关的顺序保证</h4>
 
 <div>
-The following listed guarantees are not mentioned in Go 1 memory model,
-but I think they are obvious.
+下面是一些显然的和数据通道操作相关的顺序保证：
 <ul>
 <li>
-	A channel send operation happens before the completion of the send operation.
+	一个数据通道发送操作的开始发生在此操作结束之前。
 </li>
 <li>
-	A channel receive operation happens before the completion of the receive operation.
+	一个数据通道接收操作的开始发生在此操作结束之前。
 </li>
 <li>
-	The completions of two send operations on a channel can't happen at the same time.
+	在同一个数据通道上的两个发送操作不可能同时结束。
 </li>
 <li>
-	The completions of two receive operations on a channel can't happen at the same time.
+	在同一个数据通道上的两个接收操作不可能同时结束。
 </li>
 </ul>
 
-Go 1 memory model lists the following three channel related order guarantees.
+下面列出的是数据通道操作做出的基本顺序保证：
 <ol>
 <li>
-	The <b>n</b>th successful send to a channel happens before
-	the <b>n</b>th successful receive from that channel completes,
-	no matter that channel is buffered or unbuffered.
+	一个数据通道上的第<b><i>n</i></b>次成功发送操作的开始发生在此数据通道上的第<b><i>n</i></b>次成功接收操作完成之前，无论此数据通道是缓冲的还是非缓冲的。
 </li>
 <li>
-	The <b>n</b>th successful receive from a channel with capacity <b>m</b>
-	happens before the (<b>n+m</b>)th send to that channel completes.
-	In particular, if that channel is unbuffered (m == 0),
-	the <b>n</b>th successful receive from that channel happens
-	before the <b>n</b>th successful send on that channel completes.
+	一个容量为<b><i>m</i></b>数据通道上的第<b><i>n</i></b>次成功接收操作发生在此数据通道上的第<b><i>n+m</i></b>次发送操作完成之前。
+	特别地，如果此数据通道是非缓冲的（<code>m == 0</code>），则此数据通道上的第<b><i>n</i></b>次成功接收操作发生在此数据通道上的第<b><i>n</i></b>次发送操作完成之前。
 </li>
 <li>
-	The closing of a channel happens before a receive completes if
-	the receive returns a zero value because the channel is closed.
+	一个数据通道的关闭操作发生在任何因为此数据通道被关闭而从此数据通道接收到了零值的操作完成之前。
 </li>
 </ol>
 
-<p>
-Please note, all above order guarantees are made for the involved goroutines.
-For other irrelevant goroutines,
-the observed orders may be different from the above described.
-</p>
+注意：
+<ul>
+<li>
+	对一个非缓冲数据通道来说，其上的第<b><i>n</i></b>次成功操作的完成的发送和其上的第<b><i>n</i></b>次成功接收的完成应被视为同一事件。
+</li>
+<li>
+	上述顺序保证是站在数据通道操作涉及到的协程角度上观察到的。从其它不相关的协程角度看，这些顺序未毕能够得到保证。
+</li>
+</ul>
 
-Here is an example show some guaranteed code execution orders
-in using an unbuffered channel.
-<pre class="line-numbers"><code class="language-go">func f() {
+下面这段代码展示了一个非缓冲数据通道上的发送和接收操作是如何保证特定的代码执行顺序的。
+
+<pre class="line-numbers"><code class="language-go">func f3() {
 	var a, b int
 	var c = make(chan bool)
 
 	go func() {
 		a = 1
 		c <- true
-		if b != 1 { // impossible
-			panic("b != 1") // will never happen
+		if b != 1 {
+			panic("b != 1") // 绝不可能发生
 		}
 	}()
 
 	go func() {
 		b = 1
 		<-c
-		if a != 1  { // impossible
-			panic("a != 1") // will never happen
+		if a != 1  {
+			panic("a != 1") // 绝不可能发生
 		}
 	}()
 }
 </code></pre>
 
-Here, for the two new created goroutines, the following orders are guaranteed:
+对于函数<code>f3</code>中创建的两个协程，下列顺序将得到保证：
 <ul>
 <li>
-	the assignment <code>b = 1</code> absolutely happens
-	before the condition evaluation <code>b != 1</code>.
+	赋值语句<code>b = 1</code>肯定在条件<code>b != 1</code>被估值之前执行完毕。
 </li>
 <li>
-	the assignment <code>a = 1</code> absolutely happens
-	before the condition evaluation <code>a != 1</code>.
+	赋值语句<code>a = 1</code>肯定在条件<code>a != 1</code>被估值之前执行完毕。
 </li>
 </ul>
 
-So the two calls to <code>panic</code> in the above example will never get executed.
-However, the <code>panic</code> calls in the following example may get executed.
-<pre class="line-numbers"><code class="language-go">func f() {
+所以，上例代码中两个协程中的<code>panic</code>调用将永不可能得到执行。
+做为对比，下面这段代码中的<code>panic</code>调用有可能会得到执行，因为上述数据通道操作相关的顺序保证对于不相关的协程是无效的。
+
+<pre class="line-numbers"><code class="language-go">func f4() {
 	var a, b, x, y int
 	c := make(chan bool)
 
@@ -314,24 +267,24 @@ However, the <code>panic</code> calls in the following example may get executed.
 		y = 1
 	}()
 
-	// Many data races are in this goroutine.
-	// Don't write code as such.
+	// 一个和上面的数据通道操作不相关的协程。
+	// 这是一个不良代码的例子，它造成了很多数据竞争。
 	go func() {
 		if x == 1 {
-			if a != 1 { // possible
-				panic("a != 1") // may happen
+			if a != 1 {
+				panic("a != 1") // 有可能发生
 			}
-			if b != 1 { // possible
-				panic("b != 1") // may happen
+			if b != 1 {
+				panic("b != 1") // 有可能发生
 			}
 		}
 
 		if y == 1 {
-			if a != 1 { // possible
-				panic("a != 1") // may happen
+			if a != 1 {
+				panic("a != 1") // 有可能发生
 			}
-			if b != 1 { // possible
-				panic("b != 1") // may happen
+			if b != 1 {
+				panic("b != 1") // 有可能发生
 			}
 		}
 	}()
@@ -339,22 +292,20 @@ However, the <code>panic</code> calls in the following example may get executed.
 </code></pre>
 
 <p>
-Here, for the third goroutine,
-which is irrelevant to the operations on channel <code>c</code>,
-will not be guaranteed to observe the orders observed by the first two new created goroutines.
-So, any of the four <code>panic</code> calls may get executed.
+这里的新创建的第三个协程是一个和数据通道<code>c</code>上的发送和接收操作不相关的一个协程。
+它所观察到的顺序保证和其它两个新创建的协程是不同的。
+条件<code>a != 1</code>和<code>b != 1</code>的估值有可能为<code>true</code>，所以四个<code>panic</code>调用有可能会得到执行。
 </p>
 
 <p>
-In fact, most compiler implementations do guarantee the four <code>panic</code> calls
-in the above example will never get executed,
-however, none of the Go official documentations make such guarantees.
-So the code in the above example is not cross-compiler or cross-compiler-version compatible.
-We should stick to the Go official documentations to write professional Go code.
+事实上，大多数编译器的实现确实很可能能够保证上面这个不良的例子中的四个<code>panic</code>调用永远不可能被执行，但是，没有任何Go官方文档做出了这样的保证。
+此不良例子的执行结果是依赖于不同的编译器和不同的编译器版本的。
+我们编写的Go代码应该以Go官方文档中明确记录下来的规则为依据。
 </p>
 
-Here is an example using an unbuffered channel.
-<pre class="line-numbers"><code class="language-go">func f() {
+下面是一个缓冲通道的例子。
+
+<pre class="line-numbers"><code class="language-go">func f5() {
 	var k, l, m, n, x, y int
 	c := make(chan bool, 2)
 
@@ -376,30 +327,24 @@ Here is an example using an unbuffered channel.
 }
 </code></pre>
 
-The following orders are guaranteed:
+在此例子中，下面的顺序得以保证：
 <ul>
 <li>
-	the execution of <code>k = 1</code> happens before
-	the execution of <code>y = 1</code>.
+	赋值语句<code>k = 1</code>的执行保证在赋值语句<code>y = 1</code>的执行之前结束。
 </li>
 <li>
-	the execution of <code>x = 1</code> happens before
-	the execution of <code>n = 1</code>.
+	赋值语句<code>x = 1</code>的执行保证在赋值语句<code>n = 1</code>的执行之前结束。
 </li>
 </ul>
 
 <p>
-The execution of <code>x = 1</code> is not guaranteed to happen before
-the execution of <code>l = 1</code> and <code>m = 1</code>,
-and the execution of <code>l = 1</code> and <code>m = 1</code>
-is not guaranteed to happen before the execution of <code>y = 1</code>.
+然而，赋值语句<code>x = 1</code>的执行并不能保证在赋值语句<code>l = 1</code>和<code>m = 1</code>的执行之前结束，
+赋值语句<code>l = 1</code>和<code>m = 1</code>的执行也不能保证在赋值语句<code>y = 1</code>的执行之前结束。
 </p>
 
-The following is an example on channel closing.
-In this example, the execution of <code>k = 1</code>
-is guaranteed to happen before the execution of <code>y = 1</code>,
-but not guaranteed to happen before the execution of <code>x = 1</code>,
-<pre class="line-numbers"><code class="language-go">func f() {
+下面是一个数据通道关闭的例子。在这个例子中，赋值语句<code>k = 1</code>的执行保证在赋值语句<code>y = 1</code>执行之前结束，但不能保证在赋值语句<code>x = 1</code>执行之前结束。
+
+<pre class="line-numbers"><code class="language-go">func f6() {
 	var k, x, y int
 	c := make(chan bool, 1)
 
@@ -438,51 +383,38 @@ But they are not very valuable for Go programming in pratice.
 </div>
 
 <p class="anchor" id="mutex"></p>
-<h4>Mutex Related Order Guarantees</h4>
+<h4>互斥锁相关的顺序保证</h4>
 
 <div>
-Followings are the mutex related order guarantees in Go.
+Go中和<a href="concurrent-synchronization-more.html#mutex">互斥锁</a>相关的顺序保证：
 <ol>
 <li>
-	For an addressable value <code>l</code> of type <code>Mutex</code> or <code>RWMutex</code>
-	in the <code>sync</code> standard package, the <b>n</b>th successful call of
-	<code>l.Unlock()</code> happens before the (<b>n+1</b>)th successful call of
-	<code>l.Lock()</code> returns.
+	对于一个可寻址的<code>sync.Mutex</code>类型或者<code>sync.RWMutex</code>类型的值<code>m</code>，第<b><i>n</i></b>次成功的<code>m.Unlock()</code>方法调用保证发生在第<b><i>n+1</i></b>次<code>m.Lock()</code>方法调用返回之前。
 </li>
 <li>
-	For an addressable value <code>l</code> of type <code>RWMutex</code>,
-	if a call of <code>l.Lock()</code> has returned successfully, then the next
-	successful call of <code>l.Unlock()</code> will happen before the return
-	of any call of <code>l.RLock()</code> which has not started or returned yet.
+	对一个可寻址的<code>RWMutex</code>类型值<code>rw</code>，如果它的第<b><i>n</i></b>次<code>rw.Lock()</code>方法调用已成功返回，并且有一个<code>rw.RLock()</code>方法调用保证发生在此第<b><i>n</i></b>次<code>rw.Lock()</code>方法调用返回之后，则第<b><i>n</i></b>次成功的<code>rw.Unlock()</code>方法调用保证发生在此<code>rw.RLock()</code>方法调用返回之前。
 </li>
 <li>
-	For an addressable value <code>l</code> of type <code>RWMutex</code>,
-	if the <b>n</b>th successful call of <code>l.RLock()</code> has returned,
-	then the <b>m</b>th successful call of <code>l.RUnlock()</code>,
-	where <code>m &lt;= n</code>, happens before the return of any call of
-	<code>l.Lock()</code> which has not started or returned yet.
+	对一个可寻址的<code>RWMutex</code>类型值<code>rw</code>，如果它的第<b><i>n</i></b>次<code>rw.RLock()</code>方法调用已成功返回，并且有一个<code>rw.Lock()</code>方法调用保证发生在此第<b><i>n</i></b>次<code>rw.RLock()</code>方法调用返回之后，则第<b><i>m</i></b>次成功的<code>rw.RUnlock()</code>方法调用（其中<code>m &lt;= n</code>）保证发生在此<code>rw.Lock()</code>方法调用返回之前。
 </li>
 </ol>
 
-In the following exanmple, the following orders are guaranteed:
+在下面这个例子中，下列顺序肯定得到保证。
 <ul>
 <li>
-	the execution of <code>a = 1</code> happens before
-	the execution of <code>b = 1</code>.
+	赋值语句<code>a = 1</code>的执行保证在赋值语句<code>b = 1</code>的执行之前结束。
 </li>
 <li>
-	the execution of <code>m = 1</code> happens before
-	the execution of <code>n = 1</code>.
+	赋值语句<code>m = 1</code>的执行保证在赋值语句<code>n = 1</code>的执行之前结束。
 </li>
 <li>
-	the execution of <code>x = 1</code> happens before
-	the execution of <code>y = 1</code>.
+	赋值语句<code>x = 1</code>的执行保证在赋值语句<code>y = 1</code>的执行之前结束。
 </li>
 </ul>
 
 <pre class="line-numbers"><code class="language-go">func fab() {
 	var a, b int
-	var l sync.RWMutex
+	var l sync.Mutex // or sync.RWMutex
 
 	l.Lock()
 	go func() {
@@ -528,78 +460,68 @@ func fxy() {
 	}()
 }
 </code></pre>
+
+<p>
+</p>
+
+注意，在下面这段代码中，根据Go官方文档，赋值语句<code>p = 1</code>的执行并不能保证在赋值语句<code>q = 1</code>的执行之前结束，尽管有的编译器确实能够做出这样的保证。
+
+<pre class="line-numbers"><code class="language-go">var p, q int
+func fpq() {
+	var l sync.Mutex
+	p = 1
+	l.Lock()
+	l.Unlock()
+	q = 1
+}
+</code></pre>
+
+<p>
+</p>
 </div>
 
 
-<h4>Order Guarantees Made By <code>sync.WaitGroup</code> Values</h4>
+<h4><code>sync.WaitGroup</code>值做出的顺序保证</h4>
 
 <p>
-Assume at a given time, the counter maintained by
-an addressable <code>sync.WaitGroup</code> value <code>wg</code> is not zero,
-and after the given time, a <code>wg.Add</code> (or <code>wg.Done</code>) method call
-and a <code>wg.Wait</code> method call are made.
-As long as we can confirm that the counter never becomes to zero
-before the <code>wg.Add</code> (or <code>wg.Done</code>) method call returns
-(and after the given time),
-the <code>wg.Add</code> (or <code>wg.Done</code>) method call
-is guaranteed to happen before
-any <code>wg.Wait</code> method call made after the given time returns.
+假设在某个给定时刻，一个可寻址的<code>sync.WaitGroup</code>值<code>wg</code>维护的计数不为0，并且有一个<code>wg.Wait()</code>方法调用在此给定时刻之后调用。
+如果有一组<code>wg.Add(n)</code>方法调用在此给定时刻之后调用，并且我们可以保证这组调用中只有最后一个返回的调用会将code>wg</code>维护的计数修改为0，
+则这组调用中的每个调用保证都发生在此<code>wg.Wait()</code>方法调用返回之前。
 </p>
 
 <p>
-Please read <a href="concurrent-synchronization-more.html#waitgroup">the explanations
-for sync.WaitGroup</a> to get how to use <code>sync.WaitGroup</code> values.
-</p>
-
-<h4>Order Guarantees Made By <code>sync.Once</code> Values</h4>
-
-<p>
-For an addressable <code>sync.Once</code> value <code>o</code>,
-among all the <code>o.Do</code> calls, only exact one argument function will be invoked.
-The invoked argument function is guaranteed to return before
-any <code>o.Do</code> method call returns.
-In other words, the code in the invoked argument function
-is guaranteed to be executed before any <code>o.Do</code> method call returns.
+注意：调用<code>wg.Done()</code>和<code>wg.Add(-1)</code>是等价的。
 </p>
 
 <p>
-Please read <a href="concurrent-synchronization-more.html#once">the explanations
-for sync.Once</a> to get how to use <code>sync.Once</code> values.
+请阅读<a href="concurrent-synchronization-more.html#waitgroup">对<code>sync.WaitGroup</code>类型的解释</a>来获取如何使用<code>sync.WaitGroup</code>值。
 </p>
 
-<h4>Order Guarantees Made By <code>sync.Cond</code> Values</h4>
+<h4><code>sync.Once</code>值做出的顺序保证</h4>
 
 <p>
-It is some hard to make a clear discription for
-the order guarantees made by an addressable <code>sync.Cond</code> value <code>c</code>.
-Simply put, if a <code>c.Wait()</code> call is guaranteed to be resumed
-by a <code>c.Notify</code> (or <code>c.Broadcast</code>) call,
-then the <code>c.Notify</code> (or <code>c.Broadcast</code>) call is guaranteed to
-happen before the <code>c.Wait()</code> call returns.
+请阅读<a href="concurrent-synchronization-more.html#once">对<code>sync.Once</code>类型的解释</a>来获取<code>sync.Once</code>值做出的顺序保证和如何使用<code>sync.Once</code>值。
 </p>
 
+<h4><code>sync.Cond</code>值做出的顺序保证</h4>
+
 <p>
-Please read <a href="concurrent-synchronization-more.html#cond">the explanations
-for sync.Cond</a> to get how to use <code>sync.Cond</code> values.
+<code>sync.Cond</code>值出的顺序保证有些难以表达清楚。所以这里就只可意会不可言传了。
+请阅读<a href="concurrent-synchronization-more.html#cond">对<code>sync.Cond</code>类型的解释</a>来获取如何使用<code>sync.Cond</code>值。
 </p>
 
 <p class="anchor" id="atomic"></p>
-<h4>Atomic Related Order Guarantees</h4>
+<h4>原子操作相关的顺序保证</h4>
 
 <div>
 <p>
-All above mentioned synchronization techniques make some memory order guarantees.
-These guarantees are well documented in all kinds of Go official documentations.
-However, none of Go official documentations mentions what memory order guarantees
-are made by the atomic synchronization technique.
+没有任何官方文档提到了原子操作所保证的内存顺序。
+然而，事实上，对于官方Go标准编译器来说，原子操作确实保证了某些特定的内存顺序。
+标准库的实现大量地依赖于这些原子操作做出的内存顺序保证。
 </p>
 
-In fact, in the implementation of the standard Go compiler,
-at least up to Go SDK 1.11,
-there are exactly some memory order guarantees made by atomic operations.
-The standard Go runtime relies extensively on the guarantees provided by atomic operations.
-For example, the following program always prints <code>1</code>,
-if it is compiled with the standard Go compiler 1.11.
+下面这个程序如果使用官方Go标准编译器1.11编译的话，它在运行时肯定打印出<code>1</code>。
+
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -616,8 +538,7 @@ func main() {
 
 	for {
 		if n := atomic.LoadInt32(&b); n == 1 {
-			// The following line always prints 1.
-			fmt.Println(atomic.LoadInt32(&a))
+			fmt.Println(atomic.LoadInt32(&a)) // 1
 			break
 		}
 		runtime.Gosched()
@@ -626,24 +547,14 @@ func main() {
 </code></pre>
 
 <p>
-Here, the main goroutine will always observe that the modification
-of <code>a</code> happens before the modification of <code>b</code>.
+在此程序中，主协程总是会观察到对<code>a</code>的修改在对<code>b</code>的修改之前结束。
+但是，这种保证没有记录在任何Go官方文档中。
+如果你希望你编写的Go代码能够跨编译器和跨编译器版本兼容，那么安全的建议是<b>不要依赖于原子操作做出的内存顺序保证</b>。
+有<a href="https://github.com/golang/go/issues/5045">一个issue</a>建议Go官方文档将目前原子操作做出的内存顺序保证记录下来，但是到目前为止（Go 1.11），此建议还未被采纳。
 </p>
 
 <p>
-However, the guarantees made by atomic operations are not
-written down in the Go specification and other offcial Go documentations.
-If you want to write cross-compiler and cross-compile-version compatible Go code,
-the safe advice is,
-<b>don't rely on atomic to guarantee memory orderings in general Go programming</b>.
-There is <a href="https://github.com/golang/go/issues/5045">an issue</a>
-on how these guarantees should be written down.
-But, up to now (Go 1.11), the decision has not been made.
-</p>
-
-<p>
-Please read <a href="concurrent-atomic-operation.html">this article</a>
-to get how to do atomic operations.
+请阅读<a href="concurrent-atomic-operation.html">原子操作</a>一文来获取如何使用原子操作。
 </p>
 </div>
 
