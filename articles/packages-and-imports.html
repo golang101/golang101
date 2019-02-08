@@ -474,7 +474,21 @@ var (
 
 <p>
 其中引入名<code>importname</code>是可选的，它的默认值为被引入的包的包名（不是文件夹名）。
-如果一个包引入声明中的<code>importname</code>没有省略，则限定标识符使用的前缀为<code>importname</code>。
+</p>
+
+事实上，在本文上面的例子中的包引入声明中，<code>importname</code>部分都被省略掉了，因为它们都分别和引入的代码包的包名相同。
+这些引入声明等价于下面这些：
+
+<pre><code class="language-go">import fmt "fmt"        // <=> import "fmt"
+import rand "math/rand" // <=> import "math/rand"
+import time "time"      // <=> import "time"
+</code></pre>
+
+<p>
+</p>
+
+<p>
+如果一个包引入声明中的<code>importname</code>没有省略，则限定标识符使用的前缀必须为<code>importname</code>，而不是被引入的包的名称。
 </p>
 
 <p>

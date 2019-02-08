@@ -1,66 +1,56 @@
-﻿<h1>Memory Leaking Scenarios</h1>
+﻿<h1>一些可能的内存泄漏场景</h1>
 
 <p>
-When programming in a langauge supporting garbage collecting,
-generally we don't need care about memory leaking problem,
-for the language runtime will collect unused memory regularly.
-However, we do need to be aware of some special scenarios
-which may cause kind-of or real memory leaking.
-The remaining of the current article will list several such scenarios.
+当使用一门支持自动垃圾回收的语言编程时，一般来说我们不需要关心内存泄露问题，因为程序的运行时会负责回收不再使用的内存。
+但是，我们确实也需要知道一些特殊的可能会造成暂时性或永久性内存泄露的情形。
+本文的余下部分将列出一些这样的情形。
 </p>
 
 <p class="anchor" id="substring"></p>
-<h3>Kind-Of Memory Leaking Caused By Substrings</h3>
+<h3>子字符串造成的暂时性内存泄露</h3>
 
 <div>
 <p>
-Go specification doesn't specify whether or not the result string
-and base string involved in a substring expression should share
-the same underlying <a href="memory-block.html">memory block</a> to host
-<a href="string.html">the underlying byte sequences</a> of the two strings.
-The standard Go compiler/runtime does let them share the same underlying memory block.
-This is a good design, which is both memory and CPU consuming wise.
-But it may cause kind-of memory leaking sometimes.
+Go白皮书并没有说明一个子字符串表达式的结果（子）字符串和基础字符串是否应该共享一个承载<a href="string.html">底层字节序列</a>的<a href="memory-block.html">内存块</a>。
+但官方Go标准编译器确实让它们共享一个内存块，而且很多标准库包的函数原型设计也默认了这一点。
+这是一个好的设计，它不仅节省内存，而且还减少了CPU消耗。
+但是有时候它会造成暂时性的内存泄露。
 </p>
 
-For example, after the following function <code>f</code> is called,
-there will be 1M bytes memory leaking (kind of),
-until the package-level variable <code>s0</code> is modified again elsewhere.
+比如，当下面这段代码中的<code>demo</code>函数被调用之后，将会造成大约1M字节的暂时性内存泄露，直到包级变量<code>s0</code>的值在其它某处被重新修改为止。
 
-<pre class="line-numbers"><code class="language-go">var s0 string // a package-level variable
+<pre class="line-numbers"><code class="language-go">var s0 string // 一个包级变量
 
-func f(s1 string) {
-	// Assume s1 is a string much longer than 50.
+// 一个演示目的的函数。
+func f(s string) {
 	s0 = s1[:50]
-	// Now, s0 shares the same underlying memory block of s1.
-	// s1 is not alive now, but s0 is still alive.
-	// Although there are only 50 bytes used in the block,
-	// the fact that s0 is still alive prevent the 1M bytes
-	// memory block from being collected.
+	// 目前，s0和s共享着承载它们的字节序列的同一个内存块。
+	// 虽然s到这里已经不再被使用了，但是s0仍然在使用中，
+	// 所以它们共享的内存块将不会被回收。虽然此内存块中
+	// 只有50字节被真正使用，而其它字节却无法再被使用。
+}
+
+func demo() {
+	s := createStringWithLengthOnHeap(1 << 20) // 1M bytes
+	f(s)
 }
 </code></pre>
 
 <p>
 </p>
 
-To avoid this kind-of memory leaking, we can convert the substring to a
-<code>[]byte</code> value then convert the <code>[]byte</code> value back
-to <code>string</code>.
+为防止上面的<code>f</code>函数产生临时性内存泄露，我们可以将子字符串表达式的结果转换为一个字节切片，然后再转换回来。
 
-<pre class="line-numbers"><code class="language-go">func f(s1 string) {
-	s0 = string([]byte(s1[:50]))
+<pre class="line-numbers"><code class="language-go">func f(s string) {
+	s0 = string([]byte(s[:50]))
 }
 </code></pre>
 
 <p>
-The disadvantage of the above way to avoid the kind-of memory leaking
-is there are two 50-byte duplications happen in the conversion process,
-one of them is unecessary.
+此种防止临时性内存泄露的方法不是很高效，因为在此过程中底层的字节序列被复制了两次，其中一次是不必要的。
 </p>
 
-We can make using of one of <a href="string.html#conversion-optimizations">the
-optimizations</a> made by the standard Go compiler to avoid one duplication,
-with a small extra cost of one byte memory wasting.
+我们可以利用<a href="string.html#conversion-optimizations">官方Go编译器对字符串衔接所做的优化</a>来防止一次不必要的复制，代价是有一个字节的浪费。
 
 <pre class="line-numbers"><code class="language-go">func f(s1 string) {
 	s0 = (" " + s1[:50])[1:]
@@ -68,12 +58,10 @@ with a small extra cost of one byte memory wasting.
 </code></pre>
 
 <p>
-The disadvantage of the above way is the compiler optimization may become
-invalid later, and the optimization may be not available for other compilers.
+此第二种防止临时性内存泄露的方法有可能在将来会失效，并且它对于其它编译器来说很可能是无效的。
 </p>
 
-The third way to avoid the kind-of memory leaking is to untilize
-the <code>strings.Builder</code> supported since Go 1.10.
+第三种防止临时性内存泄露的方法是使用在Go 1.10种引入的<code>strings.Builder</code>类型来防止一次不必要的复制。
 
 <pre class="line-numbers"><code class="language-go">import "strings"
 
@@ -82,35 +70,29 @@ func f(s1 string) {
 	b.Grow(50)
 	b.WriteString(s1[:50])
 	s0 = b.String()
-	// b.Reset() // if b is used elsewhere,
-	             // it must be reset here.
 }
 </code></pre>
 
 <p>
-The disadvantage of the third way is a little verbose
-(by comparing to the first two ways).
-A good news is, since Go 1.12 (the next main version to be released at Feb. 2019),
-we can call the <code>Repeat</code> function with the <code>count</code> argument as <code>1</code>
-in the <code>strings</code> standard package to clone a string.
-Since Go 1.12, the underlying implementation of <code>strings.Repeat</code> will make use of <code>strings.Builder</code>.
+此第三种方法的缺点是它的实现有些啰嗦（和前两种方法相比）。
+一个好消息是，从Go 1.12（将在2019年2月发布）开始，我们可以调用<code>strings</code>标准库包中的<code>Repeat</code>函数来克隆一个字符串。
+从Go 1.12开始，此函数将利用<code>strings.Builder</code>类型来防止一次不必要的复制。
 </p>
 
 </div>
 
 <p class="anchor" id="subslice"></p>
-<h3>Kind-Of Memory Leaking Caused By Subslices</h3>
+<h3>子切片造成的暂时性内存泄露</h3>
 
 <div>
-Similarly to substrings, subslices may also cause kind-of memory leaking.
-In the following code, after the <code>g</code> function is called,
-most memory occupied by the memory block hosting the elements of <code>s1</code>
-will be lost (if no more values reference the memory block).
+和子字符串情形类似，子切片也可能会造成暂时性的内存泄露。
+在下面这段代码中，当函数<code>g</code>被调用之后，承载着切片<code>s1</code>的元素的内存块的开头大段内存将不再可用（假设没有其它值引用着此内存块）。
+同时因为<code>s0</code>仍在引用着此内存块，所以此内存块得不到释放。
 
 <pre class="line-numbers"><code class="language-go">var s0 []int
 
 func g(s1 []int) {
-	// Assume the length of s1 is much larger than 30.
+	// 假设s1的长度远大于30。
 	s0 = s1[len(s1)-30:]
 }
 </code></pre>
@@ -118,50 +100,44 @@ func g(s1 []int) {
 <p>
 </p>
 
-If we want to avoid the kind-of memory leaking, we must duplicate the
-30 elements for <code>s0</code>, so that the aliveness of <code>s0</code>
-will not prevent the memory block hosting the elements of <code>s1</code>
-from being collected.
+如果我们想防止这样的临时性内存泄露，我们必须在函数<code>g</code>中将30个元素均复制一份，使得切片<code>s0</code>和<code>s1</code>不共享承载底层元素的内存块。
 
 <pre class="line-numbers"><code class="language-go">func g(s1 []int) {
-	s0 = append([]int(nil), s1[len(s1)-30:]...)
+	s0 = append(s1[:0:0], s1[len(s1)-30:]...)
+	// 现在，如果再没有其它值引用着承载着s1元素的内存块，
+	// 则此内存块可以被回收了。
 }
 </code></pre>
 
 </div>
 
 <p class="anchor" id="dead-slice-elements"></p>
-<h3>Kind-Of Memory Leaking Caused By Not Resetting Pointers In Dead Slice Elements</h3>
+<h3>因为未重置丢失的切片元素中的指针而造成的临时性内存泄露</h3>
 
 <div>
-In the following code, after the <code>g</code> function is called,
-the memory block allocated for the first and the last elements of slice
-<code>s</code> will get lost.
+在下面这段代码中，<code>h</code>函数调用之后，<code>s</code>的首尾两个元素将不再可用。
 
 <pre class="line-numbers"><code class="language-go">func h() []*int {
 	s := []*int{new(int), new(int), new(int), new(int)}
-	// do smething ...
+	// 使用此s切片 ...
+	
 	return s[1:3:3]
 }
 </code></pre>
 
 <p>
-Only if the returned slice is still alive, it will prevent the underlying
-memory block which hosts the elements of <code>s</code> from being collected,
-which in consequence prevents the two memory blocks allocated for the first
-and the last elements of <code>s</code> from being collected,
-though the two elements are dead.
+只要<code>h</code>函数调用返回的切片仍在被使用中，它的各个元素就不会回收，包括首尾两个已经丢失的元素。
+因此这两个已经丢失的元素引用着的两个<code>int</code>值也不会被回收，即使我们再也无法使用这两个<code>int</code>值。
 </p>
 
-If we want to avoid such memory leaking,
-we must reset the pointers stored in the dead elements.
+为了防止这样的暂时性内存泄露，我们必须重置丢失的元素中的指针。
 
 <pre class="line-numbers"><code class="language-go">func h() []*int {
 	s := []*int{new(int), new(int), new(int), new(int)}
-	// do smething ...
-	s1 := s[1:3]
-	s[0] = nil; s[len(s)-1] = nil
-	return s1
+	// 使用此s切片 ...
+	
+	s[0], s[len(s)-1] = nil, nil // 重置首尾元素指针
+	return s[1:3:3]
 }
 </code></pre>
 
@@ -169,76 +145,46 @@ we must reset the pointers stored in the dead elements.
 </p>
 
 <p>
-We often need to reset the pointers for some old slice elements in
-<a href="container.html#slice-manipulations">slice element deletion operations</a>.
+我们经常需要在<a href="container.html#slice-manipulations">删除切片元素操作</a>中重置一些切片元素中的指针值。
 </p>
 
 </div>
 
 <p class="anchor" id="hanging-goroutine"></p>
-<h3>Real Memory Leaking Caused By Hanging Goroutines</h3>
+<h3>因为协程被永久阻塞而造成的永久性内存泄露</h3>
 
 <div>
 <p>
-Some times, for some logic mistakes in code design, one or more goroutines
-stay in blocking state for ever (hanging).
-Such goroutines are called hanging goroutines.
-Go runtime thinks hanging goroutines are still alive.
-Once a goroutine becomes hanging, the resources allocated for it and the
-memory blocks referenced by it will never be garbage collected.
-</p>
-
-For example, if the following function is called
-by passing a nil channel argument to it,
-then the current goroutine will become hanging.
-so the memory block allocated for <code>s</code> will never get collected.
-
-<pre class="line-numbers"><code class="language-go">func k(c <-chan bool) {
-	s := make([]int64, 1e6)
-	if <-c { // block here for ever if c is nil
-		_ = s
-		// use s, ...
-	}
-}
-</code></pre>
-
-<p>
-If we pass a non-nil channel to the above function, and there are no other
-goroutines will send values to the channel since the function is called,
-The current goroutine will also become hanging.
+有时，一个程序中的某些协程会永久处于阻塞状态。
+Go运行时并不会将处于永久阻塞状态的协程杀掉，因此永久处于阻塞状态的协程所占用的资源将永得不到释放。
 </p>
 
 <p>
-Sometimes, we deliberately makes the main goroutine in a program hang to
-prevent the program from exiting.
-Generally, most other hanging goroutine cases are unexpected.
-We should avoid such cases happening.
+Go运行时出于两个原因并不杀掉处于永久阻塞状态的协程。
+一是有时候Go运行时很难分辨出一个处于阻塞状态的协程是永久阻塞还是暂时性阻塞；二是有时我们可能故意永久阻塞某些协程。
+</p>
+
+<p>
+我们应该避免因为代码设计中的一些错误而导致一些协程处于永久阻塞状态。
 </p>
 
 </div>
 
-<h3>Real Memory Leaking Caused By Not Stopping <code>time.Ticker</code> Values Which Are Not Used Any More</h3>
+<h3>因为没有停止不再使用的<code>time.Ticker</code>值而造成的永久性内存泄露</h3>
 
 <p>
-When a <code>time.Timer</code> value is not used any more,
-it will be garbage collected eventaully,
-but this is not true for a <code>time.Ticker</code> value.
-We should stop a <code>time.Ticker</code> value when it is not used any more.
+当一个<code>time.Timer</code>值不再被使用，一段时间后它将被自动垃圾回收掉。
+但对于一个不再使用的<code>time.Ticker</code>值，我们必须调用它的<code>Stop</code>方法结束它，否则它将永远不会得到回收。
 </p>
 
-<h3>Real Memory Leaking Caused By Using Finalizers Improperly</h3>
+<h3>因为不正确地使用终结器（finalizer）而造成的永久性内存泄露</h3>
 
 <div>
 <p>
-Setting a finalizer for a value which is a member of a cyclic reference group may
-<a href="https://golang.org/pkg/runtime/#SetFinalizer">prevent all memory blocks allocated
-for the cyclic reference group from being collected</a>.
-This is real memory leaking, not kind of.
+将一个终结器设置到一个循环引用值组中的一个值上可能导致<a href="https://golang.org/pkg/runtime/#SetFinalizer">被此值组中的值所引用的内存块永远得不到回收</a>。
 </p>
 
-After the following function is called and exits,
-the memory blocks allocated for <code>x</code> and <code>y</code> are not
-guaranteed to be garbage collected in future garbage collecting.
+比如，当下面这个函数被调用后，承载着<code>x</code>和<code>y</code>的两个内存块将不保证会被逐渐回收。
 
 <pre class="line-numbers"><code class="language-go">func memoryLeaking() {
 	type T struct {
@@ -252,31 +198,30 @@ guaranteed to be garbage collected in future garbage collecting.
 
 	var x, y T
 
-	// SetFinalizer will make x escape to heap.
+	// 此SetFinalizer函数调用将使x逃逸到堆上。
 	runtime.SetFinalizer(&x, finalizer)
 
-	// Following two lines combined will make
-	// x and y not collectable.
-	x.t, y.t = &y, &x // y also escapes to heap.
+	// 下面这行将形成一个包含x和y的循环引用值组。
+	// 这有可能造成x和y不可回收。
+	x.t, y.t = &y, &x // y也逃逸到了堆上。
 }
 </code></pre>
 
 <p>
-So, please avoid setting finalizers for values in a cyclic reference group.
+所以，不要为一个循环引用值组中的值设置终结器。
 </p>
 
 <p>
-By the way, we <a href="unofficial-faq.html#finalizers">shouldn't use
-finalizers as object destructors</a>.
+顺便说一下，我们<a href="unofficial-faq.html#finalizers">不应该把终结器用做析构函数</a>。
 </p>
 </div>
 
-<h3>Kind-Of Resource Leaking By Deferring Function Calls</h3>
+<h3>延迟调用函数导致的临时性内存泄露</h3>
 
 <div>
 
 <p>
-Please read <a href="defer-more.html#kind-of-resource-leaking">this article</a> for details.
+请阅读<a href="defer-more.html#kind-of-resource-leaking">此文</a>以获得详情。
 </p>
 
 </div>

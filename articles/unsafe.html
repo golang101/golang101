@@ -270,7 +270,7 @@ func foo() {
 
 <div>
 <p>
-为了确保一个值仍然在使用中，我们应该将引用着此值的另一个值传给一个<code>runtime.KeepAlive</code>函数调用。
+为了确保一个值和它所引用着的值部仍然被认为在使用中，我们应该将引用着此值的另一个值传给一个<code>runtime.KeepAlive</code>函数调用。
 在实践中，我们常常将此值的指针传递给一个<code>runtime.KeepAlive</code>函数调用。
 </p>
 

@@ -1,147 +1,123 @@
-<h1>Memory Blocks</h1>
+<h1>内存块</h1>
 
 <p>
-Go is a language which supports automatic memory management, such as memory allocation and garbage collection.
-So Go programmers can do programming without handling the underlying memory management.
-This saves Go programmers lots of time.
+Go是一门支持自动内存管理的语言，比如自动内存开辟和自动垃圾回收。
+所以Go程序员在编程时无须进行各种纷繁的内存管理操作。
+这不仅给Go程序员提供了很多便利和节省了很多开发时间，而且也帮助Go程序员避免了很多因为疏忽大意而造成的bug。
 </p>
 
 <p>
-Although knowing the underlying memory management implementation details is not necessary
-for Go programmers to write Go code, understanding some concepts and being aware of some facts
-in the memory management implementation by the standard Go compiler and runtime is very
-helpful for Go programmers to write high quality Go code.
+在Go编程中，尽管我们无须知道底层的自动内存管理是如何实现的，但是知道自动内存管理实现中的一些概念和事实对我们写出高质量的Go代码时非常有帮助的。
 </p>
 
 <p>
-This article will explain some concepts and facts of memory block allocation
-and garbage collection by the standard Go compiler and runtime.
-Other aspects, such as memory apply and memory release in memory management,
-will not be touched in this article.
+本文将解释和列出官方Go标准编译器和运行时中内存块开辟和垃圾回收实现相关的一些概念和事实。
+内存管理的其它方面，比如内存申请和内存释放，将不会在本文中探讨。
 </p>
 
 <p class="anchor" id="memory-block"></p>
-<h3>Memory Blocks</h3>
+<h3>内存块（memory block）</h3>
 
 <p>
-A memory block is a continuous memory segment to host
-<a href="value-part.html">value parts</a> at run time.
-Different memory blocks may have different sizes, to host different value parts.
-One memory block may host multiple value parts at the same time,
-but each value part can only be hosted within one memory block,
-no matter how large the size of that value part is.
-In other words, for any value part, it never crosses memory blocks.
+一个内存块是一段在运行时刻承载着若干<a href="value-part.html">值部</a>的连续内存片段。
+不同的内存块的大小可能不同，因它们所承载的值部的尺寸而定。
+一个内存块同时可能承载着不同Go值的如干值部，但是一个值部在内存中绝不会跨内存块存储，无论此值部的尺寸有多大。
 </p>
 
 <div>
-There are many reasons when one memory block may host multiple value parts. Some of them:
+一个内存块可能承载若干值部的原因有很多，这里仅列出一部分：
 <ul>
 <li>
-	struct values often have several fields, so when a memory block is allocated for
-	a struct value, the memory block will also host these field values.
+	一个结构体值很可能由若干字段，所以当为此结构体值开辟了一个内存块时，此内存块同时也将承载此结构体值的各个字段值（的直接部分）。
 </li>
 <li>
-	array values often have many elements, so when a memory block is allocated for
-	a array value, the memory block will also host the array element values.
+	一个数组值常常包含很多元素，所以当为此数组值开辟了一个内存块时，此内存块同时也将承载此数组值的各个元素值（的直接部分）。
 </li>
 <li>
-	the underlying element sequences of two slices may be hosted on the same memory block,
-	the two element sequences even can overlap with each other.
+	两个切片的底层间接部分的元素序列可能承载在同一个内存块上，这两个间接值部甚至可能有部分重叠。
 </li>
 </ul>
 </div>
 
-<h3>A Value References The Memory Block It Is Hosted On</h3>
+<h3>一个值引用着承载着它的值部的内存块</h3>
 
 <p>
-I have known that a value part can reference another value part.
-Here, we extend the definition by saying
-a memory block is referenced by all the value parts it hosts.
-So if a value part <code>v</code> is referenced by another value part,
-then the other value will also reference the memory block hosting <code>v</code>, indirectly.
+我们已经知道，一个值部可能引用着另一个值部。这里，我们将引用引用的定义扩展到一下。
+我们可以说一个内存块被它承载着各个值部所引用着。
+所以，当一个值部<code>v</code>被另一个值部引用着时，此另一个值部也（间接地）引用着承载着值部<code>v</code>的内存块。
 </p>
 
 <p class="anchor" id="when-to-allocate"></p>
-<h3>When Will Memory Blocks Be Allocated?</h3>
+<h3>什么时候需要开辟内存块？</h3>
 
 <div>
-In Go, memory blocks may be allocated but not limited at following situations:
+在Go中，在下列场合（不限于）将发生开辟内存块的操作：
 <ul>
 <li>
-	explicitly call the <code>new</code> and <code>make</code> built-in functions.
-	A <code>make</code> call will allocate more than one memory blocks to host
-	the direct part and underlying part(s) of the created map, slice or channel value.
+	显式地调用<code>new</code>和<code>make</code>内置函数。
+	一个<code>new</code>函数调用总是只开辟一个内存块。
+	一个<code>make</code>函数调用有可能会开辟多个内存块来承载创建的映射表或数据通道值的底层间接值部。
 </li>
 <li>
-	create maps, slices and anonymous functions with corresponding composite literals.
-	More than one memory blocks may be allocated in each of the processes.
+	使用字面值创建映射表、切片或函数值。在此创建过程中，一个或多个内存块将被开辟出来。
 </li>
 <li>
-	declare variables.
-	Depends on variable value types, one or more memory blocks may be allocated in each declaration.
+	声明变量。
 </li>
 <li>
-	assign non-interface values to interface values
-	(when the non-interface value is not a pointer value).
+	将一个非接口值赋给一个接口值。（对于官方Go标准编译器来说，不包括将一个指针值赋给一个接口值的情况。）
 </li>
 <li>
-	concatenate strings.
+	衔接非常量字符串。
 </li>
 <li>
-	convert strings to byte or rune slices, and vice versa
-	(except <a href="string.html#conversion-optimizations">some special compiler optimization cases</a>).
+	将字符串转换为字节切片或者码点切片，或者反之。（除了<a href="string.html#conversion-optimizations">一些编译器优化情形</a>。）
 </li>
 <li>
-	convert integers to <code>string</code>.
+	将一个整数转换为字符串。
 </li>
 <li>
-	call <code>append</code> function (when the capacity of the base slice is not large enough).
+	调用内置<code>append</code>函数并且基础切片的容量不足够大。
 </li>
 <li>
-	add new key-element pairs into maps (when the underlying hash table needs to be resized).
+	向一个映射表添加一个键值条目并且此映射表底层内部的哈希表需要改变大小。
 </li>
 </ul>
+
 </div>
 
-<h3>Where Will Memory Blocks Be Allocated?</h3>
+<p class="anchor" id="where-to-allocate"></p>
+<h3>内存块将被开辟在何处？</h3>
 
 <p>
-For the standard Go compiler and runtime, in every Go program,
-each goroutine will maintain a stack, a memory region, at run time.
-The initial stack size of each goroutine is small.
-The stack size will grow and shrink as needed.
+对每一个使用官方Go标准编译器编译的Go程序，在运行时刻，每一个协程在将维护一个栈（stack）。
+一个栈是一个预申请的内存段，它做为一个内存池供某些内存块从中开辟。
+每个协程的初始栈大小比较小（在64位系统上大概2千字节）。
+每个栈的大小在协程运行的时候将按照需要增长和收缩。
 </p>
 
 <p><i>
-(Please note, for the standard Go compiler, there is a limit of stack size
-each goroutine can have. Ar present, Go 1.11, the default maximum stack size
-is 1 GB on 64-bit systems, and 250 MB on 32-bit systems.
-We can call the <code>SetMaxStack</code> function in the
-<code>runtime/debug</code> standard package to change the size.)
+（注意：对于官方Go标准编译器来说，每个协程维护的栈的大小有一个最大限制。
+对于Go SDK 1.11中编译器来说，此最大限制的默认值在64位系统上位1GB，在32位系统上为250MB。
+我们可以在运行时刻调用<code>runtime/debug</code>标准库包中的<code>SetMaxStack</code>来修改此最大值。）
 </i></p>
 
 <p>
-Memory blocks allocated on the stack of a goroutine can only be used (referenced)
-in the goroutine internally.
-They are goroutine localized resources.
-They are not safe to be referenced crossing goroutines.
-A goroutine can access a memory block allocated on the stack of the goroutine
-without using any data synchronization techniques.
+内存块可以被开辟在栈上。开辟在一个协程维护的栈上的内存块只能在此协程内部被使用（引用）。
+这些内存块不能被多个协程并发地安全访问。
+一个协程可以无需使用任何数据同步技术而访问开辟在它的栈上的内存块。
 </p>
 
 <p>
-Heap is a singleton in each program.
-Memory blocks allocated on heap can be accessed by multiple goroutines.
-In other words, they can be accessed concurrently.
-Their accessments should be synchronized when needed.
+堆（heap）是一个虚拟的概念。每个程序只有一个堆。
+一般地，如果一个内存块没有开辟在任何一个栈上，则我们说它开辟在了堆上。
+开辟在堆上的内存块可以被多个协程并发地访问。
+在需要的时候，对它们的访问需要做同步。
 </p>
 
 <p>
-Heap is a conservative place to register memory blocks.
-If compilers detect a memory block will be referenced crossing goroutines
-or can't easily confirm whether or not the memory block is safe to be put on stacks,
-then the memory block will be allocated on heap at run time.
-This means some values can be safely allocated on stacks may be also allocated on heap.
+如果编译器觉察到一个内存块在运行时将会被多个协程访问，或者不能轻松地断定此内存块是否只会被一个协程访问，则此内存块将会被开辟在堆上。
+也就是说，编译器将采取保守但安全的策略，使得某些可以安全地被开辟在栈上的内存块也有可能会被开辟在堆上。
 </p>
 
 <!--
@@ -155,136 +131,123 @@ The values referenced by values allocated on heap will never be allocated in sta
 -->
 
 <div>
-In fact, stacks are not essential for Go programs.
-Go compiler/runtime can allocate all memory block on heap.
-Supporting stacks is just to make Go programs run more efficiently:
+事实上，栈对于Go程序来说并非必要。Go程序中所有的内存块都可以开辟在堆上。
+支持栈只是为了让Go程序的运行效率更高。
 <ul>
 <li>
-	allocating memory blocks on stacks is much faster than on heap.
+	从栈上开辟内存块比在堆上快得多；
 </li>
 <li>
-	memory blocks allocated on a stack don't need to be garbage collected.
+	开辟在栈上的内存块不需要被垃圾回收；
 </li>
 <li>
-	stack memory blocks are more CPU cache friendly than heap ones.
+	开辟在栈上的内存块对CPU缓存更加友好。
 </li>
 </ul>
 </div>
 
 <p>
-If a memory block is allocated somewhere, we can also say the value parts hosted
-on the memory block are allocated on the same place.
+如果一个内存块被开辟在某处（堆上或某个栈上），则我们也可以说承载在此内存块上的各个值部（和值）也开辟在此处。
 </p>
 
 <p>
-If a value part used in a function is allocated on heap,
-we can say the value part escapes to heap.
-By using the official Go SDK, we can run <code>go build -gcflags -m</code> to check
-which local values (value parts) will escape to heap at run time.
-As above has mentioned, the current escape analyzer in the standard Go compiler
-is still not perfect, many local value parts can be allocated on stacks safely
-will still escape to heap.
+如果一个局部声明的变量的某些值部被开辟在堆上，则我们说这些值部以及此局部变量逃逸到了堆上。
+我们可以运行官方Go SDK中提供的的<code>go build -gcflags -m</code>命令来查看代码中哪些局部值（或者值部）在运行时刻会逃逸到堆上。
+如上所述，目前官方Go编译器中的逃逸分析器并不十分完美，因此某些可以安全地开辟在栈上的值可能会逃逸到了堆上。
 </p>
 
 <p>
-When a local variable value of type <code>T</code> escapes to heap,
-what that really means is that Go runtime also creates
-an implicit pointer of type <code>*T</code> on the stack of the current goroutine.
-The value of the pointer stores the address of the memory block allocated on heap
-(a.k.a., the address of the local variable of type <code>T</code>).
-Go compiler has already replaced all references to the variable to
-the deferences of the pointer value at compile time.
+在运行时刻，每一个仍在被使用中的逃逸到堆上的值部肯定被至少一个开辟在栈上的值部所引用着。
+如果一个逃逸到堆上的值是一个被声明为<code>T</code>类型的局部变量，则在运行时，一个<code>*T</code>类型的隐式指针将被创建在栈上。
+另外，编译器还将所有对此局部变量的使用替换为对此指针的解引用。
+此指针存储着此<code>T</code>类型的局部变量的在堆上的地址，从而形成了一个从栈到堆的引用关系。
+此<code>*T</code>值可能从今后的某一时刻不再被使用从而使得此引用关系不再存在。
+此引用关系在下面介绍的垃圾回收过程中发挥着重要的作用。
 </p>
 
 <p>
-Direct parts of global variables (package-level variables) will never be allocated on stacks.
-Whether or not they will be allocated in heap is compiler dependent.
-A value part referenced by the direct part of any global variable and any value part allocated
-on heap will be allocated on heap if the value part is not the direct part of a global variable.
-Direct parts of global variables and value parts allocated on heap will never
-reference value parts allocated on stacks.
-Value parts allocated on a stack can only be referenced by value parts allocated on the same stack.
+类似地，我们可以认为每个包级变量（常称全局变量）都被开辟在了堆上，并且它被一个开辟在一个全局栈上的隐式指针所引用着。
+事实上，此指针引用着此包级变量的直接部分，此直接部分又引用着其它的值（部）。
+</p>
+
+<p>
+一个开辟在堆上的内存块可能同时被开辟在若干不同栈上的值部所引用着。
 </p>
 
 <div>
-Some facts:
+一些事实：
 <ul>
 <li>
-	if a field of a struct value escapes to heap,
-	then the whole struct value will also escape to heap.
+	如果一个结构体值的一个字段逃逸到了堆上，则此整个个结构体值也逃逸到了堆上。
 </li>
 <li>
-	if an element of an array value escapes to heap,
-	then the whole array value will also escape to heap.
+	如果一个数组的某个元素逃逸到了堆上，则此整个数组也逃逸到了堆上。
 </li>
 <li>
-	if an element of a slice value escapes to heap,
-	then all the elements of the slice will also escape to heap.
+	如果一个切片的某个元素逃逸到了堆上，则此切片中的所有元素都将逃逸到堆上，但此切片值的直接部分可能开辟在栈上。
 </li>
 <li>
-	if a non-nil slice value escapes to heap,
-	then its elements will also escape to heap.
+	如果一个值（部）<code>v</code>被一个逃逸到了堆上的值（部）所引用，则此值（部）<code>v</code>也将逃逸到堆上。
 </li>
 </ul>
 </div>
 
 <p>
-A memory block created by calling <code>new</code> function may be allocated on heap or stacks.
-This is different to C++.
+使用内置<code>new</code>函数开辟的内存可能开辟在堆上，也可能开辟在栈上。这是与C++不同的一点。
 </p>
+
+<!--p>
+另一个我们需要知道的重要事实是，为了让64位整数的原子操作在32位架构上成为可能，任何开在堆上的内存块的起始地址都保证是8字节对齐的。
+</p-->
 
 <p class="anchor" id="when-can-collect"></p>
-<h3>When Can A Memory Block Be Collected?</h3>
+<h3>一个内存块在什么条件下可以被回收？</h3>
 
 <p>
-Memory blocks allocated for direct parts of global variables will never be collected.
+为包级变量的直接部分开辟的内存块永远不会被回收。
 </p>
 
 <p>
-Each stack will be collected as a whole when the corresponding goroutine exits.
-So there is no need to collect the memory blocks allocated on stacks, individually, one by one.
-Stacks are not collected by the garbage collector.
+每个协程的栈将在此协程退出之时被整体回收，此栈上开辟的各个内存块没必要被一个一个单独回收。
+栈内存池并不由垃圾回收器回收。
 </p>
 
 <p>
-For a memory block allocated on heap, it can be safely collected only when
-it is no longer referenced (either directly or indirectly)
-by any direct part of global values and any value part allocated on goroutine stacks.
-We call such memory blocks as unused memory blocks.
-Here the global values include not only explicit package-level variables,
-but also some runtime internal global values.
-Unused memory blocks on heap will be collected by the garbage collector.
+对一个开在堆上的内存块，当没有任何栈（包括协程栈和全局栈）上的仍被使用中的隐式指针在（直接或者间接）引用着它，则此内存块可以被安全地垃圾回收了。
+我们称这样的内存块为不再被使用的内存块。开辟在堆上的不再被使用的内存块将在以后某个时刻被垃圾回收器回收掉。
 </p>
 
 <div>
-Here is an example to show when some memory blocks can be collected:
+下面是一个展示了一些内存块在何时可以被垃圾回收的例子。
+
 <pre class="line-numbers"><code class="language-go">package main
 
 var p *int
 
 func main() {
 	done := make(chan bool)
-	// done will be used on the main and the following
-	// new goroutine, so it will be allocated on heap.
+	// done数据通道将被使用在主协程和下面将要创建的新协程中，
+	// 所以它将被开辟在堆上。
 
 	go func() {
 		x, y, z := 123, 456, 789
-		_ = z  // z can be allocated on stack safely.
-		p = &x // For x and y are referenced by global p,
-		p = &y // so they will be both allocated on heap.
-		// Now, x is not referenced by anyone, so
-		// its memory block can be collected now.
+		_ = z  // z可以被安全地开辟在栈上。
+		p = &x // 因为x和y都会将曾经被包级指针p所引用过，
+		p = &y // 因此，它们都将开辟在堆上。
+		
+		// 到这里，x已经不再被任何其它值所引用。或者说承载
+		// 它的内存块已经不再被使用。此内存块可以被回收了。
+		
 		p = nil
-		// Now, y is als not referenced by anyone,
-		// so its memory block can be collected now.
+		// 到这里，y已经不再被任何其它值所引用。
+		// 承载它的内存块可以被回收了。
 
 		done <- true
 	}()
 
-	<- done
-	// Now the above goroutine exits, the done channel
-	// is not used any more, a smart compiler will
-	// think it can be collected now.
+	<-done
+	// 到这里，done已经不再被任何其它值所引用。一个聪明的
+	// 编译器将认为承载它的内存块可以被回收了。
 
 	// ...
 }
@@ -293,9 +256,8 @@ func main() {
 <p>
 </p>
 
-Sometimes, smart compilers, such as the standard Go compiler,
-may make some optimizations so that some references
-are removed earlier than we expect. Here is such an example.
+有时，聪明的编译器可能会做出一些出人意料的（但正确的）的优化。
+比如在下面这个例子中，切片<code>bs</code>的底层间接值部在<code>bs</code>仍在使用之前就已经被官方Go标准编译器发觉已经不再被使用了。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -304,27 +266,23 @@ import "fmt"
 func main() {
 	bs := make([]int, 1000000)
 
-	// A smart compiler can detect that the underlying part of the
-	// slice bs will never be used later, so that the underlying
-	// part of the slice bs can be garbage collected safely now.
+	// 一个聪明的编译器将觉察到bs的底层元素部分已经不会再被使用，
+	// 而正确地认为bs的底层元素部分在此刻可以被安全地回收了。
 
 	fmt.Println(len(bs))
 }
 </code></pre>
 
 <p>
-Please read <a href="value-part.html">value parts</a> to learn the
-internal structures of slice values.
+关于切片值的内部实现结构，请参考<a href="value-part.html">值部</a>一文。
 </p>
 
 <p>
-By the way, sometimes, we may hope the slice <code>bs</code> is guaranteed
-to not being garbage collected after the <code>fmt.Println</code> call,
-then we can use a <code>runtime.KeepAlive</code> function call to tell
-garbage collectors that the slice <code>bs</code> is still used.
+顺便说一下，有时候出于种种原因，我们希望确保上例中的<code>bs</code>切片的底层间接值部不要<code>fmt.Println</code>调用之前被垃圾回收。
+这时，我们可以使用一个<code>runtime.KeepAlive</code>函数调用以便让垃圾回收器知晓在此调用之前切片<code>bs</code>和它所引用着的值部仍在被使用中。
 </p>
 
-For example,
+一个例子：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -335,91 +293,86 @@ func main() {
 	bs := make([]int, 1000000)
 
 	fmt.Println(len(bs))
-	runtime.KeepAlive(&bs) // runtime.KeepAlive(bs) is also
-	                       // okay for this specified example.
+	runtime.KeepAlive(&bs) // 对于这个特定的例子，也可以调用
+	                       // runtime.KeepAlive(bs)。
 }
 </code></pre>
 
 <p>
-<code>runtime.KeepAlive</code> function calls are often needed
-if <a href="unsafe.html">unsafe pointers</a> are involved.
+<code>runtime.KeepAlive</code>函数调用在使用<a href="unsafe.html">非类型安全指针</a>的时候常常是需要的。
 </p>
 
+</div>
+
+<p class="anchor" id="how-to-detect"></p>
+<h3>如何判断一个内存块是否仍在被使用？</h3>
+
+<div>
+<p>
+目前的官方Go标准运行时（1.11版本）使用<a href="https://blog.golang.org/go15gc">一个并发三色（tri-color）标记清扫（mark-sweep）算法</a>来实现垃圾回收。
+这里仅会对此算法的原理做一个大致的描述。一个具体实现可能和此大致描述会有很多细节上的差别。
+</p>
+
+<p>
+一个垃圾回收过程分为两个阶段：标记阶段和清扫阶段。
+</p>
+
+在标记阶段，垃圾回收器（实际上是一组协程）使用三色算法来分析哪些（开辟在堆上的）内存块已经不再使用了。
+<ul>
+<li>
+	在每一轮（见下一节的解释）垃圾回收过程的开始，所有的内存块将被标记为白色。
+</li>
+<li>
+	然后垃圾回收器将所有开辟在栈上的内存块标记为灰色，并把它们加入一个灰色内存块列表。
+</li>
+<li>
+	循环下面两步：
+	<ol>
+	<li>
+		从个灰色内存块列表中取出一个内存块，并把它标记为黑色。
+	</li>
+	<li>
+		然后扫描承载在此内存块上的指针值，并通过这些指针找到它们引用着的内存块。
+		如果一个引用着的内存块为白色的，则将其标记为灰色并加入灰色内存块列表。
+	</li>
+	</ol>
+</li>
+</ul>
+
+<p>
+在清扫阶段，仍被标记为白色的堆内存块将被认为是不再使用的而被回收掉。
+</p>
+
+<p>
+此垃圾回收算法不会移动内存块来整理内存碎片。换句话说，每个值的地址是不会变的。
+</p>
 </div>
 
 <p class="anchor" id="when-to-collect"></p>
-<h3>When Will A Memory Block Be Collected?</h3>
-
-<p>
-Go runtime will collect unused heap memory blocks (garbage) to reuse or release memory.
-The current standard Go compiler (up to version 1.11) uses
-<a href="https://blog.golang.org/go15gc">a concurrent, tri-color, mark-sweep garbage collector</a>.
-Here this article will not explain the detailed implementation. Just some facts are listed below.
-</p>
+<h3>不再被使用的内存块将在什么时候被回收？</h3>
 
 <div>
-The collector is not always running. It will start when a threshold is satisfied.
-So an unused memory block may be not collected immediately after it becomes unused,
-it will be collected eventually.
-Currently, the threshold is controlled by
-<a href="https://golang.org/pkg/runtime/#hdr-Environment_Variables">GOGC environment variable</a>:
-<blockquote style="margin-top:0px;margin-bottom:0px;">
-<small>
-	The GOGC variable sets the initial garbage collection target percentage.
-	A collection is triggered when the ratio of freshly allocated data to
-	live data remaining after the previous collection reaches this percentage.
-	The default is GOGC=100. Setting GOGC=off disables the garbage collector entirely.
-</small>
-</blockquote>
 <p>
-The value of this environment variable determines the frequency of garbage collecting,
-and it can <a href="https://golang.org/pkg/runtime/debug/#SetGCPercent">be modified at run time</a>.
-Smaller values lead to more frequent garbage collections.
-Go programs can also run the collector explicitly by calling the
-<a href="https://golang.org/pkg/runtime/#GC">runtime.GC</a> function.
+开辟在堆上的不再使用的内存块将被Go运行时认为是垃圾而将被回收，以供以后重用或者释放（给操作系统）回收回来的内存。
+垃圾回收器并不是时刻都在运行着。它只是每隔一段时间因为某些条件达成之后才开始新的一轮垃圾回收过程。
+所以，一个不再被使用的内存块不会在它不再使用后立即得到回收，而是将在一段时间后被逐步回收。
+</p>
+
+<p>
+目前（Go 1.11），一轮新的垃圾回收过程开启的默认条件是通过<a href="https://golang.org/pkg/runtime/#hdr-Environment_Variables"><code>GOGC</code>环境变量</a>来控制的。
+当从上一轮垃圾回收结束后新申请的内存块的内存总和占上一轮垃圾回收结束时仍在被使用的所有内存块的内存总和的百分比超过此值时，新的一轮垃圾回收过程将开始。
+此环境变量的默认值为100。
+所以此值决定了垃圾回收过程的频率。
+此值也可以通过调用<a href="https://golang.org/pkg/runtime/debug/#SetGCPercent"><code>runtime/debug.SetGCPercent</code>函数</a>在运行时刻被动态地修改。
+</p>
+
+<p>
+一轮新的垃圾回收过程也可以通过调用<a href="https://golang.org/pkg/runtime/#GC"><code>runtime.GC</code>函数</a>来手动开启。
+</p>
+
+<p>
+一个不再被使用的内存块被回收后可能并不会立即释放给操作系统，这样Go运行时可以将其重新分配给其它值部使用。
+不用担心，官方Go运行时的实现比大多数主流的Java运行时要消耗少得多的内存。
 </p>
 </div>
 
-<div>
-In the mark phase, the collector uses the tri-color algorithm mentioned above to analyze
-which memory blocks are unused:
-<blockquote style="margin-top:0px;margin-bottom:0px;">
-<small>
-	At the start of a GC cycle all objects are white.
-	The GC visits all roots, which are objects directly accessible by the application
-	such as globals and things on the stack, and colors these grey.
-	The GC then chooses a grey object, blackens it, and then scans it for pointers to other objects.
-	When this scan finds a pointer to a white object, it turns that object grey.
-	This process repeats until there are no more grey objects.
-	At this point, white objects are known to be unreachable and can be reused.
-</small>
-</blockquote>
-<p>
-Here, <b><i>objects</i></b> are either value parts or memory blocks.
-</p>
-
-<p>
-The unused memory blocks will be swept at the sweep phase.
-</p>
-</div>
-
-<!--
-<p>
-There is a stop-the-world phase in garbage collecting. All goroutines must be paused in this phase.
-After many improvements from version to version,
-since v1.8, the collector makes typical worst-case stop-the-world duration less than 100μs (0.1 millisecond).
-This generally removes noticeable lags at run time.
-</p>
--->
-
-<p>
-The collector is a non-compacting one, so it will not move memory blocks to rearrange them.
-</p>
-
-<!--
-<p>
-A memory block may not be released to OS immediately after it is collected,
-so that it can be reused in another memory block allocation shortly after.
-Don't worry, the offical Go runtime is much less memory greedy than most Java runtimes.
-</p>
--->

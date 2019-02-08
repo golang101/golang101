@@ -1,4 +1,4 @@
-﻿<h1>Memory Layouts</h1>
+﻿<h1>内存布局</h1>
 
 <!--
 https://groups.google.com/forum/#!topic/golang-nuts/XDfQUn4U_g8
@@ -7,123 +7,204 @@ https://groups.google.com/forum/#!topic/golang-nuts/HaxJMtSngOo
 -->
 
 <p>
-This articles will introduce type alignment guarantees in Go.
-It is essential to know the guarantees to
-properly use the 64-bit functions in <code>sync/atomic</code> standard package.
+本文将介绍Go中的各种类型的尺寸和对齐保证。
+知晓这些保证对于估计结构体值的尺寸和正确使用64位整数原子操作函数是必要的。
 </p>
 
 <p>
-Go is a C family language,
-so you will find many concepts talked in this article are shared with C.
+Go是一门属于C语言家族的编程语言，所以本文谈及的很多概念和C语言是相通的。
 </p>
 
-<h3>Type Alignment Guarantees In Go</h3>
-
-<p>
-Type alignment (or value address alignment) guarantees are the requirements
-for Go compilers made by Go specification.
-If the alignment guarantee of a type <code>T</code> is <code>N</code>,
-then the address of every value of type <code>T</code> must be a multiple of <code>N</code> at run time.
-We can also say the addresses of values of type <code>T</code> are promised to be N-byte aligned.
-</p>
-
-<p>
-In fact, each type has two alignment guarantees, one is for when it is used fields of other (struct) types,
-the other is for other cases (when it is used for a variable declaration, array element type, etc).
-We call the former one the field alignment guarantee of that type,
-and call the latter one the general alignment guarantee of that type.
-</p>
-
-<p>
-At compile time, for a type <code>T</code>, we can call <code>unsafe.Alignof(t)</code> to
-get its general alignment guarantee, where <code>t</code> is a non-field value of type <code>T</code>,
-and call <code>unsafe.Alignof(x.t)</code> to
-get its field alignment guarantee, where <code>x.t</code> is a field value of type <code>T</code>.
-</p>
-
-<p>
-At run time, for a value <code>t</code> of type <code>T</code>,
-we can call <code>reflect.ValueOf(t).Type().Align()</code> to get the general alignment guarantee
-of type <code>T</code>, and call <code>reflect.ValueOf(t).Type().FieldAlign()</code> to get
-the field alignment guarantee of type <code>T</code>.
-</p>
-
-<p>
-For the current standard Go compiler, the field alignment guarantee and the general alignment guarantee
-of a type are always equal. For gccgo compiler, the statement is false.
-</p>
-
-<p>
-Following of the article will use alignment guarantee to refer to either guarantee.
-</p>
+<h3>Go中的类型对齐保证（alignment guarantee）</h3>
 
 <div>
-Go specification only mentions <a href="https://golang.org/ref/spec#Size_and_alignment_guarantees">a little
-on type alignment guarantees</a>:
-<blockquote>
-<small>
-The following minimal alignment properties are guaranteed:
+<p>
+类型对齐保证也称为值地址对齐保证。
+如果一个类型<code>T</code>的对齐保证为<code>N</code>（一个正整数），则在运行时刻<code>T</code>类型的每个值的地址都是<code>N</code>的倍数。
+我们也可以说类型<code>T</code>的值的地址保证为<code>N</code>字节对齐的。
+</p>
+
+<p>
+事实上，每个类型有两个对齐保证。当它被用作结构体类型的字段类型时的对齐保证称为此类型的字段对齐保证，其它情形的对齐保证称为此类型的一般对齐保证。
+</p>
+
+<p>
+对于一个类型<code>T</code>，我们可以调用<code>unsafe.Alignof(t)</code>来获得它的一般对齐保证，其中<code>t</code>为一个<code>T</code>类型的的非字段值，
+也可以调用<code>unsafe.Alignof(x.t)</code>来获得<code>T</code>的字段对齐保证，其中<code>x.t</code>为一个类型为<code>T</code>的结构体字段值。
+<code>unsafe</code>标准库包中的函数的调用都是在编译时刻估值的。
+</p>
+
+<p>
+在运行时刻，对于类型为<code>T</code>的一个值<code>t</code>，我们可以调用<code>reflect.TypeOf(t).Align()</code>来获得类型<code>T</code>的一般对齐保证，
+也可以调用<code>reflect.TypeOf(t).FieldAlign()</code>来获得<code>T</code>的字段对齐保证。
+</p>
+
+<p>
+对于当前的官方Go编译器（1.11版本），一个类型的一般对齐保证和字段对齐保证总是相等的。对于gccgo编译器，这两者可能不相等。
+</p>
+
+Go白皮书仅列出了<a href="https://golang.org/ref/spec#Size_and_alignment_guarantees">些许类型对齐保证要求</a>。
+一个合格的Go编译器必须保证：
 <ol>
-<li>For a variable <code>x</code> of any type: <code>unsafe.Alignof(x)</code> is at least <code>1</code>.</li>
-<li>For a variable <code>x</code> of struct type: <code>unsafe.Alignof(x)</code> is the largest of all the values <code>unsafe.Alignof(x.f)</code> for each field <code>f</code> of <code>x</code>, but at least <code>1</code>.</li>
-<li>For a variable <code>x</code> of array type: <code>unsafe.Alignof(x)</code> is the same as the alignment of a variable of the array's element type..</li>
+<li>
+	对于任何类型的变量<code>x</code>，<code>unsafe.Alignof(x)</code>的结果最小为<code>1</code>。
+</li>
+<li>
+	对于一个结构体类型的变量<code>x</code>，<code>unsafe.Alignof(x)</code>的结果为<code>x</code>的所有字段的对齐保证<code>unsafe.Alignof(x.f)</code>中的最大值（但是最小为<code>1</code>）。
+</li>
+<li>
+	对于一个数组类型的变量<code>x</code>，<code>unsafe.Alignof(x)</code>的结果和此数组的元素类型的一个变量的对齐保证相等。
+</li>
 </ol>
-</small>
-</blockquote>
 
 <p>
-The guarantees don't specify the exact alignment guarantees for any types.
-It just specifies some minimal requirements.
-For the same compiler, the exact type alignment guarantees may be different
-between different architectures and between different compiler versions.
+从这些要求可以看出，Go白皮书并未为任何类型指定了确定的对齐保证要求，它只是指定了一些最基本的要求。
 </p>
-</div>
 
-<div>
-For the current version (1.11) of the standard Go compiler,
-the alignment guarantees are listed here:
+即使对于同一个编译器，具体类型的对齐保证在不同的架构上也是不相同的。
+同一个编译器的不同版本做出的具体类型的对齐保证也有可能是不相同的。
+当前版本（1.11）的官方Go标准编译器做出的对齐保证列在了下面：
+
 <pre>
-type                               alignment guarantee
+类型种类                            对齐保证（字节数）
 ------                             ------
 bool, byte, uint8, int8            1
 uint16, int16                      2
 uint32, int32, float32, complex64  4
-arrays and structs                 depend on element types and field types
-other types                        size of a native word
+数组和结构体类型                     取决于元素类型和各个字段类型
+其它类型                            一个自然字（native word）的尺寸
 </pre>
 <p>
-Here, a native word (or machine word) is 4-byte sized
-on 32-bit architectures and 8-byte sized on 64-bit architectures.
+这里，一个自然字的尺寸在32位的架构上为4字节，在64位的架构上为8字节。
 </p>
 
 <!--
 todo: above assertion may be not correct for some architectures?
 -->
+
+<p>
+这意味着，对于当前版本的官方Go标准编译器，其它类型的对齐保证为<code>4</code>或者<code>8</code>，具体取决于程序编译时选择的目标架构。
+此结论对另一个流行Go编译器gccgo也成立。
+</p>
+
+<p>
+一般情况下，在Go编程中，我们不必关心值地址的对齐保证。
+除非有时候我们打算优化一下内存消耗，或者编写跨平台移植性良好的Go代码。
+请阅读下两节以获得详情。
+</p>
 </div>
 
-<p>
-This means, for the current version of the standard Go compiler,
-the alignment guarantees of other types may be either <code>4</code> or <code>8</code>,
-depends on the build target.
-</p>
-
-<p>
-Generally, we don't need to care about the value address alignments in Go programming,
-except that we want to write portable programs and
-use the 64-bit functions from <code>sync/atomic</code> package.
-</p>
-
-<h3>64-bit Word Atomic Accessment Guarantees</h3>
-
-<p><i>
-(In this article, <b><i>64-bit words</i></b> mean values of types
-whose underlying types are <code>int64</code> or <code>uint64</code>.)
-</i></p>
+<p class="anchor" id="size-and-padding"></p>
+<h3>类型的尺寸和结构体字节填充（structure padding）</h3>
 
 <div>
-At the end of the <a href="https://golang.org/pkg/sync/atomic/#pkg-note-BUG">sync/atomic documentation</a>,
-it mentions:
-<br/>
+Go白皮书只对以下种类的类型的尺寸进行了<a href="https://golang.org/ref/spec#Size_and_alignment_guarantees">明确规定</a>。
+
+<pre>
+类型种类                            尺寸（字节数）
+------                             ------
+byte, uint8, int8                  1
+uint16, int16                      2
+uint32, int32, float32             4
+uint64, int64, float64, complex64  8
+complex128                         16
+uint, int                          4或者8，取决于系统架构
+uintptr                            能够存下任一个内存地址
+</pre>
+<p>
+Go白皮书没有对其它种类的类型的尺寸最初明确规定。
+请阅读<a href="value-copy-cost.html#value-sizes">值复制成本</a>一文来获取官方Go标准编译器使用的各种其它类型的尺寸。
+</p>
+
+<p>
+官方Go标准编译器（和gccgo编译器）将确保一个类型的尺寸为此类型的对齐保证的倍数。
+</p>
+
+<p>
+为了满足上一节中规定的地址对齐保证要求，Go编译器可能会在结构体的相邻字段之间填充一些字节。
+这使得一个结构体类型的尺寸并非等于它的各个字段类型尺寸的简单相加之和。
+</p>
+
+下面是一个展示了一些字节是如何填充到一个结构体中的例子。
+首先，从上面的描述中，我们已得知（对于官方Go标准编译器来说）：
+<ul>
+<li>
+	内置类型<code>int8</code>的对齐保证和尺寸均为1个字节；
+	内置类型<code>int16</code>的对齐保证和尺寸均为2个字节；
+	内置类型<code>int64</code>的尺寸为8个字节，但它的对齐保证在32位架构上为4个字节，在64位架构上为8个字节。
+</li>
+<li>
+	下例中的类型<code>T1</code>和<code>T2</code>的对齐保证均为它们的各个字段的最大对齐保证。
+	所以它们的对齐保证和内置类型<code>int64</code>相同，即在32位架构上为4个字节，在64位架构上为8个字节。
+</li>
+<li>
+	类型<code>T1</code>和<code>T2</code>尺寸需为它们的对齐保证的倍数，即在32位架构上为4N个字节，在64位架构上为8N个字节。
+</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-go">type T1 struct {
+	a int8
+	
+	// 在64位架构上，为了让字段b的地址为8字节对齐，需在这里
+	// 填充7个字节。在32位架构上，为了让字段b的地址为4字节
+	// 对齐，需在这里填充3个字节。
+	
+	b int64
+	c int16
+	
+	// 为了让类型T1的尺寸为T1的对齐保证的倍数，在64位架构上
+	// 需在这里填充6个字节，在32架构上需在这里填充2个字节。
+}
+// 类型T1的尺寸在64位架构上位24个字节（1 + 7 + 8 + 2 + 6），
+// 在32位架构上为16个字节（1 + 3 + 8 + 2 + 2）。
+
+type T2 struct {
+	a int8
+	
+	// 为了让字段c的地址为2字节对齐，需在这里填充1个字节。
+	
+	c int16
+	
+	// 在64位架构上，为了让字段b的地址为8字节对齐，需在这里
+	// 填充4个字节。在32位架构上，不需填充字节即可保证字段b
+	// 的地址为4字节对齐的。
+	
+	b int64
+}
+// 类型T2的尺寸在64位架构上位16个字节（1 + 1 + 2 + 4 + 8），
+// 在32位架构上为12个字节（1 + 1 + 2 + 8）。
+</code></pre>
+
+<p>
+从这个例子可以看出，尽管类型<code>T1</code>和<code>T2</code>拥有相同的字段集，但是它们的尺寸并不相等。
+</p>
+
+<p>
+一个有趣的事实是有时候一个结构体类型中零尺寸类型的字段可能会影响到此结构体类型的尺寸。
+请阅读<a href="unofficial-faq.html#final-zero-size-field">此问答</a>获取详情。
+</p>
+</div>
+
+<h3>64位字原子操作的地址对齐保证要求</h3>
+
+<div>
+<p>
+在此文中，64位字是指类型为内值类型<code>int64</code>或<code>uint64</code>的值。
+</p>
+
+<p>
+<a href="concurrent-atomic-operation.html">原子操作</a>一文提到了一个事实：一个64位字的原子操作要求此64位字的地址必须是8字节对齐的。
+这对于官方Go标准编译器目前支持的64位架构来说并不是一个问题，因为官方Go标准编译器保证任何一个64位字的地址在64位架构上都是8字节对齐的。
+</p>
+
+<p>
+然而，在32位架构上，官方Go标准编译器为64位字做出的地址对齐保证仅为4个字节。
+对一个不是8字节对齐的64位字进行64位原子操作将在运行时刻产生一个恐慌。
+更糟的是，一些非常老旧的架构并不支持64位原子操作需要的基本指令。
+</p>
+
+<a href="https://golang.org/pkg/sync/atomic/#pkg-note-BUG"><code>sync/atomic</code>标准库包文档的末尾</a>提到：
+
 <blockquote>
 <small>
 On x86-32, the 64-bit functions use instructions unavailable before the Pentium MMX.
@@ -132,77 +213,44 @@ On non-Linux ARM, the 64-bit functions use instructions unavailable before the A
 <br/><br/>
 On both ARM and x86-32, it is the caller's responsibility to
 arrange for 64-bit alignment of 64-bit words accessed atomically.
-The first word in a variable or in an allocated struct, array,
-or slice can be relied upon to be 64-bit aligned.
+The first word in a variable or in an allocated struct,
+array, or slice can be relied upon to be 64-bit aligned.
 </small>
 </blockquote>
 
+<!--
 <p><i>
-(Here, <code>64-bit</code> in the last sentence is appended by context.
-Although the above quoted texts shown in the bug zone of that documentation,
+(Note, although the above quoted texts shown in the bug zone of that documentation,
 what they describe are not bugs.)
 </i></p>
-</div>
-
-<p>
-So, on very old CPU architectures, 64-bit atomic functions are not supported.
-Programs will panic when 64-bit atomic functions are called on such platforms.
-If a program is expected to support these architectures,
-<code>sync.Mutex</code> should be used instead to synchronize 64-bit words.
-Methods of <code>sync.Mutex</code> are less efficient than atomic functions.
-</p>
-
-<p>
-On 64-bit CPU architectures, 64-bit word values are always 8-byte aligned,
-so we can call the 64-bit atomic functions safely.
-</p>
-
-<p>
-What we do need to pay attention to is 64-bit word atomic accessments
-on some not-very-old 32-bit architectures.
-64-bit atomic functions are supported on these architectures,
-but the addresses of 64-bit word values are not guaranteed to
-be 8-byte aligned on these architectures.
-Calls of 64-bit atomic functions for 64-bit words which addresses
-are not 8-byte aligned may panic at run time.
-</p>
-
-<p>
-However, on the not-very-old 32-bit architectures,
-the official documentation guarantees that
-<b><i>the first word in a variable or in an allocated struct,
-array, or slice can be relied upon to be 64-bit aligned</i></b>.
-</p>
-
-<!--
-<p>
-In my honest opinion, the wording is very vague.
-And it is very conservative.
-
-In fact, Ian, one of the core member of Go team,
-<a href="https://groups.google.com/forum/#!topic/golang-nuts/_nHK6P8_lhw">clarified</a> that
-local declared 64-bit word variables can also be relied upon to be 8-byte aligned.
-</p>
 -->
 
+所以，情况并非无可挽救。
+<ol>
+<li>
+	这些非常老旧的架构在今日已经相当得不主流了。
+	如果一个程序需要在这些架构上对64位字进行原子操作，还有<a href="concurrent-synchronization-more.html">很多其它同步技术</a>可用。
+</li>
+<li>
+	对其它不是很老旧的32位架构，有一些途径可以保证在这些架构上对一些64位字的原子操作是安全的。
+</li>
+</ol>
+
 <p>
-What does the word <b><i>allocated</i></b> mean?
-You can think an <b><i>allocated</i></b> value
-as a <b><i>declared</i></b> variable or a value returned
-by the <code>new</code> and <code>make</code> functions.
-If a slice value derives from an alloacted array and
-the first element of the slice is the first element of the array,
-then the slice value can also be viewed as an alloacted value.
+这些途径被描述为<b>开辟的结构体、数组和切片值中的第一个（64位）字可以被认为是8字节对齐的</b>。
+这里的<b><i>开辟的</i></b>应该如何解读？
+我们可以认为一个<b><i>开辟的值</i></b>为一个声明的变量、内置函数<code>make</code>的调用返回值，或者内置函数<code>new</code>的调用返回值所引用的值。
+如果一个切片是从一个数组派生出来的并且此切片和此数组共享第一个元素，则我们也可以将此切片看作是是一个开辟的值。
 </p>
 
 <p>
-The guarantees made by the official documentation is very conservative.
-In fact, if a value is located at the start address of
-a <a href="memory-block.html">memory block</a> allocated on heap,
-then the first word in the value can be relied upon to be 64-bit aligned.
+此对哪些64位字可以在32位架构上被安全地原子访问的描述是有些保守的。
+有很多此描述并未包括的64位字在32位架构上也是可以被安全地原子访问的。
+比如，如果一个元素类型为64位字的数组或者切片的第一个元素可以被安全地进行64位原子访问，则此数组或切片中的所有元素都可以被安全地进行64位原子访问。
+只是因为很难用三言两语将所有在32位架构上可以被安全地原子访问的64位字都罗列出来，所以官方文档采取了一种保守的描述。
 </p>
 
-<p>
+<!--p>
 And <b><i>be relied upon to be 8-byte aligned</i></b> doesn't mean the address of
 the first 64-bit word in a global variable or in an allocated struct or array
 is always 8-byte aligned on 32-bit architectures.
@@ -215,19 +263,10 @@ If it is never accessed atomically, its address is not guaranteed to be 8-byte a
 There are more other 64-bit words which can also be accessed atomically.
 It is just some subtle and verbose to make a simple clear definition in wording,
 so official documentations just makes conservative guarantees.
-</p>
+</p-->
 
-<p>
-By common sense, a qualified compiler should promise that
-all elements in an array/slice can also be accessed atomically
-if the element type of the array/slice is a 64-bit word type
-and there is one element in the array/slice could be accessed atomically,
-though official documentations doesn't make this guarantee.
-</p>
+下面是一个展示了哪些64位字在32位架构上可以和哪些不可以被安全地原子访问。
 
-<div>
-Here is an example which lists some 64-bit words
-which are safe or unsafe to be accessed atomically:
 <pre class="line-numbers"><code class="language-go">type (
 	T1 struct {
 		v uint64
@@ -246,48 +285,39 @@ which are safe or unsafe to be accessed atomically:
 	}
 )
 
-// below, the "safe"s in comments mean "safe to be accessed atomically
-// on both 64-bit and 32-bit architectures".
+var a int64    // a可以安全地被原子访问
+var b T1       // b.v可以安全地被原子访问
+var c [6]int64 // c[0]可以安全地被原子访问
 
-var a int64    // a is safe
-var b T1       // b.v is safe
-var c [6]int64 // c[0] is safe
-
-var d T2 // d.x.v is unsafe
-var e T3 // e.x[0] is unsafe
+var d T2 // d.x.v不能被安全地被原子访问
+var e T3 // e.x[0]不能被安全地被原子访问
 
 func f() {
-	var f int64           // f is safe
-	var g = []int64{5: 0} // g[0] is safe
+	var f int64           // f可以安全地被原子访问
+	var g = []int64{5: 0} // g[0]可以安全地被原子访问
 
-	var h = e.x[:] // h[0] is unsafe
+	var h = e.x[:] // h[0]可以安全地被原子访问
 
-	// here, d.y.v and e.y[0] are both safe, for they are allocated.
+	// 这里，d.y.v和e.y[0]都可以安全地被原子访问，
+	// 因为*d.y和*e.y都是开辟出来的。
 	d.y = new(T1)
 	e.y = &[6]int64{}
 
 	_, _, _ = f, g, h
 }
 
-// In fact, all elements in c, g and e.y.v are safe to be accessed
-// atomically, though the official documentations don't make the
-// guarantees.
+// 事实上，c、g和e.y.v的所有以元素都可以被安全地原子访问。
+// 只不过官方文档没有明确地做出保证。
 </code></pre>
 
 <p>
-Package maintainers should beware of exposing types
-with 64-bit fields accessed atomically.
-For example, it is unsafe to embed the <code>Int</code> and
-<code>Float</code> types from the
-<a href="https://golang.org/pkg/expvar/">expvar standard package</a>
-in user code which would run on 32-bit architectures.
+如果一个结构体类型的某个64位字的字段（通常为第一个字段）在代码中需要被原子访问，为了保证此字段值在各种架构上都可以被原子访问，我们应该总是使用开辟的此结构体值。
+当此结构体类型被用做另一个结构体类型的一个字段的类型时，此字段应该（尽量）被安排为此另一个结构体类型的第一个字段。
 </p>
-</div>
 
-<div>
-If you can't make sure whether or not a 64-bit word can be accessed atomically,
-you can use a value of type <code>[15]byte</code> to determine
-the address for the 64-bit word at run time:
+如果一个结构体含有需要一个被原子访问的字段，并且我们希望此结构体可以自由地用做其它结构体的任何字段（可能非第一个字段）的类型，则我们可以用一个<code>[15]byte</code>值来模拟此64位值，并在运行时刻动态地决定此此64位值的地址。
+比如：
+
 <pre class="line-numbers"><code class="language-go">package mylib
 
 import (
@@ -296,11 +326,11 @@ import (
 )
 
 type Counter struct {
-	x [15]byte // instead of "x uint64"
+	x [15]byte // 模拟：x uint64
 }
 
 func (c *Counter) xAddr() *uint64 {
-	// the return must be 8-byte aligned.
+	// 此返回结果总是8字节对齐的。
 	return (*uint64)(unsafe.Pointer(
 		uintptr(unsafe.Pointer(&c.x)) + 8 -
 		uintptr(unsafe.Pointer(&c.x))%8))
@@ -317,110 +347,16 @@ func (c *Counter) Value() uint64 {
 </code></pre>
 
 <p>
-By using this solution, the <code>Counter</code> type can be embedded in other user types safely,
-even on 32-bit architectures.
-The drawback of this solution is there are seven bytes being wasted for every value of <code>Counter</code> type.
-The <code>sync</code> standard package uses
-<a href="https://github.com/golang/go/blob/master/src/sync/waitgroup.go#L23">a <code>[3]uint32</code> value to do this trick instead</a>.
-This trick work for both the standard Go compiler and gccgo but
-<a href="https://github.com/golang/go/issues/27577">might not work for another third-party Go compiler</a>.
+通过时此方法，<code>Counter</code>类型可以自由地用做其它结构体的任何字段的类型，而无需担心此类型中维护的64位字段值可能不是8字节对齐的。
+此方法的缺点是，对于每个<code>Counter</code>类型的值，都有7个字节浪费了。而且此方法使用了类型非安全指针。
+<code>sync</code>标准库包中的<a href="https://github.com/golang/go/blob/master/src/sync/waitgroup.go#L23"><code>WaitGroup</code>类型的实现</a>采用了此方法，但使用的是<code>[3]uint32</code>类型而不是<code>[15]byte</code>类型。
+这基于<code>uint32</code>类型的对齐保证为4的倍数个字节这个假设。
+此假设对于当前的官方Go编译器和gccgo编译器来说，都是成立的。但此假设对于一个可能第三方编译器<a href="https://github.com/golang/go/issues/27577">未必成立</a>。
 </p>
 
-<!--
-<p><i>
-(BTW, the solution in the just mentioned standard package assumes that any Go compiler
-should make sure the alignment guarantees of 64-bit words must be 4N on any architectures.
-However, I can't find the guarantee written in any official Go documentation.)
-</i></p>
--->
+<p>
+为了原子操作的跨架构兼容编程变得更简单，Russ Cox<a href="https://github.com/golang/go/issues/599">提议64位字的地址应该总是8字节对齐的</a>，无论在64位架构上还是32位架构上。
+但截至目前（Go 1.11），此提议尚未得到通过。
+</p>
 
 </div>
-
-<h3>Future Possible Change</h3>
-
-<p>
-Russ Cox, one core Go team member, <a href="https://github.com/golang/go/issues/599">has proposed that the addresses of 64-bit words
-should always be 8-byte aligned</a>, either on 64-bit or 32-bit architectures, to make Go programming simpler.
-Currently (Go 1.11), this proposal hasn't been adopted yet.
-</p>
-
-<p class="anchor" id="size-and-padding"></p>
-<h3>Type Value Sizes And Structure Field Padding</h3>
-
-<div>
-Go specification only makes following <a href="https://golang.org/ref/spec#Size_and_alignment_guarantees">type size guarantees</a>:
-<pre>
-type                               size in bytes
-------                             ------
-byte, uint8, int8                   1
-uint16, int16                       2
-uint32, int32, float32              4
-uint64, int64, float64, complex64   8
-complex128                         16
-</pre>
-<p>
-Go specification doesn't make value size guarantees for other types.
-For the current version (1.11) of the standard Go compiler,
-<code>bool</code> values are one-byte sized and
-<code>int</code>/<code>uint</code>/<code>uintptr</code>/pointer values
-are one-native-word sized.
-The full list of value sizes of different types settled
-by the standard Go compiler are listed in
-<a href="value-copy-cost.html#value-sizes">this article</a>.
-</p>
-</div>
-
-<p>
-The standard Go compiler will ensure the size of values of a type
-is a multiple of the alignment guarantee of the type.
-</p>
-
-<p>
-To satisfy type alignment guarantees mentioned in previous sections,
-Go compiler and runtime may pad some bytes between fields of struct values.
-This makes the value size of a struct type may be not a simple
-sum of the sizes of all fields of the type.
-</p>
-
-<div>
-Here is an example showing how bytes are padded between struct fields:
-<pre class="line-numbers"><code class="language-go">// The alignments of type T1 and T2 are the same as
-// the largest alignment of their field types (int64),
-// 8 on AMD64 OS and 4 on i386 OS.
-
-type T1 struct {
-	a int8
-	// To make b 8-aligned on AMD64 OS and 4-aligned on i386 OS,
-	// 7 bytes padded on AMD64 OS and pad 3 bytes padded on i386 OS here.
-	b int64
-	c int16
-	// To make the size of T1 values is a multiple of the alignment of T1,
-	// 6 bytes padded on AMD64 OS and pad 2 bytes padded on i386 OS here.
-}
-// the sizes of T1 values are 24 on AMD64 OS and 16 on i386 OS.
-
-type T2 struct {
-	a int8
-	// To make c 2-aligned,
-	// 1 byte padded on both AMD64 and i386 OS here.
-	c int16
-	// To make b 8-aligned on AMD64 OS and 4-aligned on i386 OS,
-	// 4 bytes padded on AMD64 OS here. No padding on i386 OS.
-	b int64
-}
-// the sizes of T2 values are 16 on AMD64 OS and 12 on i386 OS.
-</code></pre>
-
-<p>
-Although <code>T1</code> and <code>T2</code> have the same field set,
-their value sizes are different.
-</p>
-</div>
-
-<p>
-One interesting fact for the standard Go compiler
-is that sometimes zero sized fields may affect structure padding.
-Please read <a href="unofficial-faq.html#final-zero-size-field">this question in the unoffcial Go FAQ</a>
-for details.
-</p>
-
