@@ -2,7 +2,7 @@
 
 <p>
 目前，官方Go SDK中提供的工具是使用的最广泛的Go开发工具。
-Go 101所有中所有的实例代码都使用标准编译器编译验证过。
+Golang 101所有中所有的实例代码都使用标准编译器编译验证过。
 </p>
 
 <p>
@@ -13,7 +13,7 @@ Go 101所有中所有的实例代码都使用标准编译器编译验证过。
 <h3>安装Go SDK</h3>
 
 <p>
-请从<a href="https://golang.org/doc/install">国际官网</a>或
+请从<a href="https://golang.google.cn/doc/install">国际官网</a>或
 者<a href="https://golang.google.cn/doc/install">国内官网</a>下载Go SDK，
 并按照消灾页面中的说明安装Go SDK。
 </p>
@@ -57,7 +57,7 @@ Go SDK安装目录下的<code>bin</code>子目录路径必须配置在<code>PATH
 目前，Go SDK推荐将所有第三方Go包，包括你自己的Go项目代码文件夹都
 放置在<code>GOPATH</code>环境变量指定
 的某个路径下的<code>src</code>子目录中。
-Go 101中的所有代码示例都非常简单，所以可与不遵从此规则。
+Golang 101中的所有代码示例都非常简单，所以可与不遵从此规则。
 </p>
 -->
 
@@ -124,7 +124,7 @@ Go SDK工具要求所有的Go源代码文件必须以<code>.go</code>后缀结�
 <h3>更多<code>go</code>子命令</h3>
 
 <p>
-上面提到的三个<code>go</code>子命令（<code>go run</code>,、<code>go build</code>和<code>go install</code>）
+上面提到的三个<code>go</code>子命令（<code>go run</code>、<code>go build</code>和<code>go install</code>）
 将只会显示代码语法错误。它们不会显示可能的代码逻辑错误（即警告）。
 <code>go vet</code>子命令可以用来检查可能的代码逻辑错误。
 </p>
@@ -160,8 +160,8 @@ Go SDK工具要求所有的Go源代码文件必须以<code>.go</code>后缀结�
 </p>
 
 <p>
-Go 101系列文章将不再对各种<code>go</code>子命令做更多的解释。
-请阅读<a href="https://golang.org/cmd/go/">官方文档</a>
+Golang 101系列文章将不再对各种<code>go</code>子命令做更多的解释。
+请阅读<a href="https://golang.google.cn/cmd/go/">官方文档</a>
 （墙内版：<a href="https://golang.google.cn/cmd/go/">golang.google.cn/cmd/go/</a>）以获取更多信息。
 </p>
 
@@ -169,7 +169,7 @@ Go 101系列文章将不再对各种<code>go</code>子命令做更多的解释�
 <h3>查看Go文档</h3>
 
 <p>
-我们可以在Go官网<a href="https://golang.org">golang.org</a>
+我们可以在Go官网<a href="https://golang.google.cn">golang.org</a>
 （墙内版：<a href="https://golang.google.cn">golang.google.com</a>）阅读各种Go文档。
 </p>
 
@@ -178,7 +178,7 @@ Go 101系列文章将不再对各种<code>go</code>子命令做更多的解释�
 </p>
 
 <p>
-请注意对于1.10版本的Go SDK,如果<code>GOROOT</code>环境变量没有设置，
+请注意对于1.10版本的Go SDK，如果<code>GOROOT</code>环境变量没有设置，
 那么我们需要在开启本地镜像的时候指定一个<code>goroot</code>选项：
 <code>godoc -http=:9999 -goroot path/to/go/sdk</code>。
 这个不便可能是<code>godoc</code>的一个bug造成的。这个bug已经在Go SDK 1.11中修复了。

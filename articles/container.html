@@ -174,7 +174,7 @@ be assignable to the corresponding map key type.
 在一个数组或者切片组合字面形式中：
 <ul>
 <li>
-	如果一个索引下标出现，它的类型不必是数组和切片类型的键值类型<code>int</code>，但它必须是是一个可以表示为int值的非负常量；
+	如果一个索引下标出现，它的类型不必是数组和切片类型的键值类型<code>int</code>，但它必须是一个可以表示为int值的非负常量；
 	如果它是一个类型确定值，则它的类型必须为一个基本整数类型。
 </li>
 <li>
@@ -476,7 +476,7 @@ func main() {
 <div>
 <p>
 一个容器值<code>v</code>中存储的对应着键值<code>k</code>的元素用语法形式<code>v[k]</code>来表示。
-今后我们称<code>v[k]</code>为一个元素访问或者元素索引表达式。
+今后我们称<code>v[k]</code>为一个元素索引表达式。
 </p>
 
 假设<code>v</code>是一个数组或者切片，在<code>v[k]</code>中，
@@ -512,7 +512,7 @@ func main() {
 </li>
 </ul>
 
-一个展示了容器元素访问的例子：
+一个展示了容器元素修改和取出的例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -1029,7 +1029,7 @@ func main() {
 	                    // mt["John"].age in map.
 	*/
 
-	// 访问映射表元素的元素或者字段是没问题的。
+	// 取出映射表元素的元素或者字段是没问题的。
 	fmt.Println(ma[1][1])       // 789
 	fmt.Println(mt["John"].age) // 29
 }
@@ -1628,7 +1628,7 @@ func main() {
 <p>
 </p>
 
-我们可以通过数组的指针来访问此数组中的元素。如果此指针是一个nil指针，将导致一个恐慌。
+我们可以通过数组的指针来访问和修改此数组中的元素。如果此指针是一个nil指针，将导致一个恐慌。
 
 <pre class="line-numbers"><code class="language-go">package main
 

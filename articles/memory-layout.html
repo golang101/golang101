@@ -43,7 +43,7 @@ Go是一门属于C语言家族的编程语言，所以本文谈及的很多概�
 对于当前的官方Go编译器（1.11版本），一个类型的一般对齐保证和字段对齐保证总是相等的。对于gccgo编译器，这两者可能不相等。
 </p>
 
-Go白皮书仅列出了<a href="https://golang.org/ref/spec#Size_and_alignment_guarantees">些许类型对齐保证要求</a>。
+Go白皮书仅列出了<a href="https://golang.google.cn/ref/spec#Size_and_alignment_guarantees">些许类型对齐保证要求</a>。
 一个合格的Go编译器必须保证：
 <ol>
 <li>
@@ -98,7 +98,7 @@ todo: above assertion may be not correct for some architectures?
 <h3>类型的尺寸和结构体字节填充（structure padding）</h3>
 
 <div>
-Go白皮书只对以下种类的类型的尺寸进行了<a href="https://golang.org/ref/spec#Size_and_alignment_guarantees">明确规定</a>。
+Go白皮书只对以下种类的类型的尺寸进行了<a href="https://golang.google.cn/ref/spec#Size_and_alignment_guarantees">明确规定</a>。
 
 <pre>
 类型种类                            尺寸（字节数）
@@ -144,14 +144,14 @@ Go白皮书没有对其它种类的类型的尺寸最初明确规定。
 
 <pre class="line-numbers"><code class="language-go">type T1 struct {
 	a int8
-	
+
 	// 在64位架构上，为了让字段b的地址为8字节对齐，需在这里
 	// 填充7个字节。在32位架构上，为了让字段b的地址为4字节
 	// 对齐，需在这里填充3个字节。
-	
+
 	b int64
 	c int16
-	
+
 	// 为了让类型T1的尺寸为T1的对齐保证的倍数，在64位架构上
 	// 需在这里填充6个字节，在32架构上需在这里填充2个字节。
 }
@@ -160,15 +160,15 @@ Go白皮书没有对其它种类的类型的尺寸最初明确规定。
 
 type T2 struct {
 	a int8
-	
+
 	// 为了让字段c的地址为2字节对齐，需在这里填充1个字节。
-	
+
 	c int16
-	
+
 	// 在64位架构上，为了让字段b的地址为8字节对齐，需在这里
 	// 填充4个字节。在32位架构上，不需填充字节即可保证字段b
 	// 的地址为4字节对齐的。
-	
+
 	b int64
 }
 // 类型T2的尺寸在64位架构上位16个字节（1 + 1 + 2 + 4 + 8），
@@ -203,7 +203,7 @@ type T2 struct {
 更糟的是，一些非常老旧的架构并不支持64位原子操作需要的基本指令。
 </p>
 
-<a href="https://golang.org/pkg/sync/atomic/#pkg-note-BUG"><code>sync/atomic</code>标准库包文档的末尾</a>提到：
+<a href="https://golang.google.cn/pkg/sync/atomic/#pkg-note-BUG"><code>sync/atomic</code>标准库包文档的末尾</a>提到：
 
 <blockquote>
 <small>
@@ -240,7 +240,7 @@ what they describe are not bugs.)
 这些途径被描述为<b>开辟的结构体、数组和切片值中的第一个（64位）字可以被认为是8字节对齐的</b>。
 这里的<b><i>开辟的</i></b>应该如何解读？
 我们可以认为一个<b><i>开辟的值</i></b>为一个声明的变量、内置函数<code>make</code>的调用返回值，或者内置函数<code>new</code>的调用返回值所引用的值。
-如果一个切片是从一个数组派生出来的并且此切片和此数组共享第一个元素，则我们也可以将此切片看作是是一个开辟的值。
+如果一个切片是从一个数组派生出来的并且此切片和此数组共享第一个元素，则我们也可以将此切片看作是一个开辟的值。
 </p>
 
 <p>

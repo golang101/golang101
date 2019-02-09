@@ -120,7 +120,7 @@ func g(s1 []int) {
 <pre class="line-numbers"><code class="language-go">func h() []*int {
 	s := []*int{new(int), new(int), new(int), new(int)}
 	// 使用此s切片 ...
-	
+
 	return s[1:3:3]
 }
 </code></pre>
@@ -135,7 +135,7 @@ func g(s1 []int) {
 <pre class="line-numbers"><code class="language-go">func h() []*int {
 	s := []*int{new(int), new(int), new(int), new(int)}
 	// 使用此s切片 ...
-	
+
 	s[0], s[len(s)-1] = nil, nil // 重置首尾元素指针
 	return s[1:3:3]
 }
@@ -181,7 +181,7 @@ Go运行时出于两个原因并不杀掉处于永久阻塞状态的协程。
 
 <div>
 <p>
-将一个终结器设置到一个循环引用值组中的一个值上可能导致<a href="https://golang.org/pkg/runtime/#SetFinalizer">被此值组中的值所引用的内存块永远得不到回收</a>。
+将一个终结器设置到一个循环引用值组中的一个值上可能导致<a href="https://golang.google.cn/pkg/runtime/#SetFinalizer">被此值组中的值所引用的内存块永远得不到回收</a>。
 </p>
 
 比如，当下面这个函数被调用后，承载着<code>x</code>和<code>y</code>的两个内存块将不保证会被逐渐回收。

@@ -85,7 +85,7 @@ func main() {
 		}()
 	}
 	wg.Wait()
-	
+
 	fmt.Println(atomic.LoadInt32(&n)) // 1000
 }
 </code></pre>
@@ -159,7 +159,7 @@ func main() {
 		c uint32 = 5
 		d int    = 6
 	)
-	
+
 	atomic.AddUint64(&n, -m);             fmt.Println(n) // 96 (97 - 1)
 	atomic.AddUint64(&n, -uint64(k));     fmt.Println(n) // 94 (95 - 2)
 	atomic.AddUint64(&n, ^uint64(a - 1)); fmt.Println(n) // 91 (94 - 3)
@@ -259,7 +259,7 @@ func main() {
 
 <p>
 是的，目前，指针的原子操作使用起来是相当得啰嗦。
-事实上，啰嗦还是次要的，更主要的是，因为指针的原子操作需要引入<code>unsafe</code>标准库包，所以这些操作函数不在<a href="https://golang.org/doc/go1compat">Go 1兼容性保证</a>之列。
+事实上，啰嗦还是次要的，更主要的是，因为指针的原子操作需要引入<code>unsafe</code>标准库包，所以这些操作函数不在<a href="https://golang.google.cn/doc/go1compat">Go 1兼容性保证</a>之列。
 </p>
 
 <p>
@@ -310,7 +310,7 @@ func main() {
 	var tb = v.Load().(T)
 	fmt.Println(tb)       // {1 2 3}
 	fmt.Println(ta == tb) // true
-	
+
 	v.Store("hello") // 将导致一个恐慌
 }
 </code></pre>

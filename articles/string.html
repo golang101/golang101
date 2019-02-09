@@ -82,13 +82,13 @@ func main() {
 	字符串类型没有内置的方法。我们可以
 	<ul>
 	<li>
-		使用<a href="https://golang.org/pkg/strings/"><code>strings</code>标准库</a>提供的函数来进行各种字符串操作。
+		使用<a href="https://golang.google.cn/pkg/strings/"><code>strings</code>标准库</a>提供的函数来进行各种字符串操作。
 	</li>
 	<li>
 		调用内置函数<code>len</code>来获取一个字符串值的长度（此字符串中存储的字节数）。
 	</li>
 	<li>
-		使用<a href="container.html#element-accessment">容器元素访问</a>语法<code>aString[i]</code>来获取<code>aString</code>中的第<b>i</b><i></i>个字节。
+		使用<a href="container.html#element-accessment">容器元素索引</a>语法<code>aString[i]</code>来获取<code>aString</code>中的第<b>i</b><i></i>个字节。
 		表达式<code>aString[i]</code>是不可寻址的。换句话说，<code>aString[i]</code>不可被修改。
 	</li>
 	<li>
@@ -211,11 +211,11 @@ Go并不支持字节切片和码点切片之间的直接转换。我们可以用
 	利用字符串做为中间过渡。这种方法相对方便但效率较低，因为需要做两个深复制。
 </li>
 <li>
-	使用<a href="https://golang.org/pkg/unicode/utf8/">unicode/utf8</a>标准库包中的函数来实现这些转换。
+	使用<a href="https://golang.google.cn/pkg/unicode/utf8/">unicode/utf8</a>标准库包中的函数来实现这些转换。
 	这种方法效率较高，但使用起来不太方便。
 </li>
 <li>
-	使用<a href="https://golang.org/pkg/bytes/#Runes"><code>bytes</code>标准库包中的<code>Runes</code>函数</a>来将一个字节切片转换为码点切片。
+	使用<a href="https://golang.google.cn/pkg/bytes/#Runes"><code>bytes</code>标准库包中的<code>Runes</code>函数</a>来将一个字节切片转换为码点切片。
 	但此包中没有将码点切片转换为字节切片的函数。
 </ul>
 
@@ -294,7 +294,7 @@ func main() {
 	一个<code>for-range</code>循环中跟随<code>range</code>关键字的从字符串到字节切片的转换；
 </li>
 <li>
-	一个在映射表元素访问语法中被用作映射表主健的从字节切片到字符串的转换；
+	一个在映射表元素索引语法中被用作映射表主健的从字节切片到字符串的转换；
 </li>
 <li>
 	一个字符串比较表达式中被用作两个比较值之一的从字节切片到字符串的转换；
@@ -396,7 +396,7 @@ func main() {
 从此输出结果可以看出：
 <ol>
 <li>下标循环变量的值并非连续。原因是下标循环变量为字符串中字节的下标，而一个码点可能需要多个字节进行UTF-8编码。</li>
-<li>第一个字符<code>é</code>由两个码点（共三字节）组成, 其中一个码点需要两个字节进行UTF-8编码。</li>
+<li>第一个字符<code>é</code>由两个码点（共三字节）组成，其中一个码点需要两个字节进行UTF-8编码。</li>
 <li>第二个字符<code>क्षि</code>由四个码点（共12字节）组成，每个码点需要三个字节进行UTF-8编码。</li>
 <li>英语字符<code>a</code>由一个码点组成，此码点只需一个字节进行UTF-8编码。</li>
 <li>字符<code>π</code>由一个码点组成，此码点只需两个字节进行UTF-8编码。</li>
@@ -439,7 +439,7 @@ func main() {
 <p>
 从上面几个例子可以看出，<code>len(s)</code>将返回字符串<code>s</code>中的字节数。
 <code>len(s)</code>的时间复杂度为<code><i>O</i>(1)</code>。
-如何得到一个字符串中的码点数呢？使用刚介绍的<code>for-range</code>循环来统计一个字符串中的码点数是一种方法，使用<code>unicode/utf8</code>标准库包中的<a href="https://golang.org/pkg/unicode/utf8/#RuneCountInString">RuneCountInString</a>是另一种方法。
+如何得到一个字符串中的码点数呢？使用刚介绍的<code>for-range</code>循环来统计一个字符串中的码点数是一种方法，使用<code>unicode/utf8</code>标准库包中的<a href="https://golang.google.cn/pkg/unicode/utf8/#RuneCountInString">RuneCountInString</a>是另一种方法。
 这两种方法的效率基本一致。第三种方法为使用<code>len([]rune(s）)</code>来获取字符串<code>s</code>中码点数。官方标准Go编译器从1.11版本开始，对此表达式做了优化以避免一个不必要的深复制，从而使得它的效率和前两种方法一致。
 注意，这三种方法的时间复杂度均为<code><i>O</i>(n)</code>。
 </p>
