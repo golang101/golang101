@@ -13,7 +13,7 @@ Golang 101所有中所有的实例代码都使用标准编译器编译验证过�
 <h3>安装Go SDK</h3>
 
 <p>
-请从<a href="https://golang.google.cn/doc/install">国际官网</a>或
+请从<a href="https://golang.org/doc/install">国际官网</a>或
 者<a href="https://golang.google.cn/doc/install">国内官网</a>下载Go SDK，
 并按照消灾页面中的说明安装Go SDK。
 </p>
@@ -148,11 +148,11 @@ Go SDK工具要求所有的Go源代码文件必须以<code>.go</code>后缀结�
 </p>
 
 <p>
-我们可以运行<code>go help aSubCommand</code>来查看一个子命令的帮助信息。
+从Go SDK 1.11版本开始，我们可以运行<code>go mod</code>子命令来管理包依赖。
 </p>
 
 <p>
-从Go SDK 1.11版本开始，我们可以运行不带参数的<code>go mod</code>子命令来管理包依赖。
+我们可以运行<code>go help aSubCommand</code>来查看一个子命令的帮助信息。
 </p>
 
 <p>
@@ -161,7 +161,7 @@ Go SDK工具要求所有的Go源代码文件必须以<code>.go</code>后缀结�
 
 <p>
 Golang 101系列文章将不再对各种<code>go</code>子命令做更多的解释。
-请阅读<a href="https://golang.google.cn/cmd/go/">官方文档</a>
+请阅读<a href="https://golang.org/cmd/go/">官方文档</a>
 （墙内版：<a href="https://golang.google.cn/cmd/go/">golang.google.cn/cmd/go/</a>）以获取更多信息。
 </p>
 
@@ -169,13 +169,25 @@ Golang 101系列文章将不再对各种<code>go</code>子命令做更多的解�
 <h3>查看Go文档</h3>
 
 <p>
-我们可以在Go官网<a href="https://golang.google.cn">golang.org</a>
-（墙内版：<a href="https://golang.google.cn">golang.google.com</a>）阅读各种Go文档。
+我们可以在Go官网<a href="https://golang.org">golang.org</a>（或墙内版：<a href="https://golang.google.cn">golang.google.com</a>）阅读Go官方文档。
 </p>
 
 <p>
-我们也可以运行<code>godoc -http=:9999</code>开启一个官网的一个本地镜像来阅读各种Go文档。
+我们也可以运行<code>godoc -http=:9999</code>开启一个官网的一个本地镜像来阅读Go官方文档。
 </p>
+
+请注意：
+<ul>
+<li>
+	对于1.10版本的Go SDK，如果<code>GOROOT</code>环境变量没有设置，
+	那么我们需要在开启本地镜像的时候指定一个<code>goroot</code>选项：
+	<code>godoc -http=:9999 -goroot path/to/go/sdk</code>。
+	这个不便可能是<code>godoc</code>的一个bug造成的。这个bug已经在Go SDK 1.11中修复了。
+</li>
+<li>
+	此<code>godoc</code>命令<a href="https://golang.org/doc/go1.12">可能从Go 1.13开始将不再集成在Go SDK中</a>。
+</li>
+</ul>
 
 <p>
 请注意对于1.10版本的Go SDK，如果<code>GOROOT</code>环境变量没有设置，

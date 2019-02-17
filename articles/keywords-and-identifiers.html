@@ -41,7 +41,7 @@ continue  for          import  return     var
 </ul>
 
 <p>
-这些关键字将在后续文章中的到详细介绍。
+这些关键字将在后续文章中得到详细介绍。
 </p>
 </div>
 
@@ -74,14 +74,12 @@ continue  for          import  return     var
 </p>
 
 <p>
-一个由<a href="http://www.fileformat.info/info/unicode/category/Lu/list.htm">Unicode大写字母</a>开头
-的标识符称为<b>导出标识符</b>。这里<b><i>导出</i></b>可以被理解为<b><i>公开</i></b>（public）。
-</p>
-
-<p>
-截至目前（Go 1.10），东方字符都被视为<b>未导出</b>。
-<b><i>未导出</i></b>可以被理解为<b><i>私有</i></b>（private）。
-<b>未导出</b>有时候也被称为<b><i>非导出</i></b>。
+一个由<a href="http://www.fileformat.info/info/unicode/category/Lu/list.htm">Unicode大写字母</a>开头的标识符称为<b>导出标识符</b>。
+这里<b><i>导出</i></b>可以被理解为<b><i>公开</i></b>（public）。
+其它（即非Unicode大写字母开头的）标识符称为<b>非导出标识符</b>。
+<b><i>非导出</i></b>可以被理解为<b><i>私有</i></b>（private）。
+截至目前（Go 1.11），东方字符都被视为非导出字符。
+<b>非导出</b>有时候也被称为<b><i>未导出</i></b>。
 </p>
 
 <div>

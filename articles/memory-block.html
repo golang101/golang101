@@ -326,7 +326,7 @@ func main() {
 	然后垃圾回收器将所有开辟在栈上的内存块标记为灰色，并把它们加入一个灰色内存块列表。
 </li>
 <li>
-	循环下面两步：
+	循环下面两步直到灰色内存块列表为空：
 	<ol>
 	<li>
 		从个灰色内存块列表中取出一个内存块，并把它标记为黑色。
@@ -364,6 +364,7 @@ func main() {
 此环境变量的默认值为100。
 所以此值决定了垃圾回收过程的频率。
 此值也可以通过调用<a href="https://golang.google.cn/pkg/runtime/debug/#SetGCPercent"><code>runtime/debug.SetGCPercent</code>函数</a>在运行时刻被动态地修改。
+调用<code>debug.SetGCPercent(-1)</code>将关闭自动垃圾回收。
 </p>
 
 <p>
