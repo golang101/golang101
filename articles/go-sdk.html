@@ -13,9 +13,8 @@ Golang 101所有中所有的实例代码都使用标准编译器编译验证过�
 <h3>安装Go SDK</h3>
 
 <p>
-请从<a href="https://golang.org/doc/install">国际官网</a>或
-者<a href="https://golang.google.cn/doc/install">国内官网</a>下载Go SDK，
-并按照消灾页面中的说明安装Go SDK。
+请从<a href="https://golang.org/doc/install">国际官网</a>或者<a href="https://golang.google.cn/doc/install">国内官网</a>下载Go SDK，
+并按照下载页面中的说明安装Go SDK。
 </p>
 
 <p>
@@ -30,7 +29,7 @@ Go SDK安装目录下的<code>bin</code>子目录路径必须配置在<code>PATH
 
 <p>
 一些老的Go SDK版本可能需要配置<code>GOROOT</code>和<code>GOPATH</code>环境变量。
-当前最新的Go SDK版本对这些没有没有做强制要求。
+当前最新的Go SDK版本对这些没有做强制要求。
 <code>GOPATH</code>环境变量的默认值为当前用户的HOME目录下的<code>go</code>文件夹对应的目录。
 <code>GOPATH</code>环境变量中可以指定多个目录。
 </p>
@@ -105,7 +104,10 @@ Go SDK工具要求所有的Go源代码文件必须以<code>.go</code>后缀结�
 </code></pre>
 
 <p>
-什么也没输出？是的，此程序不干什么又实质意义的事儿。
+什么也没输出？是的，此程序不做什么有实质意义的事儿。
+</p>
+
+<p>
 如果代码中有语法错误，这些错误将输出在终端中。
 </p>
 
@@ -118,7 +120,7 @@ Go SDK工具要求所有的Go源代码文件必须以<code>.go</code>后缀结�
 <p>
 注意：<code>go run</code>子命令并不推荐在正式的大项目中使用。
 <code>go run</code>子命令只是一种方便的方式来运行简单的Go程序。
-对于正式的项目，最好使用<code>go build</code>或者<code>go install</code>子命令。
+对于正式的项目，最好使用<code>go build</code>或者<code>go install</code>子命令生成（并运行）可执行程序文件。
 </p>
 
 <h3>更多<code>go</code>子命令</h3>
@@ -130,13 +132,12 @@ Go SDK工具要求所有的Go源代码文件必须以<code>.go</code>后缀结�
 </p>
 
 <p>
-我们可以使用<code>go fmt</code>子命令来用一种同一个风格格式化Go代码。
+我们可以使用<code>go fmt</code>子命令来用同一种代码风格格式化Go代码。
 </p>
 
 <p>
-我们可以使用<code>go get</code>子命令将一个远程Go代码库克隆到本地以便将其
-做为第三方Go包引入并使用其中的资源。
-<code>go get</code>子命令需要相应的代码版本管理工具已经安装在本机。
+我们可以使用<code>go get</code>子命令将一个远程Go代码库克隆到本地以便将其做为第三方Go包引入并使用其中的资源。
+<code>go get</code>子命令需要首先安装相应的代码版本管理工具。
 </p>
 
 <p>
@@ -144,7 +145,7 @@ Go SDK工具要求所有的Go源代码文件必须以<code>.go</code>后缀结�
 </p>
 
 <p>
-我们可以使用<code>go doc</code>子命令来查看Go包的文档。
+我们可以使用<code>go doc</code>子命令来查看Go代码库包的文档。
 </p>
 
 <p>
@@ -152,7 +153,7 @@ Go SDK工具要求所有的Go源代码文件必须以<code>.go</code>后缀结�
 </p>
 
 <p>
-我们可以运行<code>go help aSubCommand</code>来查看一个子命令的帮助信息。
+我们可以运行<code>go help aSubCommand</code>来查看一个子命令<code>aSubCommand</code>的帮助信息。
 </p>
 
 <p>
@@ -169,7 +170,7 @@ Golang 101系列文章将不再对各种<code>go</code>子命令做更多的解�
 <h3>查看Go文档</h3>
 
 <p>
-我们可以在Go官网<a href="https://golang.org">golang.org</a>（或墙内版：<a href="https://golang.google.cn">golang.google.com</a>）阅读Go官方文档。
+我们可以在Go官网<a href="https://golang.org">golang.org</a>（或墙内版：<a href="https://golang.google.cn">https://golang.google.com</a>）阅读Go官方文档。
 </p>
 
 <p>
@@ -190,16 +191,8 @@ Golang 101系列文章将不再对各种<code>go</code>子命令做更多的解�
 </ul>
 
 <p>
-请注意对于1.10版本的Go SDK，如果<code>GOROOT</code>环境变量没有设置，
-那么我们需要在开启本地镜像的时候指定一个<code>goroot</code>选项：
-<code>godoc -http=:9999 -goroot path/to/go/sdk</code>。
-这个不便可能是<code>godoc</code>的一个bug造成的。这个bug已经在Go SDK 1.11中修复了。
-</p>
-
-<p>
 <code>godoc</code>默认将会为所有本地已经下载的Go第三方库包生成文档。
-有时这需要很长的时间。如果你只想查看标准库的文档，你可以在<code>godoc</code>命令
-运行之前在终端中将<code>GOPATH</code>环境变量暂时设为一个不存在的路径，
+有时这可能需要很长的时间。如果你只想查看标准库的文档，你可以在<code>godoc</code>命令运行之前在终端中将<code>GOPATH</code>环境变量暂时设为一个不存在的路径，
 比如：<code>GOPATH=nonexist godoc -http=:9999</code>。
 </p>
 

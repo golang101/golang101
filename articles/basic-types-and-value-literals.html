@@ -15,7 +15,7 @@ Go支持如下内置基本类型：
 	一种内置布尔类型：<code>bool</code>。
 </li>
 <li>
-	11种内置整数类型： <code>int8</code>、<code>uint8</code>、<code>int16</code>、<code>uint16</code>、<code>int32</code>、<code>uint32</code>、<code>int64</code>、<code>uint64</code>、<code>int</code>、<code>uint</code>和<code>uintptr</code>。
+	11种内置整数类型：<code>int8</code>、<code>uint8</code>、<code>int16</code>、<code>uint16</code>、<code>int32</code>、<code>uint32</code>、<code>int64</code>、<code>uint64</code>、<code>int</code>、<code>uint</code>和<code>uintptr</code>。
 </li>
 <li>
 	两种内置浮点数类型：<code>float32</code>和<code>float64</code>。
@@ -39,7 +39,7 @@ Go支持如下内置基本类型：
 </p>
 
 <p>
-除了<code>bool</code>和<code>string</code>类型，其它的15种内置基本类型都称为数值类型（整型，浮点数型和复数型）。
+除了<code>bool</code>和<code>string</code>类型，其它的15种内置基本类型都称为数值类型（整型、浮点数型和复数型）。
 </p>
 
 Go中有两种内置别名类型（alias type）：
@@ -66,6 +66,10 @@ Go中有两种内置别名类型（alias type）：
 </p>
 
 <p>
+任一个类型的所有值的尺寸都是相同的，所以一个值的尺寸也常称为它的类型的尺寸。
+</p>
+
+<p>
 更多的时候，我们使用字节（byte）做为值尺寸的度量单位。
 一个字节相当于8个比特。所以<code>uint32</code>类型的尺寸为4，即每个<code>uint32</code>值占用4个字节。
 </p>
@@ -87,7 +91,7 @@ Go中有两种内置别名类型（alias type）：
 
 <p>
 一个布尔值表示一个真假。在内存中，一个布尔值只有两种可能的状态。
-这两种状态使用两个预声明的（或称为内置）常量（<code>false</code>和<code>true</code>）来表示。
+这两种状态使用两个预声明（或称为内置）的常量（<code>false</code>和<code>true</code>）来表示。
 关于常量声明，<a href="basic-types-and-value-literals.html">下一篇文章</a>将做详细解释。
 </p>
 
