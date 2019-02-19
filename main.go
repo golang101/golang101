@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-var port = flag.Int("port", 55555, "server port")
+var port = flag.Int("port", 12345, "server port")
 
 func main() {
 	log.SetFlags(0)

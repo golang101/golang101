@@ -25,7 +25,7 @@
 	</ul>
 </li>
 
-<li>standard packages
+<li>标准库
 	<ul>
 	<li><a href="#pointer-atomic">如何原子地操作指针的值？</a></li>
 	<li><a href="#get-days-of-month">如何使用尽可能短的代码行数来获取任意月份的天数？</a></li>
@@ -278,7 +278,7 @@ func main() {
 		x int64
 	}
 	fmt.Println(unsafe.Sizeof(T1{})) // 8
-	
+
 	type T2 struct {
 		x int64
 		a struct{}
@@ -335,7 +335,7 @@ func main() {
 
 <!--
 <div>
-For Go programs run on 32-bit OSes, there is no the universal guarantee.
+
 But following 64-bit words are guaranteed to be able to be accessed atomically:
 对于运行中32位操作系统上的Go程序，这不是普遍的保证。
 但是下述64位的词会保证以原子地方式访问：
@@ -391,23 +391,23 @@ func main() {
 	var y2 [3]uint64
 	var z2 = make([]int64, 5)
 	var t2 T
-	
+
 	var v2 = new(V)
-	
+
 	// following lines are guaranteed to be safe on
 	// both 64-bit and 32-bit OS.
 	atomic.LoadInt64(&x)
 	atomic.LoadUint64(&y[1])
 	atomic.LoadInt64(&z[2])
 	atomic.LoadUint64(&t.a)
-	
+
 	atomic.LoadInt64(&x2)
 	atomic.LoadUint64(&y2[1])
 	atomic.LoadInt64(&z2[2])
 	atomic.LoadUint64(&t2.a)
-	
+
 	// the following two lines are safe on 64-bit OS
-	// but may be panic on 32-bit OS	
+	// but may be panic on 32-bit OS
 	atomic.LoadUint64(&v.t.a)
 	atomic.LoadUint64(&v2.t.a)
 }
@@ -426,7 +426,7 @@ func main() {
 </p>
 
 <p>
-关于细节请阅读<a href="https://golang.org/doc/faq#What_operations_are_atomic_What_about_mutexes">the official question</a>。
+Please view <a href="https://golang.org/doc/faq#What_operations_are_atomic_What_about_mutexes">the official question</a> for more details.
 </p>
 
 <p class="anchor" id="zero-values-zero-bytes"></p>
@@ -519,27 +519,27 @@ func demo(newP *T) {
 	var _ = (*T)(atomic.LoadPointer(
 		(*unsafe.Pointer)(unsafe.Pointer(&p)),
 		))
-	
+
 	// store
 	atomic.StorePointer(
 		(*unsafe.Pointer)(unsafe.Pointer(&p)),
 		unsafe.Pointer(newP),
 		)
-	
-	
+
+
 	// swap
 	var oldP = (*T)(atomic.SwapPointer(
 		(*unsafe.Pointer)(unsafe.Pointer(&p)),
 		unsafe.Pointer(newP),
 		))
-	
+
 	// compare and swap
 	var swapped = atomic.CompareAndSwapPointer(
 		(*unsafe.Pointer)(unsafe.Pointer(&p)),
 		unsafe.Pointer(oldP),
 		unsafe.Pointer(newP),
 		)
-	
+
 	_ = swapped
 }
 </code></pre>
@@ -574,16 +574,16 @@ import (
 func main() {
 	// 2017-02-01 00:00:00 +0000 UTC
 	fmt.Println(time.Date(2017, 1, 32, 0, 0, 0, 0, time.UTC))
-	
+
 	// 2017-01-31 23:59:59.999999999 +0000 UTC
 	fmt.Println(time.Date(2017, 1, 32, 0, 0, 0, -1, time.UTC))
-	
+
 	// 2017-01-31 00:00:00 +0000 UTC
 	fmt.Println(time.Date(2017, 2, 0, 0, 0, 0, 0, time.UTC))
-	
+
 	// 2016-12-31 00:00:00 +0000 UTC
 	fmt.Println(time.Date(2016, 13, 0, 0, 0, 0, 0, time.UTC))
-	
+
 	// 2017-02-01 00:00:00 +0000 UTC
 	fmt.Println(time.Date(2016, 13, 32, 0, 0, 0, 0, time.UTC))
 }
@@ -917,7 +917,7 @@ func main() {
 	var x interface{} = pi
 	var y interface{} = pb
 	var z interface{} = nil
-	
+
 	fmt.Println(x == y)   // false
 	fmt.Println(x == nil) // false
 	fmt.Println(y == nil) // false
@@ -972,7 +972,7 @@ import (
 
 func main() {
 	type MyInt int
-	
+
 	var a = []int{7, 8, 9}
 	var b = *(*[]MyInt)(unsafe.Pointer(&a))
 	b[0]= 123
@@ -1194,13 +1194,13 @@ import "fmt"
 
 func main() {
 	var s0 = "Go"
-	
+
 	var bs = []byte(s0)
 	var s1 = string(bs)
-	
+
 	var rs = []rune(s0)
 	var s2 = string(rs)
-	
+
 	fmt.Println(s0 == s1) // true
 	fmt.Println(s0 == s2) // true
 }
@@ -1310,9 +1310,9 @@ but for consistentcy, ...)
 
 why break and fallthrought are not allowed in type switcn and select
 
-* why non-exported fileds can be listed through reflect?
-  * for a non-exported fileds can have exported fileds.
-    Otherwise, there are no ways to listed the exported fileds.
+* why non-exported fields can be listed through reflect?
+  * for a non-exported fields can have exported fields.
+    Otherwise, there are no ways to listed the exported fields.
 
 -->
 

@@ -21,7 +21,7 @@
 
 <div>
 下面是一个编写得非常不职业的Go程序。此程序的编写没有考虑指令执行顺序调整带来的影响。
-此程序扩展于<a href="https://golang.org/ref/mem">Go 1 内存模型</a>中的一个例子.
+此程序扩展于<a href="https://golang.google.cn/ref/mem">Go 1 内存模型</a>中的一个例子.
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -75,7 +75,7 @@ func main() {
 
 <p>
 除了没有考虑指令执行顺序调整带来的影响，此程序还存在数据竞争的问题。
-变量<code>a</code>和<code>done</code>的访问没有进行同步。
+变量<code>a</code>和<code>done</code>的使用没有进行同步。
 所以此程序是一个充满了各种并发编程错误的不良例子。
 一个职业的Go程序员不应该写出这样的使用于生产环境中的代码。
 </p>
@@ -103,7 +103,7 @@ Go语言的设计哲学是用尽量少的易于理解的特性来支持尽量多
 
 <p>
 本文的余下部分将列出Go保证的各种代码执行顺序。
-这些顺序保证可能在<a href="https://golang.org/ref/mem">Go 1 内存模型</a>一文提到了，也可能没有提到。
+这些顺序保证可能在<a href="https://golang.google.cn/ref/mem">Go 1 内存模型</a>一文提到了，也可能没有提到。
 </p>
 
 <p>

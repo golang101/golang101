@@ -213,7 +213,7 @@ func main() {
 
 <p>
 并非所有处于运行状态的协程都在执行。在任一时刻，只能最多有和逻辑CPU数目一样多的协程在同时执行。
-我们可以调用<a href="https://golang.org/pkg/runtime/#NumCPU"><code>runtime.NumCPU</code></a>函数来查询当前程序可利用的逻辑CPU数目。
+我们可以调用<a href="https://golang.google.cn/pkg/runtime/#NumCPU"><code>runtime.NumCPU</code></a>函数来查询当前程序可利用的逻辑CPU数目。
 每个逻辑CPU在同一时刻只能最多执行一个协程。Go运行时必须让逻辑CPU频繁地在不同的处于运行状态的协程之间切换，从而每个处于运行状态的协程都有机会得到执行。
 这和操作系统执行系统线程的原理是一样的。
 </p>
@@ -239,7 +239,7 @@ func main() {
 </p>
 
 <p>
-在运行时刻，我们可以调用<a href="https://golang.org/pkg/runtime/#GOMAXPROCS"><code>runtime.GOMAXPROCS</code></a>函数来获取和设置逻辑处理器的的数量。
+在运行时刻，我们可以调用<a href="https://golang.google.cn/pkg/runtime/#GOMAXPROCS"><code>runtime.GOMAXPROCS</code></a>函数来获取和设置逻辑处理器的的数量。
 对于官方标准编译器，在Go 1.5之前，默认初始逻辑处理器的数量为1；自从Go 1.5之后，默认初始逻辑处理器的数量和逻辑CPU的数量一致。
 此新的默认设置在大多数情况下是最佳选择。但是对于某些文件操作十分频繁的程序，设置一个大于<code>runtime.NumCPU()</code>的<code>GOMAXPROCS</code>值可能是有好处的。
 </p>

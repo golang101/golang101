@@ -32,7 +32,7 @@
 
 <div>
 类型非安全指针在Go中为<a href="type-system-overview.html#type-kinds">一种</a>特别的类型。
-我们必须引入<a href="https://golang.org/pkg/unsafe/"><code>unsafe</code>标准库包</a>来使用类型非安全指针。
+我们必须引入<a href="https://golang.google.cn/pkg/unsafe/"><code>unsafe</code>标准库包</a>来使用类型非安全指针。
 类型非安全指针code>unsafe.Pointer</code>被声明定义为：
 
 <pre class="line-numbers"><code class="language-go">type Pointer *ArbitraryType
@@ -127,14 +127,14 @@ todo: remove most this section, except the Ian confirmed points,
 <div>
 
 The <code>unsafe</code> package documentation
-<a href="https://golang.org/pkg/unsafe/#pkg-overview">says</a>:
+<a href="https://golang.google.cn/pkg/unsafe/#pkg-overview">says</a>:
 
 <div class="alert alert-success">
 Packages that import <code>unsafe</code> may be non-portable
 and are not protected by the Go 1 compatibility guidelines.
 </div>
 
-And the <a href="https://golang.org/doc/go1compat">Go 1 compatibility guidelines</a> says:
+And the <a href="https://golang.google.cn/doc/go1compat">Go 1 compatibility guidelines</a> says:
 <div class="alert alert-success">
 Packages that import <code>unsafe</code> may depend on internal properties of the Go implementation.
 We reserve the right to make changes to the implementation that may break such programs.
@@ -249,7 +249,7 @@ func foo() {
 	// int值已经不再被使用了，所以垃圾回收器认为可以回收vz值所占据的
 	// 内存块了。另一方面，p0和p1各自所引用的int值仍旧将在下面被使用。
 
-	// uinptr值可以参与算术运算。
+	// uintptr值可以参与算术运算。
 	p2 += 2; p2--; p2--
 
 	*p0 = 1                          // okay
@@ -357,7 +357,7 @@ func main() {
 <h3>如何正确地使用类型非安全指针？</h3>
 
 <p>
-<code>unsafe</code>标准库包的文档中列出了<a href="https://golang.org/pkg/unsafe/#Pointer">六种类型非安全指针的使用模式</a>。
+<code>unsafe</code>标准库包的文档中列出了<a href="https://golang.google.cn/pkg/unsafe/#Pointer">六种类型非安全指针的使用模式</a>。
 下面将对它们逐一讲解。
 </p>
 
@@ -568,7 +568,7 @@ runtime.KeepAlive(unsafe.Pointer(uintptr(n)))
 <p>
 Although the <code>syscall.Syscall</code> function has this privilege,
 there is a requirement to call this function.
-The conversions from unsafe pointers to <code>uinptr</code> must be present
+The conversions from unsafe pointers to <code>uintptr</code> must be present
 within the literal representations of the arguments of the calls to this function.
 </p>
 
@@ -737,7 +737,7 @@ func main() {
 </code></pre>
 
 <p>
-<code>reflect</code>标准库包中<code>SliceHeader</code>和<code>StringHeader</code>类型的<a href="https://golang.org/pkg/reflect/#SliceHeader">文档</a>提到这两个结构体类型的定义不保证在以后的版本中不发生改变。
+<code>reflect</code>标准库包中<code>SliceHeader</code>和<code>StringHeader</code>类型的<a href="https://golang.google.cn/pkg/reflect/#SliceHeader">文档</a>提到这两个结构体类型的定义不保证在以后的版本中不发生改变。
 好在目前的两个主流Go编译器（官方标准Go编译器和gccgo编译器）都认可当前版本中的定义。
 这也可以看作是使用类型非安全指针的另一个潜在风险。
 </p>

@@ -45,7 +45,7 @@ type Runnable = interface {
 </p>
 
 请注意<code>ReadWriter</code>接口类型中指定的方法原型都有一个<code>error</code>类型的返回值。
-<code>error</code>类型为一个<a href="https://golang.org/pkg/builtin/#error">内置接口类型</a>。
+<code>error</code>类型为一个<a href="https://golang.google.cn/pkg/builtin/#error">内置接口类型</a>。
 它的定义声明如下：
 
 <pre class="line-numbers"><code class="language-go">type error interface {
@@ -134,7 +134,7 @@ func (MyInt) About() string {
 </p>
 
 隐式实现关系的设计是的一个声明在另一个代码包（包括标准库包）中的类型可以被动地实现一个用户代码包中的接口类型。
-比如，如果我们声明一个像下面这样的接口类型，则<a href="https://golang.org/pkg/database/sql/"><code>database/sql</code></a>标准库包中生命的<code>DB</code>和<code>Tx</code>类型都实现了这个接口类型，因为它们拥有此接口类型指定的的三个方法。
+比如，如果我们声明一个像下面这样的接口类型，则<a href="https://golang.google.cn/pkg/database/sql/"><code>database/sql</code></a>标准库包中生命的<code>DB</code>和<code>Tx</code>类型都实现了这个接口类型，因为它们拥有此接口类型指定的的三个方法。
 
 <pre class="line-numbers"><code class="language-go">import "database/sql"
 
@@ -237,8 +237,8 @@ func (book *Book) About() string {
 
 func main() {
 	// 一个*Book值被包裹在了一个Aboutable值中。
-	var a Aboutable = &Book{"Go 101"}
-	fmt.Println(a) // &{Go 101}
+	var a Aboutable = &Book{"Golang 101"}
+	fmt.Println(a) // &{Golang 101}
 
 	// i是一个空接口值。类型*Book实现了任何空接口类型。
 	var i interface{} = &Book{"Rust 101"}
@@ -246,7 +246,7 @@ func main() {
 
 	// Aboutable实现了空接口类型interface{}。
 	i = a
-	fmt.Println(i) // &{Go 101}
+	fmt.Println(i) // &{Golang 101}
 }
 </code></pre>
 
@@ -337,7 +337,7 @@ func main() {
 
 <p>
 当方法<code>i.m</code>被调用时，<code>i</code>存储的实现关系信息的方法表的方法<code>t.m</code>将被找到并被调用。
-此方法表是一个切片，所以此寻找过程只不过是一个切片元素访问，不会消耗很多时间。
+此方法表是一个切片，所以此寻找过程只不过是一个切片元素访问操作，不会消耗很多时间。
 </p>
 
 <p>
@@ -455,7 +455,7 @@ func main() {
 
 <p>
 本片文章将不介绍<code>reflect</code>标准包中提供的各种反射功能。
-请阅读后面的<a href="https://golang.org/pkg/reflect/">Go中的反射</a>一文来了解如何如何使用此包。
+请阅读后面的<a href="https://golang.google.cn/pkg/reflect/">Go中的反射</a>一文来了解如何如何使用此包。
 本文下面将值介绍Go中的内置反射反射机制。在Go中，内置反射机制包括类型断言（type assertion）和类型<code>type-switch</code>流程控制代码块。
 </p>
 
@@ -966,9 +966,9 @@ func (t T) m(n int) bool {
 
 func main() {
 	var i I = T("gopher")
-	fmt.Println (i.m(5))                          // true
-	fmt.Println (I.m(i, 5))                       // true
-	fmt.Println (interface {m(int) bool}.m(i, 5)) // true
+	fmt.Println(i.m(5))                          // true
+	fmt.Println(I.m(i, 5))                       // true
+	fmt.Println(interface {m(int) bool}.m(i, 5)) // true
 
 	// 下面这几行被执行的时候都将会产生一个恐慌。
 	I(nil).m(5)

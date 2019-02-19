@@ -45,9 +45,9 @@ Go反射机制设计的目标之一是任何非反射操作都可以通过反射
 </p>
 
 <p>
-类型<code>reflect.Type</code>为一个接口类型，它指定了<a href="https://golang.org/pkg/reflect/#Type">若干方法</a>。
+类型<code>reflect.Type</code>为一个接口类型，它指定了<a href="https://golang.google.cn/pkg/reflect/#Type">若干方法</a>。
 通过这些方法，我们能够观察到一个<code>reflect.Type</code>值所表示Go类型的各种信息。
-这些方法中的有的是适用于<a href="https://golang.org/pkg/reflect/#Kind">所有种类</a>的类型的，有的只适用于一种或几种类型。
+这些方法中的有的是适用于<a href="https://golang.google.cn/pkg/reflect/#Kind">所有种类</a>的类型的，有的只适用于一种或几种类型。
 通过不合适的<code>reflect.Type</code>属主值调用某个方法将在运行时产生一个恐慌。
 请阅读<code>reflect</code>代码库中各个方法的文档来获取如何正确地使用这些方法。
 </p>
@@ -222,11 +222,11 @@ func main() {
 </p>
 
 <p>
-<code>reflect.Value</code>类型有<a href="https://golang.org/pkg/reflect/">很多方法</a>。
+<code>reflect.Value</code>类型有<a href="https://golang.google.cn/pkg/reflect/">很多方法</a>。
 我们可以在调用这些方法来观察和操纵用一个<code>reflect.Value</code>属主值表示的Go值。
 这些方法中的有些适用于所有种类类型的值，有些只适用于一种或几种类型的值。
 通过不合适的<code>reflect.Value</code>属主值调用某个方法将在运行时产生一个恐慌。
-请阅读<code>reflect</code>代码库中各个方法的文档来获取如何正确地使用这些方法。 
+请阅读<code>reflect</code>代码库中各个方法的文档来获取如何正确地使用这些方法。
 </p>
 
 <p>
@@ -499,7 +499,7 @@ func main() {
 	vx := reflect.ValueOf(123)
 	vy := reflect.ValueOf("abc")
 	vz := reflect.ValueOf([]bool{false, true})
-	
+
 	x := vx.Interface().(int)
 	y := vy.Interface().(string)
 	z := vz.Interface().([]bool)
@@ -531,7 +531,7 @@ func main() {
 </p>
 
 <p>
-第三个区别是当<code>x</code>和<code>y</code>处于一个循环引用链中时，<code>DeepEqual</code>调用的结果可能未必正确。 
+第三个区别是当<code>x</code>和<code>y</code>处于一个循环引用链中时，<code>DeepEqual</code>调用的结果可能未必正确。
 </p>
 
 <p>
@@ -625,10 +625,10 @@ func main() {
 <!--
 
 Go 1.12
-A new MapIter type is an iterator for ranging over a map. 
-This type is exposed through the Value type's new MapRange method. 
-This follows the same iteration semantics as a range statment, 
-with Next to advance the iterator, and Key/Value to access each entry. 
+A new MapIter type is an iterator for ranging over a map.
+This type is exposed through the Value type's new MapRange method.
+This follows the same iteration semantics as a range statment,
+with Next to advance the iterator, and Key/Value to access each entry.
 
 bug setcion in reflect docs
 

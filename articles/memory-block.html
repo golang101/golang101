@@ -104,15 +104,15 @@ Go是一门支持自动内存管理的语言，比如自动内存开辟和自动
 
 <p>
 内存块可以被开辟在栈上。开辟在一个协程维护的栈上的内存块只能在此协程内部被使用（引用）。
-这些内存块不能被多个协程并发地安全访问。
-一个协程可以无需使用任何数据同步技术而访问开辟在它的栈上的内存块。
+其它协程是无法访问到这些内存块的。
+一个协程可以无需使用任何数据同步技术而使用承载在开辟在它的栈上的内存块上的值（部）。
 </p>
 
 <p>
 堆（heap）是一个虚拟的概念。每个程序只有一个堆。
 一般地，如果一个内存块没有开辟在任何一个栈上，则我们说它开辟在了堆上。
 开辟在堆上的内存块可以被多个协程并发地访问。
-在需要的时候，对它们的访问需要做同步。
+在需要的时候，对承载在它们之上的值（部）的访问需要做同步。
 </p>
 
 <p>
@@ -234,10 +234,10 @@ func main() {
 		_ = z  // z可以被安全地开辟在栈上。
 		p = &x // 因为x和y都会将曾经被包级指针p所引用过，
 		p = &y // 因此，它们都将开辟在堆上。
-		
+
 		// 到这里，x已经不再被任何其它值所引用。或者说承载
 		// 它的内存块已经不再被使用。此内存块可以被回收了。
-		
+
 		p = nil
 		// 到这里，y已经不再被任何其它值所引用。
 		// 承载它的内存块可以被回收了。
@@ -326,7 +326,7 @@ func main() {
 	然后垃圾回收器将所有开辟在栈上的内存块标记为灰色，并把它们加入一个灰色内存块列表。
 </li>
 <li>
-	循环下面两步：
+	循环下面两步直到灰色内存块列表为空：
 	<ol>
 	<li>
 		从个灰色内存块列表中取出一个内存块，并把它标记为黑色。
@@ -359,15 +359,16 @@ func main() {
 </p>
 
 <p>
-目前（Go 1.11），一轮新的垃圾回收过程开启的默认条件是通过<a href="https://golang.org/pkg/runtime/#hdr-Environment_Variables"><code>GOGC</code>环境变量</a>来控制的。
+目前（Go 1.11），一轮新的垃圾回收过程开启的默认条件是通过<a href="https://golang.google.cn/pkg/runtime/#hdr-Environment_Variables"><code>GOGC</code>环境变量</a>来控制的。
 当从上一轮垃圾回收结束后新申请的内存块的内存总和占上一轮垃圾回收结束时仍在被使用的所有内存块的内存总和的百分比超过此值时，新的一轮垃圾回收过程将开始。
 此环境变量的默认值为100。
 所以此值决定了垃圾回收过程的频率。
-此值也可以通过调用<a href="https://golang.org/pkg/runtime/debug/#SetGCPercent"><code>runtime/debug.SetGCPercent</code>函数</a>在运行时刻被动态地修改。
+此值也可以通过调用<a href="https://golang.google.cn/pkg/runtime/debug/#SetGCPercent"><code>runtime/debug.SetGCPercent</code>函数</a>在运行时刻被动态地修改。
+调用<code>debug.SetGCPercent(-1)</code>将关闭自动垃圾回收。
 </p>
 
 <p>
-一轮新的垃圾回收过程也可以通过调用<a href="https://golang.org/pkg/runtime/#GC"><code>runtime.GC</code>函数</a>来手动开启。
+一轮新的垃圾回收过程也可以通过调用<a href="https://golang.google.cn/pkg/runtime/#GC"><code>runtime.GC</code>函数</a>来手动开启。
 </p>
 
 <p>

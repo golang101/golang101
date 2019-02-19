@@ -16,13 +16,13 @@ Golang 101中的系列文章主要着墨于Go语法和语义。
 请阅读下列文章获取详情：
 <ul>
 <li>
-	<a href="https://golang.org/pkg/testing/"><code>testing</code>标准库包</a>
+	<a href="https://golang.google.cn/pkg/testing/"><code>testing</code>标准库包</a>
 </li>
 <li>
 	<a href="https://blog.golang.org/subtests">使用子单元测试和子基准测试</a>
 </li>
 <li>
-	<a href="https://golang.org/cmd/go/#hdr-Test_packages"><code>go test</code>命令选项</a>
+	<a href="https://golang.google.cn/cmd/go/#hdr-Test_packages"><code>go test</code>命令选项</a>
 </li>
 <li>
 	<a href="https://github.com/golang/go/wiki/Performance">Go程序性能分析</a>
@@ -37,7 +37,7 @@ Golang 101中的系列文章主要着墨于Go语法和语义。
 它的主要目的是为了验证标准编译器（gc）的正确性。
 我们可以在<code>go run</code>、<code>go build</code>和<code>go install</code>等命令中使用选项<code>-compiler=gccgo</code>来指定使用gccgo编译器。
 此选项需要安装<code>gccgo</code>软件包才能起作用。
-gccgo命令也可<a href="https://golang.org/doc/install/gccgo#Using_gccgo">单独运行</a>。
+gccgo命令也可<a href="https://golang.google.cn/doc/install/gccgo#Using_gccgo">单独运行</a>。
 </p>
 
 <h3>Go汇编</h3>
@@ -51,7 +51,7 @@ Go汇编汇编常用来实现一些对性能要求很高的函数。
 更多详情，请阅读下列文章：
 <ul>
 <li>
-	<a href="https://golang.org/doc/asm">Go汇编快速导读</a>
+	<a href="https://golang.google.cn/doc/asm">Go汇编快速导读</a>
 </li>
 <li>
 	<a href ="https://talks.golang.org/2016/asm.slide">Go汇编的设计</a>
@@ -71,7 +71,7 @@ Go汇编汇编常用来实现一些对性能要求很高的函数。
 	<a href="https://github.com/golang/go/wiki/WindowsCrossCompiling">在Linux上编译Windows程序</a>
 </li>
 <li>
-	<a href="https://golang.org/doc/install/source#environment">目前支持的操作系统和编译架构</a>.
+	<a href="https://golang.google.cn/doc/install/source#environment">目前支持的操作系统和编译架构</a>.
 </li>
 </ul>
 
@@ -84,6 +84,9 @@ Go汇编汇编常用来实现一些对性能要求很高的函数。
 通过cgo机制，我们可以在Go代码中调用C代码，或者反之。
 请阅读下列连接获取详情：
 <ul>
+<li>
+	<a href="https://blog.golang.org/cmd/cgo/">cgo官方文档</a>
+</li>
 <li>
 	<a href="https://blog.golang.org/c-go-cgo">C? Go? Cgo!</a>
 </li>
@@ -104,14 +107,14 @@ Go汇编汇编常用来实现一些对性能要求很高的函数。
 <h3>编译标签（build constraint/tag）</h3>
 
 <p>
-我们可以使用<a href="https://golang.org/pkg/go/build/">编译标签</a>来让编译器选择性地忽略某些源文件。
+我们可以使用<a href="https://golang.google.cn/pkg/go/build/">编译标签</a>来让编译器选择性地忽略某些源文件。
 选择标签可以出现在源代码文件中的最顶部，也可以出现在源代码文件名（不包含<code>.go</code>后缀）的结尾（并用下划线分割开来）。
 </p>
 
 <h3>编译器指示（compiler directive）</h3>
 
 <p>
-标准Go编译器支持若干<a href="https://golang.org/cmd/compile/#hdr-Compiler_Directives">编译器指示</a>。
+标准Go编译器支持若干<a href="https://golang.google.cn/cmd/compile/#hdr-Compiler_Directives">编译器指示</a>。
 一个编译器指示以注释的形式<code>//directive args</code>出现。
 我们常常使用<a href="https://blog.golang.org/generate">go:generate</a>编译器指示来生成代码。
 </p>
@@ -127,16 +130,16 @@ Go汇编汇编常用来实现一些对性能要求很高的函数。
 
 <p>
 <code>go/*</code>标准库包提供Go源文件解析相关的功能。这些库包对于开发各种Go源代码分析工具很有帮助。
-请阅读<a href="https://github.com/golang/example/tree/master/gotypes">Go代码分析</a>和<a href="https://golang.org/pkg/go/">这些库包的文档</a>来获取如何使用这些库包中提供的功能。
+请阅读<a href="https://github.com/golang/example/tree/master/gotypes">Go代码分析</a>和<a href="https://golang.google.cn/pkg/go/">这些库包的文档</a>来获取如何使用这些库包中提供的功能。
 </p>
 
 <h3>更多的编译模式（build mode）</h3>
 
 <p>
 官方Go SDK中的<code>go build</code>命令支持更多的编译模式。
-运行<code>go help buildmode</code>可以列出所有支持的模式，或者查看<a href="https://golang.org/cmd/go/#hdr-Build_modes">官方文档</a>来查看这些模式的解释说明。
+运行<code>go help buildmode</code>可以列出所有支持的模式，或者查看<a href="https://golang.google.cn/cmd/go/#hdr-Build_modes">官方文档</a>来查看这些模式的解释说明。
 除了最常用的<b>default</b>模式，<b>plugin</b>（插件）模式可能是另一种用的较多的模式。
-我们可以使用<a href="https://golang.org/pkg/plugin/"><code>plugin</code>标准库包</a>中的函数来加载和使用Go插件。
+我们可以使用<a href="https://golang.google.cn/pkg/plugin/"><code>plugin</code>标准库包</a>中的函数来加载和使用Go插件。
 </p>
 
 

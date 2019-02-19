@@ -6,7 +6,7 @@
 此书同时适合Go初学者和有一定经验的Go程序员阅读。
 
 此书的英文项目（亦为本人维护）地址为：
-* [gitlib.com/go101/go101](https://gitlib.com/go101/go101)
+* [gitlab.com/go101/go101](https://gitlab.com/go101/go101)
 * [github.com/go101/go101](https://github.com/go101/go101)
 
 ### 安装和更新
@@ -28,12 +28,12 @@ $ go get -u github.com/golang101/golang101
 ```
 $ golang101
 Server started:
-   http://localhost:55555 (non-cached version)
-   http://127.0.0.1:55555 (cached version)
+   http://localhost:12345 (non-cached version)
+   http://127.0.0.1:12345 (cached version)
 ```
 
 本书起始页将自动在用户默认浏览器中打开。
-如果没有，请手动访问http://localhost:55555
+如果没有，请手动访问http://localhost:12345
 
 ### 一些注意事项
 

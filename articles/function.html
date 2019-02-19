@@ -11,7 +11,7 @@
 </p>
 
 <p>
-Go中有一些内置函数，这些函数声明在<a href="https://golang.org/pkg/builtin/"><code>builtin</code></a>和<a href="https://golang.org/pkg/unsafe/"><code>unsafe</code></a>标准包中。
+Go中有一些内置函数，这些函数声明在<a href="https://golang.google.cn/pkg/builtin/"><code>builtin</code></a>和<a href="https://golang.google.cn/pkg/unsafe/"><code>unsafe</code></a>标准包中。
 内置函数和自定义函数有很多差别。其中一个差别是很多内置函数支持范型参数，但自定义函数不支持（至少到Go 1.11为止）。
 更多这两者之间的差异将在下面逐一提及。
 </p>
@@ -85,7 +85,7 @@ func (a int, b string)
 变长参数在声明的时候必须在它的（切片）类型的元素类型前面前置三个点<code>...</code>，以示这是一个变长参数。
 两个变长函数类型的例子：
 <pre class="line-numbers"><code class="language-go">func (values ...int64) (sum int64)
-func (seperator string, tokens ...string) string
+func (separator string, tokens ...string) string
 </code></pre>
 
 <p>
@@ -153,12 +153,12 @@ func Sum(values ...int64) (sum int64) {
 }
 
 // Concat是一个低效的字符串拼接函数。
-func Concat(seperator string, tokens ...string) string {
+func Concat(separator string, tokens ...string) string {
 	// tokens的类型为[]string。
 	r := ""
 	for i, t := range tokens {
 		if i != 0 {
-			r += seperator
+			r += separator
 		}
 		r += t
 	}
@@ -239,10 +239,10 @@ func main() {
 
 import "fmt"
 
-func Concat(seperator string, tokens ...string) (r string) {
+func Concat(separator string, tokens ...string) (r string) {
 	for i, t := range tokens {
 		if i != 0 {
-			r += seperator
+			r += separator
 		}
 		r += t
 	}
@@ -269,7 +269,7 @@ func Sum(values ...int64) (sum int64) {
 	return
 }
 
-func Concat(seperator string, tokens ...string) (r string) {
+func Concat(separator string, tokens ...string) (r string) {
 	// ...
 	return
 }
@@ -321,7 +321,7 @@ func main() {
 <h4>不含函数体的函数声明</h4>
 
 <p>
-我们可以使用<a href="https://golang.org/doc/asm">Go汇编（Go assembly）</a>来实现一个Go函数。
+我们可以使用<a href="https://golang.google.cn/doc/asm">Go汇编（Go assembly）</a>来实现一个Go函数。
 Go汇编代码采访在后追为<code>*.a</code>的文件中。
 一个使用Go汇编实现的函数依旧必须在一个<code>*.go</code>文件中声明，但是它的声明必须不能含有函数体。
 换句话说，一个使用Go汇编实现的函数的声明中只含有它的原型。
@@ -330,7 +330,7 @@ Go汇编代码采访在后追为<code>*.a</code>的文件中。
 <h4>某些有返回值的函数可以不必返回</h4>
 
 <div>
-如果一个函数有返回值，则它的函数体内的最后一条语句必须为一条<a href="https://golang.org/ref/spec#Terminating_statements">终止语句</a>。
+如果一个函数有返回值，则它的函数体内的最后一条语句必须为一条<a href="https://golang.google.cn/ref/spec#Terminating_statements">终止语句</a>。
 Go中有多种终止语句，<code>return</code>语句是其中一种。所以一个有返回值的函数的体内不一定需要一个<code>return</code>语句。
 比如下面两个函数（它们均可编译通过）：
 <pre class="line-numbers"><code class="language-go">func fa() int {

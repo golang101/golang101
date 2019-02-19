@@ -24,7 +24,7 @@
 </p>
 
 <p>
-<code>*sync.WaitGroup</code>类型有<a href="https://golang.org/pkg/sync/#WaitGroup">三个方法</a>：<code>Add(delta int)</code>、<code>Done()</code>和<code>Wait()</code>。
+<code>*sync.WaitGroup</code>类型有<a href="https://golang.google.cn/pkg/sync/#WaitGroup">三个方法</a>：<code>Add(delta int)</code>、<code>Done()</code>和<code>Wait()</code>。
 </p>
 
 对于一个可寻址的<code>sync.WaitGroup</code>值<code>wg</code>，
@@ -73,7 +73,7 @@ func main() {
 
 	const N = 5
 	var values [N]int32
-	
+
 	var wg sync.WaitGroup
 	wg.Add(N)
 	for i := 0; i < N; i++ {
@@ -84,7 +84,7 @@ func main() {
 			wg.Done() // <=> wg.Add(-1)
 		}()
 	}
-	
+
 	wg.Wait()
 	// 所有的元素都保证被初始化了。
 	fmt.Println("values:", values)
@@ -127,7 +127,7 @@ values: [71 89 50 62 60]
 
 	const N = 5
 	var values [N]int32
-	
+
 	var wgA, wgB sync.WaitGroup
 	wgA.Add(N)
 	wgB.Add(1)
@@ -183,13 +183,13 @@ import (
 
 func main() {
 	log.SetFlags(0)
-	
+
 	x := 0
 	doSomething := func() {
 		x++
 		log.Println("Hello")
 	}
-	
+
 	var wg sync.WaitGroup
 	var once sync.Once
 	for i := 0; i < 5; i++ {
@@ -200,7 +200,7 @@ func main() {
 			log.Println("world!")
 		}()
 	}
-	
+
 	wg.Wait()
 	log.Println("x =", x) // x = 1
 }
@@ -217,12 +217,12 @@ func main() {
 
 <div>
 <p>
-<code>*sync.Mutex</code>和<code>*sync.RWMutex</code>类型都实现了<a href="https://golang.org/pkg/sync/#Locker"><code>sync.Locker</code>接口类型</a>。
-所以这两个类型都有两个方法：<code>Lock()</code>和<code>Unlock()</code>，用来保护一份数据不会被多个访问者同时读取和修改。
+<code>*sync.Mutex</code>和<code>*sync.RWMutex</code>类型都实现了<a href="https://golang.google.cn/pkg/sync/#Locker"><code>sync.Locker</code>接口类型</a>。
+所以这两个类型都有两个方法：<code>Lock()</code>和<code>Unlock()</code>，用来保护一份数据不会被多个使用者同时读取和修改。
 </p>
 
 <p>
-除了<code>Lock()</code>和<code>Unlock()</code>这两个方法，<code>*sync.RWMutex</code>类型还有两个另外的方法：<code>RLock()</code>和<code>RUnlock()</code>，用来支持多个读取者并发访问一份数据但防止此份数据被某个数据写入者和其它数据访问者（包括读取者和写入者）同时访问。
+除了<code>Lock()</code>和<code>Unlock()</code>这两个方法，<code>*sync.RWMutex</code>类型还有两个另外的方法：<code>RLock()</code>和<code>RUnlock()</code>，用来支持多个读取者并发访问一份数据但防止此份数据被某个数据写入者和其它数据访问者（包括读取者和写入者）同时使用。
 </p>
 
 <p><i>
@@ -286,7 +286,7 @@ func main() {
 </code></pre>
 
 <p>
-在上面这个例子中，一个<code>Counter</code>值使用了一个<code>Mutex</code>字段来确保它的字段<code>n</code>永远不会被多个协程同时访问。
+在上面这个例子中，一个<code>Counter</code>值使用了一个<code>Mutex</code>字段来确保它的字段<code>n</code>永远不会被多个协程同时使用。
 </p>
 
 <p>
@@ -439,7 +439,7 @@ func main() {
 </p>
 
 <p>
-<code>*sync.Cond</code>类型有<a href="https://golang.org/pkg/sync/#Cond">三个方法</a>：<code>Wait()</code>、<code>Signal()</code>和<code>Broadcast()</code>。
+<code>*sync.Cond</code>类型有<a href="https://golang.google.cn/pkg/sync/#Cond">三个方法</a>：<code>Wait()</code>、<code>Signal()</code>和<code>Broadcast()</code>。
 </p>
 
 每个<code>Cond</code>值维护着一个先进先出等待协程队列。
@@ -459,11 +459,11 @@ func main() {
 		<p>
 		然后使当前协程进入阻塞状态；<!--sup>(1)</sup-->
 		</p>
-		
+
 		<p><i>
 		（当前协程将被另一个协程通过<code>c.Signal()</code>或<code>c.Broadcast()</code>调用唤醒而重新进入运行状态。）
 		</i></p>
-		
+
 		<p>
 		</p>
 		一旦当前协程重新进入运行状态，<code>c.L.Lock()</code>将被调用来试图重新<code>c.L</code>字段值的锁。
@@ -518,13 +518,13 @@ import (
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
-	
+
 	const N = 10
 	var values [N]string
-	
+
 	cond := sync.NewCond(&sync.Mutex{})
 	cond.L.Lock()
-	
+
 	for i := 0; i < N; i++ {
 		d := time.Second * time.Duration(rand.Intn(10)) / 10
 		go func(i int) {
@@ -539,7 +539,7 @@ func main() {
 	}
 
 	// 此函数必须在cond.L被锁定的时候调用。
-	checkConditon := func() bool {
+	checkCondition := func() bool {
 		fmt.Println(values)
 		for i := 0; i < N; i++ {
 			if values[i] == "" {
@@ -548,7 +548,7 @@ func main() {
 		}
 		return true
 	}
-	for !checkConditon() {
+	for !checkCondition() {
 		cond.Wait() // 必须在cond.L被锁定的时候调用
 	}
 	cond.L.Unlock()
@@ -574,7 +574,7 @@ func main() {
 
 <p>
 为了防止数据竞争，对自定义条件的修改必须在<code>cond.L</code>的锁被成功获取的时候才能执行。
-另外，<code>checkConditon</code>函数和<code>cond.Wait</code>方法也必须在<code>cond.L</code>的锁被成功获取的时候才可被调用。
+另外，<code>checkCondition</code>函数和<code>cond.Wait</code>方法也必须在<code>cond.L</code>的锁被成功获取的时候才可被调用。
 </p>
 
 <p>
@@ -586,7 +586,7 @@ func main() {
 <pre class="line-numbers"><code class="language-go">...
 	cond := sync.NewCond(&sync.RWMutex{})
 	cond.L.Lock()
-	
+
 	for i := 0; i < N; i++ {
 		d := time.Second * time.Duration(rand.Intn(10)) / 10
 		go func(i int) {

@@ -39,11 +39,11 @@ func main() {
 	它可以将不定数量参数的字符串表示形式输出到标准输出中。
 	第六行调用了此<code>Println</code>函数。
 	注意在此调用中，函数名之前需要带上前缀<code>fmt.</code>，其中<code>fmt</code>是<code>Println</code>函数所处的代码包的引入名称。
-	<code>aImportName.AnExportedIdentifier</code>这种形式称为一个限定标识符（<a href="https://golang.org/ref/spec#Qualified_identifiers">qualified identifier</a>）。
+	<code>aImportName.AnExportedIdentifier</code>这种形式称为一个限定标识符（<a href="https://golang.google.cn/ref/spec#Qualified_identifiers">qualified identifier</a>）。
 </li>
 <li>
 	<code>fmt.Println</code>函数调用接受任意数量的实参并且对实参的类型没有任何限制。
-	所以此程序中的此函数调用的三个实参的类型将被推断为它们各自的默认类型：<code>string</code>, <code>int</code>和<code>string</code>。
+	所以此程序中的此函数调用的三个实参的类型将被推断为它们各自的默认类型：<code>string</code>、<code>int</code>和<code>string</code>。
 </li>
 <li>
 	对于一个<code>fmt.Println</code>函数调用，任何两个相邻的实参的输出之间将被插入一个空格字符，并且在最后将输出一个空行字符。
@@ -205,7 +205,7 @@ type of a: int, type of b: string
 </p>
 
 <p>
-请阅读<a href="https://golang.org/pkg/fmt/"><code>fmt</code>标准库包的文档</a>（墙内版：<a href="https://golang.google.cn/pkg/fmt/">golang.google.cn/pkg/fmt/</a>）以了解更多的占位字符组合。
+请阅读<a href="https://golang.google.cn/pkg/fmt/"><code>fmt</code>标准库包的文档</a>（墙内版：<a href="https://golang.google.cn/pkg/fmt/">golang.google.cn/pkg/fmt/</a>）以了解更多的占位字符组合。
 我们也可以运行<code>go doc fmt</code>命令来在终端中查看<code>fmt</code>标准库包的文档。
 运行<code>go doc fmt.Printf</code>命令可以查看<code>fmt.Printf</code>的文档。
 </p>
@@ -563,7 +563,7 @@ func main() {
 被匿名引入的包中的<code>init</code>函数将被执行并且仅执行一遍。
 </p>
 
-在下面这个例子中，<a href="https://golang.org/pkg/net/http/pprof/"><code>net/http/pprof</code>标准库包</a>中的所有<code>init</code>函数将在<code>main</code>入口函数开始执行之前全部执行一遍。
+在下面这个例子中，<a href="https://golang.google.cn/pkg/net/http/pprof/"><code>net/http/pprof</code>标准库包</a>中的所有<code>init</code>函数将在<code>main</code>入口函数开始执行之前全部执行一遍。
 
 <pre class="line-numbers"><code class="language-go">package main
 

@@ -43,7 +43,7 @@ func main() {
 
 <p>
 因为历史原因，内嵌字段有时也称为匿名字段。但是，事实上，每个内嵌字段有一个（隐式的）名字。
-此字段的<a href="https://golang.org/ref/spec#Qualified_identifiers">非限定（unqualified）</a>类型名即为此字段的名称。
+此字段的<a href="https://golang.google.cn/ref/spec#Qualified_identifiers">非限定（unqualified）</a>类型名即为此字段的名称。
 比如，上例中的五个内嵌字段的名称分别为<code>string</code>、<code>error</code>、<code>int</code>、<code>P</code>和<code>Header</code>。
 </p>
 </div>
@@ -52,7 +52,7 @@ func main() {
 <h3>哪些类型可以被内嵌？</h3>
 
 <div>
-当前的Go白皮书（1.11）<a href="https://golang.org/ref/spec#Struct_types">规定</a>：
+当前的Go白皮书（1.11）<a href="https://golang.google.cn/ref/spec#Struct_types">规定</a>：
 
 <div class="alert alert-info">
 An embedded field must be specified as a type name <code>T</code>
@@ -67,7 +67,7 @@ and <code>T</code> itself may not be a pointer type.
 </div>
 
 <p>
-此规则描述在Go 1.09之前是精确的。但是随着从Go 1.09引入的自定义类型别名概念，此描述<a href="https://github.com/golang/go/issues/22005">有些过时和不太准确了</a>。
+此规则描述在Go 1.09之前是精确的。但是随着从Go 1.09引入的自定义别名类型概念，此描述<a href="https://github.com/golang/go/issues/22005">有些过时和不太准确了</a>。
 比如，此描述没有包括上一节的例子中的<code>P</code>内嵌字段的情形。
 </p>
 
@@ -335,7 +335,7 @@ func main() {
 <code>Name</code>被称为类型<code>Singer</code>的提升字段（promoted field）。
 </p>
 
-因为任何内嵌其它类型的类型必然是结构体类型，并且<a href="struct.html#use-pointer-as-struct">结构体</a>一文中已经了我们可以通过一个可寻址的结构体值的指针来访问此结构体的字段，所以下面的代码也是合法的：
+因为任何内嵌其它类型的类型必然是结构体类型，并且<a href="struct.html#use-pointer-as-struct">结构体</a>一文中已经了我们可以通过一个可寻址的结构体值的指针选择此结构体的字段，所以下面的代码也是合法的：
 <pre class="line-numbers"><code class="language-go">func main() {
 	var c C
 	pc = &c

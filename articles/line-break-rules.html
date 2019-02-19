@@ -69,14 +69,14 @@ func main() {
 在编译时刻，编译器会自动此插入这些去除掉的分号（至此文件的内存中的版本）。
 </p>
 
-自动插入分号的规则是什么呢？Go白皮书<a href="https://golang.org/ref/spec#Semicolons">这样描述</a>：
+自动插入分号的规则是什么呢？Go白皮书<a href="https://golang.google.cn/ref/spec#Semicolons">这样描述</a>：
 
 <div class="alert alert-success">
 
 
 <ol>
 <li>
-	在Go代码中，注释除外，如果一个代码行的最后一个语法词段（token）为下列所示之一,则一个分号将自动插入在此字段后（即行尾）：
+	在Go代码中，注释除外，如果一个代码行的最后一个语法词段（token）为下列所示之一，则一个分号将自动插入在此字段后（即行尾）：
 	<ul>
 	<li>
 		一个<a href="keywords-and-identifiers.html#identifier">标识符</a>；
@@ -225,12 +225,12 @@ func main() {
 	i++ {
 		// 使用i ...
 	}
-	
+
 	if x := alwaysFalse()
 	!x {
 		// ...
 	}
-	
+
 	switch alwaysFalse()
 	{
 	case true: fmt.Println("true")

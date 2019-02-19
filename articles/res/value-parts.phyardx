@@ -13,8 +13,8 @@
         <Setting name="viewport_width" value="500"/>
         <Setting name="viewport_height" value="500"/>
         <Setting name="zoom_scale" value="1"/>
-        <Setting name="camera_center_x" value="275"/>
-        <Setting name="camera_center_y" value="195"/>
+        <Setting name="camera_center_x" value="314"/>
+        <Setting name="camera_center_y" value="244"/>
         <Setting name="world_left" value="0"/>
         <Setting name="world_top" value="0"/>
         <Setting name="world_width" value="500"/>
@@ -48,9 +48,9 @@
         <Setting name="remove_pinks_on_mouse_down" value="1"/>
       </Settings>
       <Entities>
-        <Entity id="0" entity_type="31" x="130.5" y="308" scale="1" flipped="0" r="0" visible="1" alpha="1" enabled="1" active="1" draw_border="0" draw_background="1" border_color="0x00cccccc" border_thickness="3" background_color="0x00cccccc" background_opacity="100" border_opacity="100" text="Source Direct Part" flags1="0" flags2="0" text_color="0x00000000" font_size="14" bold="0" italic="0" align="17" underlined="0" half_width="100" half_height="12.5"/>
-        <Entity id="1" entity_type="31" x="366.5" y="365.5" scale="1" flipped="0" r="0" visible="1" alpha="1" enabled="1" active="1" draw_border="0" draw_background="1" border_color="0x00cccccc" border_thickness="3" background_color="0x00cccccc" background_opacity="100" border_opacity="100" text="Underlying Part" flags1="0" flags2="0" text_color="0x00000000" font_size="14" bold="0" italic="0" align="17" underlined="0" half_width="100" half_height="12.5"/>
-        <Entity id="2" entity_type="31" x="130.5" y="418" scale="1" flipped="0" r="0" visible="1" alpha="1" enabled="1" active="1" draw_border="0" draw_background="1" border_color="0x00cccccc" border_thickness="3" background_color="0x00cccccc" background_opacity="100" border_opacity="100" text="Destination Direct Part" flags1="0" flags2="0" text_color="0x00000000" font_size="14" bold="0" italic="0" align="17" underlined="0" half_width="100" half_height="12.5"/>
+        <Entity id="0" entity_type="31" x="130.5" y="308" scale="1" flipped="0" r="0" visible="1" alpha="1" enabled="1" active="1" draw_border="0" draw_background="1" border_color="0x00cccccc" border_thickness="3" background_color="0x00cccccc" background_opacity="100" border_opacity="100" text="源值的直接值部" flags1="0" flags2="0" text_color="0x00000000" font_size="14" bold="0" italic="0" align="17" underlined="0" half_width="100" half_height="12.5"/>
+        <Entity id="1" entity_type="31" x="366.5" y="365.5" scale="1" flipped="0" r="0" visible="1" alpha="1" enabled="1" active="1" draw_border="0" draw_background="1" border_color="0x00cccccc" border_thickness="3" background_color="0x00cccccc" background_opacity="100" border_opacity="100" text="间接值部" flags1="0" flags2="0" text_color="0x00000000" font_size="14" bold="0" italic="0" align="17" underlined="0" half_width="100" half_height="12.5"/>
+        <Entity id="2" entity_type="31" x="130.5" y="418" scale="1" flipped="0" r="0" visible="1" alpha="1" enabled="1" active="1" draw_border="0" draw_background="1" border_color="0x00cccccc" border_thickness="3" background_color="0x00cccccc" background_opacity="100" border_opacity="100" text="目标值的直接值部" flags1="0" flags2="0" text_color="0x00000000" font_size="14" bold="0" italic="0" align="17" underlined="0" half_width="100" half_height="12.5"/>
         <Entity id="3" entity_type="13" x="249.5" y="338" scale="1" flipped="0" r="0" visible="1" alpha="1" enabled="1" active="1" draw_border="0" draw_background="1" border_color="0x00000000" border_thickness="0" background_color="0x00606060" background_opacity="100" border_opacity="100" ai_type="-1" enable_physics="0" curve_thickness="0" round_ends="0" closed="0">
           <LocalVertices>
             <Vertex x="-18.5" y="-29"/>
@@ -80,8 +80,8 @@
           <BodyTexture module_index="-1"/>
         </Entity>
         <Entity id="7" entity_type="31" x="133.5" y="80" scale="1" flipped="0" r="0" visible="1" alpha="1" enabled="1" active="1" draw_border="0" draw_background="1" border_color="0x00cccccc" border_thickness="3" background_color="0x00cccccc" background_opacity="100" border_opacity="100" text="Solo Direct Value Part" flags1="0" flags2="0" text_color="0x00000000" font_size="14" bold="0" italic="0" align="17" underlined="0" half_width="100" half_height="12.5"/>
-        <Entity id="8" entity_type="31" x="369.5" y="190" scale="1" flipped="0" r="0" visible="1" alpha="1" enabled="1" active="1" draw_border="0" draw_background="1" border_color="0x00cccccc" border_thickness="3" background_color="0x00cccccc" background_opacity="100" border_opacity="100" text="Underlying Value Part" flags1="0" flags2="0" text_color="0x00000000" font_size="14" bold="0" italic="0" align="17" underlined="0" half_width="100" half_height="12.5"/>
-        <Entity id="9" entity_type="31" x="133.5" y="190" scale="1" flipped="0" r="0" visible="1" alpha="1" enabled="1" active="1" draw_border="0" draw_background="1" border_color="0x00cccccc" border_thickness="3" background_color="0x00cccccc" background_opacity="100" border_opacity="100" text="Direct Value Part" flags1="0" flags2="0" text_color="0x00000000" font_size="14" bold="0" italic="0" align="17" underlined="0" half_width="100" half_height="12.5"/>
+        <Entity id="8" entity_type="31" x="369.5" y="190" scale="1" flipped="0" r="0" visible="1" alpha="1" enabled="1" active="1" draw_border="0" draw_background="1" border_color="0x00cccccc" border_thickness="3" background_color="0x00cccccc" background_opacity="100" border_opacity="100" text="底层间接值部" flags1="0" flags2="0" text_color="0x00000000" font_size="14" bold="0" italic="0" align="17" underlined="0" half_width="100" half_height="12.5"/>
+        <Entity id="9" entity_type="31" x="133.5" y="190" scale="1" flipped="0" r="0" visible="1" alpha="1" enabled="1" active="1" draw_border="0" draw_background="1" border_color="0x00cccccc" border_thickness="3" background_color="0x00cccccc" background_opacity="100" border_opacity="100" text="直接值部" flags1="0" flags2="0" text_color="0x00000000" font_size="14" bold="0" italic="0" align="17" underlined="0" half_width="100" half_height="12.5"/>
         <Entity id="10" entity_type="13" x="251.375" y="190.625" scale="1" flipped="0" r="0" visible="1" alpha="1" enabled="1" active="1" draw_border="0" draw_background="1" border_color="0x00000000" border_thickness="0" background_color="0x00606060" background_opacity="100" border_opacity="100" ai_type="-1" enable_physics="0" curve_thickness="0" round_ends="0" closed="0">
           <LocalVertices>
             <Vertex x="-18.375" y="0.125"/>

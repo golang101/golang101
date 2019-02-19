@@ -25,7 +25,7 @@ Go语言是一门天然支持并发的编程语言。
 <li>
 	其次，在主协程中，条件<code>b == true</code>成立并不能确保条件<code>a != nil</code>也成立。
 	编译器和CPU可能会对<a href="/article/memory-model.html">调整此程序中匿名协程中的某些指令的顺序</a>已获取更快的执行速度，
-	所以，站在主协程的视角看，对变量<code>b</code>的赋值可能会发生在对变量<code>a</code>的赋值之前,这将造成在修改<code>a</code>的元素时<code>a</code>依然为一个nil切片。
+	所以，站在主协程的视角看，对变量<code>b</code>的赋值可能会发生在对变量<code>a</code>的赋值之前，这将造成在修改<code>a</code>的元素时<code>a</code>依然为一个nil切片。
 </li>
 </ul>
 
@@ -127,6 +127,8 @@ import (
 	"time"
 )
 
+var x = 0
+
 func main() {
 	var num = 123
 	var p = &num
@@ -134,7 +136,7 @@ func main() {
 	c := make(chan int)
 
 	go func() {
-		c <- *p + 0
+		c <- *p + x
 	}()
 
 	time.Sleep(time.Second)
@@ -151,7 +153,7 @@ func main() {
 </p>
 
 <p>
-让我们将此例中的<code>c &lt;- *p + 0</code>一行换成<code>c &lt;- *p</code>，然后重新运行它，你将会发现它的输出变成了<code>789</code>（如果它使用官方Go标准编译器1.11版本编译的话）。
+让我们将此例中的<code>c &lt;- *p + x</code>一行换成<code>c &lt;- *p</code>，然后重新运行它，你将会发现它的输出变成了<code>789</code>（如果它使用官方Go标准编译器1.11版本编译的话）。
 重申一次，此结果是和具体使用的编译器和编译器的版本相关的。
 </p>
 
@@ -259,7 +261,7 @@ Go运行时很难分辨出一个处于阻塞状态的协程是否将永久阻塞
 下面是一个有问题的并发编程的例子。
 在此例子中，当<code>Counter.Value</code>方法被调用时，一个<code>Counter</code>属主值将被复制，此属主值的字段<code>Mutex</code>也将被一同复制。
 此复制并没有被同步保护，因此复制结果可能是不完整的，并非被复制的属主值的一个快照。
-即使此<code>Mutex</code>字段得以侥幸复制，它的副本所保护的是对字段<code>n</code>的一个副本的访问，因此一般是没有实际价值的。
+即使此<code>Mutex</code>字段得以侥幸复制，它的副本所保护的是对字段<code>n</code>的一个副本的访问，因此一般是没有意义的。
 
 <pre class="line-numbers"><code class="language-go">import "sync"
 
@@ -420,7 +422,7 @@ Go程序员常犯的一个错误是关闭一个后续可能还会有协程向其
 <div>
 <p>
 <code>time</code>标准库包中的<code>After</code>函数返回<a href="channel-use-cases.html#timer">一个用作延迟通知的数据通道</a>。
-此函数给并发编程带来了很多便利，但是它的每个调用都需要创建一个<code>time.Timer</code>值，此新创建的<code>Timer</code>值在传递给<code>After</code>函数调用的时长(实参)内肯定不会被垃圾回收。 
+此函数给并发编程带来了很多便利，但是它的每个调用都需要创建一个<code>time.Timer</code>值，此新创建的<code>Timer</code>值在传递给<code>After</code>函数调用的时长(实参)内肯定不会被垃圾回收。
 如果此函数在某个时段内被多次频繁调用，则可能导致积累很多尚未过期的<code>Timer</code>值从而造成大量的内存和计算消耗。
 </p>
 
@@ -460,7 +462,7 @@ func longRunning(messages <-chan string) {
 			return
 		case msg := <-messages:
 			fmt.Println(msg)
-			
+
 			// 此if代码块很重要。
 			if !timer.Stop() {
 				<-timer.C

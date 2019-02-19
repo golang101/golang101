@@ -124,9 +124,9 @@ https://github.com/golang/go/issues/18640
 </p>
 
 <p>
-对于类型<code>S</code>的一个值<code>v</code>，我们可以用<code>v.x</code>和<code>v.y</code>来访问它的字段。
+对于类型<code>S</code>的一个值<code>v</code>，我们可以用<code>v.x</code>和<code>v.y</code>来表示它的字段。
 <code>v.x</code>这种形式称为一个选择器（selector）。
-今后，我们称一个选择器中的句点<code>.</code>为属性访问操作符。
+今后，我们称一个选择器中的句点<code>.</code>为属性选择操作符。
 </p>
 
 一个例子：
@@ -142,17 +142,17 @@ type Book struct {
 }
 
 func main() {
-	book := Book{"Go 101", "Tapir", 256}
-	fmt.Println(book) // {Go 101 Tapir 256}
+	book := Book{"Golang 101", "老貘", 256}
+	fmt.Println(book) // {Golang 101 老貘 256}
 
 	// 使用带字段名的组合字面形式来表示结构体值：
 	book = Book{} // title和author字段的值都为空字符串""，pages字段的值为0。
-	book = Book{author: "Tapir"} // title字段空字符串""，pages字段为0。
-	book = Book{author: "Tapir", pages: 256, title: "Go 101"}
+	book = Book{author: "老貘"} // title字段空字符串""，pages字段为0。
+	book = Book{author: "老貘", pages: 256, title: "Golang 101"}
 
 	// 使用选择器来访问和修改字段值。
 	var book2 Book // <=> book2 := Book{}
-	book2.author = "Tapir Liu"
+	book2.author = "Tapir"
 	book2.pages = 300
 	fmt.Println(book.pages) // 300
 }
@@ -164,13 +164,13 @@ func main() {
 （我们可以阅读后面的<a href="line-break-rules.html">Go代码断行规则</a>一文了解更多断行规则。）
 
 <pre class="line-numbers"><code class="language-go">var _ = Book {
-	author: "Go 101",
+	author: "老貘",
 	pages: 256,
-	title: "Go 101", // 这里行尾的逗号不可省略
+	title: "Golang 101", // 这里行尾的逗号不可省略
 }
 
 // 下行}前的逗号可以省略。
-var _ = Book{author: "Go 101", pages: 256, title: "Go 101",}
+var _ = Book{author: "老貘", pages: 256, title: "Golang 101",}
 </code></pre>
 
 <p>
@@ -185,7 +185,7 @@ var _ = Book{author: "Go 101", pages: 256, title: "Go 101",}
 
 <pre class="line-numbers"><code class="language-go">func f() {
 	book1 := Book{pages: 300}
-	book2 := Book{"Go 101", "Tapir", 256}
+	book2 := Book{"Golang 101", "老貘", 256}
 
 	book2 = book1
 	// 上面这行和下面这三行是等价的。
@@ -232,7 +232,7 @@ func main() {
 </code></pre>
 
 <p>
-注意：选择器中的属性访问操作符<code>.</code>的优先级比取地址操作符<code>&amp;</code>的优先级要高。
+注意：选择器中的属性选择操作符<code>.</code>的优先级比取地址操作符<code>&amp;</code>的优先级要高。
 </p>
 </div>
 
