@@ -240,10 +240,6 @@ Go编译器将不会重新排列结构体的字段来最小化结构体值的大
 </h3>
 
 <p><i>
-(This is not a Go spec rule. It is a compiler specified implementation.
-Here is the compiler is the standard Go compiler.
-Please view <a href="https://github.com/golang/go/issues/9401">issue#9401</a> for details.)
-（这个不是一个Go语言规范里的规则。而是一个编译器的实现规范。这里的编译器是标准的Go编译器。
 关于细节请参考 <a href="https://github.com/golang/go/issues/9401">issue#9401</a>）
 </i></p>
 
@@ -325,18 +321,11 @@ func main() {
 <p>
 传给<code>sync/atomic</code>包里的64位函数的地址必须是64位对齐的，否则调用这些函数就会在运行时导致代码崩溃（panic）。
 <p>
-For the standard Go compiler and gccgo compiler,
-on 64-bit architectures, 64-bit integers are guaranteed to be 64-bit aligned.
-So they can be always accessed atomically without any problems.
 对于标准的Go编译器和gccgo编译器，在64位架构下，64位整数会保证以64位对齐。
 所以它们总是可以以原子的方式访问而不发生任何问题。
 </p>
 
 <p>
-On 32-bit architectures, 64-bit integers are only guaranteed to be 32-bit aligned.
-So accessing many 64-bit integers atomically may cause panics.
-However, there are some ways to guarantee some 64-bit integers to be elied upon to be 64-bit aligned.
-Please read <a href="memory-layout.html">memory layouts in Go</a> for details.
 在32位架构下，64位整数仅保证以32位对齐。
 所以原子的访问许多64位整数会导致代码崩溃（panics）。
 但是，有一些方法可以保证某些64位整数被省略，从而实现64位对齐。
@@ -447,10 +436,6 @@ func main() {
 
 <div>
 <p>
-For most types, this is true.
-In fact, this is compiler dependent.
-For example, for the standard Go runtime,
-the statement is wrong for some zero values of string types.
 对于大部分类型，肯定的。
 不过事实上，也依赖于编译器。
 例如，对于标准的Go运行时，对于某些字符串类型的零值，这个声明是错误的。
