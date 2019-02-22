@@ -1,165 +1,165 @@
-<h1>Go Details 101</h1>
+﻿<h1>Go 细节 101</h1>
 
 <div>
 <p>
-This article will list all kinds of details in Go.
-Some of these details are shown in other Go 101 articles,
-some are shown in the following sections.
+这一章节将列出Go的各个方面的细节。
+其中一些细节在Go 101的其它章节中也有描述。
+以下部分将讨论其中一些。
 </p>
 
 <ul>
 <li>
-	Code package related details:
+	代码包相关的细节：
 	<ul>
 	<li>
-		<a href="#import-package-multiple-times">A package can be imported more than once in a source file.</a>
+		<a href="#import-package-multiple-times">一个包可以在源文件里被导入多次。</a>
 	</li>
 	<li>
-		<a href="#force-import-path">The comment <code>// import "x.y.z/mypkg"</code> following <code>package mypkg</code> is meaningful for the standard Go compiler.</a>
+		<a href="#force-import-path">在<code>package mypkg</code>之后的注释<code>// import "x.y.z/mypkg"</code>对标准Go编译器是否有意义。</a>
 	</li>
 	</ul>
 </li>
 <li>
-	Control flow related details:
+	控制流相关的细节：
 	<ul>
 	<li>
-		<a href="#default-branch-position">The <code>default</code> branch in <code>switch</code> and <code>select</code> blocks can be put before all <code>case</code> branches, after all <code>case</code> branches, or between <code>case</code> branches.</a>
+		<a href="#default-branch-position">在<code>switch</code> 和 <code>select</code>代码块里，<code>default</code>分支可以放在所有的<code>case</code>分支之前，所有的<code>case</code>分支之后，以及<code>case</code>分支之间。</a>
 	</li>
 	<li>
-		<a href="#constant-case-expressions">The numeric constant case expressions in a <code>switch</code> block can't be duplicate, but boolean ones can.</a>
+		<a href="#constant-case-expressions">在<code>switch</code>代码块里的数字常量case表达式不能够重复，但是布尔可以。</a>
 	</li>
 	<li>
-		<a href="#switch-expressions-are-typed">The switch expressions in <code>switch</code> block are always evaluated to typed values.</a>
+		<a href="#switch-expressions-are-typed">在<code>switch</code>代码块里的switch表达式总是计算为类型化值。</a>
 	</li>
 	<li>
-		<a href="#default-switch-expression-value">The default switch expression of a <code>switch</code> block is a typed value <code>true</code> of the predeclared type <code>bool</code>.</a>
+		<a href="#default-switch-expression-value"><code>switch</code>代码块中的default switch表达式是预声明类型<code>bool</code>的类型值<code>true</code>。</a>
 	</li>
 	<li>
-		<a href="#open-brace-on-the-next-line">Sometimes, the open brace <code>{</code> of an explicit code block can be put on the next line.</a>
+		<a href="#open-brace-on-the-next-line">有时候，显示代码块的开括号<code>{</code>可以放在下一行。</a>
 	</li>
 	<li>
-		<a href="#some-case-branch-blocks-must-be-explicit">Some <code>case</code> branch blocks must be explicit.</a>
+		<a href="#some-case-branch-blocks-must-be-explicit">部分<code>case</code>分支代码块必须是显式的。</a>
 	</li>
 	<li>
-		<a href="#defer-modify-results">Nested deferred function calls can modify return result values of nesting functions.</a>
+		<a href="#defer-modify-results">嵌套的defered函数调用可以修改所嵌套函数返回结果的值。</a>
 	</li>
 	<li>
-		<a href="#no-op-recover-calls">Some <code>recover</code> calls may be NoOps.</a>
+		<a href="#no-op-recover-calls">部分<code>recover</code>调用可以是NoOps。</a>
 	</li>
 	<li>
-		<a href="#os-exit-runtime-goexit">Exit a program with a <code>os.Exit</code> function call and exit a goroutine with a <code>runtime.Goexit</code> function call</a>.
+		<a href="#os-exit-runtime-goexit">用一个<code>os.Exit</code>函数调用退出一个程序和用一个<code>runtime.Goexit</code>函数调用退出一个goroutine。</a>
 	</li>
 	</ul>
 </li>
 <li>
-	Operator related details:
+	操作符相关的细节：
 	<ul>
 	<li>
-		<a href="#some-operator-precedence">The precedence of the increment operator <code>++</code> and the decrement <code>--</code> is lower than the dereference operator <code>*</code> and the address-taken operator <code>&amp;</code>, which are lower than the property selection operator <code>.</code> in selectors.</a>
+		<a href="#some-operator-precedence">递增运算符<code>++</code>和递减运算符<code>--</code>的优先级低于解引用(dereference)运算符<code>*</code>和取地址运算符<code>&amp;</code>，这两个运算符的优先级低于选择器<code>.</code>中的属性选择运算符。</a>
 	</li>
 	<li>
-		<a href="#type-deduction-in-bit-shift">The type deduction rule for the left untyped operand of a bit-shift operation depends on whether or not the right operand is a constant.</a>
+		<a href="#type-deduction-in-bit-shift">位移操作的左无类型操作数的类型推断规则取决于右操作数是否是常量。</a>
 	</li>
 	</ul>
 </li>
 <li>
-	Pointer related details:
+	指针相关的细节：
 	<ul>
 	<li>
-		<a href="#conversion-of-pointers-with-different-underlying-types">Values of two pointer types with different underlying types can be converted to each other if the base types of their underlying types share the same underlying type.</a>
+		<a href="#conversion-of-pointers-with-different-underlying-types">如果具有不同底层类型的两个指针类型的基础类型共享相同的底层类型，则可以将其值相互转换。</a>
 	</li>
 	<li>
-		<a href="#addresses-of-zeor-sized-values">Addresses of different zero-sized values may be equal, or not.</a>
+		<a href="#addresses-of-zeor-sized-values">不同的零大小值的地址可能相等，也可能或不相等。</a>
 	</li>
 	<li>
-		<a href="#self-based-pointer-type">The base type of a pointer type may be the pointer type itself.</a>
+		<a href="#self-based-pointer-type">指针类型的基础类型可能是指针类型自身。</a>
 	</li>
 	<li>
-		<a href="#pointer-selector-shorthands">A detail about selector shorthands.</a>
+		<a href="#pointer-selector-shorthands">有关选择器速记的细节。</a>
 	</li>
 	</ul>
 </li>
 <li>
-	Container related details:
+	容器相关的细节：
 	<ul>
 	<li>
-		<a href="#composite-literal-simplification">Sometimes, nested composite Literals can be simplified.</a>
+		<a href="#composite-literal-simplification">有时候，嵌套组合字面值可以简化。</a>
 	</li>
 	<li>
-		<a href="#use-pointer-as-array">In some scenarios, it is ok to use array pointers as arrays.</a>
+		<a href="#use-pointer-as-array">在部分场景下，可以使用数组指针作为数组。</a>
 	</li>
 	<li>
-		<a href="#nil-map-element-retrieving">Retrieving elements from nil maps will not panic. The result is a zero element value.</a>
+		<a href="#nil-map-element-retrieving">从空(nil)映射里检索元素不会导致崩溃(panic)。其结果是一个零元素值。</a>
 	</li>
 	<li>
-		<a href="#nil-map-element--deletion">Deleting an entry from a nil map will not panic. It is a no-op.</a>
+		<a href="#nil-map-element--deletion">从一个空(nil)映射删除一个条目不会导致崩溃(panic)。这是一个无操作(no-op)。</a>
 	</li>
 	<li>
-		<a href="#append-slice-elements">The result slice of an <code>append</code> function call may share some elements with the original slice, or not.</a>
+		<a href="#append-slice-elements">切片调用<code>append</code>函数的结果可能会与原始切片共享一些元素，也可能不会。</a>
 	</li>
 	<li>
-		<a href="#subslice">The length of a subslice may be larger than the base slice the subslice derives from.</a>
+		<a href="#subslice">子切片的长度可能大于子切片派生自的基切片。</a>
 	</li>
 	<li>
-		<a href="#derive-from-nil-slice">Deriving a subslice from a nil slice is ok if all the indexes used in the subslice expression are zero. The result subslice is also a nil slice.</a>
+		<a href="#derive-from-nil-slice">如果子切片表达式中使用的所有索引都为零，则从空(nil)切片中派生子切片是可以的。子切片的结果同样是一个空切片。</a>
 	</li>
 	<li>
-		<a href="#range-over-nil-map-and-slice">Ranging over a nil maps or a nil slices is ok, it is a no-op.</a>
+		<a href="#range-over-nil-map-and-slice">在空映射或者空切片上用range遍历是可以的，这是一个无操作(no-op)。</a>
 	</li>
 	<li>
-		<a href="#range-over-nil-array-pointer">Range over a nil array pointer is ok if the second iteration variable is ignored or omitted.</a>
+		<a href="#range-over-nil-array-pointer">如果第二个迭代变量被忽略或省略，那么在空(nil)数组指针上用range遍历是可以的。</a>
 	</li>
 	<li>
-		<a href="#modify-slice-length-and-capacity-separately">The length and capacity of a slice can be modified separately.</a>
+		<a href="#modify-slice-length-and-capacity-separately">切片的长度和容量可以单独修改。</a>
 	</li>
 	<li>
-		<a href="#indexes-in-composite-literals"">The indexes in slice and array composite literals must be constants and non-negative.</a>
+		<a href="#indexes-in-composite-literals"">切片和数组复合字面值中的索引必须是常量和非负值。</a>
 	</li>
 	<li>
-		<a href="#constant-keys-in-composite-literals"">The constant indexes or keys in slice/array/map composite literals can't be duplicate.</a>
+		<a href="#constant-keys-in-composite-literals"">切片/数组/映射复合字面值的常量索引和键不能重复。</a>
 	</li>
 	<li>
-		<a href="#array-slice-element-addressability">Elements of unaddressable arrays are also unaddressable, but elements of unaddressable slices are always addressable.</a>
+		<a href="#array-slice-element-addressability">不可寻址的数组的元素依旧时不可寻址的，但是不可寻址的切片的元素总是可寻址的。</a>
 	</li>
 	<li>
-		<a href="#array-slice-derivable">It is ok to derive subslices from unaddressable slices, but not ok from unaddressable arrays. It is ok to take addresses for elements of unaddressable slices, but not ok for elements of unaddressable arrays.</a>
+		<a href="#array-slice-derivable">可以从不可寻址的切片中派生子切片，但是不能从不可寻址的数组中派生子切片。可以从不可寻址的切片中取元素的地址，但是不能从不可寻址的数组中取元素的地址。</a>
 	</li>
 	<li>
-		<a href="#nan-as-map-keys">Putting elements with <code>NaN</code> as keys to a map is like putting the elements in a black hole.</a>
+		<a href="#nan-as-map-keys">把以<code>NaN</code>作为键的元素放在映射上就像把元素放到黑洞里一样。</a>
 	</li>
 	<li>
-		<a href="#capacity-of-slice-from-string">The capacity of the result slice of a conversion from a string to byte/rune slice may be larger than the length of the result slice.</a>
+		<a href="#capacity-of-slice-from-string">将字符串转换为字节/符文的结果切片的容量可能会大于结果切片的长度。</a>
 	</li>
 	<li>
-		<a href="#different-loops">For a slice <code>s</code>, the loop <code>for i = range s {...}</code> is not equivalent to the loop <code>for i = 0; i < len(s); i++ {...}</code>.</a>
+		<a href="#different-loops">对于切片<code>s</code>，循环<code>for i = range s {...}</code> 不等于循环<code>for i = 0; i < len(s); i++ {...}</code>。</a>
 	</li>
 	</ul>
 </li>
 <li>
-	Function and method related details:
+	函数和方法相关的细节：
 	<ul>
 	<li>
-		<a href="#call-as-expression">A multi-result function call can't mix with other expressions when the call is used as the sources in an assignment or the arguments of another function call.</a>
+		<a href="#call-as-expression">当调用用做赋值中的源或另一个函数调用的参数时，多结果函数调用并不能与其它表达式混合。</a>
 	</li>
 	<li>
-		<a href="#compile-time-evaluated-calls">Some function calls are evaluated at compile time.</a>
+		<a href="#compile-time-evaluated-calls">部分函数调用可以在编译时求值。</a>
 	</li>
 	<li>
-		<a href="#method-as-function">Each method corresponds to an implicit function.</a>
+		<a href="#method-as-function">每一个方法都与一个隐式函数相关。</a>
 	</li>
 	</ul>
 </li>
 <li>
-	Interface related details:
+	接口相关的细节：
 	<ul>
 	<li>
-		<a href="#comparison-interfaces-may-panic">Comparing two interface values with the same dynamic uncomparable type produces a panic.</a>
+		<a href="#comparison-interfaces-may-panic">将两个接口值与相同的动态不可比较类型进行比较会产生崩溃(panic)。</a>
 	</li>
 	<li>
-		<a href="#type-assertion-to-interface-type">Type assertions can be used to convert a value of an interface type to another interface type, even if the former interface type doesn't implement the latter one.</a>
+		<a href="#type-assertion-to-interface-type">类型推断可以用于转换一个接口类型的值为另一个接口类型，即使前一种接口类型不实现后一种接口类型。</a>
 	</li>
 	<li>
-		<a href="#failed-type-assertion-may-panic">Whether or not the second optional result of a type assertion is present will affect the behavior of the type assertion.</a>
+		<a href="#failed-type-assertion-may-panic">类型断言的第二个可选结果是否存在将影响类型断言的行为。</a>
 	</li>
 	<!--
 	<li>
@@ -170,43 +170,43 @@ some are shown in the following sections.
 	</li>
 	-->
 	<li>
-		<a href="#errors-new-different-returns">Two <code>error</code> values returned by two <code>errors.New</code> calls with the same argument are not equal.</a>
+		<a href="#errors-new-different-returns">以相同参数调用两次<code>errors.New</code>返回的两个<code>错误</code>值是不相等的。</a>
 	</li>
 	</ul>
 </li>
 <li>
-	Channel related details:
+	管道相关的细节：
 	<ul>
 	<li>
-		<a href="#receive-only-channel-canot-be-closed">Receive-only channels can't be closed.</a>
+		<a href="#receive-only-channel-canot-be-closed">仅接收的管道不能关闭。</a>
 	</li>
 	<li>
-		<a href="#send-to-closed-channel-is-non-blocking">Sending a value to a closed channel is viewed as a non-blocking operation, and this operation causes a panic.</a>
+		<a href="#send-to-closed-channel-is-non-blocking">将一个值发送到一个关闭的通道被视为一个非阻塞操作，该操作会引起崩溃(panic)。</a>
 	</li>
 	</ul>
 </li>
 <li>
-	More type and value related details:
+	更多关于类型和值的细节：
 	<ul>
 	<li>
-		<a href="#local-type-declaration">Types can be declared within function bodies.</a>
+		<a href="#local-type-declaration">类型可以在函数体内被声明。</a>
 	</li>
 	<li>
-		<a href="#final-zero-size-field">For the standard compiler, zero-sized fields in a struct may be treated as one-byte-sized value.</a>
+		<a href="#final-zero-size-field">对于标准编译器，结构体中零大小的字段会被视为一个比特大小的值。</a>
 	</li>
 	<li>
 		<a href="#nan-inf">NaN != NaN, Inf == Inf.</a>
 	</li>
 	<li>
-		<a href="#non-exported-names-from-different-packages">Non-exported method names and struct field names from different packages are viewed as different names.</a>
+		<a href="#non-exported-names-from-different-packages">来自不同包的非导出方法名和结构体字段名被视为不同的名称。</a>
 	</li>
 	</ul>
 </li>
 <li>
-	Miscellanies:
+	杂项：
 	<ul>
 	<li>
-		<a href="#sometimes-parentheses-are-required">Parentheses are required in several rare scenarios to make code compile okay.</a>
+		<a href="#sometimes-parentheses-are-required">在一些罕见场景里，需要使用圆括号才能使代码编译通过。</a>
 	</li>
 	<!--
 	<li>
@@ -214,28 +214,28 @@ some are shown in the following sections.
 	</li>
 	-->
 	<li>
-		<a href="#stack-overflow-is-not-panic">Stack overflow is not panic.</a>
+		<a href="#stack-overflow-is-not-panic">栈溢出不是崩溃(panic)。</a>
 	</li>
 	<li>
-		<a href="#some-evaluation-order-are-compiler-dependent">Some expression evaluation orders in Go are compiler implementation dependent.</a>
+		<a href="#some-evaluation-order-are-compiler-dependent">部分表达式的求值顺序在Go里依赖于编译器实现。</a>
 	</li>
 
 	</ul>
 </li>
 <li>
-	Standard packages related:
+	标准包相关的细节：
 	<ul>
 	<li>
-		<a href="#reflect-deep-equal">The results of <code>reflect.DeepEqual(x, y)</code> and <code>x == y</code> may be different.</a>
+		<a href="#reflect-deep-equal"><code>reflect.DeepEqual(x, y)</code> 和 <code>x == y</code>的结果可能会不同。</a>
 	</li>
 	<li>
-		<a href="#check-file-existent">We should use <code>os.IsNotExist(err)</code> instead of <code>err == os.ErrNotExist</code> to check whether or not a file exists.</a>
+		<a href="#check-file-existent">我们必须使用<code>os.IsNotExist(err)</code>而不是<code>err == os.ErrNotExist</code>来检查文件是否存在。</a>
 	</li>
 	<li>
-		<a href="#boolean-flag">The <code>flag</code> standard package treats boolean command flags differently than integer and string flags.</a>
+		<a href="#boolean-flag">标准包<code>flag</code>对待布尔命令标志不同于整数和字符串标志。</a>
 	</li>
 	<li>
-		<a href="#printf-positional-arguments"><code>[Sp|Fp|P]rintf</code> functions support positional arguments.</a>
+		<a href="#printf-positional-arguments"><code>[Sp|Fp|P]rintf</code>支持位置参数。</a>
 	</li>
 	</ul>
 </li>
@@ -243,16 +243,16 @@ some are shown in the following sections.
 </div>
 
 <p class="anchor" id="import-package-multiple-times"></p>
-<h3>A package can be imported more than once in a source file.</h3>
+<h3>一个包可以在源文件里被导入多次。</h3>
 
 <div>
 <p>
-A Go source file can imports the same package multiple times,
-but the import names must be different.
-These same-package imports reference the same package instance.
+一个Go源文件可以多次导入同一个包。，
+但是导入的名称必须不同。
+这些相同的包导入引用着同一个包实例。
 </p>
 
-For example:
+示例如下：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -266,11 +266,10 @@ func main() {
 </div>
 
 <p class="anchor" id="force-import-path"></p>
-<h3>The comment <code>// import "x.y.z/mypkg"</code> following <code>package mypkg</code> is meaningful for the standard Go compiler.</h3>
+<h3>在<code>package mypkg</code>之后的注释<code>// import "x.y.z/mypkg"</code>对标准Go编译器是否有意义。</h3>
 
 <div>
-For example, when the source files importing this package are compiled by the standard Go compiler,
-the import path of the following package must be <code>"x.y.z/mypkg"</code>.
+例如，当标准编译器编译导入此包的源文件时，以下包的导入路径必须是 <code>"x.y.z/mypkg"</code>。
 
 <pre class="line-numbers"><code class="language-go">package mypkg // import "x.y.z/mypkg"
 ...
@@ -281,7 +280,7 @@ the import path of the following package must be <code>"x.y.z/mypkg"</code>.
 </div>
 
 <p class="anchor" id="default-branch-position"></p>
-<h3>The <code>default</code> branch in <code>switch</code> and <code>select</code> blocks can be put before all <code>case</code> branches, after all <code>case</code> branches, or between <code>case</code> branches.</h3>
+<h3>在<code>switch</code> 和 <code>select</code>代码块里，<code>default</code>分支可以放在所有的<code>case</code>分支之前，所有的<code>case</code>分支之后，以及<code>case</code>分支之间。</h3>
 
 <div>
 For example:
@@ -331,10 +330,10 @@ For example:
 </div>
 
 <p class="anchor" id="constant-case-expressions"></p>
-<h3>The numeric constant case expressions in a <code>switch</code> block can't be duplicate, but boolean ones can.</h3>
+<h3>在<code>switch</code>代码块里的数字常量case表达式不能够重复，但是布尔可以。</h3>
 
 <div>
-For example, the following program fails to compile.
+例如，下列程序在编译时会失败。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -346,7 +345,7 @@ func main() {
 }
 </code></pre>
 
-But the following program compiles okay.
+但是下列程序在编译时是正常的。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -359,19 +358,17 @@ func main() {
 </code></pre>
 
 <p>
-For reasons, please read <a href="https://github.com/golang/go/issues/28357">this issue</a>.
-The behavior is compiler dependent.
-In fact, the standard Go compiler also doesn't allow duplicate string case expressions, but gccgo allows.
+关于原因，请阅读<a href="https://github.com/golang/go/issues/28357">这个问题</a>。
+这个行为依赖于编译器。
+事实上，标准的Go编译器同样不允许重复的字符串case表达式，但是gccgo允许。
 </p>
 </div>
 
 <p class="anchor" id="switch-expressions-are-typed"></p>
-<h3>The switch expressions in <code>switch</code> block are always evaluated to typed values.</h3>
+<h3>在<code>switch</code>代码块里的switch表达式总是计算为类型化值。</h3>
 
 <div>
-For example, the switch expression <code>123</code> in the following <code>switch</code> block
-is viewed as a value of <code>int</code> instead of an untyped integer.
-So the following program fails to compile.
+例如，在下列<code>switch</code>代码块中的switch表达式<code>123</code>被视为一个<code>int</code>值，而不是一个无类型的整数。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -388,10 +385,11 @@ func main() {
 </div>
 
 <p class="anchor" id="default-switch-expression-value"></p>
-<h3>The default switch expression of a <code>switch</code> block is a typed value <code>true</code> of the predeclared type <code>bool</code>.</h3>
+<h3><code>switch</code>代码块中的default switch表达式是预声明类型<code>bool</code>的类型值<code>true</code>。</h3>
 
 <div>
 For example, the following program will print <code>true</code>.
+例如，下列程序会打印<code>true</code>。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -410,10 +408,10 @@ func main() {
 </div>
 
 <p class="anchor" id="open-brace-on-the-next-line"></p>
-<h3>Sometimes, the open brace <code>{</code> of an explicit code block can be put on the next line.</h3>
+<h3>有时候，显示代码块的开括号<code>{</code>可以放在下一行。</h3>
 
 <div>
-For example:
+例如：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -435,9 +433,9 @@ Outer:
 
 <p></p>
 
-What result will the following program print? <code>true</code> or <code>false</code>?
-The answer is <code>true</code>.
-Please read <a href="line-break-rules.html">line break rules in Go</a> for reasons.
+下面程序的结果会打印什么？<code>true</code> 还是 <code>false</code>?
+答案是<code>true</code>。
+关于原因请阅读<a href="line-break-rules.html">Go的断行规则</a>。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -462,10 +460,10 @@ func main() {
 </div>
 
 <p class="anchor" id="some-case-branch-blocks-must-be-explicit"></p>
-<h3>Some <code>case</code> branch blocks must be explicit.</h3>
+<h3>部分<code>case</code>分支代码块必须是显式的。</h3>
 
 <div>
-For example, the following program fails to compile.
+例如，下面的程序会在编译时失败。
 
 <pre class="line-numbers"><code class="language-go">func demo(n, m int) (r int) {
 	switch n {
@@ -483,7 +481,7 @@ For example, the following program fails to compile.
 }
 </code></pre>
 
-To make it compile okay, the <code>case</code> branch code block should be explicit:
+为了编译通过，<code>case</code>分支代码块必须是显式的：
 
 <pre class="line-numbers"><code class="language-go">func demo(n, m int) (r int) {
 	switch n {
@@ -502,7 +500,7 @@ To make it compile okay, the <code>case</code> branch code block should be expli
 }
 </code></pre>
 
-Alternatively, we can let a semicolon follow the label <code>End:</code>:
+另外，我们可以在标签<code>End:</code>之后加一个分号：
 
 <pre class="line-numbers"><code class="language-go">func demo(n, m int) (r int) {
 	switch n {
@@ -521,16 +519,16 @@ Alternatively, we can let a semicolon follow the label <code>End:</code>:
 </code></pre>
 
 <p>
-Please read <a href="line-break-rules.html">line break rules in Go</a> for reasons.
+关于原因，请阅读<a href="line-break-rules.html">Go的断行规则</a>。
 </p>
 
 </div>
 
 <p class="anchor" id="defer-modify-results"></p>
-<h3>A nested deferred function calls can modify return result values of its innermost nesting function.</h3>
+<h3>嵌套的defered函数调用可以修改所嵌套函数返回结果的值。</h3>
 
 <div>
-For example:
+例如：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -554,15 +552,15 @@ func main() {
 </div>
 
 <p class="anchor" id="no-op-recover-calls"></p>
-<h3>Some <code>recover</code> calls may be NoOps.</h3>
+<h3>部分<code>recover</code>调用可以是NoOps。</h3>
 
 <p>
-We should call the <code>recover</code> function at the right places.
-Please read <a href="panic-and-recover-more.html">the right places to call the built-in <code>recover</code> function</a> for details.
+我们需要在正确的地方调用<code>recover</code>函数。
+关于细节请阅读 <a href="panic-and-recover-more.html">调用内置函数<code>recover</code>的正确位置</a>。
 </p>
 
 <p class="anchor" id="os-exit-runtime-goexit"></p>
-<h3>Exit a program with a <code>os.Exit</code> function call and exit a goroutine with a <code>runtime.Goexit</code> function call.</h3>
+<h3>用一个<code>os.Exit</code>函数调用退出一个程序和用一个<code>runtime.Goexit</code>函数调用退出一个goroutine。</h3>
 
 <!--
 https://github.com/golang/go/issues/29226 a bug of goexit
@@ -570,12 +568,11 @@ https://github.com/golang/go/issues/29226 a bug of goexit
 
 <div>
 <p>
-We can exit a program from any function by calling the <code>os.Exit</code> function.
-An <code>os.Exit</code> function call takes an <code>int</code> code as
-argument and returns the code to operating system.
+我们可以通过调用<code>os.Exit</code>函数从任何函数里退出一个程序。
+<code>os.Exit</code>函数调用以<code>int</code> 代码作为参数并将代码返回给操作系统。
 </p>
 
-An example:
+示例如下：
 
 <pre class="line-numbers"><code class="language-go">// exit-example.go
 package main
@@ -592,7 +589,7 @@ func main() {
 }
 </code></pre>
 
-Run it:
+运行：
 
 <pre class="output"><code>$ go run a.go
 exit status 1
@@ -604,11 +601,11 @@ $ echo $?
 </p>
 
 <p>
-We can make a goroutine exit by calling the <code>runtime.Goexit</code> function.
-The <code>runtime.Goexit</code> function has no parameters.
+我们可以通过调用<code>runtime.Goexit</code>函数退出一个goroutine。
+<code>runtime.Goexit</code>函数不需要参数。
 </p>
 
-In the following example, the <code>Java</code> word will not be printed.
+在下列示例里，单词<code>Java</code>将不会被打印。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -636,10 +633,10 @@ func main() {
 </div>
 
 <p class="anchor" id="some-operator-precedence"></p>
-<h3>The precedence of the increment operator <code>++</code> and the decrement <code>--</code> is lower than the dereference operator <code>*</code> and the address-taken operator <code>&amp;</code>, which are lower than the property selection operator <code>.</code> in selectors.</h3>
+<h3>递增运算符<code>++</code>和递减运算符<code>--</code>的优先级低于解引用(dereference)运算符<code>*</code>和取地址运算符<code>&amp;</code>，这两个运算符的优先级低于选择器<code>.</code>中的属性选择运算符。</h3>
 
 <div>
-For example:
+例如：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -669,7 +666,7 @@ func main() {
 </div>
 
 <p class="anchor" id="type-deduction-in-bit-shift"></p>
-<h3>The type deduction rule for the left untyped operand of a bit-shift operation depends on whether or not the right operand is a constant.</h3>
+<h3>位移操作的左无类型操作数的类型推断规则取决于右操作数是否是常量。</h3>
 
 <div>
 
@@ -687,16 +684,16 @@ var _ = 1.0 << N // fail to compile. 1.0 is deduced as a float64 value.
 </code></pre>
 
 <p>
-Please read <a href="operators.html#bitwise-shift-left-operand-type-deduction">this article</a> for reasons.
+关于原因请阅读<a href="operators.html#bitwise-shift-left-operand-type-deduction">这一章节</a>。 
 </p>
 </div>
 
 <p class="anchor" id="conversion-of-pointers-with-different-underlying-types"></p>
-<h3>Values of two pointer types with different underlying types can be converted to each other if the base types of their underlying types share the same underlying type.</h3>
+<h3>如果具有不同底层类型的两个指针类型的基础类型共享相同的底层类型，则可以将其值相互转换。</h3>
 
 <div>
 
-An example:
+例如：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -725,14 +722,13 @@ func main() {
 </div>
 
 <p class="anchor" id="addresses-of-zeor-sized-values"></p>
-<h3>Addresses of different zero-sized values may be equal, or not.</h3>
+<h3>不同的零大小值的地址可能相等，也可能或不相等。</h3>
 <!--
 https://github.com/golang/go/issues/12726
 -->
 
 <div>
-Whether or not the addresses of two zero-sized values are equal
-is compiler and compiler version dependent.
+两个零大小值的地址是否相等时依赖于编译器以及编译器版本。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -765,16 +761,16 @@ func main() {
 </code></pre>
 
 <p>
-The outputs indicated in the above code are for the standard Go compiler 1.11.
+上面代码中所示的输出是针对标准Go编译器1.11的。
 </p>
 </div>
 
 <p class="anchor" id="self-based-pointer-type"></p>
-<h3>The base type of a pointer type may be the pointer type itself.</h3>
+<h3>指针类型的基础类型可能是指针类型自身。</h3>
 
 <div>
 
-An example:
+例如：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -789,19 +785,19 @@ func main() {
 <p>
 </p>
 
-Similarly,
+类似的，
 <ul>
 <li>
-	the element type of a slice type can be the slice type itself,
+	切片类型的元素类型可以是切片类型自身，
 </li>
 <li>
-	the element type of a map type can be the map type itself,
+	映射类型的元素类型可以是映射类型自身，
 </li>
 <li>
-	the element type of a channel type can be the channel type itself,
+	管道类型的元素类型可以是管道类型自身，
 </li>
 <li>
-	and the argument and result types of a function type can be the function type itself.
+	函数类型的参数和返回值类型可以是函数类型自身。
 </li>
 </ul>
 
@@ -835,18 +831,15 @@ func main() {
 </div>
 
 <p class="anchor" id="pointer-selector-shorthands"></p>
-<h3>A detail about selector shorthands.</h3>
+<h3>有关选择器速记的细节。</h3>
 
 <div>
 
 <p>
 <p>
-For a pointer value, which type is either defined or not,
-if the base type of its (pointer) type is a struct type,
-then the pointer value can select the <b>fields</b> of
-the struct value it references.
-However, if the type of the pointer value is a defined type,
-the value can not select the methods of the value its references.
+对于一个已定义或者未定义类型的指针值，如果它的（指针）类型的基础类型是结构体类型，
+那么指针值可以选择它引用的结构体值的<b>字段</b>。
+然而，如果指针值的类型是已定义类型，则该值不能选择其引用的值的方法。
 </p>
 
 <pre class="line-numbers"><code class="language-go">package main
@@ -881,26 +874,26 @@ func main() {
 </div>
 
 <p class="anchor" id="composite-literal-simplification"></p>
-<h3>Sometimes, nested composite Literals can be simplified.</h3>
+<h3>有时候，嵌套组合字面值可以简化。</h3>
 
 <p>
-Please read <a href="container.html#composite-literal-simplification">this</a> for details.
+关于细节请阅读 <a href="container.html#composite-literal-simplification">这一章节</a>。 
 </p>
 
 <p class="anchor" id="use-pointer-as-array"></p>
-<h3>In some scenarios, it is ok to use array pointers as arrays.</h3>
+<h3>在部分场景下，可以使用数组指针作为数组。</h3>
 
 <p>
-Please read <a href="container.html#use-pointer-as-array">this</a> for details.
+关于细节请阅读<a href="container.html#use-pointer-as-array">这一章节</a>。 
 </p>
 
 <p class="anchor" id="nil-map-element-retrieving"></p>
-<h3>Retrieving elements from nil maps will not panic. The result is a zero element value.</h3>
+<h3>从空(nil)映射里检索元素不会导致崩溃(panic)。其结果是一个零元素值。</h3>
 
 <div>
 
-For example, the <code>Foo1</code> and the <code>Foo2</code> functions are equivalent,
-but the function <code>Foo2</code> is much tidier than the function <code>Foo1</code>.
+例如，函数<code>Foo1</code>和<code>Foo2</code>是相等的，但是函数<code>Foo2</code>比函数
+<code>Foo1</code>整洁多了。
 
 <pre class="line-numbers"><code class="language-go">func Foo1(m map[string]int) int {
 	if m != nil {
@@ -919,11 +912,11 @@ func Foo2(m map[string]int) int {
 </div>
 
 <p class="anchor" id="nil-map-element--deletion"></p>
-<h3>Deleting an entry from a nil map will not panic. It is a no-op.</h3>
+<h3>从一个空(nil)映射删除一个条目不会导致崩溃(panic)。这是一个无操作(no-op)。</h3>
 
 <div>
 
-For example, the following program will not panic.
+例如，下列程序不会崩溃(panic)。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -938,18 +931,18 @@ func main() {
 </div>
 
 <p class="anchor" id="append-slice-elements"></p>
-<h3>The result slice of an <code>append</code> function call may share some elements with the original slice, or not.</h3>
+<h3>切片调用<code>append</code>函数的结果可能会与原始切片共享一些元素，也可能不会。</h3>
 
 <p>
-Please read <a href="container.html#element-addition-deletion">this</a> for details.
+关于细节请阅读<a href="container.html#element-addition-deletion">这一章节</a>。 
 </p>
 
 <p class="anchor" id="subslice"></p>
-<h3>The length of a subslice may be larger than the base slice the subslice derives from.</h3>
+<h3>子切片的长度可能大于子切片派生自的基切片。</h3>
 
 <div>
 
-For example,
+例如，
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -964,16 +957,16 @@ func main() {
 </code></pre>
 
 <p>
-Please read <a href="container.html#subslice">this</a> for details.
+关于细节请阅读<a href="container.html#subslice">这一章节</a>。
 </p>
 </div>
 
 <p class="anchor" id="derive-from-nil-slice"></p>
-<h3>Deriving a subslice from a nil slice is ok if all the indexes used in the subslice expression are zero. The result subslice is also a nil slice.</h3>
+<h3>如果子切片表达式中使用的所有索引都为零，则从空(nil)切片中派生子切片是可以的。子切片的结果同样是一个空切片。</h3>
 
 <div>
 
-For example, the following program will not panic at run time.
+例如，下面的程序在运行时不会崩溃(panic)。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -990,16 +983,17 @@ func main() {
 </code></pre>
 
 <p>
-Please read <a href="container.html#subslice">this</a> for details.
+关于细节请阅读<a href="container.html#subslice">这一章节</a>。
 </p>
 </div>
 
 <p class="anchor" id="range-over-nil-map-and-slice"></p>
-<h3>Ranging over a nil maps or a nil slices is ok, it is a no-op.</h3>
+<h3>在空映射或者空切片上测距(ranging over)是可以的，这是一个无操作(no-op)。</h3>
 
 <div>
 
 For example, the following program compiles okay.
+例如，下面的程序可以编译通过。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1019,11 +1013,11 @@ func main() {
 </div>
 
 <p class="anchor" id="range-over-nil-array-pointer"></p>
-<h3>Range over a nil array pointer is ok if the second iteration variable is ignored or omitted.</h3>
+<h3>如果第二个迭代变量被忽略或省略，那么在空(nil)数组指针上用range遍历是可以的。</h3>
 
 <div>
 
-For example, the following program will print <code>01234</code>.
+例如，下面的程序会输出<code>01234</code>。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1042,18 +1036,19 @@ func main() {
 </div>
 
 <p class="anchor" id="modify-slice-length-and-capacity-separately"></p>
-<h3>The length and capacity of a slice can be modified separately.</h3>
+<h3>切片的长度和容量可以单独修改。</h3>
 
 <p>
-We can modify the length and capacity of a slice separately through the reflection way.
-Please read <a href="container.html#modify-slice-length-and-capacity">this</a> for details.
+我们可以通过反射的返回单独修改一个切片的长度和容量。
+关于细节请阅读<a href="container.html#modify-slice-length-and-capacity">这一章节</a>。 
 </p>
 
 <p class="anchor" id="indexes-in-composite-literals"></p>
-<h3>The indexes in slice and array composite literals must be constants and non-negative.</h3>
+<h3>切片和数组复合字面值中的索引必须是常量和非负值。</h3>
 
 <div>
 For example, the following code fails to compile.
+例如，下面的程序会在编译时失败。
 
 <pre class="line-numbers"><code class="language-go">var k = 1
 var x = [2]int{k: 1} // error: index must be non-negative integer constant
@@ -1061,15 +1056,15 @@ var y = []int{k: 1}  // error: index must be non-negative integer constant
 </code></pre>
 
 <p>
-Note, the keys in map composite literals are not required to be constants.
+注意，映射复合字面值中的键不需要是常量。
 </p>
 </div>
 
 <p class="anchor" id="constant-keys-in-composite-literals"></p>
-<h3>The constant indexes or keys in slice/array/map composite literals can't be duplicate.</h3>
+<h3>切片/数组/映射复合字面值的常量索引和键不能重复。</h3>
 
 <div>
-For example, the following code fails to compile.
+例如，下面的程序会在编译时失败。
 
 <pre class="line-numbers"><code class="language-go">// error: duplicate index in array literal: 1
 var a = []bool{0: false, 1: true, 1: true}
@@ -1080,22 +1075,20 @@ var c = map[string]int{"foo": 1, "foo": 2}
 </code></pre>
 
 <p>
-This feature can be used to <a href="tips.html#assert-at-compile-time">assert some conditions at compile time</a>.
+这个特性可以用于<a href="tips.html#assert-at-compile-time">在编译时断言某些条件</a>。
 </p>
 </div>
 
 <p class="anchor" id="array-slice-element-addressability"></p>
-<h3>Elements of unaddressable arrays are also unaddressable, but elements of unaddressable slices are always addressable.</h3>
+<h3>不可寻址的数组的元素依旧时不可寻址的，但是不可寻址的切片的元素总是可寻址的。</h3>
 
 <div>
 <p>
-The reason is the elements of an array value and the array will be stored
-in the same memory block when the array is stored in memory.
-But <a href="unofficial-faq.html#slice-elements-always-addressable">the
-situation is different for slices</a>.
+原因是数组值的元素，当数组存储在内存中时，数组将存储在相同的内存块中。
+但是 <a href="unofficial-faq.html#slice-elements-always-addressable">切片的情况就完全不同</a>。
 </p>
 
-An example:
+例如：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1122,16 +1115,16 @@ func main() {
 
 <p class="anchor" id="array-slice-derivable"></p>
 <h3>
-It is ok to derive subslices from unaddressable slices, but not ok from unaddressable arrays.
-It is ok to take addresses for elements of unaddressable slices, but not ok for elements of unaddressable arrays.
+可以从不可寻址的切片中派生子切片，但是不能从不可寻址的数组中派生子切片。
+可以从不可寻址的切片中取元素的地址，但是不能从不可寻址的数组中取元素的地址。
 </h3>
 
 <div>
 <p>
-The reason is the same as the last detail.
+原因和最后一个细节是一样的。
 </p>
 
-An example:
+例如：
 <pre class="line-numbers"><code class="language-go">package main
 
 func main() {
@@ -1159,11 +1152,11 @@ func main() {
 </div>
 
 <p class="anchor" id="nan-as-map-keys"></p>
-<h3>Putting elements with <code>NaN</code> as keys to a map is like putting the elements in a black hole.</h3>
+<h3>把以<code>NaN</code>作为键的元素放在映射上就像把元素放到黑洞里一样。</h3>
 
 <div>
-This reason is <code>NaN != NaN</code> (see the above detail).
-The elements with <code>NaN</code> as key can only be found out in a <code>for-range</code> loop.
+原因是<code>NaN != NaN</code>（细节见下文）。
+以<code>NaN</code>作为键的元素只能在<code>for-range</code>循环中被找到。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1199,17 +1192,16 @@ func main() {
 </div>
 
 <p class="anchor" id="capacity-of-slice-from-string"></p>
-<h3>The capacity of the result slice of a conversion from a string to byte/rune slice may be larger than the length of the result slice.</h3>
+<h3>将字符串转换为字节/符文的结果切片的容量可能会大于结果切片的长度。</h3>
 
 <div>
 <p>
-We should not assume the length and the capacity of the result slice are always equal.
+我们不能假设结果切片的长度和容量总是相等的。
 </p>
 
-In the following example, if the last <code>fmt.Println</code> line is removed,
-the outputs of the two lines before it print the same value <code>32</code>,
-otherwise, one print <code>32</code> and one print <code>8</code>.
-(For the standard Go compiler 1.11.)
+在下面的例子中，如果最后一个<code>fmt.Println</code>行被删除，在其前面的两行会打印相同的值 <code>32</code>，
+否则，一个打印<code>32</code>，一个打印<code>8</code>。
+（适用于标准的Go编译器1.11。）
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1225,16 +1217,15 @@ func main() {
 </code></pre>
 
 <p>
-<a href="https://github.com/go101/go101/wiki/The-capacity-of-the-result-byte-%28or-rune%29-slice-of-a-conversion-from-a-string-is-undefined">Some buggy code will be written</a> if we assume the length and the capacity of the result slice are always equal.
+如果我们假设结果切片的长度和容量总是相等，<a href="https://github.com/go101/go101/wiki/The-capacity-of-the-result-byte-%28or-rune%29-slice-of-a-conversion-from-a-string-is-undefined">就会写出一些有bug的代码</a>。 
 </p>
 </div>
 
 <p class="anchor" id="different-loops"></p>
-<h3>For a slice <code>s</code>, the loop <code>for i = range s {...}</code> is not equivalent to the loop <code>for i = 0; i < len(s); i++ {...}</code>.</h3>
+<h3>对于切片<code>s</code>，循环<code>for i = range s {...}</code> 不等于循环<code>for i = 0; i < len(s); i++ {...}</code>。</h3>
 
 <div>
-The respective final values of the iteration variable <code>i</code>
-may be different for the two loops.
+对于这两个循环，迭代变量<code>i</code>的最终值可能是不同的。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1267,31 +1258,31 @@ func main() {
 </div>
 
 <p class="anchor" id="call-as-expression"></p>
-<h3>A multi-result function call can't mix with other expressions when the call is used as the sources in an assignment or the arguments of another function call.</h3>
+<h3>当调用用做赋值中的源或另一个函数调用的参数时，多结果函数调用并不能与其它表达式混合</h3>
 
 <p>
-Please read <a href="function.html#call-as-expression">this</a> for details.
+关于细节请阅读<a href="function.html#call-as-expression">这一章节</a>。
 </p>
 
 <p class="anchor" id="compile-time-evaluated-calls"></p>
-<h3>Some function calls are evaluated at compile time.</h3>
+<h3>部分函数调用可以在编译时求值。</h3>
 
 <p>
-Please read <a href="function.html#compile-time-evaluated-calls">this</a> for details.
+关于细节请阅读<a href="function.html#compile-time-evaluated-calls">这一章节</a>。
 </p>
 
 <p class="anchor" id="method-as-function"></p>
-<h3>Each method corresponds to an implicit function.</h3>
+<h3>每一个方法都与一个隐式函数相关。</h3>
 
 <p>
-Please read <a href="method.html#method-as-function">this</a> for details.
+关于细节请阅读<a href="function.html#compile-time-evaluated-calls">这一章节</a>。
 </p>
 
 <p class="anchor" id="comparison-interfaces-may-panic"></p>
-<h3>Comparing two interface values with the same dynamic uncomparable type produces a panic.</h3>
+<h3>将两个接口值与相同的动态不可比较类型进行比较会产生崩溃(panic)。</h3>
 
 <div>
-For example:
+例如：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1306,10 +1297,10 @@ func main() {
 </div>
 
 <p class="anchor" id="type-assertion-to-interface-type"></p>
-<h3>Type assertions can be used to convert a value of an interface type to another interface type, even if the former interface type doesn't implement the latter one.</h3>
+<h3>类型推断可以用于转换一个接口类型的值为另一个接口类型，即使前一种接口类型不实现后一种接口类型。</h3>
 
 <div>
-For example:
+例如：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1333,12 +1324,14 @@ func main() {
 </div>
 
 <p class="anchor" id="failed-type-assertion-may-panic"></p>
-<h3>Whether or not the second optional result of a type assertion is present will affect the behavior of the type assertion.</h3>
+<h3>类型断言的第二个可选结果是否存在将影响类型断言的行为。</h3>
 
 <div>
 If the second optional result presents in a failed type assertion, the type assertion will not produce a panic.
 Otherwise, a panic will occur.
-For example:
+如果第二个可选结果出现在失败的类型断言中，那么类型断言不会产生崩溃(panic)。
+否则，会发生崩溃(panic)。
+例如：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1428,12 +1421,11 @@ the sizes of the direct parts of all interface values are the same.
 -->
 
 <p class="anchor" id="errors-new-different-returns"></p>
-<h3>Two <code>error</code> values returned by two <code>errors.New</code> calls with the same argument are not equal.</h3>
+<h3>以相同参数调用两次<code>errors.New</code>返回的两个<code>错误</code>值是不相等的。</h3>
 
 <div>
-The reason is the <code>errors.New</code> function will copy the input string argument
-and use a pointer to the copied string as the dynamic value of the returned <code>error</code> value.
-Two different calls will produce two different pointers.
+原因是 <code>errors.New</code>函数会复制输入的字符串参数并用一个复制字符串的指针作为返回<code>error</code>值的动态值。
+两次调用会产生两个不同的指针。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1452,10 +1444,10 @@ func main() {
 </div>
 
 <p class="anchor" id="receive-only-channel-canot-be-closed"></p>
-<h3>Receive-only channels can't be closed.</h3>
+<h3>仅接收的管道不能关闭。</h3>
 
 <div>
-For example, the following code fails to compile.
+例如，下面的代码会在编译时候失败。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1472,10 +1464,10 @@ func foo(c <-chan int) {
 </div>
 
 <p class="anchor" id="send-to-closed-channel-is-non-blocking"></p>
-<h3>Sending a value to a closed channel is viewed as a non-blocking operation, and this operation causes a panic.</h3>
+<h3>将一个值发送到一个关闭的通道被视为一个非阻塞操作，该操作会引起崩溃(panic)。</h3>
 
 <div>
-For example, in the following program, the second case branch will get selected, it will produce a panic at run time.
+例如，在下面的程序里，第二个case分支会被选择，会在运行发生崩溃(painc)。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1495,10 +1487,10 @@ func main() {
 </div>
 
 <p class="anchor" id="local-type-declaration"></p>
-<h3>Types can be declared within function bodies.</h3>
+<h3>类型可以在函数体内被声明。</h3>
 
 <div>
-Types can be declared in function bodies. For example,
+类型可以在函数体内被声明。例如，
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1512,17 +1504,17 @@ func main() {
 </div>
 
 <p class="anchor" id="final-zero-size-field"></p>
-<h3>For the standard compiler, zero-sized fields in a struct may be treated as one-byte-sized value.</h3>
+<h3>对于标准编译器，结构体中零大小的字段会被视为一个比特大小的值。</h3>
 
 <p>
-Please read <a href="unofficial-faq.html#final-zero-size-field">this FAQ item</a> for details.
+关于细节请阅读<a href="unofficial-faq.html#final-zero-size-field">这个FAQ条目</a>。
 </p>
 
 <p class="anchor" id="nan-inf"></p>
 <h3>NaN != NaN, Inf == Inf.</h3>
 
 <div>
-This follows IEEE-754 standard and is consistent with most other programming languages:
+这遵循IEEE-754标准并与大多数其它语言一致：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -1544,10 +1536,10 @@ func main() {
 </div>
 
 <p class="anchor" id="non-exported-names-from-different-packages"></p>
-<h3>Non-exported method names and struct field names from different packages are viewed as different names.</h3>
+<h3>来自不同包的非导出方法名和结构体字段名被视为不同的名称。</h3>
 
 <div>
-For example, if the following types are declared in package <code>foo</code>:
+例如，下面在包<code>foo</code>中声明的类型：
 
 <pre class="line-numbers"><code class="language-go">package foo
 
@@ -1564,7 +1556,7 @@ func (s S) about() string {
 }
 </code></pre>
 
-and the following types are declared in package <code>bar</code>:
+以及下面在包<code>bar</code>声明的类型：
 
 <pre class="line-numbers"><code class="language-go">package bar
 
@@ -1581,21 +1573,19 @@ func (s S) about() string {
 }
 </code></pre>
 
-then,
+那么，
 <ul>
 <li>
-	values of the two respective types <code>S</code> from the two packages
-	can't be converted to each other.
+	两个包中的两个类型 <code>S</code>的值不能相互转换。
 </li>
 <li>
-	the two respective interface types <code>S</code> from the two packages
-	denote two distinct method sets.
+	两个包中的两个接口类型表示两个不同的方法集。
 </li>
 <li>
-	type <code>foo.S</code> doesn't implement the interface type <code>bar.I</code>.
+	类型<code>foo.S</code>不实现接口类型 <code>bar.I</code>。
 </li>
 <li>
-	type <code>bar.S</code> doesn't implement the interface type <code>foo.I</code>.
+	类型<code>bar.S</code>不实现接口类型<code>foo.I</code>。
 </li>
 </ul>
 
@@ -1621,10 +1611,10 @@ func main() {
 </div>
 
 <p class="anchor" id="sometimes-parentheses-are-required"></p>
-<h3>Parentheses are required in several rare scenarios to make code compile okay.</h3>
+<h3>在一些罕见场景里，需要使用圆括号才能使代码编译通过。</h3>
 
 <div>
-For example:
+例如：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1682,11 +1672,11 @@ var main int
 -->
 
 <p class="anchor" id="stack-overflow-is-not-panic"></p>
-<h3>Stack overflow is not panic.</h3>
+<h3>栈溢出不是崩溃(panic)。</h3>
 
 <div>
 
-Stack overflow in Go is fatal error. Once a stack overflow happens, program will crash with no recovery ways.
+栈溢出在Go里是致命错误。一旦栈溢出发生，程序会以不可恢复的方式崩溃。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1699,7 +1689,7 @@ func main() {
 }
 </code></pre>
 
-the running result:
+运行结果是：
 
 <pre class="output"><code>runtime: goroutine stack exceeds 1000000000-byte limit
 fatal error: stack overflow
@@ -1713,25 +1703,25 @@ runtime stack:
 </div>
 
 <p class="anchor" id="some-evaluation-order-are-compiler-dependent"></p>
-<h3>Some expression evaluation orders in Go are compiler implementation dependent.</h3>
+<h3>部分表达式的求值顺序在Go里依赖于编译器实现。</h3>
 
 <p>
-Please read <a href="evaluation-orders.html">expression evaluation orders in Go</a> for details.
+关于细节请阅读<a href="evaluation-orders.html">Go中的表达式求值顺序。</a> 
 </p>
 
 <p class="anchor" id="reflect-deep-equal"></p>
-<h3>The results of <code>reflect.DeepEqual(x, y)</code> and <code>x == y</code> may be different.</h3>
+<h3><code>reflect.DeepEqual(x, y)</code> 和 <code>x == y</code>的结果可能会不同。</h3>
 
 <p>
-Please read <a href="reflection.html#deep-equal">this</a> for details.
+关于细节请阅读<a href="reflection.html#deep-equal">这一章节</a>。
 </p>
 
 <p class="anchor" id="check-file-existent"></p>
-<h3>We should use <code>os.IsNotExist(err)</code> instead of <code>err == os.ErrNotExist</code> to check whether or not a file exists.</h3>
+<h3>我们必须使用<code>os.IsNotExist(err)</code>而不是<code>err == os.ErrNotExist</code>来检查文件是否存在。</h3>
 
 <div>
 
-Using <code>err == os.ErrNotExist</code> may miss errors.
+使用<code>err == os.ErrNotExist</code>可能漏掉一些错误。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1752,25 +1742,24 @@ func main() {
 </div>
 
 <p class="anchor" id="boolean-flag"></p>
-<h3>The <code>flag</code> standard package treats boolean command flags differently than integer and string flags.</h3>
+<h3>标准包<code>flag</code>对待布尔命令标志不同于整数和字符串标志。</h3>
 
 <div>
-There are three forms to pass flag options.
+传递标志选项有三种形式。
 <ol>
 <li>
-	<code>-flag</code>, for boolean flags only.
+	<code>-flag</code>， 仅用于布尔标志。
 </li>
 <li>
-	<code>-flag=x</code>, for any flag.
+	<code>-flag=x</code>， 用于任何标志。.
 </li>
 <li>
-	<code>-flag x</code>, for non-boolean flags only.
+	<code>-flag x</code>， 仅用于非布尔标志。
 </li>
 </ol>
 
 <p>
-And please note that, all items following a boolean flag with
-the first form are viewed as arguments.
+请注意，使用第一种形式的布尔标志后面的所有项都被视为参数。
 </p>
 
 <pre class="line-numbers"><code class="language-go">package main
@@ -1792,32 +1781,32 @@ func main() {
 <p>
 </p>
 
-If we run the following program with the below shown flags and arguments
+如果我们用下面显示的标志和参数运行下面的程序
 
 <pre class="output"><code>./exampleProgram -b false -i 789 -s bye arg0 arg1
 </code></pre>
 
-the output will be
+输出结果会是
 
 <pre class="output"><code>b=true, i=123, s=hi
 arguments: [false -i 789 -s bye arg0 arg1]
 </code></pre>
 
 <p>
-This output is obviously not what we expect.
+这个输出显然不是我们所期望的
 </p>
 
-We should pass the flags and arguments like
+我们应该像这样传递标志和参数
 
 <pre class="output"><code>./exampleProgram -b=false -i 789 -s bye arg0 arg1
 </code></pre>
 
-or
+或者
 
 <pre class="output"><code>./exampleProgram -i 789 -s bye -b arg0 arg1
 </code></pre>
 
-to get the output we expect:
+获取我们期望的输出：
 
 <pre class="output"><code>b=true, i=789, s=bye
 arguments: [arg0 arg1]
@@ -1826,14 +1815,14 @@ arguments: [arg0 arg1]
 </div>
 
 <p class="anchor" id="printf-positional-arguments"></p>
-<h3><code>[Sp|Fp|P]rintf</code> functions support positional arguments.</h3>
+<h3><code>[Sp|Fp|P]rintf</code>函数支持位置参数。</h3>
 
 <div>
 <p>
-The following program will print <code>3, 2, 1</code>.
+下面的程序会打印<code>3, 2, 1</code>。
 </p>
 
-An example:
+例如：
 
 <pre class="line-numbers"><code class="language-go">package main
 
