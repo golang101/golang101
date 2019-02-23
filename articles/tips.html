@@ -1,58 +1,61 @@
-<h1>Go Tips 101</h1>
+﻿<h1>Go 技巧 101</h1>
 
-Index
+索引
 
 <ul>
 <li>
-	<a href="#force-to-use-keyed-struct-literals">How to force package users to use struct composite literals with field names?</a>
+	<a href="#force-to-use-keyed-struct-literals">如何强制包的使用者用结构体复合字面值作为字段名字？</a>
 </li>
 <li>
-	<a href="#make-struct-type-uncomparable">How to make a struct type uncomparable?</a>
+	<a href="#make-struct-type-uncomparable">如何使得结构体类型不可比较？</a>
 </li>
 <li>
-	<a href="#dont-use-assignments-with-expression-dependencies">Don't use value assignments with dependencies between expressions.</a>
+	<a href="#dont-use-assignments-with-expression-dependencies">不要使用表达式之间依赖关系的值赋值。</a>
 </li>
 <li>
-	<a href="#simulate-loop-from-0-to-n">How to simulate <code>for i in 0..N</code> in some other languages?</a>
+	<a href="#simulate-loop-from-0-to-n">如何以其它语法模拟<code>for i in 0..N</code>？</a>
 </li>
 <li>
-	<a href="#reset-pointers-for-dead-elements">We should reset the pointers in the element slots which are freed up in all kinds of slice manipulations to avoid memory leaking if we can't make sure if the freed-up element slots will be reused later.</a>
+	<a href="#reset-pointers-for-dead-elements">我们应该重置元素slots中的指针，这些指针在所有类型的切片操作中被释放来避免内存泄漏，如果我们不能确定释放的元素slots以后是否会被重用。</a>
 </li>
 <li>
-	<a href="#avoid-copying-values-of-some-types">Values of some types in standard packages are not expected to be copied.</a>
+	<a href="#avoid-copying-values-of-some-types">在标准包里的一些类型的值不期望被复制。</a>
 </li>
 <li>
-	<a href="#memclr">We can use the memclr optimization to reset some contiguous elements in an array or slice.</a>
+	<a href="#memclr">我们可以使用memclr优化来重置一些在数组或者切片中连续的元素。</a>
 </li>
 <li>
-	<a href="#check-method-existance">How to check if a value has a method without importing the <code>refect</code> package?</a>
+	<a href="#check-method-existance">如何在不导入<code>refect</code>包的情况下检查一个值是否有方法。</a>
 </li>
 <li>
-	<a href="#clone-slice-efficiently-and-perfectly">How to efficiently and perfectly clone a slice?</a>
+	<a href="#clone-slice-efficiently-and-perfectly">如何高效且完美的克隆一个切片？</a>
 </li>
 <li>
-	<a href="#use-three-index-subslice-form">We should use the three-index subslice form at some scenarios.</a>
+	<a href="#use-three-index-subslice-form">我们在部分场景下必须使用三索引子切片。</a>
 </li>
 <li>
-	<a href="#execute-deferred-calls-earlier">Use anonymous functions to make some deferred function calls be executed earlier.</a>
+	<a href="#execute-deferred-calls-earlier">使用匿名函数来使部分defered函数调用尽早执行。</a>
 </li>
 <li>
-	<a href="#assert-implementation">Make sure and show a custom defined type implements a specified interface type.</a>
+	<a href="#assert-implementation">确保并显示自定义类型实现了指定的接口类型。</a>
 </li>
 <li>
-	<a href="#assert-at-compile-time">Some compile-time assertion tricks.</a>
+	<a href="#assert-at-compile-time">一些编译时断言技巧。</a>
 </li>
 <li>
-	<a href="#declare-max-int-uint">How to declare maximum int and uint constants?</a>
+	<a href="#declare-max-int-uint">如何声明一个最大的int和uint常量？</a>
 </li>
 <li>
-	<a href="#detect-word-size-at-compile-time">How to detect native word size at compile time?</a>
+	<a href="#detect-word-size-at-compile-time">如何在编译时检测原生单词大小？</a>
 </li>
 <li>
-	<a href="#64bit-alignment-guarantee">How to guarantee that the first pointer argument of a 64-bit atomic function call is always 64-bit aligned on 32-bit architectures?</a>
+	<a href="#64bit-alignment-guarantee">如何保证64位原子函数调用的第一个指针参数在32位架构上总是64位对齐的？</a>
 </li>
 <li>
-	<a href="#make-use-of-bce">Make optimizations by using BCE (bounds check elimination).</a>
+    <a href="#avoid-boxing-large-size-values">避免将大的值装箱到接口值中。</a>
+</li>
+<li>
+	<a href="#make-use-of-bce">使用BCE进行优化（消除边界检查）。</a>
 </li>
 </ul>
 
@@ -62,17 +65,16 @@ Index
 
 
 <p class="anchor" id="force-to-use-keyed-struct-literals"></p>
-<h3>How to force package users to use struct composite literals with field names?</h3>
+<h3>如何强制包的使用者用结构体复合字面值作为字段名字？</h3>
 
 <div>
 
 <p>
-Package developers can put a non-exported zero-size field in a struct type definition,
-so that compilers will forbid package users using composite literals without field names
-to create values of the struct type.
+包的开发者可以在一个结构体类型定义里放置一个非导出的零大小的字段，
+因此编译器将会禁止包的使用者使用没有字段名字的复合字面值来创建结构体类型。
 </p>
 
-An example:
+例如：
 
 <pre class="line-numbers"><code class="language-go">// foo.go
 package foo
@@ -99,8 +101,7 @@ func main() {
 </p>
 
 <p>
-Please try not to place the zero-size non-exported field as the last field in the struct,
-for <a href="unofficial-faq.html#final-zero-size-field">doing so might enlarge the size of the struct type</a>.
+请尽量不要把零大小的非导出字段作为结构体的最后一个字段，因为<a href="unofficial-faq.html#final-zero-size-field">这样做会扩大结构体类型的大小</a>。
 </p>
 
 </div>
@@ -108,13 +109,12 @@ for <a href="unofficial-faq.html#final-zero-size-field">doing so might enlarge t
 
 
 <p class="anchor" id="make-struct-type-uncomparable"></p>
-<h3>How to make a struct type uncomparable?</h3>
+<h3>如何使得结构体类型不可比较？</h3>
 
 <div>
-Sometimes, we want to avoid a custom struct type being used a map key types,
-then we can put a field of a non-exported zero-size uncomparable type
-in a struct type to make the struct type uncomparable.
-For example:
+有时候，我们想要避免一个自定义的结构体类型被用做一个映射的键类型，
+那么我们可以放置一个非导出的零大小的不可比较类型的字段在结构体类型中来使结构体类型不可比较。
+例如：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -138,22 +138,17 @@ func main() {
 
 
 <p class="anchor" id="dont-use-assignments-with-expression-dependencies"></p>
-<h3>Don't use value assignments with dependencies between expressions.</h3>
+<h3>不要使用表达式之间依赖关系的值赋值。</h3>
 
 <div>
 
 <p>
-Currently (Go 1.11), there are
-<a href="https://github.com/go101/go101/wiki/Some-evaluation-orders-in-multi-value-assignments-are-unspecified">some evaluation orders in multi-value assignments are unspecified</a>
-and there are <a href="https://github.com/go101/go101/wiki/An-ambiguity-of-%28or-dispute-on%29-the-evaluation-order-of-LHS-%28left-hand-side%29-items-in-a-multi-value-assignment">some disputes and bugs</a>
-in the standard Go compiler and gccgo compiler when there are dependencies existing between the expressions involved in a multi-value assignment.
-So try to split a multi-value assignment into multiple single value assignments
-if there are, or you can't make sure whether or not there are, dependencies between the involved expressions.
+目前(Go 1.11)，在一些多值赋值中<a href="https://github.com/go101/go101/wiki/Some-evaluation-orders-in-multi-value-assignments-are-unspecified">有一些求值顺序是未指定的</a>，并且标准Go编译器和gccgo编译器当涉及多值赋值的表达式之间存在依赖关系时还有<a href="https://github.com/go101/go101/wiki/An-ambiguity-of-%28or-dispute-on%29-the-evaluation-order-of-LHS-%28left-hand-side%29-items-in-a-multi-value-assignment">一些争议和bug</a>。
+因此，如果在涉及的表达式之间存在依赖，或者你不确定是否存在依赖关系时，请尝试把多值赋值分拆成多个单值赋值。
 </p>
 
-In fact, in some bad-written single-value assignments, there are also expression evaluation order ambiguities.
-For example, the following program might print <code>[7 0 9]</code>, <code>[0 8 9]</code>,
-or <code>[7 8 9]</code>, depending on compiler implementations.
+事实上，在部分写得很坏的单值赋值代码中，表达式求值同样是模棱两可的。
+例如，下面的程序可能会打印<code>[7 0 9]</code>，<code>[0 8 9]</code>，或者<code>[7 8 9]</code>，依赖于编译器实现。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -178,9 +173,8 @@ func main() {
 </p>
 
 <p>
-In other words, a function call in a value assignment shouldn't affect
-the evaluation results of the non-function-call expressions in the same assignment.
-Please read <a href="evaluation-orders.html">evaluation orders in Go</a> for details.
+换言之，在值赋值里的一个函数调用不会影响在同样赋值里的非函数调用表达式的求值结果。
+关于细节请阅读<a href="evaluation-orders.html">Go里的求值顺序</a>。
 </p>
 
 </div>
@@ -188,12 +182,12 @@ Please read <a href="evaluation-orders.html">evaluation orders in Go</a> for det
 
 
 <p class="anchor" id="simulate-loop-from-0-to-n"></p>
-<h3>How to simulate <code>for i in 0..N</code> in some other languages?</h3>
+<h3>如何以其它语法模拟<code>for i in 0..N</code>？</h3>
 
 <div>
 
-We can range over an array with zero-size element or a nil array pointer to simulate such a loop.
-For example:
+我们可以在一个元素大小为零的数组或者一个空数组指针上进行遍历来模拟这样的循环。
+例如：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -219,29 +213,27 @@ func main() {
 
 
 <p class="anchor" id="reset-pointers-for-dead-elements"></p>
-<h3>We should reset the pointers in the element slots which are freed up in all kinds of slice manipulations to avoid memory leaking if we can't make sure if the freed-up element slots will be reused later.</h3>
+<h3>我们应该重置元素slots中的指针，这些指针在所有类型的切片操作中被释放来避免内存泄漏，如果我们不能确定释放的元素slots以后是否会被重用。</h3>
 
 <p>
-Please read how to <a href="container.html#delete-slice-elements">delete slice elements</a> and <a href="memory-leaking.html#dead-slice-elements">kind-of memory leaking caused by not resetting pointers in dead slice elements</a> for details.
+关于细节请阅读如何<a href="container.html#delete-slice-elements">删除切片元素</a>和<a href="memory-leaking.html#dead-slice-elements">因为未重置丢失的切片元素中的指针而造成的临时性内存泄露</a>。 
 </p>
 
 
 
 <p class="anchor" id="avoid-copying-values-of-some-types"></p>
-<h3>Values of some types in standard packages are not expected to be copied.</h3>
+<h3>在标准包里的一些类型的值不期望被复制。</h3>
 
 <div>
 
 <p>
-Values of the <code>bytes.Buffer</code> type, <code>strings.Builder</code> type
-and the types in the <code>sync</code> standard package are not recommended to be copied.
-(They really should not be copied, though it is no problems to copy them
-under some specified circumstances.)
+<code>bytes.Buffer</code>类型，<code>strings.Builder</code>类型以及在<code>sync</code>标准包里的类型
+的值不建议被复制。
+（他们确实不建议被复制，尽管在特定情形下复制他们也是没有问题的。）
 </p>
 
-The implementation of <code>strings.Builder</code> will detect
-invalid <code>strings.Builder</code> value copies.
-Once such a copy is found, panic will occur. For example:
+<code>strings.Builder</code>的实现会探测到非法的<code>strings.Builder</code>值复制。
+一旦这样的复制被发现，就会发生崩溃(panic)。例如：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -258,8 +250,7 @@ func main() {
 <p>
 </p>
 
-Copying values of the types in the <code>sync</code> standard package will be
-warned by the <code>go vet</code> command provided in Go SDK.
+复制标准包<code>sync</code>中类型的值会被Go SDK提供的<code>go vet</code>命令所警告。
 
 <pre class="line-numbers"><code class="language-go">// demo.go
 package demo
@@ -281,8 +272,9 @@ func f(m sync.Mutex) { // warning: f passes lock by value: sync.Mutex
 </p>
 
 <p>
-Copying <code>bytes.Buffer</code> values will never be detected at run time
-nor by the <code>go vet</code> command. Just be careful not to do this.
+复制<code>bytes.Buffer</code>的值永远不会在运行时被检查到，也不会被<code>go vet</code>命令所检查。
+只是要小心不要这样做。
+
 </p>
 
 </div>
@@ -290,12 +282,12 @@ nor by the <code>go vet</code> command. Just be careful not to do this.
 
 
 <p class="anchor" id="memclr"></p>
-<h3>We can use the memclr optimization to reset some contiguous elements in an array or slice.</h3>
+<h3>我们可以使用memclr优化来重置一些在数组或者切片中连续的元素。</h3>
 
 <div>
 
 <p>
-Please read <a href="container.html#memclr">the <code>memclr</code> optimization</a> for details.
+关于细节请阅读<a href="container.html#memclr"><code>memclr</code>优化</a>。
 </p>
 
 </div>
@@ -303,12 +295,12 @@ Please read <a href="container.html#memclr">the <code>memclr</code> optimization
 
 
 <p class="anchor" id="check-method-existance"></p>
-<h3>How to check if a value has a method without importing the <code>refect</code> package?</h3>
+<h3>如何在不导入<code>refect</code>包的情况下检查一个值是否有方法。</h3>
 
 <div>
 
-Use the way in the following example.
-(Assume the prototype of the method needed to be checked is <code>M(int) string</code>.)
+可以使用下面例子中的方法。
+（假设方法需要被检查的原型是<code>M(int) string</code>。）
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -341,13 +333,13 @@ func main() {
 
 
 <p class="anchor" id="clone-slice-efficiently-and-perfectly"></p>
-<h3>How to efficiently and perfectly clone a slice?</h3>
+<h3>如何高效且完美的克隆一个切片？</h3>
 
 <div>
 
 <p>
-Please read <a href="https://github.com/go101/go101/wiki/How-to-perfectly-clone-a-slice%3F">this wiki article</a>
-and <a href="https://github.com/go101/go101/wiki/How-to-efficiently-clone-a-slice%3F">this wiki article</a> for details.
+关于细节请阅读<a href="https://github.com/go101/go101/wiki/How-to-perfectly-clone-a-slice%3F">这篇wiki文章</a>和
+<a href="https://github.com/go101/go101/wiki/How-to-efficiently-clone-a-slice%3F">这篇wiki文章</a>
 </p>
 
 </div>
@@ -355,13 +347,12 @@ and <a href="https://github.com/go101/go101/wiki/How-to-efficiently-clone-a-slic
 
 
 <p class="anchor" id="use-three-index-subslice-form"></p>
-<h3>We should use the three-index subslice form at some scenarios.</h3>
+<h3>我们在部分场景下必须使用三索引子切片。</h3>
 
 <div>
 
-Assume a package provides a <code>func NewX(...Option) *X</code> function,
-and the implementation of this function will merge the input options with some
-internal default options, then the following implementation is not recommended.
+假设一个包提供了一个<code>func NewX(...Option) *X</code>函数，并且这个函数的实现将输入选项
+与一些内部默认选项合并，那么下面的实现是不推荐的。
 
 <pre class="line-numbers"><code class="language-go">func NewX(opts ...Option) *X {
 	options := append(opts, defaultOpts...)
@@ -371,15 +362,12 @@ internal default options, then the following implementation is not recommended.
 </code></pre>
 
 <p>
-The reason why the above implementation is not recommended is the
-<code>append</code> call may modify the underlying <code>Option</code>
-sequence of the argument <code>opts</code>.
-For most scenarios, it is not a problem.
-But for some special scenarios, it may cause some unexpected results.
+不推荐上述实现的原因是调用<code>append</code>可能修改参数<code>opts</code>的底层<code>Option</code>序列。
+对大多数场景，这是没问题的。
+但是对一些特殊场景，这会导致不可预知的结果。
 </p>
 
-To avoid modifying the underlying <code>Option</code> sequence of
-the input argument, we should use the following way instead.
+为避免输入参数的底层<code>Option</code>序列，我们应该使用下面的方法代替之。
 
 <pre class="line-numbers"><code class="language-go">func NewX(opts ...Option) *X {
 	options := append(opts[:len(opts):len(opts)], defaultOpts...)
@@ -392,14 +380,12 @@ the input argument, we should use the following way instead.
 </p>
 
 <p>
-Another scenario at which we should use three-index subslice form is mentioned
-in <a href="https://github.com/go101/go101/wiki/The-capacity-of-the-result-byte-%28or-rune%29-slice-of-a-conversion-from-a-string-is-undefined">this wiki article</a>.
+另外一个我们需要使用三索引子切片格式的场景场景在<a href="https://github.com/go101/go101/wiki/The-capacity-of-the-result-byte-%28or-rune%29-slice-of-a-conversion-from-a-string-is-undefined">这篇wiki文章</a>中被提及.
 </p>
 
 <p>
-One drawback of three-index subslice forms is they are some verbose.
-In fact, I ever made <a href="https://github.com/golang/go/issues/25638">a proposal</a>
-to make it less verbose, but it was declined.
+使用三索引子切片格式的一个缺点是他们有些冗长。
+事实上，我曾经提出了<a href="https://github.com/golang/go/issues/25638">一个建议</a>来减轻冗长，但是它被拒绝了。
 </p>
 
 </div>
@@ -407,12 +393,12 @@ to make it less verbose, but it was declined.
 
 
 <p class="anchor" id="execute-deferred-calls-earlier"></p>
-<h3>Use anonymous functions to make some deferred function calls be executed earlier.</h3>
+<h3>使用匿名函数来使部分defered函数调用尽早执行。</h3>
 
 <div>
 
 <p>
-Please read <a href="defer-more.html#kind-of-resource-leaking">this article</a> for details.
+关于细节请阅读<a href="defer-more.html#kind-of-resource-leaking">这篇文章</a>。
 </p>
 
 </div>
@@ -420,14 +406,13 @@ Please read <a href="defer-more.html#kind-of-resource-leaking">this article</a> 
 
 
 <p class="anchor" id="assert-implementation"></p>
-<h3>Make sure and show a custom defined type implements a specified interface type.</h3>
+<h3>确保并显示自定义类型实现了指定的接口类型。</h3>
 
 <div>
 <p>
-We can assign a value of the custom defined type to a variable of type of the specified interface type
-to make sure the custom type implements the specified interface type, and more importantly,
-to show the custom type is intended to implement which interface types.
-Sometimes, writing docs in runnable code is much better than in comments.
+我们可以赋予自定义类型的值给指定接口类型的变量来确保自定义类型实现了指定接口类型，更重要的是，
+要显示自定义类型需要实现哪些接口类型。
+有时候，用可执行的代码编写文档比用注释写文档好得多。
 </p>
 
 <pre class="line-numbers"><code class="language-go">package myreader
@@ -469,14 +454,14 @@ func _() {_ = io.Reader(nil).(*MyReader)}
 
 
 <p class="anchor" id="assert-at-compile-time"></p>
-<h3>Some compile-time assertion tricks.</h3>
+<h3>一些编译时断言技巧。</h3>
 
 <div>
 <p>
-Besides the above one, there are more compile-time assertion tricks.
+除了上面提到过的一个，还有更多编译时断言技巧。
 </p>
 
-Several ways to guarantee a constant <code>N</code> is not smaller than another constant <code>M</code> at compile time:
+有几种方法保证常量<code>N</code>在编译时不小于另一个常量<code>M</code>：
 
 <pre class="line-numbers"><code class="language-go">// Any of the following lines can guarantee N >= M
 func _(x []int) {_ = x[N-M]}
@@ -490,24 +475,24 @@ type _ [N-M]int
 var _ uint = N/M - 1
 </code></pre>
 
-One more way which is stolen from <a href="https://twitter.com/lukechampine/status/1026695476811390976">@lukechampine</a>.
-It makes use of the rule that <a href="container.html#value-literals">duplicate constant keys can't appear in the same composite literal</a>.
+另一个方法是从<a href="https://twitter.com/lukechampine/status/1026695476811390976">@lukechampine</a>借鉴而来。
+它利用了<a href="container.html#value-literals">重复的常量键不能出现在同一个复合字面值</a>的规则。
 
 <pre class="line-numbers"><code class="language-go">var _ = map[bool]struct{}{false: struct{}{}, N>=M: struct{}{}}
 </code></pre>
 
-The above way looks some verbose but it is more general. It can be used to assert any conditions.
-It can be less verbose but needs a little more (negligible) memory:
+上述方法看上去有些冗长，但是更加通用。它可以用来断言一些条件。
+它可以不那么冗长，但需要更多(可忽略的)内存:
 
 <pre class="line-numbers"><code class="language-go">var _ = map[bool]int{false: 0, N>=M: 1}
 </code></pre>
 
 <p>
-NOTE: currently, <a href="https://github.com/golang/go/issues/28104">gccgo 8.2.0 has a bug</a> which allows duplicate constant keys in composite literals.
-So this trick doesn't work for gccgo now. This bug will be fixed in a later gccgo version.
+注意：目前， <a href="https://github.com/golang/go/issues/28104">gccgo 8.2.0 有一个bug</a>，就是允许重复的常量键出现在复合字面值中。
+因此目前这个技巧不适用于gccgo。这个bug将会在之后的gccgo版本中被修复。
 </p>
 
-Similarly, ways to assert two integer constants are equal to each other:
+类似的，断言两个整数常量相等的方法：
 
 <pre class="line-numbers"><code class="language-go">var _ [N-M]int; var _ [M-N]int
 type _ [N-M]int; type _ [M-N]int
@@ -523,10 +508,10 @@ var _ [N-M]int = [M-N]int{}
 </code></pre>
 
 <p>
-The last line is also inspired by one of Luke Champine's tweets.
+最后一行的灵感同样来自于Luke Champine的一条tweets。
 </p>
 
-How to assert a constant string is not blank.
+如何断言一个常量字符串不是空格。
 
 <pre class="line-numbers"><code class="language-go">type _ [len(aStringConstant)-1]int
 var _ = map[bool]int{false: 0, aStringConstant != "": 1}
@@ -536,12 +521,12 @@ const _ = 1/len(aStringConstant)
 </code></pre>
 
 <p>
-The last line is stolen from Jan Mercl's <a href="https://groups.google.com/d/msg/golang-nuts/w1-JQMaH7c4/qzBFSPImBgAJ">clever idea</a>.
+最后一行借鉴自Jan Mercl的<a href="https://groups.google.com/d/msg/golang-nuts/w1-JQMaH7c4/qzBFSPImBgAJ">点子</a>。
 </p>
 
-Sometimes, to avoid package-level variables consuming too much memory,
-we can put assertion code in a function declared with the blank identifier.
-For example,
+有时候，为了避免包级别的变量消耗太多的内存，
+我们可以把断言代码放在使用空格标识符声明的函数中。
+例如，
 
 <pre class="line-numbers"><code class="language-go">func _() {
 	var _ = map[bool]int{false: 0, N>=M: 1}
@@ -554,7 +539,7 @@ For example,
 
 
 <p class="anchor" id="declare-max-int-uint"></p>
-<h3>How to declare maximum int and uint constants?</h3>
+<h3>如何声明一个最大的int和uint常量？</h3>
 
 <div>
 
@@ -570,11 +555,11 @@ const MaxInt = int(^uint(0) >> 1)
 
 
 <p class="anchor" id="detect-word-size-at-compile-time"></p>
-<h3>How to detect native word size at compile time?</h3>
+<h3>如何在编译时检测原生单词大小？</h3>
 
 <div>
 
-This tip is Go unrelated.
+这个技巧和Go无关。
 
 <pre class="line-numbers"><code class="language-go">const Is64bitArch = ^uint(0) >> 63 == 1
 const Is32bitArch = ^uint(0) >> 63 == 0
@@ -589,26 +574,25 @@ const WordBits = 32 << (^uint(0) >> 63) // 64 or 32
 
 
 <p class="anchor" id="64bit-alignment-guarantee"></p>
-<h3>How to guarantee that the first pointer argument of a 64-bit atomic function call is always 64-bit aligned on 32-bit architectures?</h3>
+<h3>如何保证64位原子函数调用的第一个指针参数在32位架构上总是64位对齐的？</h3>
 
 <div>
-Please read <a href="memory-layout.html">Go value memory layouts</a> for details.
+关于细节请阅读<a href="memory-layout.html">Go值内存布局</a>。
 </div>
 
 
 
 <p class="anchor" id="avoid-boxing-large-size-values"></p>
-<h3>Avoid boxing large-size values into interface values.</h3>
+<h3>避免将大的值装箱到接口值中。</h3>
 
 <div>
 <p>
-When a non-interface value is assigned to an interface value, a copy of the non-interface value will be boxed into the interface value.
-The copy cost depends on the size of the non-interface value. The larger the size, the higher the copy cost.
-So please try to avoid boxing large-size values into interface values.
+当一个非接口值被赋值给一个接口值，一个非接口值将被装箱到接口值中。
+复制的开销依赖于非接口值的大小。大小越大，复制开销越大。
+所以请尽量避免将一个大的值装箱到接口值中。
 </p>
 
-In the following example, the cost of the latter two print calls
-are much lower than the former two.
+在下面的例子中，后两个打印调用的成本要比前两个低得多。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -631,7 +615,7 @@ func main() {
 </p>
 
 <p>
-About value sizes of different types, please read <a href="value-copy-cost.html">value copy costs in Go</a>.
+关于不同类型值的大小，请阅读<a href="value-copy-cost.html">Go中的值复制开销</a>。
 </p>
 
 </div>
@@ -639,15 +623,14 @@ About value sizes of different types, please read <a href="value-copy-cost.html"
 
 
 <p class="anchor" id="make-use-of-bce"></p>
-<h3>Optimize Go code by making use of BCE (bounds check elimination).</h3>
+<h3>使用BCE进行优化（消除边界检查）。</h3>
 
 <div>
 
 <p>
-Please read <a href="bounds-check-elimination.html">this article</a> to get
-what is BCE and how well BCE is supported in Go now.
-That article also shows some examples of how to make using of BCE for code optimization.
-Here, another example is provided:
+请阅读<a href="bounds-check-elimination.html">这篇文章</a>来获知什么是BCE以及Go目前对BCE的支持有多好。
+这篇文章同样展示了一些关于如何使用BCE来做代码优化的例子。
+这里提供了另一个例子:
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -698,8 +681,8 @@ func BenchmarkNumSameBytes_2(b *testing.B) {
 }
 </code></pre>
 
-In the above example, function <code>NumSameBytes_2</code> is more efficient than function <code>NumSameBytes_1</code>.
-The benchmark result:
+在上面的例子里，函数<code>NumSameBytes_2</code>比函数<code>NumSameBytes_1</code>效率更高。
+基准测试结果：
 
 
 <pre class="output"><code>BenchmarkNumSameBytes_1-4   	10000000	       669 ns/op
@@ -711,9 +694,9 @@ BenchmarkNumSameBytes_2-4   	20000000	       450 ns/op
 </p>
 
 <p>
-Please note, there are many small improvements in each main release of the standard Go compiler (gc).
-The trick used in the above example doesn't work for Go SDK versions earlier than 1.11.
-And future gc versions may become smarter so that the trick will become unnecessary.
+请记住，在每一个主要的标准Go编译器(gc)的发布版里都有一些小的改进。
+使用在上述例子中的技巧在Go SDK 1.11之前的版本中不工作。
+未来的gc版本可能会变得更加智能，因此这些技巧会变的不再必要。
 </p>
 
 </div>
