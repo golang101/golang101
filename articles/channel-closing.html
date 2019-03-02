@@ -42,7 +42,7 @@ func IsClosed(ch <-chan T) bool {
 		return true
 	default:
 	}
-	
+
 	return false
 }
 
@@ -95,7 +95,7 @@ func main() {
 			justClosed = false
 		}
 	}()
-	
+
 	// 假设ch != nil。
 	close(ch)   // 如果ch已关闭，则产生一个恐慌。
 	return true // <=> justClosed = true; return
@@ -115,7 +115,7 @@ func main() {
 			closed = true
 		}
 	}()
-	
+
 	ch <- value  // 如果ch已关闭，则产生一个恐慌。
 	return false // <=> closed = false; return
 }
@@ -209,17 +209,17 @@ import (
 func main() {
 	rand.Seed(time.Now().UnixNano())
 	log.SetFlags(0)
-	
+
 	// ...
 	const MaxRandomNumber = 100000
 	const NumReceivers = 100
-	
+
 	wgReceivers := sync.WaitGroup{}
 	wgReceivers.Add(NumReceivers)
-	
+
 	// ...
 	dataCh := make(chan int, 100)
-	
+
 	// 发送者
 	go func() {
 		for {
@@ -227,24 +227,24 @@ func main() {
 				// 此唯一的发送者可以安全地关闭此数据通道。
 				close(dataCh)
 				return
-			} else {			
+			} else {
 				dataCh <- value
 			}
 		}
 	}()
-	
+
 	// 接收者
 	for i := 0; i < NumReceivers; i++ {
 		go func() {
 			defer wgReceivers.Done()
-			
+
 			// 接收数据直到数据通道dataCh已关闭并且dataCh的缓冲队列已空。
 			for value := range dataCh {
 				log.Println(value)
 			}
 		}()
 	}
-	
+
 	wgReceivers.Wait()
 }
 </code></pre>
@@ -269,20 +269,20 @@ import (
 func main() {
 	rand.Seed(time.Now().UnixNano())
 	log.SetFlags(0)
-	
+
 	// ...
 	const MaxRandomNumber = 100000
 	const NumSenders = 1000
-	
+
 	wgReceivers := sync.WaitGroup{}
 	wgReceivers.Add(1)
-	
+
 	// ...
 	dataCh := make(chan int, 100)
 	stopCh := make(chan struct{})
 		// stopCh是一个额外的信号通道。它的发送者为dataCh数据通道的接收者。
 		// 它的接收者为dataCh数据通道的发送者。
-	
+
 	// 发送者
 	for i := 0; i < NumSenders; i++ {
 		go func() {
@@ -294,7 +294,7 @@ func main() {
 					return
 				default:
 				}
-				
+
 				// 即使stopCh已经关闭，此第二个select代码块中的第一个
 				// 分支仍很有可能在若干个循环步内依然不会被选中。如果这
 				// 是不可接受的，则上面的第一个select代码块是必需的。
@@ -306,11 +306,11 @@ func main() {
 			}
 		}()
 	}
-	
+
 	// 接收者
 	go func() {
 		defer wgReceivers.Done()
-		
+
 		for value := range dataCh {
 			if value == MaxRandomNumber-1 {
 				// 此唯一的接收者同时也是stopCh数据通道的唯一发送者。
@@ -319,11 +319,11 @@ func main() {
 				close(stopCh)
 				return
 			}
-			
+
 			log.Println(value)
 		}
 	}()
-	
+
 	// ...
 	wgReceivers.Wait()
 }
@@ -361,15 +361,15 @@ import (
 func main() {
 	rand.Seed(time.Now().UnixNano())
 	log.SetFlags(0)
-	
+
 	// ...
 	const MaxRandomNumber = 100000
 	const NumReceivers = 10
 	const NumSenders = 1000
-	
+
 	wgReceivers := sync.WaitGroup{}
 	wgReceivers.Add(NumReceivers)
-	
+
 	// ...
 	dataCh := make(chan int, 100)
 	stopCh := make(chan struct{})
@@ -380,15 +380,15 @@ func main() {
 		// stopCh的第二个信号通道。此第二个信号通道的发送者为
 		// dataCh数据通道的所有的发送者和接收者，它的接收者
 		// 为中间调解者。它必须为一个缓冲通道。
-	
+
 	var stoppedBy string
-	
+
 	// 中间调解者
 	go func() {
 		stoppedBy = <-toStop
 		close(stopCh)
 	}()
-	
+
 	// 发送者
 	for i := 0; i < NumSenders; i++ {
 		go func(id string) {
@@ -403,16 +403,16 @@ func main() {
 					}
 					return
 				}
-				
+
 				// 此处的尝试接收操作是为了让此发送协程尽早退出。
-				// 官方Go标准编译器对尝试接收和尝试发送做了特殊
+				// 标准编译器对尝试接收和尝试发送做了特殊
 				// 的优化，因而它们的速度很快。
 				select {
 				case <- stopCh:
 					return
 				default:
 				}
-				
+
 				// 即使stopCh已关闭，如果这个select代码块中第二个
 				// 分支的发送操作是非阻塞的，则第一个分支仍很有可能在
 				// 若干个循环步内依然不会被选中。如果这是 不可接受的，
@@ -425,12 +425,12 @@ func main() {
 			}
 		}(strconv.Itoa(i))
 	}
-	
+
 	// 接收者
 	for i := 0; i < NumReceivers; i++ {
 		go func(id string) {
 			defer wgReceivers.Done()
-			
+
 			for {
 				// 和发送者协程一样，此处的尝试接收操作是为了让此
 				// 接收协程尽早退出。
@@ -439,7 +439,7 @@ func main() {
 					return
 				default:
 				}
-				
+
 				// 即使stopCh已关闭，如果这个select代码块中第二个
 				// 分支的接收操作是非阻塞的，则第一个分支仍很有可能
 				// 在若干个循环步内依然不会被选中。如果这是不可接受
@@ -457,13 +457,13 @@ func main() {
 						}
 						return
 					}
-					
+
 					log.Println(value)
 				}
 			}
 		}(strconv.Itoa(i))
 	}
-	
+
 	// ...
 	wgReceivers.Wait()
 	log.Println("被" + stoppedBy + "终止了")

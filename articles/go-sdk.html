@@ -19,7 +19,7 @@ Golang 101所有中所有的实例代码都使用标准编译器编译验证过�
 
 <p>
 Go SDK的版本和其所支持的最高Go语言版本是一致的。
-比如，Go SDK 1.11.x支持从1.0到1.11的所有Go语言版本。
+比如，Go SDK 1.12.x支持从1.0到1.12的所有Go语言版本。
 </p>
 
 <p>
@@ -149,7 +149,7 @@ Go SDK工具要求所有的Go源代码文件必须以<code>.go</code>后缀结�
 </p>
 
 <p>
-从Go SDK 1.11版本开始，我们可以运行<code>go mod</code>子命令来管理包依赖。
+从Go SDK 1.12版本开始，我们可以运行<code>go mod</code>子命令来管理包依赖。
 </p>
 
 <p>
@@ -186,12 +186,16 @@ Golang 101系列文章将不再对各种<code>go</code>子命令做更多的解�
 	这个不便可能是<code>godoc</code>的一个bug造成的。这个bug已经在Go SDK 1.11中修复了。
 </li>
 <li>
-	此<code>godoc</code>命令<a href="https://golang.org/doc/go1.12">可能从Go 1.13开始将不再集成在Go SDK中</a>。
+	此<code>godoc</code>命令<a href="https://golang.org/doc/go1.12">可能从Go 1.13开始将不再集成在Go SDK中</a>而需要另外下载。
 </li>
 </ul>
 
 <p>
-<code>godoc</code>默认将会为所有本地已经下载的Go第三方库包生成文档。
+另注意：当前（Go SDK 1.12），<code>godoc</code>命令不支持不处于<code>GOPATH</code>下的代码包。
+</p>
+
+<p>
+<code>godoc</code>程序启动时默认将会为所有本地已经下载的Go第三方库包生成文档。
 有时这可能需要很长的时间。如果你只想查看标准库的文档，你可以在<code>godoc</code>命令运行之前在终端中将<code>GOPATH</code>环境变量暂时设为一个不存在的路径，
 比如：<code>GOPATH=nonexist godoc -http=:9999</code>。
 </p>

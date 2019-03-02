@@ -1,61 +1,61 @@
 ﻿<h1>Go 技巧 101</h1>
 
-索引
+索引：
 
 <ul>
 <li>
-	<a href="#force-to-use-keyed-struct-literals">如何强制包的使用者用结构体复合字面值作为字段名字？</a>
+	<a href="#force-to-use-keyed-struct-literals">如何强制一个代码包的使用者总是使用带字段名称的组合字面值来表示此代码包中的结构体类型的值？</a>
 </li>
 <li>
-	<a href="#make-struct-type-uncomparable">如何使得结构体类型不可比较？</a>
+	<a href="#make-struct-type-uncomparable">如何使得一个结构体类型不可比较？</a>
 </li>
 <li>
-	<a href="#dont-use-assignments-with-expression-dependencies">不要使用表达式之间依赖关系的值赋值。</a>
+	<a href="#dont-use-assignments-with-expression-dependencies">不要使用其中涉及到的表达式之间存在依赖关系的赋值语句。</a>
 </li>
 <li>
-	<a href="#simulate-loop-from-0-to-n">如何以其它语法模拟<code>for i in 0..N</code>？</a>
+	<a href="#simulate-loop-from-0-to-n">如何模拟一些其它语言中支持的<code>for i in 0..N</code>循环代码块？</a>
 </li>
 <li>
-	<a href="#reset-pointers-for-dead-elements">我们应该重置元素slots中的指针，这些指针在所有类型的切片操作中被释放来避免内存泄漏，如果我们不能确定释放的元素slots以后是否会被重用。</a>
+	<a href="#reset-pointers-for-dead-elements">当我们废弃一个仍在使用的切片中的一些元素时，我们应该重置这些元素中的指针来避免暂时性的内存泄漏。</a>
 </li>
 <li>
-	<a href="#avoid-copying-values-of-some-types">在标准包里的一些类型的值不期望被复制。</a>
+	<a href="#avoid-copying-values-of-some-types">一些标准包中的某些类型的值不期望被复制。</a>
 </li>
 <li>
-	<a href="#memclr">我们可以使用memclr优化来重置一些在数组或者切片中连续的元素。</a>
+	<a href="#memclr">我们可以利用<code>memclr</code>优化来重置数组或者切片中一段连续的元素。</a>
 </li>
 <li>
-	<a href="#check-method-existance">如何在不导入<code>refect</code>包的情况下检查一个值是否有方法。</a>
+	<a href="#check-method-existance">如何在不导入<code>refect</code>标准库包的情况下检查一个值是否拥有某个方法。</a>
 </li>
 <li>
 	<a href="#clone-slice-efficiently-and-perfectly">如何高效且完美的克隆一个切片？</a>
 </li>
 <li>
-	<a href="#use-three-index-subslice-form">我们在部分场景下必须使用三索引子切片。</a>
+	<a href="#use-three-index-subslice-form">在部分场景下我们应该使用三下标子切片形式。</a>
 </li>
 <li>
-	<a href="#execute-deferred-calls-earlier">使用匿名函数来使部分defered函数调用尽早执行。</a>
+	<a href="#execute-deferred-calls-earlier">使用匿名函数来使部分延迟函数调用尽早执行。</a>
 </li>
 <li>
-	<a href="#assert-implementation">确保并显示自定义类型实现了指定的接口类型。</a>
+	<a href="#assert-implementation">确保并表明一个自定义类型实现了指定的接口类型。</a>
 </li>
 <li>
-	<a href="#assert-at-compile-time">一些编译时断言技巧。</a>
+	<a href="#assert-at-compile-time">一些编译时刻断言技巧。</a>
 </li>
 <li>
 	<a href="#declare-max-int-uint">如何声明一个最大的int和uint常量？</a>
 </li>
 <li>
-	<a href="#detect-word-size-at-compile-time">如何在编译时检测原生单词大小？</a>
+	<a href="#detect-word-size-at-compile-time">如何在编译时刻决定系统原生字的尺寸？</a>
 </li>
 <li>
-	<a href="#64bit-alignment-guarantee">如何保证64位原子函数调用的第一个指针参数在32位架构上总是64位对齐的？</a>
+	<a href="#64bit-alignment-guarantee">如何保证64位原子函数调用中操作的64位整数的地址在32位架构上总是64位对齐的？</a>
 </li>
 <li>
-    <a href="#avoid-boxing-large-size-values">避免将大的值装箱到接口值中。</a>
+    <a href="#avoid-boxing-large-size-values">尽量避免将大尺寸的值包裹在接口值中。</a>
 </li>
 <li>
-	<a href="#make-use-of-bce">使用BCE进行优化（消除边界检查）。</a>
+	<a href="#make-use-of-bce">利用BCE（边界检查消除）进行性能优化。</a>
 </li>
 </ul>
 
@@ -65,13 +65,12 @@
 
 
 <p class="anchor" id="force-to-use-keyed-struct-literals"></p>
-<h3>如何强制包的使用者用结构体复合字面值作为字段名字？</h3>
+<h3>如何强制一个代码包的使用者总是使用带字段名称的组合字面值来表示此代码包中的结构体类型的值？</h3>
 
 <div>
 
 <p>
-包的开发者可以在一个结构体类型定义里放置一个非导出的零大小的字段，
-因此编译器将会禁止包的使用者使用没有字段名字的复合字面值来创建结构体类型。
+代码包的开发者可以在一个结构体类型定义里放置一个非导出的零尺寸的字段，这样编译器将会禁止代码包的使用者使用含有一些字段但却不含有字段名字的组合字面值来创建此结构体类型的值。
 </p>
 
 例如：
@@ -92,8 +91,8 @@ package main
 import "foo"
 
 func main() {
-	//_ = foo.Config{[0]int{}, "bar", 123} // doesn't compile
-	_ = foo.Config{Name: "bar", Size: 123} // compile okay
+	//_ = foo.Config{[0]int{}, "bar", 123} // 此句编译不通过
+	_ = foo.Config{Name: "bar", Size: 123} // 此句编译没问题
 }
 </code></pre>
 
@@ -101,7 +100,7 @@ func main() {
 </p>
 
 <p>
-请尽量不要把零大小的非导出字段作为结构体的最后一个字段，因为<a href="unofficial-faq.html#final-zero-size-field">这样做会扩大结构体类型的大小</a>。
+请尽量不要把零尺寸的非导出字段用做结构体的最后一个字段，因为<a href="unofficial-faq.html#final-zero-size-field">这样做会有可能会增大结构体类型的尺寸</a>而导致一些内存浪费。
 </p>
 
 </div>
@@ -109,11 +108,10 @@ func main() {
 
 
 <p class="anchor" id="make-struct-type-uncomparable"></p>
-<h3>如何使得结构体类型不可比较？</h3>
+<h3>如何使得一个结构体类型不可比较？</h3>
 
 <div>
-有时候，我们想要避免一个自定义的结构体类型被用做一个映射的键类型，
-那么我们可以放置一个非导出的零大小的不可比较类型的字段在结构体类型中来使结构体类型不可比较。
+有时候，我们想要避免一个自定义的结构体类型被用做一个映射的键值类型，那么我们可以放置一个非导出的零尺寸的不可比较类型的字段在结构体类型中以使此结构体类型不可比较。
 例如：
 
 <pre class="line-numbers"><code class="language-go">package main
@@ -123,11 +121,11 @@ type T struct {
 	AnotherField int
 }
 
-var x map[T]int // compile error: invalid map key type T
+var x map[T]int // 编译错误：非法的键值类型
 
 func main() {
 	var a, b T
-	_ = a == b // compile error: invalid operation:
+	_ = a == b // 编译错误：非法的比较
 }
 </code></pre>
 
@@ -138,17 +136,17 @@ func main() {
 
 
 <p class="anchor" id="dont-use-assignments-with-expression-dependencies"></p>
-<h3>不要使用表达式之间依赖关系的值赋值。</h3>
+<h3>不要使用其中涉及到的表达式之间存在依赖关系的赋值语句。</h3>
 
 <div>
 
 <p>
-目前(Go 1.11)，在一些多值赋值中<a href="https://github.com/go101/go101/wiki/Some-evaluation-orders-in-multi-value-assignments-are-unspecified">有一些求值顺序是未指定的</a>，并且标准Go编译器和gccgo编译器当涉及多值赋值的表达式之间存在依赖关系时还有<a href="https://github.com/go101/go101/wiki/An-ambiguity-of-%28or-dispute-on%29-the-evaluation-order-of-LHS-%28left-hand-side%29-items-in-a-multi-value-assignment">一些争议和bug</a>。
-因此，如果在涉及的表达式之间存在依赖，或者你不确定是否存在依赖关系时，请尝试把多值赋值分拆成多个单值赋值。
+目前(Go 1.12)，在一些多值赋值中<a href="https://github.com/go101/go101/wiki/Some-evaluation-orders-in-multi-value-assignments-are-unspecified">有一些表达式估值顺序是未指定的</a>。
+因此，如果一个多值赋值语句中涉及的表达式之间存在依赖，或者不太容易确定是否存在依赖关系时，我们应该此多值赋值语句分拆成多个单值赋值语句。
 </p>
 
-事实上，在部分写得很坏的单值赋值代码中，表达式求值同样是模棱两可的。
-例如，下面的程序可能会打印<code>[7 0 9]</code>，<code>[0 8 9]</code>，或者<code>[7 8 9]</code>，依赖于编译器实现。
+事实上，在一些写得很糟糕的代码中，单值赋值中的表达式求值顺序也有可能是有歧义的。
+例如，下面的程序可能会打印<code>[7 0 9]</code>、<code>[0 8 9]</code>或者<code>[7 8 9]</code>，依赖于具体编译器实现。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -163,7 +161,7 @@ func f() int {
 }
 
 func main() {
-	// The evaluation order of "a", "i" and "f()" is not specified.
+	// 表达式"a"、"i"和"f()"的估值顺序未定义。
 	(*a)[i] = f()
 	fmt.Println(*a)
 }
@@ -173,8 +171,8 @@ func main() {
 </p>
 
 <p>
-换言之，在值赋值里的一个函数调用不会影响在同样赋值里的非函数调用表达式的求值结果。
-关于细节请阅读<a href="evaluation-orders.html">Go里的求值顺序</a>。
+换言之，一条赋值语句中的某个函数调用表达式的估值有可能会影响到其它非函数调用表达式的估值结果。
+请阅读<a href="evaluation-orders.html">表达式估值顺序规则</a>以获取更多细节。
 </p>
 
 </div>
@@ -182,11 +180,11 @@ func main() {
 
 
 <p class="anchor" id="simulate-loop-from-0-to-n"></p>
-<h3>如何以其它语法模拟<code>for i in 0..N</code>？</h3>
+<h3>如何模拟一些其它语言中支持的<code>for i in 0..N</code>循环代码块？</h3>
 
 <div>
 
-我们可以在一个元素大小为零的数组或者一个空数组指针上进行遍历来模拟这样的循环。
+我们可以通过遍历一个元素尺寸为零的数组或者一个空数组指针来模拟这样的循环。
 例如：
 
 <pre class="line-numbers"><code class="language-go">package main
@@ -213,27 +211,26 @@ func main() {
 
 
 <p class="anchor" id="reset-pointers-for-dead-elements"></p>
-<h3>我们应该重置元素slots中的指针，这些指针在所有类型的切片操作中被释放来避免内存泄漏，如果我们不能确定释放的元素slots以后是否会被重用。</h3>
+<h3>当我们废弃一个仍在使用的切片中的一些元素时，我们应该重置这些元素中的指针来避免暂时性的内存泄漏。</h3>
 
 <p>
-关于细节请阅读如何<a href="container.html#delete-slice-elements">删除切片元素</a>和<a href="memory-leaking.html#dead-slice-elements">因为未重置丢失的切片元素中的指针而造成的临时性内存泄露</a>。 
+关于细节，请阅读如何<a href="container.html#delete-slice-elements">删除切片元素</a>和<a href="memory-leaking.html#dead-slice-elements">因为未重置丢失的切片元素中的指针而造成的临时性内存泄露</a>。
 </p>
 
 
 
 <p class="anchor" id="avoid-copying-values-of-some-types"></p>
-<h3>在标准包里的一些类型的值不期望被复制。</h3>
+<h3>一些标准包中的某些类型的值不期望被复制。</h3>
 
 <div>
 
 <p>
-<code>bytes.Buffer</code>类型，<code>strings.Builder</code>类型以及在<code>sync</code>标准包里的类型
-的值不建议被复制。
-（他们确实不建议被复制，尽管在特定情形下复制他们也是没有问题的。）
+<code>bytes.Buffer</code>类型，<code>strings.Builder</code>类型以及在<code>sync</code>标准库包里的类型的值不推荐被复制。
+（它们确实不应该被复制，尽管在某些特定情形下复制它们或许是没有问题的。）
 </p>
 
-<code>strings.Builder</code>的实现会探测到非法的<code>strings.Builder</code>值复制。
-一旦这样的复制被发现，就会发生崩溃(panic)。例如：
+<code>strings.Builder</code>的实现会在运行时刻探测到非法的<code>strings.Builder</code>值复制。
+一旦这样的复制被发现，就会产生恐慌。例如：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -243,14 +240,14 @@ func main() {
 	var b strings.Builder
 	b.WriteString("hello ")
 	var b2 = b
-	b2.WriteString("world!") // panic here
+	b2.WriteString("world!") // 一个恐慌将在这里产生
 }
 </code></pre>
 
 <p>
 </p>
 
-复制标准包<code>sync</code>中类型的值会被Go SDK提供的<code>go vet</code>命令所警告。
+复制标准库包<code>sync</code>中类型的值会被Go SDK提供的<code>go vet</code>命令检测到并被警告。
 
 <pre class="line-numbers"><code class="language-go">// demo.go
 package demo
@@ -272,8 +269,8 @@ func f(m sync.Mutex) { // warning: f passes lock by value: sync.Mutex
 </p>
 
 <p>
-复制<code>bytes.Buffer</code>的值永远不会在运行时被检查到，也不会被<code>go vet</code>命令所检查。
-只是要小心不要这样做。
+复制<code>bytes.Buffer</code>的值不会在运行时被检查到，也不会被<code>go vet</code>命令所检测到。
+千万要小心不要这样做。
 
 </p>
 
@@ -282,12 +279,12 @@ func f(m sync.Mutex) { // warning: f passes lock by value: sync.Mutex
 
 
 <p class="anchor" id="memclr"></p>
-<h3>我们可以使用memclr优化来重置一些在数组或者切片中连续的元素。</h3>
+<h3>我们可以利用<code>memclr</code>优化来重置数组或者切片中一段连续的元素。</h3>
 
 <div>
 
 <p>
-关于细节请阅读<a href="container.html#memclr"><code>memclr</code>优化</a>。
+关于细节，请阅读<a href="container.html#memclr"><code>memclr</code>优化</a>。
 </p>
 
 </div>
@@ -295,12 +292,12 @@ func f(m sync.Mutex) { // warning: f passes lock by value: sync.Mutex
 
 
 <p class="anchor" id="check-method-existance"></p>
-<h3>如何在不导入<code>refect</code>包的情况下检查一个值是否有方法。</h3>
+<h3>如何在不导入<code>refect</code>标准库包的情况下检查一个值是否拥有某个方法。</h3>
 
 <div>
 
-可以使用下面例子中的方法。
-（假设方法需要被检查的原型是<code>M(int) string</code>。）
+可以使用下面的例子中的方法。
+（假设需要被检查的方法的原型是<code>M(int) string</code>。）
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -338,8 +335,7 @@ func main() {
 <div>
 
 <p>
-关于细节请阅读<a href="https://github.com/go101/go101/wiki/How-to-perfectly-clone-a-slice%3F">这篇wiki文章</a>和
-<a href="https://github.com/go101/go101/wiki/How-to-efficiently-clone-a-slice%3F">这篇wiki文章</a>
+关于细节请阅读<a href="https://github.com/go101/go101/wiki/How-to-perfectly-clone-a-slice%3F">这篇wiki文章</a>和<a href="https://github.com/go101/go101/wiki/How-to-efficiently-clone-a-slice%3F">这篇wiki文章</a>。
 </p>
 
 </div>
@@ -347,31 +343,30 @@ func main() {
 
 
 <p class="anchor" id="use-three-index-subslice-form"></p>
-<h3>我们在部分场景下必须使用三索引子切片。</h3>
+<h3>在部分场景下我们应该使用三下标子切片形式。</h3>
 
 <div>
 
-假设一个包提供了一个<code>func NewX(...Option) *X</code>函数，并且这个函数的实现将输入选项
-与一些内部默认选项合并，那么下面的实现是不推荐的。
+假设一个包提供了一个<code>func NewX(...Option) *X</code>函数，并且这个函数的实现将输入选项与一些内部默认选项合并，那么下面的实现是不推荐的。
 
 <pre class="line-numbers"><code class="language-go">func NewX(opts ...Option) *X {
 	options := append(opts, defaultOpts...)
-	// Use the merged options to build and return a X.
+	// 使用合并后选项来创建一个X值并返回其指针。
 	// ...
 }
 </code></pre>
 
 <p>
-不推荐上述实现的原因是调用<code>append</code>可能修改参数<code>opts</code>的底层<code>Option</code>序列。
-对大多数场景，这是没问题的。
-但是对一些特殊场景，这会导致不可预知的结果。
+上述实现不被推荐的原因是<code>append</code>函数调用可能会修改输入实参<code>opts</code>的底层<code>Option</code>元素序列。
+对大多数场景，这可能是没问题的。但是对某些特殊场景，这有可能会导致后续代码执行产生不期望的结果。
 </p>
 
-为避免输入参数的底层<code>Option</code>序列，我们应该使用下面的方法代替之。
+为了避免输入实参的底层<code>Option</code>元素序列被修改，我们应该使用下面的实现方法：
 
 <pre class="line-numbers"><code class="language-go">func NewX(opts ...Option) *X {
+	// 改用三下标子切片格式。
 	options := append(opts[:len(opts):len(opts)], defaultOpts...)
-	// Use the merged options to build and return a X.
+	// 使用合并后选项来创建一个X值并返回其指针。
 	// ...
 }
 </code></pre>
@@ -380,12 +375,13 @@ func main() {
 </p>
 
 <p>
-另外一个我们需要使用三索引子切片格式的场景场景在<a href="https://github.com/go101/go101/wiki/The-capacity-of-the-result-byte-%28or-rune%29-slice-of-a-conversion-from-a-string-is-undefined">这篇wiki文章</a>中被提及.
+另外一个需要使用三下标子切片格式的场景在<a href="https://github.com/go101/go101/wiki/The-capacity-of-the-result-byte-%28or-rune%29-slice-of-a-conversion-from-a-string-is-undefined">这篇wiki文章</a>中被提及。
 </p>
 
 <p>
-使用三索引子切片格式的一个缺点是他们有些冗长。
-事实上，我曾经提出了<a href="https://github.com/golang/go/issues/25638">一个建议</a>来减轻冗长，但是它被拒绝了。
+三下标子切片格式的一个缺点是它们有些冗长。
+事实上，我曾经提了<a href="https://github.com/golang/go/issues/25638">一个建议</a>来让三下标格式看上起简洁得多。
+但是此建议被否决了。
 </p>
 
 </div>
@@ -393,12 +389,12 @@ func main() {
 
 
 <p class="anchor" id="execute-deferred-calls-earlier"></p>
-<h3>使用匿名函数来使部分defered函数调用尽早执行。</h3>
+<h3>使用匿名函数来使部分延迟函数调用尽早执行。</h3>
 
 <div>
 
 <p>
-关于细节请阅读<a href="defer-more.html#kind-of-resource-leaking">这篇文章</a>。
+关于细节，请阅读<a href="defer-more.html#kind-of-resource-leaking">这篇文章</a>。
 </p>
 
 </div>
@@ -406,13 +402,13 @@ func main() {
 
 
 <p class="anchor" id="assert-implementation"></p>
-<h3>确保并显示自定义类型实现了指定的接口类型。</h3>
+<h3>确保并表明一个自定义类型实现了指定的接口类型。</h3>
 
 <div>
 <p>
-我们可以赋予自定义类型的值给指定接口类型的变量来确保自定义类型实现了指定接口类型，更重要的是，
-要显示自定义类型需要实现哪些接口类型。
-有时候，用可执行的代码编写文档比用注释写文档好得多。
+我们可以将一个自定义类型的一个值赋给指定接口类型的一个变量来确保此自定义类型实现了指定接口类型。
+更重要的是，这样可以表明此自定义类型实现了指定接口类型。
+使用自解释的代码编写文档比使用注释来编写文档要自然得多。
 </p>
 
 <pre class="line-numbers"><code class="language-go">package myreader
@@ -440,8 +436,7 @@ func (mr *MyReader) Read(data []byte) (int, error) {
 	return len(data), io.EOF
 }
 
-// Any of the following three lines ensures
-// type *MyReader implements io.Reader.
+// 下面三行中的任一行都可以保证类型*MyReader实现了接口io.Reader。
 var _ io.Reader = NewMyReader()
 var _ io.Reader = (*MyReader)(nil)
 func _() {_ = io.Reader(nil).(*MyReader)}
@@ -454,16 +449,16 @@ func _() {_ = io.Reader(nil).(*MyReader)}
 
 
 <p class="anchor" id="assert-at-compile-time"></p>
-<h3>一些编译时断言技巧。</h3>
+<h3>一些编译时刻断言技巧。</h3>
 
 <div>
 <p>
-除了上面提到过的一个，还有更多编译时断言技巧。
+除了上一个技巧中提到过的编译时刻断言技巧，下面将要介绍更多编译时刻断言技巧。
 </p>
 
-有几种方法保证常量<code>N</code>在编译时不小于另一个常量<code>M</code>：
+下面是一些方法用来在编译时刻保证常量<code>N</code>不小于另一个常量<code>M</code>：
 
-<pre class="line-numbers"><code class="language-go">// Any of the following lines can guarantee N >= M
+<pre class="line-numbers"><code class="language-go">// 下面任一行均可保证N >= M
 func _(x []int) {_ = x[N-M]}
 func _(){_ = []int{N-M: 0}}
 func _([N-M]int){}
@@ -471,28 +466,31 @@ var _ [N-M]int
 const _ uint = N-M
 type _ [N-M]int
 
-// If M and N are guarenteed to be positive integers.
+// 如果M和N都是正整数常量，则我们也可以使用下一行所示的方法。
 var _ uint = N/M - 1
 </code></pre>
 
-另一个方法是从<a href="https://twitter.com/lukechampine/status/1026695476811390976">@lukechampine</a>借鉴而来。
-它利用了<a href="container.html#value-literals">重复的常量键不能出现在同一个复合字面值</a>的规则。
+另一个方法是借鉴<a href="https://twitter.com/lukechampine/status/1026695476811390976">@lukechampine</a>的一个点子。
+此点子利用了<a href="container.html#value-literals">容器值的组合字面值中不能出现重复的常量键值</a>这一规则。
 
 <pre class="line-numbers"><code class="language-go">var _ = map[bool]struct{}{false: struct{}{}, N>=M: struct{}{}}
 </code></pre>
 
-上述方法看上去有些冗长，但是更加通用。它可以用来断言一些条件。
-它可以不那么冗长，但需要更多(可忽略的)内存:
+此方法看上去有些冗长，但是它更加通用。它可以用来断言任何条件。
+其实，它也可以不必很冗长，但需要多消耗一点（完全可以忽略的）内存，如下面所示：
 
 <pre class="line-numbers"><code class="language-go">var _ = map[bool]int{false: 0, N>=M: 1}
 </code></pre>
 
-<p>
-注意：目前， <a href="https://github.com/golang/go/issues/28104">gccgo 8.2.0 有一个bug</a>，就是允许重复的常量键出现在复合字面值中。
+<!--p>
+注意：目前，<a href="https://github.com/golang/go/issues/28104">gccgo 8.2.0 有一个bug</a>，就是允许重复的常量键出现在复合字面值中。
 因此目前这个技巧不适用于gccgo。这个bug将会在之后的gccgo版本中被修复。
+</p-->
+
+<p>
 </p>
 
-类似的，断言两个整数常量相等的方法：
+类似的，下面是断言两个整数常量相等的方法：
 
 <pre class="line-numbers"><code class="language-go">var _ [N-M]int; var _ [M-N]int
 type _ [N-M]int; type _ [M-N]int
@@ -501,17 +499,17 @@ func _([N-M]int, [M-N]int) {}
 
 var _ = map[bool]int{false: 0, M==N: 1}
 
-var _ = [1]int{M-N: 0} // the only valid index is 0
-var _ = [1]int{}[M-N]  // the only valid index is 0
+var _ = [1]int{M-N: 0} // 唯一被允许的元素索引下标为0
+var _ = [1]int{}[M-N]  // 唯一被允许的元素索引下标为0
 
 var _ [N-M]int = [M-N]int{}
 </code></pre>
 
 <p>
-最后一行的灵感同样来自于Luke Champine的一条tweets。
+最后一行的灵感同样来自于Luke Champine的一条tweet。
 </p>
 
-如何断言一个常量字符串不是空格。
+下面是一些用来断言一个常量字符串是不是一个空串的方法。
 
 <pre class="line-numbers"><code class="language-go">type _ [len(aStringConstant)-1]int
 var _ = map[bool]int{false: 0, aStringConstant != "": 1}
@@ -521,12 +519,11 @@ const _ = 1/len(aStringConstant)
 </code></pre>
 
 <p>
-最后一行借鉴自Jan Mercl的<a href="https://groups.google.com/d/msg/golang-nuts/w1-JQMaH7c4/qzBFSPImBgAJ">点子</a>。
+最后一行借鉴自Jan Mercl的一个<a href="https://groups.google.com/d/msg/golang-nuts/w1-JQMaH7c4/qzBFSPImBgAJ">点子</a>。
 </p>
 
-有时候，为了避免包级别的变量消耗太多的内存，
-我们可以把断言代码放在使用空格标识符声明的函数中。
-例如，
+有时候，为了避免包级变量消耗太多的内存，我们可以把断言代码放在一个名为空标识符的函数体中。
+例如：
 
 <pre class="line-numbers"><code class="language-go">func _() {
 	var _ = map[bool]int{false: 0, N>=M: 1}
@@ -555,7 +552,7 @@ const MaxInt = int(^uint(0) >> 1)
 
 
 <p class="anchor" id="detect-word-size-at-compile-time"></p>
-<h3>如何在编译时检测原生单词大小？</h3>
+<h3>如何在编译时刻决定系统原生字的尺寸？</h3>
 
 <div>
 
@@ -563,7 +560,7 @@ const MaxInt = int(^uint(0) >> 1)
 
 <pre class="line-numbers"><code class="language-go">const Is64bitArch = ^uint(0) >> 63 == 1
 const Is32bitArch = ^uint(0) >> 63 == 0
-const WordBits = 32 << (^uint(0) >> 63) // 64 or 32
+const WordBits = 32 << (^uint(0) >> 63) // 64或32
 </code></pre>
 
 <p>
@@ -574,22 +571,22 @@ const WordBits = 32 << (^uint(0) >> 63) // 64 or 32
 
 
 <p class="anchor" id="64bit-alignment-guarantee"></p>
-<h3>如何保证64位原子函数调用的第一个指针参数在32位架构上总是64位对齐的？</h3>
+<h3>如何保证64位原子函数调用中操作的64位整数的地址在32位架构上总是64位对齐的？</h3>
 
 <div>
-关于细节请阅读<a href="memory-layout.html">Go值内存布局</a>。
+关于细节，请阅读<a href="memory-layout.html">关于Go值的内存布局</a>一文。
 </div>
 
 
 
 <p class="anchor" id="avoid-boxing-large-size-values"></p>
-<h3>避免将大的值装箱到接口值中。</h3>
+<h3>尽量避免将大尺寸的值包裹在接口值中。</h3>
 
 <div>
 <p>
-当一个非接口值被赋值给一个接口值，一个非接口值将被装箱到接口值中。
-复制的开销依赖于非接口值的大小。大小越大，复制开销越大。
-所以请尽量避免将一个大的值装箱到接口值中。
+当一个非接口值被赋值给一个接口值时，此非接口值的一个副本将被包裹到此接口值中。
+副本复制的开销和非接口值的尺寸成正比。尺寸越大，复制开销越大。
+所以请尽量避免将大尺寸的值包裹到接口值中。
 </p>
 
 在下面的例子中，后两个打印调用的成本要比前两个低得多。
@@ -602,8 +599,8 @@ func main() {
 	var a [1000]int
 
 	// This cost of the two lines is high.
-	fmt.Println(a)                   // a is copied
-	fmt.Printf("Type of a: %T\n", a) // a is copied
+	fmt.Println(a)                   // 数组a中的所有元素都将被复制
+	fmt.Printf("Type of a: %T\n", a) // 数组a中的所有元素都将被复制
 
 	// The cost of the two lines is low.
 	fmt.Printf("%v\n", a[:])
@@ -615,7 +612,7 @@ func main() {
 </p>
 
 <p>
-关于不同类型值的大小，请阅读<a href="value-copy-cost.html">Go中的值复制开销</a>。
+关于不同种类的类型的尺寸，请阅读<a href="value-copy-cost.html">值复制成本</a>一文。
 </p>
 
 </div>
@@ -623,14 +620,15 @@ func main() {
 
 
 <p class="anchor" id="make-use-of-bce"></p>
-<h3>使用BCE进行优化（消除边界检查）。</h3>
+<h3>利用BCE（边界检查消除）进行性能优化。</h3>
 
 <div>
 
 <p>
-请阅读<a href="bounds-check-elimination.html">这篇文章</a>来获知什么是BCE以及Go目前对BCE的支持有多好。
-这篇文章同样展示了一些关于如何使用BCE来做代码优化的例子。
-这里提供了另一个例子:
+请阅读<a href="bounds-check-elimination.html">此文</a>来获知什么边界检查消除（BCE）以及目前的标准编译器对BCE的支持程度。
+</p>
+
+下面是一个利用了BCE进行性能优化的例子：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -655,9 +653,9 @@ func NumSameBytes_2(x, y string) int {
 	if len(x) > len(y) {
 		x, y = y, x
 	}
-	if len(x) <= len(y) { // more code but more efficient
+	if len(x) <= len(y) { // 虽然代码多了，但是效率提高了
 		for i := 0; i < len(x); i++ {
-			if x[i] != y[i] { // bound check eliminated
+			if x[i] != y[i] { // 边界检查被消除了
 				return i
 			}
 		}
@@ -681,9 +679,7 @@ func BenchmarkNumSameBytes_2(b *testing.B) {
 }
 </code></pre>
 
-在上面的例子里，函数<code>NumSameBytes_2</code>比函数<code>NumSameBytes_1</code>效率更高。
-基准测试结果：
-
+从下面所示的基准测试结果来看，函数<code>NumSameBytes_2</code>比函数<code>NumSameBytes_1</code>效率更高。
 
 <pre class="output"><code>BenchmarkNumSameBytes_1-4   	10000000	       669 ns/op
 BenchmarkNumSameBytes_2-4   	20000000	       450 ns/op
@@ -694,9 +690,9 @@ BenchmarkNumSameBytes_2-4   	20000000	       450 ns/op
 </p>
 
 <p>
-请记住，在每一个主要的标准Go编译器(gc)的发布版里都有一些小的改进。
-使用在上述例子中的技巧在Go SDK 1.11之前的版本中不工作。
-未来的gc版本可能会变得更加智能，因此这些技巧会变的不再必要。
+请注意：标准编译器（gc）的每个新的主版本都会有很多小的改进。
+上例中所示的优化从gc 1.11开始才有效。
+未来的gc版本可能会变得更加智能，以使函数<code>NumSameBytes_2</code>中使用技巧变得不再必要。
 </p>
 
 </div>

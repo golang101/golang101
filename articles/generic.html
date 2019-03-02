@@ -1,7 +1,7 @@
 ﻿<h1>内值范型</h1>
 
 <p>
-Go语言目前（1.11）不支持自定义范型，只支持一等公民组合类型的内值范型。
+Go语言目前（Go 1.12）不支持自定义范型，只支持一等公民组合类型的内值范型。
 我们可以用各种一等公民组合类型来组合出无穷中类型。
 </p>
 
@@ -45,7 +45,7 @@ func main() {
 		{0, 1, 0, 1},
 		{0, 0, 1, 1},
 	}
-	
+
 	matrix[1][1] = 3
 	a := matrix[1] // 变量a的类型为[4]int
 	fmt.Println(a) // [0 3 0 1]
@@ -71,7 +71,7 @@ func main() {
 	这两个映射表类型的键值类型均为内置类型<code>int</code>。
 </li>
 <li>
-	<code>func(int32) func(int32)</code>是一个只有一个输入参数和一个返回值的函数类型，此返回值的类型为一个只有一个输入参数的函数类型。 
+	<code>func(int32) func(int32)</code>是一个只有一个输入参数和一个返回值的函数类型，此返回值的类型为一个只有一个输入参数的函数类型。
 	这两个函数类型的输入参数的类型均为内置类型<code>int32</code>。
 </li>
 </ul>
@@ -102,7 +102,7 @@ import (
 
 func main() {
 	c := make(chan *[16]byte)
-	
+
 	go func() {
 		// 使用两个数组以避免数据竞争。
 		var dataA, dataB = new([16]byte), new([16]byte)
@@ -116,7 +116,7 @@ func main() {
 			}
 		}
 	}()
-	
+
 	for data := range c {
 		fmt.Println((*data)[:])
 		time.Sleep(time.Second / 2)
@@ -143,13 +143,13 @@ func main() {
 	plusone := func(x int) int {return x + 1}
 	square := func(x int) int {return x * x}
 	double := func(x int) int {return x + x}
-	
+
 	transforms := map[string][]func(int) int {
 		"increase,increase,increase": {plusone, plusone, plusone},
 		"square,increase,double": {square, plusone, double},
 		"double,square,square": {double, double, square},
 	}
-	
+
 	for _, n := range []int{2, 3, 5, 7} {
 		fmt.Println(">>>", n)
 		for name, transfers := range transforms {

@@ -226,9 +226,9 @@ type of a: int, type of b: string
 根据不同的情形，名称为<code>vendor</code>的文件夹可能被视为特殊的文件夹。下面的段落将会解释其特殊性。
 </p>
 
-目前最新的Go SDK版本为1.11。此版本引入了包模块（module）的概念。
+Go SDK 1.11版本引入了包模块（module）的概念。
 此概念对代码包的引入路径产生了一些影响。
-目前一个Go代码包可以选择是否支持模块模式。
+一个Go代码包可以选择是否支持模块模式。
 Go SDK 1.11引入了一个环境变量<code>GO111MODULE</code>。这个环境变量的默认值是<code>auto</code>，它的其它两个可能取值为<code>on</code>和<code>off</code>。
 如果此环境变量取值为<code>on</code>，则所有的代码包都支持模块模式；
 如果此环境变量取值为<code>off</code>，则所有的代码包都不支持模块模式；

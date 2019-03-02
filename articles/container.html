@@ -835,7 +835,7 @@ func main() {
 </p>
 
 <p>
-截至目前（Go 1.11），<code>append</code>函数调用的第一个实参不能为类型不确定的<code>nil</code>。
+截至目前（Go 1.12），<code>append</code>函数调用的第一个实参不能为类型不确定的<code>nil</code>。
 </p>
 
 </div>
@@ -1263,7 +1263,7 @@ func Copy(dest, src []T) int {
 </p>
 
 <p>
-截至目前（Go 1.11），<code>copy</code>函数调用的两个实参均不能为类型不确定的<code>nil</code>。
+截至目前（Go 1.12），<code>copy</code>函数调用的两个实参均不能为类型不确定的<code>nil</code>。
 </p>
 
 </div>
@@ -1358,7 +1358,7 @@ for range aContainer {
 一些关于遍历映射表条目的细节：
 <ul>
 <li>
-	映射表中的条目的遍历顺序是随机的。或者说，同一个映射表中的条目的两次遍历中，条目的顺序很可能是不一致的，即使在这两次遍历之间，此映射表并为发生任何改变。
+	映射表中的条目的遍历顺序是不确定的（可以认为是随机的）。或者说，同一个映射表中的条目的两次遍历中，条目的顺序很可能是不一致的，即使在这两次遍历之间，此映射表并为发生任何改变。
 </li>
 <li>
 	如果在一个映射表中的条目的遍历过程中，一个还没有被遍历到的条目被删除了，则此条目保证不会被遍历出来。
@@ -1588,11 +1588,11 @@ import "fmt"
 func main() {
 	var a [100]int
 
-	for i, n := range &a { // copying a pointer is cheap
+	for i, n := range &a { // 复制一个指针的开销很小
 		fmt.Println(i, n)
 	}
 
-	for i, n := range a[:] { // copying a slice is cheap
+	for i, n := range a[:] { // 复制一个指针的开销很小
 		fmt.Println(i, n)
 	}
 }
@@ -1693,7 +1693,7 @@ fmt.Println(len(pa), cap(pa)) // 5 5
 从优化在官方Go编译器1.5版本中被引入。
 </p>
 
-此优化也适用于<code>a</code>为一个切片的情形。但是，有点遗憾，此优化不适用于<code>a</code>为一个数组指针的情形，至少到目前（Go 1.11）为止。
+此优化也适用于<code>a</code>为一个切片的情形。但是，有点遗憾，此优化不适用于<code>a</code>为一个数组指针的情形，至少到目前（Go 1.12）为止。
 所以，如果你打算重置一个数组，最好不要在<code>range</code>关键字后跟随此数组的指针。
 特别地，推荐在<code>range</code>关键字后跟随一个从此数组派生出来的切片，如下：
 
@@ -1796,7 +1796,7 @@ Go不支持更多的内置切片操作，比如切片克隆、元素删除和插
 <h4>切片克隆</h4>
 
 <div>
-截至官方Go SDK 1.11，最有效的克隆一个切片的方法为：
+对于目前的标准编译器（1.12），最有效的克隆一个切片的方法为：
 <pre class="line-numbers"><code class="language-go">sClone := append(s[:0:0], s...)
 </code></pre>
 

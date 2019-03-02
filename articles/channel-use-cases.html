@@ -803,7 +803,7 @@ import "runtime"
 func DoSomething() {
 	for {
 		// 做点什么...
-		
+
 		runtime.Gosched() // 防止本协程霸占CPU不放
 	}
 }
@@ -845,7 +845,7 @@ func main() {
 </p>
 
 <p>
-官方标准Go编译器对尝试发送和尝试接收代码块做了特别的优化，使得它们的执行效率比多<code>case</code>分支的普通<code>select</code>代码块执行效率高得多。
+标准编译器对尝试发送和尝试接收代码块做了特别的优化，使得它们的执行效率比多<code>case</code>分支的普通<code>select</code>代码块执行效率高得多。
 </p>
 
 下例演示了尝试发送和尝试接收代码块的工作原理。

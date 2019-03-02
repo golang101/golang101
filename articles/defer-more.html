@@ -11,7 +11,7 @@
 <div>
 <p>
 在Go中，自定义函数的调用的返回结果都可以被舍弃。
-但是，<a href="exceptions.html#discard-return-results">大多数内置函数（除了<code>copy</code>和<code>recover</code>）的调用的返回结果都不可以舍弃</a>。
+但是，<a href="exceptions.html#discard-return-results">大多数内置函数（除了<code>copy</code>和<code>recover</code>）的调用的返回结果都不可以舍弃</a>（至少对于标准编译器1.12来说是如此）。
 另一方便，我们已经了解到延迟函数调用的所有返回结果必须都舍弃掉。
 所以，很多内置函数是不能被延迟调用的。
 </p>
@@ -158,7 +158,7 @@ func f2() {
 
 <div>
 <p>
-延迟调用并非没有缺点。到目前为止（Go 1.11），对于官方标准编译器来说，延迟调用将导致一些性能损失。
+延迟调用并非没有缺点。到目前为止（Go 1.12），对于官方标准编译器来说，延迟调用将导致一些性能损失。
 </p>
 
 比如，下面的例子中的<code>CounterB</code>和<code>IncreaseB</code>方法比<code>CounterA</code>和<code>IncreaseA</code>方法的效率要高。

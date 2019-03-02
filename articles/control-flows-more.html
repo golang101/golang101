@@ -231,7 +231,7 @@ func main() {
 </p>
 
 <p>
-官方标准Go编译器采纳了一种被称为<a href="https://docs.google.com/document/d/1TTj4T2JO42uD5ID9e89oa0sLKhJYD0Y_kqxDv3I3XMw">M-P-G模型</a>的算法来实现协程调度。
+标准编译器采纳了一种被称为<a href="https://docs.google.com/document/d/1TTj4T2JO42uD5ID9e89oa0sLKhJYD0Y_kqxDv3I3XMw">M-P-G模型</a>的算法来实现协程调度。
 其中，<b>M</b>表示系统线程，<b>P</b>表示逻辑处理器（并非上述的逻辑CPU），<b>G</b>表示协程。
 大多数的调度工作是通过逻辑处理器（<b>P</b>）来完成的。
 逻辑处理器像一个监工一样通过将不同的处于运行状态协程（<b>G</b>）交给不同的系统线程（<b>M</b>）来执行。
