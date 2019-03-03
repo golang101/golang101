@@ -323,8 +323,8 @@ func main() {
 <p>
 </p>
 
-<code>reflect</code>标准库包中也有很多针对<code>reflect.Value</code>值的对应着内置函数或者各种非反射功能的函数。
-下面这个例子展示了如何将一个自定义范型函数绑定到不同的类型的函数值上。
+<code>reflect</code>标准库包中也提供了一些对应着内置函数或者各种非反射功能的函数。
+下面这个例子展示了如何利用这些函数将一个自定义范型函数绑定到不同的类型的函数值上。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -398,6 +398,29 @@ func main() {
 <p>
 请注意：非导出结构体字段值不能用作反射函数调用中的实参。
 如果上例中的<code>vt.FieldByName("A")</code>被替换为<code>vt.FieldByName("b")</code>，则将产生一个恐慌。
+</p>
+
+下面是一个使用映射表反射值的例子。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import "fmt"
+import "reflect"
+
+func main() {
+	m := map[string]int{"Unix": 1973, "Windows": 1985}
+	v := reflect.ValueOf(m)
+	// 第二个实参为Value零值时，表示删除一个映射表条目。
+	v.SetMapIndex(reflect.ValueOf("Windows"), reflect.Value{})
+	v.SetMapIndex(reflect.ValueOf("Linux"), reflect.ValueOf(1991))
+	for i := v.MapRange(); i.Next(); {
+		fmt.Println(i.Key(), "\t:", i.Value())
+	}
+}
+</code></pre>
+
+<p>
+注意：方法<code>reflect.Value.MapRange</code>方法是从Go 1.12开始才支持的。
 </p>
 
 下面是一个使用数据通道反射值的例子。
