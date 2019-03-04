@@ -105,9 +105,7 @@ func main() {
 <p>
 此方违反了<b>数据通道关闭原则</b>。
 </p>
-</div>
 
-<div>
 同样的方法可以用来粗鲁地向一个关闭状态未知的数据通道发送数据。
 <pre class="line-numbers"><code class="language-go">func SafeSend(ch chan T, value T) (closed bool) {
 	defer func() {
@@ -121,6 +119,10 @@ func main() {
 }
 </code></pre>
 <p></p>
+
+<p>
+这样的粗鲁方法不仅违反了<b>数据通道关闭原则</b>，而且Go白皮书和标准编译器<a href="https://github.com/golang/go/issues/30372">不保证</a>它的实现中不<a href="https://github.com/golang/go/issues/27769">存在数据竞争</a>。
+</p>
 </div>
 
 <h3>礼貌地关闭数据通道的方法</h3>

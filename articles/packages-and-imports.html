@@ -267,7 +267,7 @@ Go SDK 1.11引入了一个环境变量<code>GO111MODULE</code>。这个环境变
 </li>
 </ul>
 
-<pre><code class="language-go">_ GOPATH
+<pre class="disable-line-numbers111">_ GOPATH
   |_ src
      |_ x
         |_ vendor
@@ -313,7 +313,7 @@ Go SDK 1.11引入了一个环境变量<code>GO111MODULE</code>。这个环境变
 
 注意：当在<code>x.go</code>、<code>y.go</code>或者<code>z.go</code>文件中引入一个引入路径均为<code>w/foo</code>的包的时候，被引入的包均为<code>MyProject/vendor/w/foo</code>文件夹中的包。
 
-<pre><code class="language-go">_ MyProject
+<pre class="disable-line-numbers111">_ MyProject
      |_ go.mod                // module example.com/mypkg
      |_ vendor
      |  |_ w
@@ -469,7 +469,7 @@ var (
 
 事实上，一个引入声明语句的完整形式为：
 
-<pre><code class="language-go">import importname "path/to/package"
+<pre class="disable-line-numbers111">import importname "path/to/package"
 </code></pre>
 
 <p>
@@ -479,7 +479,7 @@ var (
 事实上，在本文上面的例子中的包引入声明中，<code>importname</code>部分都被省略掉了，因为它们都分别和引入的代码包的包名相同。
 这些引入声明等价于下面这些：
 
-<pre><code class="language-go">import fmt "fmt"        // <=> import "fmt"
+<pre class="disable-line-numbers111">import fmt "fmt"        // <=> import "fmt"
 import rand "math/rand" // <=> import "math/rand"
 import time "time"      // <=> import "time"
 </code></pre>

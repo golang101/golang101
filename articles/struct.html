@@ -142,13 +142,13 @@ type Book struct {
 }
 
 func main() {
-	book := Book{"Golang 101", "老貘", 256}
-	fmt.Println(book) // {Golang 101 老貘 256}
+	book := Book{"Go语言101", "老貘", 256}
+	fmt.Println(book) // {Go语言101 老貘 256}
 
 	// 使用带字段名的组合字面形式来表示结构体值：
 	book = Book{} // title和author字段的值都为空字符串""，pages字段的值为0。
 	book = Book{author: "老貘"} // title字段空字符串""，pages字段为0。
-	book = Book{author: "老貘", pages: 256, title: "Golang 101"}
+	book = Book{author: "老貘", pages: 256, title: "Go语言101"}
 
 	// 使用选择器来访问和修改字段值。
 	var book2 Book // <=> book2 := Book{}
@@ -166,11 +166,11 @@ func main() {
 <pre class="line-numbers"><code class="language-go">var _ = Book {
 	author: "老貘",
 	pages: 256,
-	title: "Golang 101", // 这里行尾的逗号不可省略
+	title: "Go语言101", // 这里行尾的逗号不可省略
 }
 
 // 下行}前的逗号可以省略。
-var _ = Book{author: "老貘", pages: 256, title: "Golang 101",}
+var _ = Book{author: "老貘", pages: 256, title: "Go语言101",}
 </code></pre>
 
 <p>
@@ -185,7 +185,7 @@ var _ = Book{author: "老貘", pages: 256, title: "Golang 101",}
 
 <pre class="line-numbers"><code class="language-go">func f() {
 	book1 := Book{pages: 300}
-	book2 := Book{"Golang 101", "老貘", 256}
+	book2 := Book{"Go语言101", "老貘", 256}
 
 	book2 = book1
 	// 上面这行和下面这三行是等价的。

@@ -530,128 +530,17 @@ func main() {
 }
 </code></pre>
 
-<p>
-</p>
-
+<p class="anchor" id="deep-equal"></p>
 <p>
 上面这些例子并未触及到所有的和<code>reflect.Value</code>相关的函数和方法，请阅读<code>reflect</code>标准库包的文档以获取如何使用这些函数和方法。
+另外请注意<a href="details.html">Go细节101</a>中提到的<a href="details.html#reflect-deep-equal">一些</a>关于<a href="details.html#reflect-value-bytes">反射的细节</a>。
 </p>
 
 </div>
 
-<h3>更多和反射相关的细节</h3>
 
-<p class="anchor" id="deep-equal"></p>
-<h4><code>reflect.DeepEqual(x, y)</code>和<code>x == y</code>的估值结果可能不同</h4>
-
-<div>
-<p>
-如果表达式<code>x</code>和<code>y</code>的类型不相同，则函数调用<code>DeepEqual(x, y)</code>的结果总为<code>false</code>，但<code>x == y</code>的估值结果有可能为<code>true</code>。
-</p>
-
-<p>
-如果<code>x</code>和<code>y</code>为（同类型的）两个引用着不同其它值的指针值，则<code>x == y</code>的估值结果总为<code>false</code>，但函数调用<code>DeepEqual(x, y)</code>的结果可能为<code>true</code>，因为函数<code>reflect.DeepEqual</code>将比较<code>x</code>和<code>y</code>所引用的两个值。
-</p>
-
-<p>
-第三个区别是当<code>x</code>和<code>y</code>处于一个循环引用链中时，<code>DeepEqual</code>调用的结果可能未必正确。
-</p>
-
-<p>
-第四个区别是一个<code>DeepEqual(x, y)</code>调用无论如何不应该产生一个恐慌，但是如果<code>x</code>和<code>y</code>是两个动态类型相同的接口值并且它们的动态类型是不可比较类型的时候，<code>x == y</code>将产生一个恐慌。
-</p>
-
-一个展示了这些不同的例子：
-
-<pre class="line-numbers"><code class="language-go">package main
-
-import "fmt"
-import "reflect"
-
-func main() {
-	type Book struct {page int}
-	x := struct {page int}{123}
-	y := Book{123}
-	fmt.Println(reflect.DeepEqual(x, y)) // false
-	fmt.Println(x == y)                  // true
-
-	z := Book{123}
-	fmt.Println(reflect.DeepEqual(&z, &y)) // true
-	fmt.Println(&z == &y)                  // false
-
-	type T struct{p *T}
-	t := &T{&T{nil}}
-	t.p.p = t // form a cyclic reference chain.
-	fmt.Println(reflect.DeepEqual(t, t.p)) // true
-	fmt.Println(t == t.p)                  // false
-
-	var f1, f2 func() = nil, func(){}
-	fmt.Println(reflect.DeepEqual(f1, f1)) // true
-	fmt.Println(reflect.DeepEqual(f2, f2)) // false
-
-	var a, b interface{} = []int{1, 2}, []int{1, 2}
-	fmt.Println(reflect.DeepEqual(a, b)) // true
-	fmt.Println(a == b)                  // panic
-}
-</code></pre>
-
-<p>
-注意：如果传递给一个<code>DeepEqual</code>调用的两个实参均为函数类型值，则此调用只有在这两个实参都为nil并且它们的类型相同的情况下才返回<code>true</code>。
-</p>
-
-<p>
-所以，但是用<code>reflect.DeepEqual</code>函数比较两个值时，我我们必须清楚地知道这两个值的类型的结构。
-</p>
-</div>
-
-<h4>一个<code>[]MyByte</code>值可以通过反射转换为<code>[]byte</code>类型</h4>
-
-<div>
-<p>
-假设一个自定义类型<code>MyByte</code>的底层类型为内置类型<code>byte</code>，我们知道Go类型系统禁止切片类型<code>[]MyByte</code>的值转换为类型<code>[]byte</code>。
-但是，当前的<code>reflect.Value</code>类型的<code>Bytes</code>方法的实现可以帮我们绕过这个限制。
-此实现应该是违反了Go类型系统的规则。
-</p>
-
-例子：
-
-<pre class="line-numbers"><code class="language-go">package main
-
-import "bytes"
-import "fmt"
-import "reflect"
-
-type MyByte byte
-
-func main() {
-	var mybs = []MyByte{'a', 'b', 'c'}
-	var bs []byte
-
-	// bs = []byte(mybs) // this line fails to compile
-
-	v := reflect.ValueOf(mybs)
-	bs = v.Bytes() // okay. Violating Go type system.
-	fmt.Println(bytes.HasPrefix(bs, []byte{'a', 'b'})) // true
-
-	bs[1], bs[2] = 'r', 't'
-	fmt.Printf("%s \n", mybs) // art
-}
-</code></pre>
-
-<p>
-但是此规则违反貌似并没有什么害处，相反，它带来了一些好处。
-比如，我们可以将<code>bytes</code>标准库包中提供的函数应用到<code>[]MyByte</code>值上，如上例所示。
-</p>
-
-</div>
 
 <!--
-
-Go 1.12
-A new MapIter type is an iterator for ranging over a map.
-This type is exposed through the Value type's new MapRange method.
-This follows the same iteration semantics as a range statment,
-with Next to advance the iterator, and Key/Value to access each entry.
 
 bug setcion in reflect docs
 

@@ -8,8 +8,8 @@
 		<meta name="author" content="">
 		<link rel="icon" href="/static/go101/images/101-v1.ico">
 		<link rel="apple-touch-icon" sizes="152x152" href="/static/go101/images/iphone-v1.jpeg">
-	
-		<title>Golang 101</title>
+
+		<title>Go语言101</title>
 
 		<link href="/static/bootstrap/v3.3.7/css/bootstrap.min.css" rel="stylesheet">
 		<link href="/static/go101/css/v8.css" rel="stylesheet" media="screen, print">
@@ -23,29 +23,29 @@
 			a[href]:after {
 				content: none !important;
 			}
-			
+
 			h1, h2, h3, h4, h5 {
 				page-break-after: avoid !important;
 			}
-			
+
 			pre, table {
 				page-break-inside: auto !important;
 			}
-			
+
 			table tr td, table tr th {
 				page-break-inside: avoid !important;
 			}
-			
+
 			a:link {
 				text-decoration: underline !important;
 			}
-			
+
 			.prettyprinted ol {
 				border-style: solid;
 				border-width: 1px;
 				border-color: #666;
 			}
-			
+
 		}
 		</style>
 		<script>
@@ -60,9 +60,9 @@
 				}
 				//console.log("id: " + this.id)
 			})
-			
+
 			var printPage = location.pathname.substr(location.pathname.lastIndexOf('/') + 1)
-			
+
 			currentArticle = ""
 			$("p.article-anchor, a:not([href^='http'])").each(function(){
 				if (this.className == "article-anchor") {
@@ -74,7 +74,7 @@
 				var index = this.href.lastIndexOf('/')
 				var anchor = this.href.substr(index + 1);
 				index = anchor.indexOf('#');
-				
+
 				if (index == 0) { // impossible?
 					anchor = currentArticle + ":" + anchor.substr(0)
 				} else if (index < 0) {
@@ -92,9 +92,9 @@
 				//console.log("anchor: " + anchor)
 				this.href = location.protocol+'//'+location.host + location.pathname + "#" + anchor
 			});
-			
+
 			$("pre.line-numbers").addClass("prettyprint linenums")
-			$("pre.no-line-numbers").addClass("prettyprint")
+			$("pre.disable-line-numbers111").addClass("prettyprint")
 			PR.prettyPrint();
 		}
 		</script>
@@ -102,7 +102,7 @@
 
 	<body onload="process()">
 		<div class="container">
-		
+
 {{ range .Articles }}
 
 	<p class="article-anchor" id="{{ .FilenameWithoutExt }}.html"></p>
@@ -114,9 +114,9 @@
 	<p style="page-break-after: always;"></p>
 
 {{ end }}
-		
-		
-		
+
+
+
 		</div>
 	</body>
 </html>

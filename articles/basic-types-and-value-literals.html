@@ -181,7 +181,7 @@ Go白皮书没有定义布尔类型值字面表示形式。
 整数类型值有三种字面表示形式：十进制形式（decimal）、八进制形式（octal）和十六进制形式（hex）。
 比如，下面的三个字面值均表示十进制的15：
 
-<pre><code class="language-go">0xF // 十六进制表示（必须使用0x或者0X开头）
+<pre class="disable-line-numbers111">0xF // 十六进制表示（必须使用0x或者0X开头）
 017 // 八进制表示（必须使用0开头）
 15  // 十进制表示（必须不能用0开头）
 </code></pre>
@@ -215,11 +215,11 @@ func main() {
 一个浮点数的完整字面表示形式包含一个整数部分、一个小数点、一个小数部分和一个指数部分。
 常常地，某些部分可以根据情况省略掉。一些例子：
 
-<pre><code class="language-go">1.23
+<pre class="disable-line-numbers111">1.23
 01.23 // == 1.23
 .23
 1.
-// 一个e或者E随后数值是指数值。
+// 一个e或者E随后的数值是指数值。
 // 指数值必须为一个可以带符号的十进制整数字面值。
 1.23e2  // == 123.0
 123E2   // == 12300.0
@@ -243,7 +243,7 @@ func main() {
 一个虚部值的字面表示形式由一个浮点数字面值或者一个整数字面值加一个小写的<code>i</code>组成。
 一些例子：
 
-<pre><code class="language-go">1.23i
+<pre class="disable-line-numbers111">1.23i
 1.i
 .23i
 123i
@@ -256,7 +256,7 @@ func main() {
 
 虚部字面值用来表示复数的虚部。下面是一些复数值的字面表示形式：
 
-<pre><code class="language-go">1 + 2i       // == 1.0 + 2.0i
+<pre class="disable-line-numbers111">1 + 2i       // == 1.0 + 2.0i
 1. - .1i     // == 1.0 + -0.1i
 1.23i - 7.89 // == -7.89 + 1.23i
 1.23i        // == 0.0 + 1.23i
@@ -292,7 +292,7 @@ func main() {
 包在单引号中的字符序列表示一个Unicode码点值。
 rune字面形式有几个变种，其中最常用的一种变种是将一个rune值对应的Unicode字符直接包在一对单引号中。比如：
 
-<pre><code class="language-go">'a' // 一个英文字符
+<pre class="disable-line-numbers111">'a' // 一个英文字符
 'π'
 '众' // 一个中文字符
 </code></pre>
@@ -300,7 +300,7 @@ rune字面形式有几个变种，其中最常用的一种变种是将一个rune
 下面这些rune字面形式的变种和<code>'a'</code>是等价的
 （字符<code>a</code>的Unicode值是97）。
 
-<pre><code class="language-go">'\141'   // 141是97的八进制表示
+<pre class="disable-line-numbers111">'\141'   // 141是97的八进制表示
 '\x61'   // 61是97的十六进制表示
 '\u0061'
 '\U00000061'
@@ -339,7 +339,7 @@ func main() {
 <code>u</code>和<code>U</code>，那么这两个字符将被转义为一个特殊字符。
 目前支持的转义组合为：
 
-<pre><code class="language-go">\a   (rune值：0x07) 铃声字符
+<pre class="disable-line-numbers111">\a   (rune值：0x07) 铃声字符
 \b   (rune值：0x08) 退格字符（backspace）
 \f   (rune值：0x0C) 换页符（form feed）
 \n   (rune值：0x0A) 换行符（line feed or newline）

@@ -7,7 +7,7 @@
 <li><a href="#have-length-types">哪些种类型的值可以用作内置<code>len</code>（以及<code>cap</code>、<code>close</code>、<code>delete</code>和<code>make</code>）函数调用的实参？</a></li>
 <li><a href="#container-types">各种容器类型比较</a></li>
 <li><a href="#composite-literals-types">哪些种类型的值可以用组合字面形式（<code>T{...}</code>）表示？</a></li>
-<li><a href="#type-sizes">各种类型的尺寸大小</a></li>
+<li><a href="#type-sizes">各种类型的尺寸</a></li>
 <li><a href="#nil-zero-value-types">哪些种类型的零值使用预声明的<code>nil</code>标识符表示？</a></li>
 <li><a href="#types-can-have-methods">我们可以为什么样的类型声明方法？</a></li>
 <li><a href="#types-can-be-embedded">什么样的类型可以被内嵌在结构体类型中？</a></li>
@@ -25,7 +25,7 @@
 <p>
 </p>
 
-除了当前这篇文章，Golang 101中还有其它几篇总结性的文章，包括：
+除了当前这篇文章，Go语言101中还有其它几篇总结性的文章，包括：
 <ul>
 <li>
 	<a href="nil.html">Go中的<code>nil</code></a>；
@@ -237,7 +237,7 @@
 
 <p class="anchor" id="type-sizes"></p>
 <h3>
-	各种类型的尺寸大小
+	各种类型的尺寸
 </h3>
 
 <p>
@@ -554,7 +554,7 @@
 <ol>
 <li>向一个永不会被接收数据的数据通道发送数据。
 	<div>
-<pre><code class="language-go">make(chan struct{}) <- struct{}{}
+<pre class="disable-line-numbers111">make(chan struct{}) <- struct{}{}
 // or
 make(chan<- struct{}) <- struct{}{}
 </code></pre>
@@ -562,7 +562,7 @@ make(chan<- struct{}) <- struct{}{}
 </li>
 <li>从一个未被并且将来也不会被发送数据的（并且保证永不会被关闭的）数据通道读取数据。
 	<div>
-<pre><code class="language-go"><-make(chan struct{})
+<pre class="disable-line-numbers111"><-make(chan struct{})
 // or
 <-make(<-chan struct{})
 // or
@@ -572,7 +572,7 @@ for range make(<-chan struct{}) {}
 </li>
 <li>从一个nil数据通道读取或者发送数据。
 	<div>
-<pre><code class="language-go">chan struct{}(nil) <- struct{}{}
+<pre class="disable-line-numbers111">chan struct{}(nil) <- struct{}{}
 // or
 <-chan struct{}(nil)
 // or
@@ -582,7 +582,7 @@ for range chan struct{}(nil) {}
 </li>
 <li>使用一个不含任何分支的<code>select</code>流程控制代码块。
 	<div>
-<pre><code class="language-go">select{}
+<pre class="disable-line-numbers111">select{}
 </code></pre>
 	</div>
 </li>

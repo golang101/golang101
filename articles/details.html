@@ -225,6 +225,9 @@
 		<a href="#reflect-deep-equal"><code>reflect.DeepEqual(x, y)</code>和<code>x == y</code>的结果可能会不同。</a>
 	</li>
 	<li>
+		<a href="#reflect-value-bytes"><code>reflect.Value.Bytes()</code>方法返回一个<code>[]byte</code>值，它的元素类型<code>byte</code>可能并非属主参数代表的Go切片值的元素类型。</a>
+	</li>
+	<li>
 		<a href="#check-file-existent">我们应该使用<code>os.IsNotExist(err)</code>而不是<code>err == os.ErrNotExist</code>来检查文件是否存在。</a>
 	</li>
 	<li>
@@ -721,7 +724,7 @@ https://github.com/golang/go/issues/12726
 -->
 
 <div>
-两个零大小值的地址是否相等时依赖于具体编译器实现以及具体编译器版本。
+两个零尺寸值的地址是否相等时依赖于具体编译器实现以及具体编译器版本。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1689,15 +1692,118 @@ runtime stack:
 <h3>某些表达式的估值顺序取决于具体编译器实现。</h3>
 
 <p>
-关于细节，请阅读<a href="evaluation-orders.html">表达式估值顺序规则/a>一文。
+关于细节，请阅读<a href="evaluation-orders.html">表达式估值顺序规则</a>一文。
 </p>
 
 <p class="anchor" id="reflect-deep-equal"></p>
 <h3><code>reflect.DeepEqual(x, y)</code>和<code>x == y</code>的结果可能会不同。</h3>
 
+
+<div>
 <p>
-关于细节，请阅读<a href="reflection.html#deep-equal">反射</a>一文。
+如果表达式<code>x</code>和<code>y</code>的类型不相同，则函数调用<code>DeepEqual(x, y)</code>的结果总为<code>false</code>，但<code>x == y</code>的估值结果有可能为<code>true</code>。
 </p>
+
+<p>
+如果<code>x</code>和<code>y</code>为（同类型的）两个引用着不同其它值的指针值，则<code>x == y</code>的估值结果总为<code>false</code>，但函数调用<code>DeepEqual(x, y)</code>的结果可能为<code>true</code>，因为函数<code>reflect.DeepEqual</code>将比较<code>x</code>和<code>y</code>所引用的两个值。
+</p>
+
+<p>
+第三个区别是当<code>x</code>和<code>y</code>处于一个循环引用链中时，<code>DeepEqual</code>调用的结果可能未必正确。
+</p>
+
+<p>
+第四个区别是一个<code>DeepEqual(x, y)</code>调用无论如何不应该产生一个恐慌，但是如果<code>x</code>和<code>y</code>是两个动态类型相同的接口值并且它们的动态类型是不可比较类型的时候，<code>x == y</code>将产生一个恐慌。
+</p>
+
+一个展示了这些不同的例子：
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import "fmt"
+import "reflect"
+
+func main() {
+	type Book struct {page int}
+	x := struct {page int}{123}
+	y := Book{123}
+	fmt.Println(reflect.DeepEqual(x, y)) // false
+	fmt.Println(x == y)                  // true
+
+	z := Book{123}
+	fmt.Println(reflect.DeepEqual(&z, &y)) // true
+	fmt.Println(&z == &y)                  // false
+
+	type T struct{p *T}
+	t := &T{&T{nil}}
+	t.p.p = t // form a cyclic reference chain.
+	fmt.Println(reflect.DeepEqual(t, t.p)) // true
+	fmt.Println(t == t.p)                  // false
+
+	var f1, f2 func() = nil, func(){}
+	fmt.Println(reflect.DeepEqual(f1, f1)) // true
+	fmt.Println(reflect.DeepEqual(f2, f2)) // false
+
+	var a, b interface{} = []int{1, 2}, []int{1, 2}
+	fmt.Println(reflect.DeepEqual(a, b)) // true
+	fmt.Println(a == b)                  // panic
+}
+</code></pre>
+
+<p>
+注意：如果传递给一个<code>DeepEqual</code>调用的两个实参均为函数类型值，则此调用只有在这两个实参都为nil并且它们的类型相同的情况下才返回<code>true</code>。
+</p>
+
+<p>
+所以，当使用<code>reflect.DeepEqual</code>函数比较两个值时，我我们必须清楚地知道这两个值的类型的结构。
+</p>
+</div>
+
+<p class="anchor" id="reflect-value-bytes"></p>
+<h3><code>reflect.Value.Bytes()</code>方法返回一个<code>[]byte</code>值，它的元素类型<code>byte</code>可能并非属主参数代表的Go切片值的元素类型。</h3>
+
+<div>
+<p>
+假设一个自定义类型<code>MyByte</code>的底层类型为内置类型<code>byte</code>，我们知道Go类型系统禁止切片类型<code>[]MyByte</code>的值转换为类型<code>[]byte</code>。
+但是，当前的<code>reflect.Value</code>类型的<code>Bytes</code>方法的实现可以帮我们绕过这个限制。
+此实现应该是违反了Go类型系统的规则。
+</p>
+
+例子：
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import "bytes"
+import "fmt"
+import "reflect"
+
+type MyByte byte
+
+func main() {
+	var mybs = []MyByte{'a', 'b', 'c'}
+	var bs []byte
+
+	// bs = []byte(mybs) // this line fails to compile
+
+	v := reflect.ValueOf(mybs)
+	bs = v.Bytes() // okay. Violating Go type system.
+	fmt.Println(bytes.HasPrefix(bs, []byte{'a', 'b'})) // true
+
+	bs[1], bs[2] = 'r', 't'
+	fmt.Printf("%s \n", mybs) // art
+}
+</code></pre>
+
+<p>
+虽然这违反了Go类型系统的规则，但是貌似此违反并没有什么害处，相反，它带来了一些好处。
+比如，我们可以将<code>bytes</code>标准库包中提供的函数（间接）应用到<code>[]MyByte</code>值上，如上例所示。
+</p>
+
+<p>
+注意：<code>reflect.Value.Bytes()</code>方法<a href="https://github.com/golang/go/issues/27727">以后可能会被移除</a>。
+</p>
+
+</div>
 
 <p class="anchor" id="check-file-existent"></p>
 <h3>我们应该使用<code>os.IsNotExist(err)</code>而不是<code>err == os.ErrNotExist</code>来检查文件是否存在。</h3>
@@ -1723,6 +1829,8 @@ func main() {
 <p>
 </p>
 </div>
+
+
 
 <p class="anchor" id="boolean-flag"></p>
 <h3><code>flag</code>标准库包对待布尔命令选项不同于数值和字符串选项。</h3>

@@ -237,8 +237,8 @@ func (book *Book) About() string {
 
 func main() {
 	// 一个*Book值被包裹在了一个Aboutable值中。
-	var a Aboutable = &Book{"Golang 101"}
-	fmt.Println(a) // &{Golang 101}
+	var a Aboutable = &Book{"Go语言101"}
+	fmt.Println(a) // &{Go语言101}
 
 	// i是一个空接口值。类型*Book实现了任何空接口类型。
 	var i interface{} = &Book{"Rust 101"}
@@ -246,7 +246,7 @@ func main() {
 
 	// Aboutable实现了空接口类型interface{}。
 	i = a
-	fmt.Println(i) // &{Golang 101}
+	fmt.Println(i) // &{Go语言101}
 }
 </code></pre>
 

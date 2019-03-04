@@ -50,7 +50,7 @@ Go白皮书这样描述<b>通常估值顺序</b>：
 
 下面是Go白皮书中提到的另一个例子：
 
-<pre><code class="language-go">y[z.f()], ok = g(h(a, b), i()+x[j()], <-c), k()
+<pre class="disable-line-numbers111">y[z.f()], ok = g(h(a, b), i()+x[j()], <-c), k()
 </code></pre>
 
 在此赋值语句中，
@@ -279,7 +279,7 @@ func main() {
 		*p = 99
 		return *p
 	}
-	
+
 	x := 0
 	y, z := x+1, f(&x)
 	fmt.Println(y, z)
@@ -326,7 +326,7 @@ func main() {
 		fmt.Printf("f(%v) is called.\n", n)
 		return n
 	}
-	
+
 	switch x := f(3); x + f(4) {
 	default:
 	case f(5):
@@ -337,7 +337,7 @@ func main() {
 </code></pre>
 
 <p>
-在运行时刻，各个<code>f()</code>调用将按照传给它们参数大小顺序进行估值，则待和调用<code>f(7)</code>的比较结果为<code>true</code>为止。
+在运行时刻，各个<code>f()</code>调用将按照传给它们参数的大小顺序进行估值，直到和调用<code>f(7)</code>的比较结果为<code>true</code>为止。
 所以调用<code>f(8)</code>、<code>f(9)</code>和<code>f(10)</code>将不会被估值。
 </p>
 
@@ -384,7 +384,7 @@ func main() {
 		fmt.Println(info)
 		return new(int)
 	}
-	
+
 	select {
 	case *fptr("aaa") = <-fchan("bbb", nil): // blocking
 	case *fptr("ccc") = <-fchan("ddd", c):   // non-blocking
