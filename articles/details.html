@@ -89,10 +89,10 @@
 		<a href="#use-pointer-as-array">在部分场景下，可以使用数组指针作为数组。</a>
 	</li>
 	<li>
-		<a href="#nil-map-element-retrieving">从空(nil)映射里检索元素不会导致崩溃(panic)。其结果是一个零元素值。</a>
+		<a href="#nil-map-element-retrieving">从空(nil)映射里检索元素不会导致恐慌(panic)。其结果是一个零元素值。</a>
 	</li>
 	<li>
-		<a href="#nil-map-element--deletion">从一个空(nil)映射删除一个条目不会导致崩溃(panic)。这是一个无操作(no-op)。</a>
+		<a href="#nil-map-element--deletion">从一个空(nil)映射删除一个条目不会导致恐慌(panic)。这是一个无操作(no-op)。</a>
 	</li>
 	<li>
 		<a href="#append-slice-elements">切片调用<code>append</code>函数的结果可能会与原始切片共享一些元素，也可能不会。</a>
@@ -153,7 +153,7 @@
 	接口相关的细节：
 	<ul>
 	<li>
-		<a href="#comparison-interfaces-may-panic">将两个接口值与相同的动态不可比较类型进行比较会产生崩溃(panic)。</a>
+		<a href="#comparison-interfaces-may-panic">将两个接口值与相同的动态不可比较类型进行比较会产生恐慌(panic)。</a>
 	</li>
 	<li>
 		<a href="#type-assertion-to-interface-type">类型推断可以用于转换一个接口类型的值为另一个接口类型，即使前一种接口类型不实现后一种接口类型。</a>
@@ -181,7 +181,7 @@
 		<a href="#receive-only-channel-canot-be-closed">仅接收的管道不能关闭。</a>
 	</li>
 	<li>
-		<a href="#send-to-closed-channel-is-non-blocking">将一个值发送到一个关闭的通道被视为一个非阻塞操作，该操作会引起崩溃(panic)。</a>
+		<a href="#send-to-closed-channel-is-non-blocking">将一个值发送到一个关闭的通道被视为一个非阻塞操作，该操作会引起恐慌(panic)。</a>
 	</li>
 	</ul>
 </li>
@@ -214,7 +214,7 @@
 	</li>
 	-->
 	<li>
-		<a href="#stack-overflow-is-not-panic">栈溢出不是崩溃(panic)。</a>
+		<a href="#stack-overflow-is-not-panic">栈溢出不是恐慌(panic)。</a>
 	</li>
 	<li>
 		<a href="#some-evaluation-order-are-compiler-dependent">部分表达式的求值顺序在Go里依赖于编译器实现。</a>
@@ -888,7 +888,7 @@ func main() {
 </p>
 
 <p class="anchor" id="nil-map-element-retrieving"></p>
-<h3>从空(nil)映射里检索元素不会导致崩溃(panic)。其结果是一个零元素值。</h3>
+<h3>从空(nil)映射里检索元素不会导致恐慌(panic)。其结果是一个零元素值。</h3>
 
 <div>
 
@@ -912,11 +912,11 @@ func Foo2(m map[string]int) int {
 </div>
 
 <p class="anchor" id="nil-map-element--deletion"></p>
-<h3>从一个空(nil)映射删除一个条目不会导致崩溃(panic)。这是一个无操作(no-op)。</h3>
+<h3>从一个空(nil)映射删除一个条目不会导致恐慌(panic)。这是一个无操作(no-op)。</h3>
 
 <div>
 
-例如，下列程序不会崩溃(panic)。
+例如，下列程序不会恐慌(panic)。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -966,7 +966,7 @@ func main() {
 
 <div>
 
-例如，下面的程序在运行时不会崩溃(panic)。
+例如，下面的程序在运行时不会恐慌(panic)。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1279,7 +1279,7 @@ func main() {
 </p>
 
 <p class="anchor" id="comparison-interfaces-may-panic"></p>
-<h3>将两个接口值与相同的动态不可比较类型进行比较会产生崩溃(panic)。</h3>
+<h3>将两个接口值与相同的动态不可比较类型进行比较会产生恐慌(panic)。</h3>
 
 <div>
 例如：
@@ -1329,8 +1329,8 @@ func main() {
 <div>
 If the second optional result presents in a failed type assertion, the type assertion will not produce a panic.
 Otherwise, a panic will occur.
-如果第二个可选结果出现在失败的类型断言中，那么类型断言不会产生崩溃(panic)。
-否则，会发生崩溃(panic)。
+如果第二个可选结果出现在失败的类型断言中，那么类型断言不会产生恐慌(panic)。
+否则，会发生恐慌(panic)。
 例如：
 
 <pre class="line-numbers"><code class="language-go">package main
@@ -1464,7 +1464,7 @@ func foo(c <-chan int) {
 </div>
 
 <p class="anchor" id="send-to-closed-channel-is-non-blocking"></p>
-<h3>将一个值发送到一个关闭的通道被视为一个非阻塞操作，该操作会引起崩溃(panic)。</h3>
+<h3>将一个值发送到一个关闭的通道被视为一个非阻塞操作，该操作会引起恐慌(panic)。</h3>
 
 <div>
 例如，在下面的程序里，第二个case分支会被选择，会在运行发生崩溃(painc)。
@@ -1672,7 +1672,7 @@ var main int
 -->
 
 <p class="anchor" id="stack-overflow-is-not-panic"></p>
-<h3>栈溢出不是崩溃(panic)。</h3>
+<h3>栈溢出不是恐慌(panic)。</h3>
 
 <div>
 
