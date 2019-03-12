@@ -55,7 +55,7 @@ Go所支持的六种流程控制代码快中，除了<code>if-else</code>条件�
 
 <p>
 上面所提及的流程控制语句都属于狭义上的流程控制语句。
-下一篇文章中将要介绍的<a href="control-flows-more.html">协程、延迟调用和恐慌/恢复</a>，以及今后要介绍的<a href="concurrent-synchronization-overview.html">并发同步技术</a>属于广义上的流程控制语句。
+下一篇文章中将要介绍的<a href="control-flows-more.html">协程、延迟函数调用、以及恐慌和恢复</a>，以及今后要介绍的<a href="concurrent-synchronization-overview.html">并发同步技术</a>属于广义上的流程控制语句。
 </p>
 
 <p>
@@ -122,18 +122,18 @@ func main() {
 	rand.Seed(time.Now().UnixNano())
 
 	if n := rand.Int(); n%2 == 0 {
-		fmt.Println(n, "is an even number.")
+		fmt.Println(n, "是一个偶数。")
 	} else {
-		fmt.Println(n, "is an odd number.")
+		fmt.Println(n, "是一个奇数。")
 	}
 
 	n := rand.Int() % 2 // 此n不是上面声明的n
 	if n % 2 == 0 {
-		fmt.Println("An even number.")
+		fmt.Println("一个偶数。")
 	}
 
 	if ; n % 2 != 0 {
-		fmt.Println("An odd number.")
+		fmt.Println("一个奇数。")
 	}
 }
 </code></pre>
@@ -159,11 +159,11 @@ import (
 
 func main() {
 	if h := time.Now().Hour(); h < 12 {
-		fmt.Println("Now is AM time.")
+		fmt.Println("现在为上午。")
 	} else if h > 19 {
-		fmt.Println("Now is evening time.")
+		fmt.Println("现在为晚上。")
 	} else {
-		fmt.Println("Now is afternoon time.")
+		fmt.Println("现在为下午。")
 		h := h // 左h是一个新声明的变量，右h已经在上面声明了
 		_ = h
 	}
@@ -280,7 +280,7 @@ for {
 <pre class="line-numbers"><code class="language-go">for i := 0; i < 3; i++ {
 	fmt.Print(i)
 	i := i // 这里声明的变量i遮挡了上面声明的i。
-	       // 右边的i为上面声明的i。
+	       // 右边的i为上面声明的循环变量i。
 	i = 10 // 新声明的i被更改了。
 }
 </code></pre>
@@ -354,7 +354,7 @@ default:
 <li>
 	<code>CompareOperand0</code>部分必须为一个表达式（如果它没被省略的话，见下）。
 	此表达式的估值结果总是被视为一个类型确定值。如果它是一个类型不确定值，则它被视为类型为它的默认类型的类型确定值。
-	因为这个原因，此表达式不能为类型不额定的<code>nil</code>值。
+	因为这个原因，此表达式不能为类型不确定的<code>nil</code>值。
 	<code>CompareOperand0</code>常被称为switch表达式。
 </li>
 <li>
@@ -425,7 +425,7 @@ func main() {
 </code></pre>
 
 <p>
-在上例中，<code>rand.Intn</code>函数将返回一个从<code>0</code>到所传参数之间类型为<code>int</code>的随机数。
+在上例中，<code>rand.Intn</code>函数将返回一个从<code>0</code>到所传实参之间类型为<code>int</code>的随机数。
 </p>
 
 <!--
@@ -434,7 +434,7 @@ https://github.com/golang/go/blob/5a7cfbc0117bce314c3f079ece459173b9efc854/src/c
 -->
 <p>
 注意，编译器可能会不允许一个<code>switch-case</code>流程控制中有任何两个case表达式可以在编译时刻确定相等的表达式。
-比如，当前的官方标准编译器（1.12）认为上例中的<code>case 6, 7, 8</code>一行是不合法（如果此行未被注释掉）。但是其它编译器未必这么认为。
+比如，当前的官方标准编译器（1.12版本）认为上例中的<code>case 6, 7, 8</code>一行是不合法（如果此行未被注释掉）。但是其它编译器未必这么认为。
 事实上，当前的官方标准编译器<a href="https://github.com/golang/go/issues/28357">允许重复的布尔case表达式在同一个<code>switch-case</code>流程控制中出现</a>，
 而gccgo（v8.2）允许重复的布尔和字符串类型的case表达式在同一个<code>switch-case</code>流程控制中出现。
 </p>
@@ -496,10 +496,10 @@ default:
 <p>
 一个<code>switch-case</code>流程控制中的<code>InitSimpleStatement</code>语句和<code>CompareOperand0</code>表达式都是可选的。
 如果<code>CompareOperand0</code>表达式被省略，则它被认为类型为<code>bool</code>类型的<code>true</code>值。
-如果<code>InitSimpleStatement</code>语句被省略，其后的分号也可被一并省略。
+如果<code>InitSimpleStatement</code>语句被省略，其后的分号也可一并被省略。
 </p>
 
-上面已经它提到了一个<code>switch-case</code>流程控制中的的所有分支都可以被省略，所以下面的所有流程控制代码块都是合法的，它们都可以被视为空操作。
+上面已经提到了一个<code>switch-case</code>流程控制中的的所有分支都可以被省略，所以下面的所有流程控制代码块都是合法的，它们都可以被视为空操作。
 
 <pre class="line-numbers"><code class="language-go">switch n := 5; n {
 }
@@ -517,7 +517,7 @@ switch {
 <p>
 </p>
 
-上例中中的后两个<code>switch-case</code>流程控制中的<code>CompareOperand0</code>表达式都为<code>bool</code>类型的<code>true</code>值。
+上例中的后两个<code>switch-case</code>流程控制中的<code>CompareOperand0</code>表达式都为<code>bool</code>类型的<code>true</code>值。
 同理，下例中的代码将打印出<code>hello</code>。
 
 <pre class="line-numbers"><code class="language-go">switch {
@@ -634,14 +634,15 @@ func main() {
 	i := 0
 Next:
 	if i >= 5 {
-		goto Exit // error: goto Exit jumps over declaration of k
+		// error: goto Exit jumps over declaration of k
+		goto Exit
 	}
 
 	k := i + i
 	fmt.Println(k)
 	i++
 	goto Next
-Exit: // this label is declared in the scope of k.
+Exit: // 此标签声明在k的作用域内，但它的使用再在k的作用域之外。
 }
 </code></pre>
 
@@ -657,7 +658,7 @@ Next:
 	if i >= 5 {
 		goto Exit
 	}
-	// Create an explicit code block to shrink the scope of k.
+	// 创建一个显式代码块以缩小k的作用域。
 	{
 		k := i + i
 		fmt.Println(k)
@@ -670,7 +671,7 @@ Exit:
 
 第一种途径是放大变量<code>k</code>的作用域：
 <pre class="line-numbers"><code class="language-go">func main() {
-	var k int // move the declaration of k here.
+	var k int // 将变量k的声明移到此处。
 	i := 0
 Next:
 	if i >= 5 {
@@ -690,13 +691,13 @@ Exit:
 
 </div>
 
-<h3>跟随着跳转标签的<code>break</code>和<code>continue</code>跳转语句</h3>
+<h3>被跟随跳转标签的<code>break</code>和<code>continue</code>跳转语句</h3>
 
 <p>
 一个<code>goto</code>语句必须包含一个跳转标签名。
 一个<code>break</code>或者<code>continue</code>语句也可以包含一个跳转标签名，但此跳转标签名是可选的。
-包含跳转标签名的<code>break</code>语句一般用于嵌套可跳出流程控制代码块中。
-包含跳转标签名的<code>continue</code>语句一般用于嵌套循环流程控制代码块中。
+包含跳转标签名的<code>break</code>语句一般用于可跳出外层的嵌套可跳出流程控制代码块。
+包含跳转标签名的<code>continue</code>语句一般用于提前结束外层的嵌套循环流程控制代码块。
 </p>
 
 <p>
@@ -708,7 +709,7 @@ Exit:
 <p>
 如果一条<code>continue</code>语句中包含一个跳转标签名，则此跳转标签必须刚好声明在一个包含此<code>continue</code>语句的循环流程控制代码块之前。
 我们可以把此跳转标签名看作是其后紧跟随的循环流程控制代码块的名称。
-此<code>continue</code>语句将提前结束结束此循环流程控制代码块的执行。
+此<code>continue</code>语句将提前结束此循环流程控制代码块的当前步的执行。
 </p>
 
 下面是一个使用了包含跳转标签名的<code>break</code>和<code>continue</code>语句的例子。

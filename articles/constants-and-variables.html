@@ -79,17 +79,18 @@
 <ol>
 <li>
 	<code>v</code><a href="basic-types-and-value-literals.html#representability">可以表示为</a><code>T</code>类型的一个值。
-    转换结果为一个类型为<code>T</code>的类型确定常量值。
+	转换结果为一个类型为<code>T</code>的类型确定常量值。
 </li>
 <li>
 	<code>v</code>的默认类型是一个整数类型（<code>int</code>或者<code>rune</code>）
-    并且<code>T</code>是一个字符串类型。
-    转换<code>T(v)</code>将<code>v</code>看作是一个Unicode码点。
-    转换结果为一个类型为<code>T</code>的字符串常量。
-    此字符串常量只包含一个Unicode码点，并且可以看作是此Unicode码点的UTF-8表示形式。
-    对于不在合法的Unicode码点取值范围内的整数<code>v</code>，
-    转换结果等同于字符串字面值<code>"\uFFFD"</code>（亦即<code>"\xef\xbf\xbd"</code>）。
-    <code>0xFFFD</code>是Unicode标准中的（非法码点的）替换字符值。
+	并且<code>T</code>是一个字符串类型。
+	转换<code>T(v)</code>将<code>v</code>看作是一个Unicode码点。
+	转换结果为一个类型为<code>T</code>的字符串常量。
+	此字符串常量只包含一个Unicode码点，并且可以看作是此Unicode码点的UTF-8表示形式。
+	对于不在合法的Unicode码点取值范围内的整数<code>v</code>，
+	转换结果等同于字符串字面值<code>"\uFFFD"</code>（亦即<code>"\xef\xbf\xbd"</code>）。
+	<code>0xFFFD</code>是Unicode标准中的（非法码点的）替换字符值。
+	（但是请注意，这样的转换<a href="https://github.com/golang/go/issues/3939">可能从今后的某个Go版本开始将不再允许</a>。）
 </li>
 </ol>
 

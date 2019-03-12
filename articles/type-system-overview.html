@@ -1,10 +1,10 @@
 <h1>Go类型系统概述</h1>
 
 <p>
-本文将介绍Go中的各个类型分类。Go类型系统中的各种概念也将被介绍。如果不熟知这些概念，则很难精通Go编程。
+本文将介绍Go中的各个类型种类。Go类型系统中的各种概念也将被介绍。如果不熟知这些概念，则很难精通Go编程。
 </p>
 
-<h3>概念：基本类型（basic types）</h3>
+<h3>概念：基本类型（basic type）</h3>
 
 <div>
 内置基本类型已经在前面的文章<a href="basic-types-and-value-literals.html">基本类型和它们的值的字面表示形式</a>一文中介绍了。
@@ -22,11 +22,16 @@
 </ul>
 
 <p>
+注意，<code>byte</code>是<code>uint8</code>的一个内置别名，<code>rune</code>是<code>int32</code>的一个内置别名。
+下面将要提到如何声明自定义的类型别名。
+</p>
+
+<p>
 除了<a href="string.html">字符串类型</a>，Go语言101后续其它文章将不再对其它基本类型做详细讲解。
 </p>
 </div>
 
-<h3>概念：组合类型（composite types）</h3>
+<h3>概念：组合类型（composite type）</h3>
 
 <div>
 Go支持下列组合类型：
@@ -38,10 +43,10 @@ Go支持下列组合类型：
 	<ul>
 	<li>数组类型 - 定长容器类型</li>
 	<li>切片类型 - 动态长度和容量容器类型</li>
-	<li>映射表类型（map）- 又称字典类型。在标准编译器中映射表使用哈希表实现的。</li>
+	<li>映射表类型（map）- 也常称为字典类型。在标准编译器中映射表是使用哈希表实现的。</li>
 	</ul>
 </li>
-<li><a href="channel.html">数据通道类型</a> - 数据通道用来同步不同的协程</li>
+<li><a href="channel.html">数据通道类型</a> - 数据通道用来同步并发的协程</li>
 <li><a href="interface.html">接口类型</a> - 接口在反射和多态中发挥着重要角色</li>
 </ul>
 </div>
@@ -49,12 +54,12 @@ Go支持下列组合类型：
 <div>
 组合类型可以用它们各自的字面表示形式来表示。
 下面是一些各种不同类型的组合类型字面表示形式的例子：
-<pre class="line-numbers"><code class="language-go">// 将设T为任意一个类型，Tkey为一个支持比较的类型。
+<pre class="line-numbers"><code class="language-go">// 假设T为任意一个类型，Tkey为一个支持比较的类型。
 
 *T         // 一个指针类型
 [5]T       // 一个元素类型为T、元素个数为5的数组类型
 []T        // 一个元素类型为T的切片类型
-map[Tkey]T // 一个键类型为Tkey、元素类型为T的映射表类型
+map[Tkey]T // 一个键值类型为Tkey、元素类型为T的映射表类型
 
 // 一个结构体类型
 struct {
@@ -80,9 +85,9 @@ chan<- T
 <p>
 </p>
 
-<p><i>
-（<a href="#types-not-support-comparison">支持和不支持比较的类型</a>将在下面介绍。）
-</i></p>
+<p>
+<a href="#types-not-support-comparison">支持和不支持比较的类型</a>将在下面介绍。
+</p>
 </div>
 
 <p class="anchor" id="type-kinds"></p>
@@ -180,14 +185,14 @@ In other words, the new defined type is not an alias of the source type.
 
 一些类型定义的例子：
 
-<pre class="line-numbers"><code class="language-go">// 下面这个新定义的类型和它们的源类型都是基本类型。
+<pre class="line-numbers"><code class="language-go">// 下面这些新定义的类型和它们的源类型都是基本类型。
 type (
 	MyInt int
 	Age   int
 	Text  string
 )
 
-// 下面这个新定义的类型和它们的源类型都是组合类型。
+// 下面这些新定义的类型和它们的源类型都是组合类型。
 type IntPtr *int
 type Book struct{author, title string; pages int}
 type Convert func(in0 int, in1 bool)(out0 int, out1 string)
@@ -228,7 +233,7 @@ type Table = map[Name]Age
 </code></pre>
 
 <p>
-类型别名名也必须为标识符。同样得，类型别名可以被声明在函数体内。
+类型别名名也必须为标识符。同样地，类型别名可以被声明在函数体内。
 <p>
 
 <div>
@@ -263,7 +268,7 @@ Type alias declarations are much useful in refactoring large Go projects.
 </div>
 
 <p class="anchor" id="non-defined-type"></p>
-<h3>概念：定义类型和非定义类型（defined types and undefined types）</h3>
+<h3>概念：定义类型和非定义类型（defined type and undefined type）</h3>
 
 <p>
 一个定义类型是一个在某个类型定义声明中定义的类型，或者是另外一个定义类型的别名。
@@ -286,7 +291,7 @@ type C = []string
 </div>
 
 <p class="anchor" id="named-type"></p>
-<h3>概念：有名类型和无名类型（named types and unnamed types）</h3>
+<h3>概念：有名类型和无名类型（named type and unnamed type）</h3>
 
 <div>
 在Go中，
@@ -331,7 +336,7 @@ type (
 	AgeSlice   []Age   // 底层类型为[]Age
 )
 
-// 类型Ages和AgeSlice的底层类型均为[]Age。
+// 类型[]Age、Ages和AgeSlice的底层类型均为[]Age。
 type Ages AgeSlice
 </code></pre>
 
@@ -366,7 +371,7 @@ Ages → AgeSlice → []Age <span style="color:#aaa">→ <strike>[]MyInt</strike
 </div>
 
 <p>
-底层类型这个概念在<a href="value-conversions-assignments-and-comparisons.html">类型转换、赋值和比较规则</a>中扮演者重要角色。
+底层类型这个概念在<a href="value-conversions-assignments-and-comparisons.html">类型转换、赋值和比较规则</a>中扮演着重要角色。
 </p>
 
 <h3>概念：值（value）</h3>
@@ -421,12 +426,12 @@ Ages → AgeSlice → []Age <span style="color:#aaa">→ <strike>[]MyInt</strike
 </p>
 
 <p class="anchor" id="value-size"></p>
-<h3>概念：值尺寸</h3>
+<h3>概念：值尺寸（value size）</h3>
 
 <p>
-一个值存储在在内存中是要占据一定的空间的。此空间的大小称为此值的尺寸。值尺寸是字节数来衡量的。
+一个值存储在在内存中是要占据一定的空间的。此空间的大小称为此值的尺寸。值尺寸是用字节数来衡量的。
 在Go中，当我们谈及一个值的尺寸，如果没有特殊说明，我们一般是指此值的直接部分的尺寸。
-某个特定类别的所有类型的值的尺寸都是一样的。因为这个原因，我们也常将一个值的尺寸说成是它的类型的尺寸（值尺寸）。
+某个特定类别的所有类型的值的尺寸都是一样的。因为这个原因，我们也常将一个值的尺寸说成是它的类型的尺寸（或值尺寸）。
 </p>
 
 <p>
@@ -445,7 +450,7 @@ Go白皮书没有规定非数值类型值的尺寸。对数值类型值的尺寸
 </p>
 
 <p>
-<a href="pointer.html">指针类</a>一文详细解释了指针类类型和指针类值。
+<a href="pointer.html">指针类</a>一文详细解释了指针类类型和指针值。
 </p>
 
 <h3>概念：结构体类型的字段（field）</h3>
@@ -492,7 +497,7 @@ Go白皮书没有规定非数值类型值的尺寸。对数值类型值的尺寸
 </p>
 
 <p>
-一个接口类型可以约定若干个（可以是零个）方法，这些方法形成了此接口类型的方法集。
+一个接口类型可以指定若干个（可以是零个）方法，这些方法形成了此接口类型的方法集。
 </p>
 
 <p>
@@ -610,13 +615,13 @@ Go白皮书没有规定非数值类型值的尺寸。对数值类型值的尺寸
 Go并不全面支持面向对象编程，但是Go确实支持一些面向对象编程的元素。请阅读以下几篇文章以获取详细信息：
 <ul>
 <li>
-	<a href="method.html">方法</a>.
+	<a href="method.html">方法</a>
 </li>
 <li>
-	<a href="interface.html#implementation">实现</a>.
+	<a href="interface.html#implementation">实现</a>
 </li>
 <li>
-	<a href="type-embedding.html">类型内嵌</a>.
+	<a href="type-embedding.html">类型内嵌</a>
 </li>
 </ul>
 </div>

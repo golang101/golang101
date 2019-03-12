@@ -2,14 +2,14 @@
 
 <p>
 此篇文章将介绍协程和延迟函数调用。协程和延迟函数调用是Go中比较独特的两个特性。
-恐慌和恢复也将在此篇文章中简单介绍。本文并非全面得对这些特性进行介绍，后面的其它文章会陆续补全本文的未介绍的内容。
+恐慌和恢复也将在此篇文章中得到简单介绍。本文并非全面地对这些特性进行介绍，后面的其它文章会陆续补全本文的未介绍的内容。
 </p>
 
-<h3>协程（Goroutine）</h3>
+<h3>协程（goroutine）</h3>
 
 <p>
-协程有时也被称为绿色线程。绿色线程是由程序的运行时维护的线程。一个绿色线程的开销，比如内存消耗和情景转换，比一个系统线程常常小得多。
-只要内存充足，一个程序可以轻松支持上万个并发协程。
+协程有时也被称为绿色线程。绿色线程是由程序的运行时（runtime）维护的线程。一个绿色线程的开销（比如内存消耗和情景转换）比一个系统线程常常小得多。
+只要内存充足，一个程序可以轻松支持上万个并发（concurrent）协程。
 </p>
 
 <p>
@@ -17,15 +17,15 @@ Go不支持创建系统线程，所以协程是一个Go程序内部唯一的并�
 </p>
 
 <p>
-每个Go程序启动个时候只有一个对用户可见的协程，我们称之为主协程。
-一个协程可以开启更多其它新的协程。在Go中，开启一个新的协程是非常轻松的。
+每个Go程序启动的时候只有一个对用户可见的协程，我们称之为主协程。
+一个协程可以开启更多其它新的协程。在Go中，开启一个新的协程是非常简单的。
 我们只需在一个函数调用之前使用一个<code>go</code>关键字，即可让此函数调用运行在一个新的协程之中。
 当此函数调用退出后，这个新的协程也随之结束了。我们可以称此函数调用为一个协程调用（或者为此协程的启动调用）。
 一个协程调用的所有返回值（如果存在的话）必须被全被舍弃。
 </p>
 
 <div>
-下面的例子程序在主协程中创建了两个新的协程。在此例中，<code>time.Duration</code>是一个在<code>time</code>标准库包中定义的类型。
+在下面的例子程序中，主协程创建了两个新的协程。在此例中，<code>time.Duration</code>是一个在<code>time</code>标准库包中定义的类型。
 此类型的底层类型（见<a href="type-system-overview.html#underlying-type">下一篇文章</a>）为内置类型<code>int64</code>。
 
 <pre class="line-numbers"><code class="language-go">package main
@@ -53,7 +53,7 @@ func main() {
 }
 </code></pre>
 
-非常简单！我们编写了一个并发（concurrent）程序！
+非常简单！我们编写了一个并发程序！
 此程序在运行的时候在某一时刻将很可能会有三个协程并存。
 运行之，可能会得到如下的结果（也可能是其它结果）：
 
@@ -75,12 +75,12 @@ hi!
 <p>
 和前面的几篇文章不同，上面的例子程序使用了<code>log</code>标准库而不是<code>fmt</code>标准库中的<code>Println</code>函数。
 原因是<code>log</code>标准库中的打印函数是经过了同步处理的，而<code>fmt</code>标准库中的打印函数却没有被同步。
-如果我们在上例中使用<code>fmt</code>标准库中的<code>Println</code>函数，则不同协程的打印可能会交织在一起（虽然对此例来说交织的概率很低）。
+如果我们在上例中使用<code>fmt</code>标准库中的<code>Println</code>函数，则不同协程的打印可能会交织在一起。（虽然对此例来说，交织的概率很低。）
 </p>
 
 </div>
 
-<h3>并发同步（Concurrency Synchronization）</h3>
+<h3>并发同步（concurrency synchronization）</h3>
 
 <div>
 <p>
@@ -108,7 +108,7 @@ Go支持几种<a href="concurrent-synchronization-overview.html">并发同步技
 </li>
 </ul>
 
-Example:
+示例：
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
@@ -156,8 +156,9 @@ func main() {
 
 <p>
 下面的图片显示了一个协程的生命周期。
-<br/>
+<div class="text-center">
 <img src="res/goroutine-states.png">
+</div>
 </p>
 
 <p>
@@ -171,8 +172,8 @@ func main() {
 </p>
 
 <p>
-一个处于阻塞状态的协程不会自发结束阻塞状态，它必须被另外一个协程通过各种并发同步方法来被动地结束阻塞状态。
-如果一个运行中的程序当前所有的协程都出于阻塞状态，则这些协程将永远阻塞下去，程序将视为死锁了。
+一个处于阻塞状态的协程不会自发结束阻塞状态，它必须被另外一个协程通过某种并发同步方法来被动地结束阻塞状态。
+如果一个运行中的程序当前所有的协程都出于阻塞状态，则这些协程将永远阻塞下去，程序将被视为死锁了。
 当一个程序死锁后，官方标准编译器的处理是让这个程序崩溃。
 </p>
 
@@ -214,15 +215,16 @@ func main() {
 <p>
 并非所有处于运行状态的协程都在执行。在任一时刻，只能最多有和逻辑CPU数目一样多的协程在同时执行。
 我们可以调用<a href="https://golang.google.cn/pkg/runtime/#NumCPU"><code>runtime.NumCPU</code></a>函数来查询当前程序可利用的逻辑CPU数目。
-每个逻辑CPU在同一时刻只能最多执行一个协程。Go运行时必须让逻辑CPU频繁地在不同的处于运行状态的协程之间切换，从而每个处于运行状态的协程都有机会得到执行。
+每个逻辑CPU在同一时刻只能最多执行一个协程。Go运行时（runtime）必须让逻辑CPU频繁地在不同的处于运行状态的协程之间切换，从而每个处于运行状态的协程都有机会得到执行。
 这和操作系统执行系统线程的原理是一样的。
 </p>
 
 <p>
 下面这张图显示了一个协程的更详细的生命周期。在此图中，运行状态被细分成了多个子状态。
 一个处于排队子状态的协程等待着进入执行子状态。一个处于执行子状态的协程在被执行一会儿（非常短的的时间片）之后将进入排队子状态。
-<br/>
+<div class="text-center">
 <img src="res/goroutine-schedule.png">
+</div>
 </p>
 
 <p>
@@ -249,7 +251,7 @@ func main() {
 </p>
 
 <p class="anchor" id="defer"></p>
-<h3>延迟函数调用（Deferred Function Calls）</h3>
+<h3>延迟函数调用（deferred function call）</h3>
 
 <div>
 <p>
@@ -259,7 +261,7 @@ func main() {
 
 <p>
 当一个函数调用被延迟后，它不会立即被执行。它将被推入由当前协程维护的一个延迟调用堆栈。
-当一个函数调用（可能是或者不是一个延迟调用）返回并进入它的<a href="function-declarations-and-calls.html#existing-phase">退出阶段</a>后，所有在此函数调用中已经被推入的延迟调用将被按照它们被推入堆栈的顺序逆序执行。
+当一个函数调用（可能是也可能不是一个延迟调用）返回并进入它的<a href="function-declarations-and-calls.html#existing-phase">退出阶段</a>后，所有在此函数调用中已经被推入的延迟调用将被按照它们被推入堆栈的顺序逆序执行。
 当所有这些延迟调用执行完毕后，此函数调用也就真正退出了。
 </p>
 
@@ -367,7 +369,7 @@ func main() {
 <h3>协程和延迟调用的实参的估值时刻</h3>
 
 <div>
-一个协程调用或者延迟调用的实参是在此调用发生时被估值的。更具体的说，
+一个协程调用或者延迟调用的实参是在此调用发生时被估值的。更具体地说，
 <ul>
 <li>
 	对于一个延迟函数调用，它的实参是在此调用被推入延迟调用堆栈的时候被估值的。
@@ -416,14 +418,15 @@ b: 3
 
 <p>
 第一个匿名函数中的循环打印出<code>2</code>、<code>1</code>和<code>0</code>这个序列，但是第二个匿名函数中的循环打印出三个<code>3</code>。
-因为第一个循环中的<code>i</code>是在<code>fmt.Println</code>函数被延迟调用的时候估的值，而第二个循环中的<code>i</code>是在第二个匿名函数的退出阶段估的值。
+因为第一个循环中的<code>i</code>是在<code>fmt.Println</code>函数被延迟调用的时候估的值，而第二个循环中的<code>i</code>是在第二个匿名函数的退出阶段估的值（此时循环变量<code>i</code>的值已经变为<code>3</code>）。
 </p>
 
 我们可以对第一个循环略加修改（使用两种方法），使得它和第一个循环打印出相同的结果。
 
 <pre class="line-numbers"><code class="language-go">		for i := 0; i < 3; i++ {
 			defer func(i int) {
-				fmt.Println("b:", i) // 此i为形参i，非实参循环变量i。
+				// 此i为形参i，非实参循环变量i。
+				fmt.Println("b:", i)
 			}(i)
 		}
 </code></pre>
@@ -433,7 +436,8 @@ b: 3
 <pre class="line-numbers"><code class="language-go">		for i := 0; i < 3; i++ {
 			i := i // 在下面的调用中，左i遮挡了右i。
 			defer func() {
-				fmt.Println("b:", i) // 此i为上面的左i，非循环变量i。
+				// 此i为上面的左i，非循环变量i。
+				fmt.Println("b:", i)
 			}()
 		}
 </code></pre>
@@ -482,8 +486,8 @@ Go不支持异常抛出和捕获，而是推荐使用返回值显式返回错误
 </p>
 
 <p>
-进入恐慌状况是另一种使当前函数调用开始返回的方法。一旦一个函数调用产生一个恐慌，此函数调用将立即进入返回阶段。
-在此函数调用中被推入堆栈的延迟调用将按照它们被推入的顺序逆序执行。.
+进入恐慌状况是另一种使当前函数调用开始返回的途径。
+一旦一个函数调用产生一个恐慌，此函数调用将立即进入返回阶段，在此函数调用中被推入堆栈的延迟调用将按照它们被推入的顺序逆序执行。
 </p>
 
 <p>
@@ -518,23 +522,23 @@ import "fmt"
 
 func main() {
 	defer func() {
-		fmt.Println("exit normally.")
+		fmt.Println("正常退出")
 	}()
-	fmt.Println("hi!")
+	fmt.Println("嗨！")
 	defer func() {
 		v := recover()
-		fmt.Println("recovered:", v)
+		fmt.Println("恐慌被恢复了：", v)
 	}()
-	panic("bye!")
-	fmt.Println("unreachable")
+	panic("拜拜！") // 产生一个恐慌
+	fmt.Println("执行不到这里")
 }
 </code></pre>
 
 它的输出结果：
 
-<pre class="output"><code>hi!
-recovered: bye!
-exit nornally.
+<pre class="output"><code>嗨！
+恐慌被恢复了： 拜拜！
+正常退出
 </code></pre>
 
 <p>
@@ -575,7 +579,7 @@ goroutine 5 [running]:
 <p>
 </p>
 
-一个Go运行时会在若干情形下产生恐慌，比如一个整数被0除的时候。下面这个程序也将崩溃退出。
+Go运行时（runtime）会在若干情形下产生恐慌，比如一个整数被0除的时候。下面这个程序将崩溃退出。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -614,7 +618,7 @@ goroutine 1 [running]:
 <h3>一些致命性错误不属于恐慌</h3>
 
 <p>
-对于官方标准编译器来说，很多致命性错误，比如堆栈溢出和内存不足，不被认为是恐慌。因此它们不能被消除。它们一旦产生，程序将崩溃。
+对于官方标准编译器来说，很多致命性错误，比如堆栈溢出和内存不足，不被认为是恐慌。因此它们不能被恢复。它们一旦产生，程序将崩溃。
 </p>
 
 

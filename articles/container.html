@@ -14,7 +14,7 @@ Go中有很多和容器类型相关的细节，本文将逐一列出这些细节
 
 <div>
 <p>
-每个容器（值）用来表示和存储一个元素（element）集合。一个容器中的所有元素的类型是相同的。此相同的类型称为此容器（的类型）的元素类型。
+每个容器（值）用来表示和存储一个元素（element）序列或集合。一个容器中的所有元素的类型是相同的。此相同的类型称为此容器的类型的元素类型（或简称此容器的元素类型）。
 </p>
 
 <p>
@@ -26,22 +26,22 @@ Go中有很多和容器类型相关的细节，本文将逐一列出这些细节
 
 <p>
 每个容器值有一个长度属性，用来表明此容器中当前存储了多少个元素。
-一个数组或切片中的每个元素所关联的非负整数索引键值的取值范围为左闭右开区间<code>[0, 此数组或切片的长度)</code>。
+一个数组或切片中的每个元素所关联的非负整数索引键值的合法取值范围为左闭右开区间<code>[0, 此数组或切片的长度)</code>。
 一个映射表值类型的容器值中的元素关联的键值可以是任何此映射表类型的键值类型的任何值。
 </p>
 
 <p>
-这三种严格意义的容器类型的值在使用上有很多的差别。这些差别多源于它们的值的内存布局的差异。
-通过上一篇文章<a href="value-part.html">值部</a>，我们得知每个数组值仅有一个直接部分组成，而一个切片或者映射表由一个直接部分和一个可能的被此直接部分引用着的间接部分组成。
+这三种容器类型的值在使用上有很多的差别。这些差别多源于它们的内存定义的差异。
+通过上一篇文章<a href="value-part.html">值部</a>，我们得知每个数组值仅由一个直接部分组成，而一个切片或者映射表值是由一个直接部分和一个可能的被此直接部分引用着的间接部分组成。
 </p>
 
 <p>
 一个数组或者切片的所有元素紧挨着存放在一块连续的内存中。一个数组中的所有元素均存放在此数组值的直接部分，一个切片中的所元素均存放在此切片值的间接部分。
-在官方标准编译器和运行时中，映射表是使用哈希表算法来实现的，所以一个映射表中的所有元素也均存放在一块连续的内存（位于此哈希表值的间接部分）中，但是哈希表元素并不一定紧挨着存放。
-另外一种常用的映射表实现算法是二叉树算法。无论使用何种算法，一个哈希表中的所有元素的键值也存放在此哈希表（的间接部分）中。
+在官方标准编译器和运行时中，映射表是使用哈希表算法来实现的。所以一个映射表中的所有元素也均存放在一块连续的内存中，但是映射表中的元素并不一定紧挨着存放。
+另外一种常用的映射表实现算法是二叉树算法。无论使用何种算法，一个映射表中的所有元素的键值也存放在此映射表值（的间接部分）中。
 </p>
 
-对于每一个容器值，我们可以通过一个元素的键值来访问此元素。
+我们可以通过一个元素的键值来访问此元素。
 对于这三种容器，元素访问的时间复杂度均为<code><i>O</i>(1)</code>。
 但是一般来说，映射表元素访问消耗的时长要数倍于数组和切片元素访问消耗的时长。
 但是映射表相对于数组和切片有两个优点：
@@ -56,16 +56,16 @@ Go中有很多和容器类型相关的细节，本文将逐一列出这些细节
 
 <p>
 从上一篇文章中，我们已经了解到，在任何赋值中，源值的底层间接部分不会被复制。
-换句话说，当一个赋值结束后，一个含有间接部分的源值将和目标值共享底层间接部分。
+换句话说，当一个赋值结束后，一个含有间接部分的源值将和目标值将共享底层间接部分。
 这是为什么数组和切片/映射表值会有很多行为差异（将在下面逐一介绍）的原因。
 </p>
 
 </div>
 
-<h3>无名容器类型的文字表示形式</h3>
+<h3>无名容器类型的字面表示形式</h3>
 
 <div>
-无名容器类型的文字表示形式如下：
+无名容器类型的字面表示形式如下：
 <ul>
 <li>数组类型：<code>[N]T</code></li>
 <li>切片类型：<code>[]T</code></li>
@@ -78,7 +78,7 @@ Go中有很多和容器类型相关的细节，本文将逐一列出这些细节
 	<code>T</code>可为任意类型。它表示一个容器类型的元素类型。某个特定容器类型的值中只能存储此容器类型的元素类型的值。
 </li>
 <li>
-	<code>N</code>必须为一个非负整数常量。它值定了一个数组类型的长度，或者说它指定了此数组类型的任何一个值中存储了多少个元素。
+	<code>N</code>必须为一个非负整数常量。它指定了一个数组类型的长度，或者说它指定了此数组类型的任何一个值中存储了多少个元素。
 	一个数组类型的长度是此数组类型的一部分。比如<code>[5]int</code>和<code>[8]int</code>是两个不同的类型。
 </li>
 <li>
@@ -120,18 +120,18 @@ map[struct{x int}]*int8 // 此映射表类型的元素类型为一个指针类�
 
 <p>
 所有切片类型的<a href="type-system-overview.html#value-size">尺寸</a>都是一致的，所有映射表类型的尺寸也都是一致的。
-一个数组类型的尺寸取决于它的长度和元素类型的尺寸。长度为零的数组的尺寸为零；元素类型尺寸为零的任意长度的数组类型的尺寸也为零。
+一个数组类型的尺寸等于它的元素类型的尺寸和它的长度的乘积。长度为零的数组的尺寸为零；元素类型尺寸为零的任意长度的数组类型的尺寸也为零。
 </p>
 
 </div>
 
 <p class="anchor" id="value-literals"></p>
-<h3>容器类型值的文字表示形式</h3>
+<h3>容器类型值的字面表示形式</h3>
 
 <div>
 和结构体值类似，容器值的文字表示也可以用组合字面形式（composite literal）来表示。
 比如对于一个容器类型<code>T</code>，它的值可以用形式<code>T{...}</code>来表示（除了切片和映射表的零值外）。
-下面是一些结构体值的文字表示形式：
+下面是一些结构体值的字面表示形式：
 
 <pre class="line-numbers"><code class="language-go">// 一个含有4个布尔元素的数组值。
 [4]bool{false, true, true, false}
@@ -149,13 +149,13 @@ map[string]int{"C": 1972, "Python": 1991, "Java", 1995, "Go": 2009}
 
 数组和切片值的组合字面形式有一些微小的变种：
 
-<pre class="line-numbers"><code class="language-go">// 下面这些切片的文字表示形式都是等价的。
+<pre class="line-numbers"><code class="language-go">// 下面这些切片的字面表示形式都是等价的。
 []string{"break", "continue", "fallthrough"}
 []string{0: "break", 1: "continue", 2: "fallthrough"}
 []string{2: "fallthrough", 1: "continue", 0: "break"}
 []string{2: "fallthrough", 0: "break", "continue"}
 
-// 下面这些数组的文字表示形式都是等价的。
+// 下面这些数组的字面表示形式都是等价的。
 [4]bool{false, true, true, false}
 [4]bool{0: false, 1: true, 2: true, 3: false}
 [4]bool{1: true, true}
@@ -177,7 +177,7 @@ be assignable to the corresponding map key type.
 </p>
 -->
 
-从上面的例子，我们可以看出数组和切片组合字面形式中的索引下标（即数组和切片的键值）是可选的。
+从上面的例子中，我们可以看出数组和切片组合字面形式中的索引下标（即数组和切片的键值）是可选的。
 在一个数组或者切片组合字面形式中：
 <ul>
 <li>
@@ -188,7 +188,7 @@ be assignable to the corresponding map key type.
 	<b>在一个数组和切片组合字面形式中，如果一个元素的索引下标缺失，则编译器认为它的索引下标为出现在它之前的元素的索引下标加一。</b>
 </li>
 <li>
-	如果出现的第一个元素的索引下标缺失，则它的索引下标缺失被认为是0。
+	如果出现的第一个元素的索引下标缺失，则它的索引下标被认为是0。
 </li>
 </ul>
 
@@ -197,9 +197,9 @@ be assignable to the corresponding map key type.
 <p>
 
 <pre class="line-numbers"><code class="language-go">var a uint = 1
-var _ = map[uint]int {a : 123} // okay
-var _ = []int{a: 100}  // error: index must be non-negative integer constant
-var _ = [5]int{a: 100} // error: index must be non-negative integer constant
+var _ = map[uint]int {a : 123} // 没问题
+var _ = []int{a: 100}          // error: 下标必须为常量
+var _ = [5]int{a: 100}         // error: 下标必须为常量
 </code></pre>
 
 <p>
@@ -229,11 +229,11 @@ var _ = [5]int{a: 100} // error: index must be non-negative integer constant
 
 <p>
 在运行时刻，即使一个数组变量在声明的时候未指定初始值，它的元素所占的内存空间也已经被开辟出来。
-但是一个nil切片或者映射表值的元素的内存空间尚未开辟出来。
+但是一个nil切片或者映射表值的元素的内存空间尚未被开辟出来。
 </p>
 
 <p>
-至于，<code>[]T{}</code>表示类型<code>[]T</code>的一个空切片值，它和<code>[]T(nil)</code>是不等价的。
+注意：<code>[]T{}</code>表示类型<code>[]T</code>的一个空切片值，它和<code>[]T(nil)</code>是不等价的。
 同样，<code>map[K]T{}</code>和<code>map[K]T(nil)</code>也是不等价的。
 </p>
 
@@ -242,7 +242,7 @@ var _ = [5]int{a: 100} // error: index must be non-negative integer constant
 
 <div>
 <p>
-我们已经了解<a href="struct.html#take-composite-literal-address">结构体（组合）字面值是不可寻址但是可以被取地址</a>。
+我们已经了解到<a href="struct.html#take-composite-literal-address">结构体（组合）字面值是不可寻址的但却是可以被取地址的</a>。
 容器字面值也不例外。
 </p>
 
@@ -269,7 +269,7 @@ func main() {
 
 <div>
 <p>
-在某些情形下，内嵌在其它组合字面值中的组合字面形式可以简化为<code>{...}</code>（类型部分被省略掉了）。
+在某些情形下，内嵌在其它组合字面值中的组合字面形式可以简化为<code>{...}</code>（即类型部分被省略掉了）。
 内嵌组合字面值前的取地址操作符<code>&amp;</code>有时也可以被省略。
 </p>
 
@@ -285,7 +285,7 @@ var heads = []*[4]byte{
 }
 </code></pre>
 
-可以简化为
+可以被简化为
 
 <pre class="line-numbers"><code class="language-go">var heads = []*[4]byte{
 	{'P', 'N', 'G', ' '},
@@ -330,8 +330,8 @@ var _ = [...]language{
 	strong  bool
 }
 
-// A value of map type whose key type is a struct type and
-// whose element type is another map type "map[string]int".
+// 此映射表值的类型的键值类型为一个结构体类型，
+// 元素类型为另一个映射表类型：map[string]int。
 var _ = map[LangCategory]map[string]int{
 	LangCategory{true, true}: map[string]int{
 		"Python": 1991,
@@ -385,7 +385,7 @@ var _ = map[LangCategory]map[string]int{
 </p>
 
 <p>
-尽管个映射表值和切片值是不能比较的，但是一个映射表值或者切片值可以和预声明的<code>nil</code>标识符进行比较以检查此映射表值或者切片值是否为一个零值。
+尽管两个映射表值和切片值是不能比较的，但是一个映射表值或者切片值可以和预声明的<code>nil</code>标识符进行比较以检查此映射表值或者切片值是否为一个零值。
 </p>
 
 <p>
@@ -393,7 +393,7 @@ var _ = map[LangCategory]map[string]int{
 </p>
 
 <p>
-当比较类型相同的两个数组值时，它么的对应元素将逐一被比较。这两个数组只有在它们的对应元素都相等的情况下才相等。
+当比较两个数组值时，它么的对应元素将逐一被比较。这两个数组只有在它们的对应元素都相等的情况下才相等。
 </p>
 
 <div>
@@ -434,7 +434,7 @@ func main() {
 <h3>查看容器值的长度和容量</h3>
 
 <p>
-除了上面已提到每个容器值有一个长度属性（此容器中含有有多少个元素），每个容器值还有一个容量属性。
+除了上面已提到的容器长度属性（此容器中含有有多少个元素），每个容器值还有一个容量属性。
 一个数组值的容量总是和它的长度相等；一个非零映射表值的容量可以被认为是无限大的。切片值的容量的含义将在后续章节介绍。
 一个切片值的容量总是不小于此切片值的长度。在编程中，只有切片值的容量有实际意义。
 </p>
@@ -447,8 +447,8 @@ func main() {
 
 <p>
 一个数组值的长度和容量永不改变。同一个数组类型的所有值的长度和容量都总是和此数组类型的长度相等。
-切片值的长度和容量可在运行时刻改变。因为此原因，切片可被认为是动态数组。
-切片在使用上相比数组更为灵活，所以切片在编程用得更为广泛。
+切片值的长度和容量可在运行时刻改变。因为此原因，切片可以被认为是动态数组。
+切片在使用上相比数组更为灵活，所以切片（相对数组）在编程用得更为广泛。
 </p>
 
 <div>
@@ -473,12 +473,12 @@ func main() {
 
 <p>
 上面这个特定的例子中的每个切片值的长度和容量都相等，但这并不是一个普遍定律。
-我们将在后面的章节展示一些长度和容量不相等的切片值。
+我们将在后面的章节中展示一些长度和容量不相等的切片值。
 </p>
 </div>
 
 <p class="anchor" id="element-accessment"></p>
-<h3>取出和修改容器的元素</h3>
+<h3>读取和修改容器的元素</h3>
 
 <div>
 <p>
@@ -489,12 +489,12 @@ func main() {
 假设<code>v</code>是一个数组或者切片，在<code>v[k]</code>中，
 <ul>
 <li>
-	如果<code>k</code>是一个常量，则它必须满足上面列出的<a href="#value-literals">对在组合字面值中出现的索引下面的要求</a>。
+	如果<code>k</code>是一个常量，则它必须满足上面列出的<a href="#value-literals">对出现在组合字面值中的索引的要求</a>。
 	另外，如果<code>v</code>是一个数组，则<code>k</code>必须小于此数组的长度。
 </li>
 <li>
 	如果<code>k</code>不是一个常量，则它必须为一个整数。
-	另外它必须为一个非负数并且小于<code>len(v)</code>，否则，在运行时刻将产生一个<a href="control-flows-more.html#panic-recover">恐慌</a>。
+	另外它必须为一个非负数并且小于<code>len(v)</code>，否则，在运行时刻将产生一个恐慌。
 </li>
 <li>
 	如果<code>v</code>是一个零值切片，则在运行时刻将产生一个恐慌。
@@ -510,16 +510,16 @@ func main() {
 	如果<code>v[k]</code>被用作一个赋值语句中的目标值并且<code>v</code>是一个零值nil映射表，则<code>v[k]</code>在运行时刻将造成一个恐慌；
 </li>
 <li>
-	如果<code>v[k]</code>用来表示取出映射表值<code>v</code>中键值<code>k</code>对应的元素，则它无论如何都不会产生一个恐慌，即使<code>v</code>是一个零值nil映射表（假设<code>k</code>的估值没有造成恐慌）；
+	如果<code>v[k]</code>用来表示读取映射表值<code>v</code>中键值<code>k</code>对应的元素，则它无论如何都不会产生一个恐慌，即使<code>v</code>是一个零值nil映射表（假设<code>k</code>的估值没有造成恐慌）；
 </li>
 <li>
-	如果<code>v[k]</code>用来表示取出映射表值<code>v</code>中键值<code>k</code>对应的元素，并且映射表值<code>v</code>中并不含有此元素，则<code>v[k]</code>返回一个此映射表值的类型的元素类型的零值。
+	如果<code>v[k]</code>用来表示读取映射表值<code>v</code>中键值<code>k</code>对应的元素，并且映射表值<code>v</code>中并不含有对应着键值<code>k</code>的条目，则<code>v[k]</code>返回一个此映射表值的类型的元素类型的零值。
 	一般情况下，<code>v[k]</code>被认为是一个单值表达式。但是在一个<code>v[k]</code>被用为唯一源值的赋值语句中，<code>v[k]</code>可以返回一个可选的第二个返回值。
-	此第二个返回值是一个类型不确定布尔值，用来表示键值<code>k</code>是否有对应的元素存储在映射表值<code>v</code>中。
+	此第二个返回值是一个类型不确定布尔值，用来表示是否有对应着键值<code>k</code>的条目存储在映射表值<code>v</code>中。
 </li>
 </ul>
 
-一个展示了容器元素修改和取出的例子：
+一个展示了容器元素修改和读取的例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -528,9 +528,9 @@ func main() {
 	a := [3]int{-1, 0, 1}
 	s := []bool{true, false}
 	m := map[string]int{"abc": 123, "xyz": 789}
-	fmt.Println (a[2], s[1], m["abc"])    // 取出
+	fmt.Println (a[2], s[1], m["abc"])    // 读取
 	a[2], s[1], m["abc"] = 999, true, 567 // 修改
-	fmt.Println (a[2], s[1], m["abc"])    // 取出
+	fmt.Println (a[2], s[1], m["abc"])    // 读取
 
 	n, present := m["hello"]
 	fmt.Println(n, present, m["hello"]) // 0 false 0
@@ -574,15 +574,15 @@ func main() {
 </p>
 
 <p>
-上面展示的切片的内部定义为切片的直接部分的定义。直接部分的<code>len</code>字段表示一个切片当前存储了多少个元素；直接部分的<code>cap</code>表示一个切片的可能的容量。
+上面展示的切片的内部定义为切片的直接部分的定义。直接部分的<code>len</code>字段表示一个切片当前存储了多少个元素；直接部分的<code>cap</code>表示一个切片的容量。
 下面这张图描绘了一个切片值的内存布局。
-<br/>
+<div class="text-center">
 <img src="res/slice-internal.png">
-<br/>
+</div>
 </p>
 
 <p>
-尽管一个切片值的底层元素部分可能位于一个表较大的内存片段上，但是此切片值只能感知到此内存片段上的一个子片段。
+尽管一个切片值的底层元素部分可能位于一个比较大的内存片段上，但是此切片值只能感知到此内存片段上的一个子片段。
 比如，上图中的切片值只能感知到灰色的子片段。
 </p>
 
@@ -608,7 +608,7 @@ func main() {
 </ul>
 
 <p>
-下一节将展示一张包含了上述两种情况的图片。
+下下一节将展示一张包含了上述两种情况的图片。
 </p>
 
 <p>
@@ -628,7 +628,7 @@ func main() {
 <div>
 
 <p>
-当一个映射表赋值完成之后，目标映射表值和源映射表值将共享底层的元素。
+当一个映射表赋值语句执行完毕之后，目标映射表值和源映射表值将共享底层的元素。
 向其中一个映射表中添加（或从一个映射表中删除）元素将体现在另一个映射表中。
 </p>
 
@@ -672,8 +672,8 @@ func main() {
 <h3>添加和删除容器元素</h3>
 
 <div>
-向一个映射表中添加一个键值对（条目）的语法和修改一个映射表元素的语法是一样的。
-比如，对于一个非零映射表值<code>m</code>，如果当前<code>m</code>中尚未存储键值对<code>(k, e)</code>，则下面的语法形式将把此键值对存入<code>m</code>；否则，下面的语法形式将把键值<code>k</code>对应的元素值更新为<code>e</code>。
+向一个映射表中添加一个条目的语法和修改一个映射表元素的语法是一样的。
+比如，对于一个非零映射表值<code>m</code>，如果当前<code>m</code>中尚未存储条目<code>(k, e)</code>，则下面的语法形式将把此条目存入<code>m</code>；否则，下面的语法形式将把键值<code>k</code>对应的元素值更新为<code>e</code>。
 
 <pre class="disable-line-numbers111">m[k] = e
 </code></pre>
@@ -688,7 +688,7 @@ func main() {
 -->
 
 内置函数<code>delete</code>用来从一个映射表中删除一个条目。比如，下面的<code>delete</code>调用将把键值<code>k</code>对应的条目从映射表<code>m</code>中删除。
-如果映射表<code>m</code>中未存储键值为<code>k</code>的条目，则此调用为一个空操作，它不会产生一个恐慌，即使<code>m</code>是一个零值映射表。
+如果映射表<code>m</code>中未存储键值为<code>k</code>的条目，则此调用为一个空操作，它不会产生一个恐慌，即使<code>m</code>是一个nil零值映射表。
 
 <pre class="disable-line-numbers111">delete(m, k)
 </code></pre>
@@ -714,7 +714,7 @@ func main() {
 </code></pre>
 
 <p>
-注意，在Go 1.12之前，映射表打印结果中的条目顺序并不固定。两次打印结果可能并不相同。
+注意，在Go 1.12之前，映射表打印结果中的条目顺序并不固定，两次打印结果可能并不相同。
 </p>
 
 <p>
@@ -723,7 +723,7 @@ func main() {
 
 <p>
 我们可以通过调用内置<code>append</code>函数，以一个切片为基础，来添加不定数量的元素并返回一个新的切片。
-此新的结果切片包含着基础切片中的所有元素和所有被添加的元素。
+此新的结果切片包含着基础切片中所有的元素和所有被添加的元素。
 注意，基础切片并未被此<code>append</code>函数调用所修改。
 当然，如果我们愿意（事实上在实践中常常如此），我们可以将结果切片赋值给基础切片以修改基础切片。
 </p>
@@ -743,15 +743,16 @@ import "fmt"
 
 func main() {
 	s0 := []int{2, 3, 5}
-	s1 := append(s0, 7)      // 添加一个元素
-	s2 := append(s1, 11, 13) // 添加两个元素
 	fmt.Println(s0, cap(s0)) // [2 3 5] 3
+	s1 := append(s0, 7)      // 添加一个元素
 	fmt.Println(s1, cap(s1)) // [2 3 5 7] 6
+	s2 := append(s1, 11, 13) // 添加两个元素
 	fmt.Println(s2, cap(s2)) // [2 3 5 7 11 13] 6
 	s3 := append(s0)         // <=> s3 := s0
-	s4 := append(s0, s0...)  // 以s0为基础添加s0中所有的元素
 	fmt.Println(s3, cap(s3)) // [2 3 5] 3
+	s4 := append(s0, s0...)  // 以s0为基础添加s0中所有的元素
 	fmt.Println(s4, cap(s4)) // [2 3 5 2 3 5] 6
+
 	s0[0], s1[0] = 99, 789
 	fmt.Println(s2[0], s3[0], s4[0]) // 789 99 2
 }
@@ -766,22 +767,30 @@ func main() {
 </p>
 
 <p>
-变长参数函数函数将在下下篇文章中解释。目前，我们只需知道变长参数函数调用中的实参有两种传递方式。
-在上面的例子中，第<i>7</i>行、第<i>8</i>行和第<i>12</i>行使用了同一种方式，第<i>13</i>行使用了另外一种方式。
-在第一种方式中，零或多个实参元素值可以传递给<code>append</code>函数的第二个形参。
-在第二种方式中，一个（和第一个实参同元素类型的）实参切片传递给了第二个形参，此实参切片必须跟随三个点<code>...</code>。
+变长参数函数将在下下篇文章中解释。目前，我们只需知道变长参数函数调用中的实参有两种传递方式。
+在上面的例子中，第<i>8</i>行、第<i>10</i>行和第<i>12</i>行使用了同一种方式，第<i>14</i>行使用了另外一种方式。
+在第一种方式中，零个或多个实参元素值可以传递给<code>append</code>函数的第二个形参。
+在第二种方式中，一个（和第一个实参同元素类型的）实参切片传递给了第二个形参，此切片实参必须跟随三个点<code>...</code>。
 （关于变长参数函数调用，详见<a href="function.html#variadic-call">下下篇文章</a>。）
 </p>
 
-在上例中，第<i>13</i>行等价于
+在上例中，第<i>14</i>行等价于
 
-<pre class="line-numbers"><code class="language-go">	s4 := append(s0, s0[0], s0[1], s0[2])
+<pre class="disable-line-numbers111"><code class="language-go">	s4 := append(s0, s0[0], s0[1], s0[2])
 </code></pre>
+<p>
+</p>
 
-第<i>7</i>和第<i>8</i>行等价于
+第<i>8</i>行等价于
 
-<pre class="line-numbers"><code class="language-go">	s1 := append(s0, []int{7}...)
-	s2 := append(s1, []int{11, 13}...)
+<pre class="disable-line-numbers111"><code class="language-go">	s1 := append(s0, []int{7}...)
+</code></pre>
+<p>
+</p>
+
+第<i>10</i>行等价于
+
+<pre class="disable-line-numbers111"><code class="language-go">	s2 := append(s1, []int{11, 13}...)
 </code></pre>
 
 <p>
@@ -795,26 +804,26 @@ func main() {
 在上面的程序中，
 <ul>
 <li>
-	第<i>7</i>行的<code>append</code>函数调用将为结果切片<code>s1</code>开辟一段新的内存。
+	第<i>8</i>行的<code>append</code>函数调用将为结果切片<code>s1</code>开辟一段新的内存。
 	原因是切片<code>s0</code>中没有足够的冗余元素槽位来容纳新添加的元素。
-	第<i>13</i>行的<code>append</code>函数调用也是同样的情况。
+	第<i>14</i>行的<code>append</code>函数调用也是同样的情况。
 </li>
 <li>
-	第<i>8</i>行的<code>append</code>函数调用不会为结果切片<code>s2</code>开辟新的内存片段。
+	第<i>10</i>行的<code>append</code>函数调用不会为结果切片<code>s2</code>开辟新的内存片段。
 	原因是切片<code>s1</code>中的冗余元素槽位足够容纳新添加的元素。
 </li>
 </ul>
 
 <p>
 所以，上面的程序中在退出之前，切片<code>s1</code>和<code>s2</code>共享一些元素，切片<code>s0</code>和<code>s3</code>共享所有的元素。
-下面这张图描绘了在上面的程序结束之前各个切片的内存布局。
-<br/>
+下面这张图描绘了在上面的程序结束之前各个切片的状态。
+<div class="text-center">
 <img src="res/slice-append.png">
-<br/>
+</div>
 </p>
 
 <p>
-请注意，当一个<code>append</code>函数调用需要为结果切片开辟内存，结果切片的容量取决于具体编译器实现。
+请注意，当一个<code>append</code>函数调用需要为结果切片开辟内存时，结果切片的容量取决于具体编译器实现。
 在这种情况下，对于官方标准编译器，如果基础切片的容量较小，则结果切片的容量至少为基础切片的两倍。
 这样做的目的是使结果切片有足够多的冗余元素槽位，以防止此结果切片被用作后续其它<code>append</code>函数调用的基础切片时再次开辟内存。
 </p>
@@ -834,7 +843,7 @@ func main() {
 	fmt.Println(s)      // [array slice map]
 	fmt.Println(cap(s)) // 4
 	s = append(s, "channel")
-	fmt.Println(s)      // [array slice map string channel]
+	fmt.Println(s)      // [array slice map channel]
 	fmt.Println(cap(s)) // 4
 }
 </code></pre>
@@ -905,10 +914,8 @@ func main() {
 	// 创建切片。
 	s := make([]int, 3, 5)
 	fmt.Println(s, len(s), cap(s)) // [0 0 0] 3 5
-	s = append(s, 7, 11)
-	fmt.Println(s, len(s), cap(s)) // [0 0 0 7 11] 5 5
 	s = make([]int, 2)
-	fmt.Println(s, len(s), cap(s)) // [0 0] 2
+	fmt.Println(s, len(s), cap(s)) // [0 0] 2 2
 }
 </code></pre>
 
@@ -1009,11 +1016,11 @@ func main() {
 <ul>
 <li>
 	如果一个映射表类型的元素类型为一个结构体类型，则我们无法修改此映射表类型的值中的每个结构体元素的单个字段。
-	我们必须整体地修改每个结构体元素。
+	我们必须整体地同时修改所有结构体字段。
 </li>
 <li>
 	如果一个映射表类型的元素类型为一个数组类型，则我们无法修改此映射表类型的值中的每个数组元素的单个元素。
-	我们必须整体地修改每个数组元素。
+	我们必须整体地同时修改所有数组元素。
 </li>
 </ul>
 
@@ -1033,11 +1040,11 @@ func main() {
 	// 这看上去确实有些反直觉。
 	/*
 	ma[1][1] = 123      // error: cannot assign to a[1][1]
-	mt["John"].age = 30 // cannot assign to struct field
-	                    // mt["John"].age in map.
+	mt["John"].age = 30 // error: cannot assign to struct
+	                    // field mt["John"].age in map.
 	*/
 
-	// 取出映射表元素的元素或者字段是没问题的。
+	// 读取映射表元素的元素或者字段是没问题的。
 	fmt.Println(ma[1][1])       // 789
 	fmt.Println(mt["John"].age) // 29
 }
@@ -1079,7 +1086,7 @@ func main() {
 <div>
 <p>
 我们可以从一个基础切片或者一个可寻址的基础数组派生出另一个切片。此派生操作也常称为一个取子切片操作。
-派生出来的切片的元素和基础切片（或者数组）的元素位于同一个内存片段上。或者说，派生出来的切片很可能和基础切片（或者数组）共享一些元素。
+派生出来的切片的元素和基础切片（或者数组）的元素位于同一个内存片段上。或者说，派生出来的切片和基础切片（或者数组）将共享一些元素。
 </p>
 
 Go中有两种取子切片的语法形式（假设<code>baseContainer</code>是一个切片或者数组）：
@@ -1098,7 +1105,7 @@ baseContainer[low : high : max] // 三下标形式
 </p>
 
 <p>
-（三下标形式是从Go 1.2开始支持的。）
+（注意：三下标形式是从Go 1.2开始支持的。）
 <p>
 
 上面所示的取子切片表达式的语法形式中得下标必须满足下列关系，否则代码要么编译不通过，要么在运行时刻将造成恐慌。
@@ -1154,12 +1161,12 @@ import "fmt"
 
 func main() {
 	a := [...]int{0, 1, 2, 3, 4, 5, 6}
-	s0 := a[:]
-	s1 := s0[:]   // <=> s1 := s0[0:7] <=> s1 := s0
-	s2 := s1[1:3] // <=> s2 := s1[1:3] <=> s2 := a[1:3]
-	s3 := s2[2:6] // <=> s3 := s2[2:6] <=> s3 := s1[3:7]
-	s4 := s0[3:5] // <=> s4 := s0[3:5:7]
-	s5 := s0[3:5:5]
+	s0 := a[:]     // <=> s0 := a[0:7:7]
+	s1 := s0[:]    // <=> s1 := s0
+	s2 := s1[1:3]  // <=> s2 := a[1:3]
+	s3 := s1[3:]   // <=> s3 := s1[3:7]
+	s4 := s0[3:5]  // <=> s4 := s0[3:5:7]
+	s5 := s4[:2:2] // <=> s5 := s0[3:5:5]
 	s6 := append(s4, 77)
 	s7 := append(s5, 88)
 	s8 := append(s7, 66)
@@ -1175,10 +1182,10 @@ func main() {
 </code></pre>
 
 <p>
-下面这张图描绘了上面的程序在退出之前各个数组和切片的内存布局。
-<br/>
+下面这张图描绘了上面的程序在退出之前各个数组和切片的状态。
+<div class="text-center">
 <img src="res/slice-subslice-2.png">
-<br/>
+</div>
 </p>
 
 <p>
@@ -1211,6 +1218,7 @@ func main() {
 这两个切片的类型可以不同，但是它们的元素类型必须相同。
 换句话说，这两个切片的类型的底层类型必须相同。
 <code>copy</code>函数的第一个参数为目标切片，第二个参数为源切片。
+传递给一个<code>copy</code>函数调用的两个实参可以共享一些底层元素。
 <code>copy</code>函数返回复制了多少个元素，此值（<code>int</code>类型）为这两个切片的长度的较小值。
 <p>
 
@@ -1267,7 +1275,7 @@ func Copy(dest, src []T) int {
 </p>
 
 <p>
-注意，做为一个特例，<code>copy</code>函数可以用来<a href="string.html#use-string-as-byte-slice">将一个字符串中的字节复制到一个byte切片</a>。
+注意，做为一个特例，<code>copy</code>函数可以用来<a href="string.html#use-string-as-byte-slice">将一个字符串中的字节复制到一个字节切片</a>。
 </p>
 
 <p>
@@ -1286,7 +1294,7 @@ func Copy(dest, src []T) int {
 }
 </code></pre>
 <p>
-在此语法形式中，<code>key</code>和<code>element</code>称为循环变量。
+在此语法形式中，<code>for</code>和<code>range</code>为两个关键字，<code>key</code>和<code>element</code>称为循环变量。
 如果<code>aContainer</code>是一个切片或者数组（或者数组指针，见后），则<code>key</code>的类型必须为内置类型<code>int</code>。
 </p>
 
@@ -1296,7 +1304,7 @@ func Copy(dest, src []T) int {
 </p>
 
 <p>
-和传统的<code>for</code>循环流程控制一样，每个<code>for-range</code>循环流程控制形成了两个代码块，其中一个是隐式的，另一个是显式的（花括号<code>{}</code>起始的部分）。
+和传统的<code>for</code>循环流程控制一样，每个<code>for-range</code>循环流程控制形成了两个代码块，其中一个是隐式的，另一个是显式的（花括号<code>之间</code>的部分）。
 此显式的代码块内嵌在隐式的代码块之中。
 </p>
 
@@ -1330,7 +1338,7 @@ func main() {
 <p>
 </p>
 
-<code>for-range</code>循环代码块以一些变种形式：
+<code>for-range</code>循环代码块有一些变种形式：
 <pre class="line-numbers"><code class="language-go">// 忽略键值循环变量。
 for _, element = range aContainer {
 	// ...
@@ -1366,7 +1374,7 @@ for range aContainer {
 一些关于遍历映射表条目的细节：
 <ul>
 <li>
-	映射表中的条目的遍历顺序是不确定的（可以认为是随机的）。或者说，同一个映射表中的条目的两次遍历中，条目的顺序很可能是不一致的，即使在这两次遍历之间，此映射表并为发生任何改变。
+	映射表中的条目的遍历顺序是不确定的（可以认为是随机的）。或者说，同一个映射表中的条目的两次遍历中，条目的顺序很可能是不一致的，即使在这两次遍历之间，此映射表并未发生任何改变。
 </li>
 <li>
 	如果在一个映射表中的条目的遍历过程中，一个还没有被遍历到的条目被删除了，则此条目保证不会被遍历出来。
@@ -1406,7 +1414,7 @@ for range aContainer {
 <li>
 	被遍历的容器值是<code>aContainer</code>的<b>一个副本</b>。
 	注意，<a href="value-part.html#about-value-copy">只有<code>aContainer</code>的直接部分被复制了</a>。
-	此（直接部分的）副本是一个匿名的值，所以它是不可被修改的。
+	此副本是一个匿名的值，所以它是不可被修改的。
 	<ul>
 	<li>
 		如果<code>aContainer</code>是一个数组，那么在遍历过程中对此数组元素的修改不会体现到循环变量中。
@@ -1414,17 +1422,17 @@ for range aContainer {
 	</li>
 	<li>
 		如果<code>aContainer</code>是一个切片（或者映射表），那么在遍历过程中对此切片（或者映射表）元素的修改将体现到循环变量中。
-		原意是此切片（或者映射表）的副本和此切片或者映射表共享元素（或条目）。
+		原因是此切片（或者映射表）的副本和此切片（或者映射表）共享元素（或条目）。
 	</li>
 	</ul>
 </li>
 <li>
-	在遍历中的每个循环步，<code>aContainer</code>副本中的一个键值对对将被赋值（复制）给循环变量。
-	所以对循环变量的直接部分的修改将不会体现在<code>aContainer</code>中的对应元素（或者条目）上。
-	（因为这个原因，并且<code>for-range</code>循环是遍历映射表条目的唯一途径，最好不要使用大尺寸的映射表键值和元素类型，以避免较大的复制负担。）
+	在遍历中的每个循环步，<code>aContainer</code>副本中的一个键值元素对将被赋值（复制）给循环变量。
+	所以对循环变量的直接部分的修改将不会体现在<code>aContainer</code>中的对应元素中。
+	（因为这个原因，并且<code>for-range</code>循环是遍历映射表条目的唯一途径，所以最好不要使用大尺寸的映射表键值和元素类型，以避免较大的复制负担。）
 </li>
 <li>
-	所有被遍历的键值对将被赋值给<b>同一对</b>循环变量。
+	所有被遍历的键值对将被赋值给<b>同一对</b>循环变量实例。
 </li>
 </ol>
 
@@ -1443,10 +1451,10 @@ func main() {
 	for i, p := range persons {
 		fmt.Println(i, p)
 		// 此修改将不会体现在这个遍历过程中，
-		// 因为被遍历得数组是persons的一个副本。
+		// 因为被遍历的数组是persons的一个副本。
 		persons[1].name = "Jack"
-		// 此修改不会反映到persons数组中，
-		// 因为p是一个persons数组元素的副本。
+		// 此修改不会反映到persons数组中，因为p
+		// 是persons数组的副本中的一个元素的副本。
 		p.age = 31
 	}
 	fmt.Println("persons:", &persons)
@@ -1465,16 +1473,10 @@ persons: &[{Alice 28} {Jack 25}]
 如果我们将上例中的数组改为一个切片，则在循环中对此切片的修改将在循环过程中体现出来。
 但是对循环变量的修改仍然不会体现在此切片中。
 
-<pre class="line-numbers"><code class="language-go">package main
+<pre class="line-numbers"><code class="language-go">...
 
-import "fmt"
-
-func main() {
-	type Person struct {
-		name string
-		age  int
-	}
-	persons := []Person {{"Alice", 28}, {"Bob", 25}} // a slice
+	// 改为一个切片。
+	persons := []Person {{"Alice", 28}, {"Bob", 25}}
 	for i, p := range persons {
 		fmt.Println(i, p)
 		// 这次，此修改将反映在此次遍历过程中。
@@ -1541,13 +1543,13 @@ map[{true true}:map[Go:2009]]
 </p>
 
 <p>
-一个切片或者映射表赋值的代价很小，但是复制一个大尺寸的数组的代价比较大。
+复制一个切片或者映射表的代价很小，但是复制一个大尺寸的数组的代价比较大。
 所以，一般来说，<code>range</code>关键字后跟随一个大尺寸数组不是一个好主意。
 如果我们要遍历一个大尺寸数组中的元素，我们以遍历从此数组派生出来的一个切片，或者遍历一个指向此数组的指针（详见下一节）。
 </p>
 
 对于一个数组或者切片，如果它的元素类型的尺寸较大，则一般来说，用第二个循环变量来存储每个循环步中被遍历的元素不是一个好主意。
-对于这样的数组或者切片，我们忽略或者舍弃<code>for-range</code>代码块中的第二个循环变量，或者使用传统的<code>for</code>循环来遍历元素。
+对于这样的数组或者切片，我们最好忽略或者舍弃<code>for-range</code>代码块中的第二个循环变量，或者使用传统的<code>for</code>循环来遍历元素。
 比如，在下面这个例子中，函数<code>fa</code>中的循环效率比函数<code>fb</code>中的循环低得多。
 
 <pre class="line-numbers"><code class="language-go">type Buffer struct {
@@ -1586,7 +1588,7 @@ func fb(buffers []Buffer) int {
 </p>
 
 我们可以通过在<code>range</code>关键字后跟随一个数组的指针来遍历此数组中的元素。
-对于大尺寸的数组，这种方法比较有效，因为复制一个指针比复制一个大尺寸数组的代价低得多。
+对于大尺寸的数组，这种方法比较高效，因为复制一个指针比复制一个大尺寸数组的代价低得多。
 下面的例子中的两个循环是等价的，它们的效率也基本相同。
 
 <pre class="line-numbers"><code class="language-go">package main
@@ -1600,7 +1602,7 @@ func main() {
 		fmt.Println(i, n)
 	}
 
-	for i, n := range a[:] { // 复制一个指针的开销很小
+	for i, n := range a[:] { // 复制一个切片的开销很小
 		fmt.Println(i, n)
 	}
 }
@@ -1676,7 +1678,7 @@ func main() {
 内置<code>len</code>和<code>cap</code>函数调用接受数组指针做为实参。
 nil数组指针实参不会导致恐慌。
 
-<pre class="line-numbers"><code class="language-go">var pa *[5]int // nil
+<pre class="line-numbers"><code class="language-go">var pa *[5]int // == nil
 fmt.Println(len(pa), cap(pa)) // 5 5
 </code></pre>
 
@@ -1689,8 +1691,8 @@ fmt.Println(len(pa), cap(pa)) // 5 5
 <h3><code>memclr</code>优化</h3>
 
 <div>
-假设<code>t0</code>是一个类型<code>T</code>的零值的文字表示形式，并且<code>a</code>是一个元素类型为<code>T</code>的数组，则官方标准编译器将把下面的单循环变量<code>for-range</code>代码块优化为<a href="https://github.com/golang/go/issues/5373">内部的<code>memclr</code>调用</a>。
-大多数情况下，此<code>memclr</code>调用比一个一个的重置元素要快。
+假设<code>t0</code>是一个类型<code>T</code>的零值的字面表示形式，并且<code>a</code>是一个元素类型为<code>T</code>的数组，则官方标准编译器将把下面的单循环变量<code>for-range</code>代码块优化为一个<a href="https://github.com/golang/go/issues/5373">内部的<code>memclr</code>调用</a>。
+大多数情况下，此<code>memclr</code>调用比一个一个地重置元素要快。
 
 <pre class="line-numbers"><code class="language-go">for i := range a {
 	a[i] = t0
@@ -1698,7 +1700,7 @@ fmt.Println(len(pa), cap(pa)) // 5 5
 </code></pre>
 
 <p>
-从优化在官方Go编译器1.5版本中被引入。
+此优化在官方Go编译器1.5版本中被引入。
 </p>
 
 此优化也适用于<code>a</code>为一个切片的情形。但是，有点遗憾，此优化不适用于<code>a</code>为一个数组指针的情形，至少到目前（Go 1.12）为止。
@@ -1712,7 +1714,7 @@ for i := range s {
 </code></pre>
 
 <p>
-不推荐在<code>range</code>关键字后直接此数组的原因是其它可能的第三方编译器可能并没有实现此优化，<code>range</code>关键字后一个数组将复制此数组。
+不推荐在<code>range</code>关键字后直接此数组的原因是其它可能的第三方编译器可能并没有实现此优化，导致<code>range</code>关键字后跟随的数组将被复制，从而影响性能。
 </p>
 
 </div>
@@ -1734,7 +1736,7 @@ import "fmt"
 var a [5]int
 var p *[7]string
 
-// N和M都是类型确定值。
+// N和M都是类型为int的类型确定值。
 const N = len(a)
 const M = cap(p)
 
@@ -1785,7 +1787,7 @@ func main() {
 </p>
 
 <p>
-反射的效率很低，远低于一个切片的赋值。
+此反射方法的效率很低，远低于一个切片的赋值。
 </p>
 </div>
 
@@ -1798,7 +1800,7 @@ Go不支持更多的内置切片操作，比如切片克隆、元素删除和插
 </p>
 
 <p>
-在下面当前大节中的例子中，假设<code>s</code>是被谈到的切片、<code>T</code>是它的元素类型、<code>t0</code>是类型<code>T</code>的零值的文字表示形式。
+在下面当前大节中的例子中，假设<code>s</code>是被谈到的切片、<code>T</code>是它的元素类型、<code>t0</code>是类型<code>T</code>的零值的字面表示形式。
 </p>
 
 <h4>切片克隆</h4>
@@ -1814,7 +1816,7 @@ copy(sClone, s)
 </code></pre>
 
 <p>
-刚提到的第二种方法并不完美，如果<code>s</code>是一个nil切片，此第二种方法将得到一个非nil切片。
+刚提到的第二种方法有一个缺点：如果<code>s</code>是一个nil切片，此第二种方法将得到一个非nil切片。
 </p>
 
 </div>
@@ -1856,7 +1858,7 @@ for i := range temp {
 </code></pre>
 
 <p>
-刚才已经提到了，上面这个<code>for-range</code>循环将被官方标准编译器优化为一个<code>memclr</code>调用。
+前面已经提到了，上面这个<code>for-range</code>循环将被官方标准编译器优化为一个<code>memclr</code>调用。
 </p>
 
 </div>
@@ -1889,7 +1891,9 @@ s = s[:len(s)-1]
 
 如果切片的元素可能引用着其它值，则我们应该重置刚多出来的元素槽位上的元素值，以避免暂时性的内存泄露：
 
-<pre class="line-numbers"><code class="language-go">s[len(s):][0] = t0
+<pre class="line-numbers"><code class="language-go">s[len(s):len(s)+1][0] = t0
+// 或者
+s[:len(s)+1][len(s)] = t0
 </code></pre>
 
 <p>
@@ -1912,7 +1916,7 @@ func DeleteElements(s []T, shouldKeep func(T) bool, clear bool) []T {
 	if clear { // 避免暂时性的内存泄露。
 		temp := s[len(result):]
 		for i := range temp {
-			temp[i] = t0 // t0是类型T的零值的文字表示形式
+			temp[i] = t0 // t0是类型T的零值的字面表示形式
 		}
 	}
 	return result
@@ -1959,16 +1963,15 @@ s = append(elements, s...)
 <h4>特殊的插入和删除：前推/后推，前弹出/后弹出</h4>
 
 <div>
-Assume the pushed or popped element is <code>e</code> and slice
-<code>s</code> has at least one element.
+假设被推入和弹出的元素为<code>e</code>并且切片<code>s</code>拥有至少一个元素。
 
-<pre class="line-numbers"><code class="language-go">// 前弹出（pop front，又称shift）：
+<pre class="line-numbers"><code class="language-go">// 前弹出（pop front，又称shift）
 s, e = s[1:], s[0]
-// 后弹出（pop back）：
+// 后弹出（pop back）
 s, e = s[:len(s)-1], s[len(s)-1]
-// 前推（push front）：
+// 前推（push front）
 s = append([]T{e}, s...)
-// 后推（push back）：
+// 后推（push back）
 s = append(s, e)
 </code></pre>
 
@@ -1996,7 +1999,7 @@ Go不支持内置集合（<b>set</b>）类型。但是，集合类型可以用�
 <h3>上述各种容器操作内部都未同步</h3>
 
 <p>
-请注意，上述所有各种容器操作的内部实现都未进行同步。如果不使用今后将要介绍的各种并发同步技术，多个协程并发读取同一个容器值是安全的，但是并发修改同一个容器值是不安全的。
+请注意，上述所有各种容器操作的内部实现都未进行同步。如果不使用今后将要介绍的各种并发同步技术，在没有协程修改一个容器值和它的元素的时候，多个协程并发读取此容器值和它的元素是安全的。但是并发修改同一个容器值则是不安全的。
 不使用并发同步技术而并发修改同一个容器值将会造成数据竞争。请阅读以后的<a href="concurrent-synchronization-overview.html">并发同步概述</a>一文以了解Go支持的各种并发同步技术。
 </p>
 

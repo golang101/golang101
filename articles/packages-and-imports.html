@@ -11,7 +11,7 @@
 
 <div>
 
-下面这个简短的程序（假如它存在一个名为<code>simple-import-demo.go</code>的源文件中）引入了一个标准库包。
+下面这个简短的程序（假设它存在一个名为<code>simple-import-demo.go</code>的源文件中）引入了一个标准库包。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -31,7 +31,7 @@ func main() {
 <li>
 	第三行通过使用<code>import</code>关键字引入了<code>fmt</code>标准库包。
 	在此源文件中，<code>fmt</code>标准库包将用<code>fmt</code>标识符来表示。
-	标识符<code>fmt</code>称为<code>fmt</code>标准库包的引入名称。（后续某节将详述代码包的引入名称）
+	标识符<code>fmt</code>称为<code>fmt</code>标准库包的引入名称。（后续某节将详述代码包的引入名称）。
 </li>
 <li>
 	<code>fmt</code>标准库包中声明了很多终端打印函数供其它代码包使用。
@@ -57,8 +57,8 @@ Go has 25 keywords.
 </code></pre>
 
 <p>
-当一个代码包被引入Go一个源文件时，只有此代码包中的<a href="keywords-and-identifiers.html#identifier">导出</a>资源（名称为大写字母的变量、常量、函数和类型等）可以在此源文件被使用。
-比如上例中的<code>Println</code>函数即为一个导出资源，所以它可以在上面的程序文件中使用。
+当一个代码包被引入一个Go源文件时，只有此代码包中的<a href="keywords-and-identifiers.html#identifier">导出</a>资源（名称为大写字母的变量、常量、函数和类型等）可以在此源文件被使用。
+比如上例中的<code>Println</code>函数即为一个导出资源，所以它可以在上面的程序源文件中使用。
 </p>
 
 <p>
@@ -67,7 +67,7 @@ Go has 25 keywords.
 </p>
 
 <p>
-注意，<code>print</code>和<code>println</code>这两个内置函数不推荐使用在生产环境，因为它们不保证一定会出现在以后的Go版本中。
+注意：<code>print</code>和<code>println</code>这两个内置函数不推荐使用在生产环境，因为它们不保证一定会出现在以后的Go版本中。
 </p>
 
 <p>
@@ -86,7 +86,7 @@ import "fmt"
 import "math/rand"
 
 func main() {
-	fmt.Printf("Next pseudo-random number is always %v.\n", rand.Uint32())
+	fmt.Printf("下一个伪随机数总是%v。\n", rand.Uint32())
 }
 </code></pre>
 
@@ -107,12 +107,12 @@ func main() {
 	一个<code>Printf</code>函数调用必须带有至少一个实参，并且第一个实参的类型必须为<code>string</code>。
 	此第一个实参指定了此调用的打印格式。此格式中的<code>%v</code>在打印结果将被对应的后续实参的字符串表示形式所取代。
 	比如上列中的<code>%v</code>在打印结果中将被<code>rand.Uint32()</code>函数调用所返回的随机数所取代。
-	打印格式中的<code>\n</code>表示一个换行符，这在<a href="basic-types-and-value-literals.html">基本类型和它们的文字表示形式</a>一文中已经解释过。
+	打印格式中的<code>\n</code>表示一个换行符，这在<a href="basic-types-and-value-literals.html">基本类型和它们的字面表示形式</a>一文中已经解释过。
 </li>
 </ul>
 
 上面这个程序的输出如下：
-<pre class="output"><code>Next pseudo-random number is always 2596996162.
+<pre class="output"><code>下一个伪随机数总是2596996162。
 </code></pre>
 
 <p>
@@ -134,7 +134,7 @@ import (
 
 func main() {
 	rand.Seed(time.Now().UnixNano()) // 设置随机数种子
-	fmt.Printf("Next pseudo-random number is %v.\n", rand.Uint32())
+	fmt.Printf("下一个伪随机数总是%v。\n", rand.Uint32())
 }
 </code></pre>
 
@@ -146,7 +146,7 @@ func main() {
 	其中<code>time.Time</code>和<code>time.Duration</code>是两个最常用的类型。
 </li>
 <li>
-	函数调用<code>time.Now()</code>将返回一个类型为<code>time.Time</code>的表示当前时间的时间值。
+	函数调用<code>time.Now()</code>将返回一个表示当前时间的类型为<code>time.Time</code>的值。
 <li>
 	<code>UnixNano</code>是类型<code>time.Time</code>的一个方法。
 	我们可以把方法看作是特殊的函数。方法将在<a href="method.html">Go中的方法</a>一文中详述。
@@ -162,7 +162,7 @@ func main() {
 
 <div>
 从上面的例子中，我们已经了解到<code>fmt.Printf</code>函数调用的第一个实参中的<code>%v</code>在输出中将替换为后续的实参的字符串表示形式。
-实际上，这种百分号开头的占位字符组合还用很多。下面是一些常用的占位字符组合：
+实际上，这种百分号开头的占位字符组合还有很多。下面是一些常用的占位字符组合：
 
 <ul>
 <li>
@@ -205,13 +205,13 @@ type of a: int, type of b: string
 </p>
 
 <p>
-请阅读<a href="https://golang.google.cn/pkg/fmt/"><code>fmt</code>标准库包的文档</a>（墙内版：<a href="https://golang.google.cn/pkg/fmt/">golang.google.cn/pkg/fmt/</a>）以了解更多的占位字符组合。
+请阅读<a href="https://golang.google.cn/pkg/fmt/"><code>fmt</code>标准库包的文档</a>以了解更多的占位字符组合。
 我们也可以运行<code>go doc fmt</code>命令来在终端中查看<code>fmt</code>标准库包的文档。
-运行<code>go doc fmt.Printf</code>命令可以查看<code>fmt.Printf</code>的文档。
+运行<code>go doc fmt.Printf</code>命令可以查看<code>fmt.Printf</code>函数的文档。
 </p>
 </div>
 
-<h3>代码包文件夹、代码包引入路径代码包依赖关系</h3>
+<h3>代码包文件夹、代码包引入路径、和代码包依赖关系</h3>
 
 <div>
 <p>
@@ -263,7 +263,7 @@ Go SDK 1.11引入了一个环境变量<code>GO111MODULE</code>。这个环境变
 	当在<code>y.go</code>文件中引入一个引入路径均为<code>w/foo</code>的包的时候，被引入的包为<code>GOPATH/src/x/y/vendor/w/foo</code>文件夹中的包。
 </li>
 <li>
-	当在<code>x.go</code>或者<code>z.go</code>文件中引入一个引入路径均为<code>w/foo</code>的包的时候，被引入的包为<code>GOPATH/src/x/vendor/w/foo</code>文件夹中的包。
+	当在<code>x.go</code>或者<code>z.go</code>文件中引入一个引入路径为<code>w/foo</code>的包的时候，被引入的包为<code>GOPATH/src/x/vendor/w/foo</code>文件夹中的包。
 </li>
 </ul>
 
@@ -292,7 +292,7 @@ Go SDK 1.11引入了一个环境变量<code>GO111MODULE</code>。这个环境变
 对于一个支持模块模式的代码包，其对应的<code>go.mod</code>文件中必须指定此<code>go.mod</code>文件所处的最内层文件夹对应的代码包的引入路径。
 指定引入路径的格式为<code>module ImportPath</code>。
 在这种模式下，只有和与此<code>go.mod</code>文件处于同一文件夹下的<code>vendor</code>文件夹才被视为特殊的文件夹。
-并且请注意，如果<code>go</code>命令的选项<code>-mod=vendor</code>未提供，则此<code>vendor</code>文件夹的包将被忽略。
+并且请注意，如果<code>go</code>命令的选项<code>-mod=vendor</code>未提供，则此<code>vendor</code>文件夹的包将被忽略，而下载缓存（处于项目代码包之外）中相应的代码包将被使用。
 </p>
 
 在支持模块模式的情形下，假设有一个如下的包层级结构，则：
@@ -332,7 +332,7 @@ Go SDK 1.11引入了一个环境变量<code>GO111MODULE</code>。这个环境变
 </code></pre>
 
 <p>
-如果一个包文件夹含有一个<code>go.mod</code>文件，则请不要在它的任何（直接或间接）子文件夹中也放置一个<code>go.mod</code>文件。
+如果一个包文件夹含有一个<code>go.mod</code>文件，则请不要在它的任何（直接或间接）子包文件夹中也放置一个<code>go.mod</code>文件。
 </p>
 
 <p>
@@ -354,7 +354,7 @@ Go不支持循环引用（依赖）。
 </p>
 
 <p>
-代码包文件夹的名称并不要求要和其对应的代码包的名称相同。
+代码包文件夹的名称并不要求一定要和其对应的代码包的名称相同。
 但是，库代码包文件夹的名称最好设为和其对应的代码包的名称相同。
 因为一个代码包的引入路径中包含的是此包的文件夹名，但是此包的默认引入名为此包的名称。
 如果两者不一致，会使人感到困惑。
@@ -494,7 +494,7 @@ import time "time"      // <=> import "time"
 <p>
 引入声明语句的完整形式在日常编程中使用的频率不是很高。
 但是在某些情况下，完整形式必须被使用。
-比如，如果一个源文件引入的两个代码包的包名一样，为了防止使编译器产生困惑，我们至少需要用完整形式指定一个不同的引入名以区分这两个包。
+比如，如果一个源文件引入的两个代码包的包名一样，为了防止使编译器产生困惑，我们至少需要用完整形式为其中一个包指定一个不同的引入名以区分这两个包。
 </p>
 
 下面是一个使用了完整引入声明语句形式的例子。
@@ -509,12 +509,12 @@ import (
 
 func main() {
 	random.Seed(time.Now().UnixNano())
-	format.Print("A pseudo-random number: ", random.Uint32(), "\n")
+	format.Print("一个随机数:", random.Uint32(), "\n")
 
 	// 下面这两行编译不通过。
 	/*
 	rand.Seed(time.Now().UnixNano())
-	fmt.Print("A pseudo-random number: ", rand.Uint32(), "\n")
+	fmt.Print("一个随机数:", rand.Uint32(), "\n")
 	*/
 }
 </code></pre>
@@ -522,7 +522,7 @@ func main() {
 一些解释：
 <ul>
 <li>
-	我们必须使用<code>format</code>和<code>random</code>，而不是<code>fmt</code>和<code>rand</code>，做为限定标识符的前缀。
+	我们必须使用<code>format</code>和<code>random</code>，而不是<code>fmt</code>和<code>rand</code>，来做为限定标识符的前缀。
 </li>
 <li>
 	<code>Print</code>是<code>fmt</code>标准库包中的另外一个函数。
@@ -554,7 +554,7 @@ func main() {
 </p>
 
 <p>
-一般来说，句点引入不推荐使用。
+一般来说，句点引入不推荐使用，因为它们的可读性较低。
 </p>
 
 <p>
