@@ -32,24 +32,24 @@ Go中有一些内置函数，这些函数声明在<a href="https://golang.google
 </p>
 
 下面是一个函数类型的字面形式:
-<pre class="line-numbers"><code class="language-go">func (a int, b string, c string) (x int, y int, z bool)
+<pre class="disable-line-numbers111"><code class="language-go">func (a int, b string, c string) (x int, y int, z bool)
 </code></pre>
 
 从前面的<a href="function-declarations-and-calls.html">函数声明和调用</a>一文中，我们了解到连续的同类型参数和结果可以声明在一块儿。
 所以上面的字面形式等价于：
-<pre class="line-numbers"><code class="language-go">func (a int, b, c string) (x, y int, z bool)
+<pre class="disable-line-numbers111"><code class="language-go">func (a int, b, c string) (x, y int, z bool)
 </code></pre>
 
 参数名称和结果名称并不重要，只要它们不重名即可。上面两个字面形式等价于下面这个：
-<pre class="line-numbers"><code class="language-go">func (x int, y, z string) (a, b int, c bool)
+<pre class="disable-line-numbers111"><code class="language-go">func (x int, y, z string) (a, b int, c bool)
 </code></pre>
 
 参数名和结果名可以是空标识符<code>_</code>。上面的字面形式等价于：
-<pre class="line-numbers"><code class="language-go">func (_ int, _, _ string) (_, _ int, _ bool)
+<pre class="disable-line-numbers111"><code class="language-go">func (_ int, _, _ string) (_, _ int, _ bool)
 </code></pre>
 
 函数参数列表中的参数名或者结果列表中的结果名可以同时省略（即匿名）。上面的字面形式等价于：
-<pre class="line-numbers"><code class="language-go">func (int, string, string) (int, int, bool) // 标准函数字面形式
+<pre class="disable-line-numbers111"><code class="language-go">func (int, string, string) (int, int, bool) // 标准函数字面形式
 func (a int, b string, c string) (int, int, bool)
 func (x int, _ string, z string) (int, int, bool)
 func (int, string, string) (x int, y int, z bool)
@@ -63,7 +63,7 @@ func (int, string, string) (a int, b int, _ bool)
 参数列表必须用一对小括号<code>()</code>括起来，即使此列表为空。
 如果一个函数类型一个结果列表为空，则它可以在函数类型的字面形式中被省略掉。
 当一个结果列表含有最多一个结果，则此结果列表的字面形式在它不包含结果名称的时候可以不用括号<code>()</code>括起来。
-<pre class="line-numbers"><code class="language-go">// 这三个函数类型字面形式是等价的。
+<pre class="disable-line-numbers111"><code class="language-go">// 这三个函数类型字面形式是等价的。
 func () (x int)
 func () (int)
 func () int
@@ -81,10 +81,10 @@ func (a int, b string)
 <h4>变长参数和变长参数函数类型</h4>
 
 <div>
-一个函数的最后一个参数可以是一个变长参数。一个函数可以有最多一个变长参数。一个变长参数的类型总为一个切片类型。
+一个函数的最后一个参数可以是一个变长参数。一个函数可以最多有一个变长参数。一个变长参数的类型总为一个切片类型。
 变长参数在声明的时候必须在它的（切片）类型的元素类型前面前置三个点<code>...</code>，以示这是一个变长参数。
 两个变长函数类型的例子：
-<pre class="line-numbers"><code class="language-go">func (values ...int64) (sum int64)
+<pre class="disable-line-numbers111"><code class="language-go">func (values ...int64) (sum int64)
 func (separator string, tokens ...string) string
 </code></pre>
 
@@ -105,7 +105,7 @@ func (separator string, tokens ...string) string
 </p>
 
 <p>
-因为函数类型属于不可比较类型，所以映射表类型的键值类型不可为函数类型。
+因为函数类型属于不可比较类型，所以函数类型不可用做映射表类型的键值类型。
 </p>
 
 <p class="anchor" id="prototype"></p>
@@ -113,12 +113,12 @@ func (separator string, tokens ...string) string
 
 <div>
 <p>
-一个函数原型由一个函数名称和一个函数类型类型组成。
+一个函数原型由一个函数名称和一个函数类型（或者说一个函数签名）组成。
 它的字面形式由一个<code>func</code>关键字、一个函数名和一个函数签名字面形式组成。
 </p>
 
 一个函数原型的例子：
-<pre class="line-numbers"><code class="language-go">func Double(n int) (result int)
+<pre class="disable-line-numbers111"><code class="language-go">func Double(n int) (result int)
 </code></pre>
 
 <p>
@@ -167,7 +167,7 @@ func Concat(separator string, tokens ...string) string {
 </code></pre>
 
 <p>
-从上面的两个变长参数函数声明可以看出，如果一个变长参数的类型部分为<code>...T</code>，则此变长参数的类型史记为<code>[]T</code>。
+从上面的两个变长参数函数声明可以看出，如果一个变长参数的类型部分为<code>...T</code>，则此变长参数的类型实际为<code>[]T</code>。
 </p>
 
 事实上，在前面的文章中多次使用过的<code>fmt</code>标准库包中的<code>Print</code>、<code>Println</code>和<code>Printf</code>函数均为变长参数函数。
@@ -197,7 +197,7 @@ func Println(a ...interface{}) (n int, err error)
 </li>
 <li>
 	传递零个或者多个可以被隐式转换为<code>T</code>的实参（或者说这些实参可以赋值给类型为<code>T</code>的值）。
-	这些实参将被添加入一个匿名的在运行时刻开辟的类型为<code>[]T</code>的切片，然后此切片将被传递给此变长形参。
+	这些实参将被添加入一个匿名的在运行时刻创建的类型为<code>[]T</code>的切片中，然后此切片将被传递给此函数调用。
 </li>
 </ol>
 
@@ -264,18 +264,12 @@ func main() {
 
 <pre class="line-numbers"><code class="language-go">package main
 
-func Sum(values ...int64) (sum int64) {
-	// ...
-	return
-}
-
-func Concat(separator string, tokens ...string) (r string) {
-	// ...
-	return
-}
+// 这两个函数的声明见前面几例。
+func Sum(values ...int64) (sum int64) {......}
+func Concat(separator string, tokens ...string) string {......}
 
 func main() {
-	// 下面两行报同样的错：too many arguments in call
+	// 下面两行报同样的错：实参数目太多了。
 	_ = Sum(2, []int64{3, 5}...)
 	_ = Concat(",", "Go", []string{"C", "Rust"}...)
 }
@@ -293,7 +287,7 @@ func main() {
 一般来说，同一个包中声明的函数的名称不能重复，但有两个例外：
 <ol>
 <li>
-	同一个包内可以声明若干个类型为<code>func ()</code>的名称为<a href="packages-and-imports.html#init"><code>init</code>的函数</a>。
+	同一个包内可以声明若干个类型为<code>func ()</code>的<a href="packages-and-imports.html#init">名称为<code>init</code>的函数</a>。
 </li>
 <li>
 	多个函数的名称可以被声明为空标识符<code>_</code>。这样声明的函数不可被调用。
@@ -322,7 +316,7 @@ func main() {
 
 <p>
 我们可以使用<a href="https://golang.google.cn/doc/asm">Go汇编（Go assembly）</a>来实现一个Go函数。
-Go汇编代码采访在后追为<code>*.a</code>的文件中。
+Go汇编代码放在后缀为<code>.a</code>的文件中。
 一个使用Go汇编实现的函数依旧必须在一个<code>*.go</code>文件中声明，但是它的声明必须不能含有函数体。
 换句话说，一个使用Go汇编实现的函数的声明中只含有它的原型。
 </p>
@@ -361,8 +355,8 @@ func fb() bool {
 <div>
 
 <p>
-一个有且只有返回值的函数的每个调用总可以被当成一个单值表达式使用。
-比如，它可以被内嵌在其它函数调用中当作参数使用，或者可以被当作其它表达式中的操作数使用。
+一个有且只有一个返回值的函数的每个调用总可以被当成一个单值表达式使用。
+比如，它可以被内嵌在其它函数调用中当作实参使用，或者可以被当作其它表达式中的操作数使用。
 </p>
 
 如果一个有多个返回结果的函数的一个调用的返回结果没有被舍弃，则此调用可以当作一个多值表达式使用在两种场合：
@@ -406,7 +400,7 @@ func main() {
 </code></pre>
 
 <p>
-注意，<a href="exceptions.html#nest-function-calls">有几个内置函数破坏了上述规则的普遍性</a>。
+注意，在目前的标准编译器的实现中，<a href="exceptions.html#nest-function-calls">有几个内置函数破坏了上述规则的普遍性</a>。
 </p>
 
 </div>
@@ -416,7 +410,7 @@ func main() {
 <div>
 <p>
 本文开头已经介绍了函数类型是Go中天然支持的一种类型。函数类型的值称为函数值。
-在字面上，函数类型的零值也使用与定义的<code>nil</code>来表示。
+在字面上，函数类型的零值也使用预定义的<code>nil</code>来表示。
 </p>
 
 <p>
@@ -425,12 +419,12 @@ func main() {
 </p>
 
 <p>
-注意，内置函数和<code>init</code>函数不可被用做函数值。
+注意：内置函数和<code>init</code>函数不可被用做函数值。
 </p>
 
 <p>
 任何函数值都可以被当作普通声明函数来调用。
-调用一个nil函数来开启一个协程将产生一个致命的的不可恢复的错误，此错误将使整个程序崩溃。
+调用一个nil函数来开启一个协程将产生一个致命的不可恢复的错误，此错误将使整个程序崩溃。
 在其它情况下调用一个nil函数将产生一个可恢复的恐慌。
 </p>
 
@@ -449,7 +443,7 @@ func Double(n int) int {
 }
 
 func Apply(n int, f func(int) int) int {
-	return f(n) // the type of f is "func(int) int"
+	return f(n) // f的类型为"func(int) int"
 }
 
 func main() {

@@ -48,10 +48,8 @@ Go支持一些面向对象编程特性，方法是这些所支持的特性之一
 	接口类型。但是接口类型可以拥有方法。详见<a href="interface.html">下一篇文章</a>。
 </li>
 <li>
-	除了满足上面条件的指针类型<code>*T</code>的<a href="type-system-overview.html#non-defined-type">非定义类型</a>，
-	包括各种<a href="type-system-overview.html#named-type">无名</a>组合类型。
-	但是无名结构体类型可以通过内嵌其它类型而获得（一些隐式声明的）方法。
-	详见后面的<a href="type-embedding.html">类型内嵌</a>一文。
+	除了满足上面条件的指针类型<code>*T</code>之外的<a href="type-system-overview.html#non-defined-type">非定义类型</a>，包括各种<a href="type-system-overview.html#named-type">无名</a>组合类型。
+	但是注意：虽然我们无法显式地为无名结构体类型声明方法，无名结构体类型可以通过内嵌其它类型而获得（一些隐式声明的）方法。详见后面的<a href="type-embedding.html">类型内嵌</a>一文。
 </li>
 </ul>
 
@@ -142,10 +140,10 @@ func (*Book).SetPages(b *Book, pages int) {
 
 <p>
 在上面的两个隐式函数声明中，它们各自对应的方法声明的属主参数声明被插入到了普通参数声明的第一位。
-它们的函数体和各自对应的方法的显式方法体是一样的。
+它们的函数体和各自对应的显式方法的方法体是一样的。
 </p>
 
-两个隐式函数名<code>Book.Pages</code>和<code>(*Book).SetPages</code>都是<code>TypeDenotation.MethodName</code>这种形式的。
+两个隐式函数名<code>Book.Pages</code>和<code>(*Book).SetPages</code>都是<code>aType.MethodName</code>这种形式的。
 我们不能显式声明名称为这种形式的函数，因为这种形式不属于合法标识符。
 这样的函数只能由编译器隐式声明，但是我们可以在代码中调用这些隐式声明的函数：
 
@@ -202,7 +200,7 @@ func (b *Book) SetPages(pages int) {
 </code></pre>
 
 <p>
-这是为什么我并不排斥使用值类型属主做为指针类型属主的对立面的原因。
+这是为什么我并不排斥使用值类型属主这个术语做为指针类型属主这个术语的对立面的原因。
 毕竟，当我们为一个非指针类型显式声明一个方法的时候，事实上两个方法被声明了。
 一个方法是为非指针类型显式声明的，另一个是为指针类型隐式声明的。
 </p>
@@ -258,7 +256,7 @@ SetPages(pages int)
 </p>
 
 <p>
-方法集中的方法原型的次序并不重要。
+方法集之中的方法原型的次序并不重要。
 </p>
 
 <p>
@@ -298,7 +296,7 @@ SetPages(pages int)
 <p>
 方法事实上是特殊的函数。方法也常被称为成员函数。
 当一个类型拥有一个方法，则此类型的每个值将拥有一个不可修改的函数类型的成员（类似于结构体的字段）。
-此成员的名称为此方法名，它的类型和从此方法的声明中去掉属主部分的函数声明的类型一致。
+此成员的名称为此方法名，它的类型和此方法的声明中不包括属主部分的函数声明的类型一致。
 一个值的成员函数也可以称为此值的方法。
 </p>
 
@@ -354,7 +352,7 @@ the receiver arguments of the <code>Pages</code> and <code>SetPages</code> metho
 <p>
 事实上，上例中的<code>(&amp;book).SetPages(123)</code>一行可以被简化为<code>book.SetPages(123)</code>。
 为什么呢？毕竟，类型<code>book</code>并不拥有一个<code>SetPages</code>方法。
-啊哈，这是Go中特别设计的为了让代码看上去更整洁的语法糖。此语法糖只对可寻址的<code>Book</code>类型的属主有效。
+啊哈，这是Go中特别设计的为了让代码看上去更简洁并方便了编程的语法糖。此语法糖只对可寻址的值类型的属主有效。
 编译器会自动将<code>book.SetPages(123)</code>改写为<code>(&amp;book).SetPages(123)</code>。
 </p>
 
@@ -399,7 +397,7 @@ can be viewed as closures returned by:
 
 <p>
 如上面刚提到的，当为一个类型声明了一个方法后，每个此类型的值将拥有一个和此方法同名的成员函数。
-此类型的零值也不例外，不论此类型的零值是否可以用<code>nil</code>来表示。
+此类型的零值也不例外，不论此类型的零值是否用<code>nil</code>来表示。
 </p>
 
 一个例子：
@@ -493,7 +491,7 @@ func main() {
 <p>
 </p>
 
-有点题外话：如果将上例中<code>Modify</code>方法中的两行代码次序调换，那么此方法中的两处修改都不能反映到此方法之外。
+有点题外话，如果将上例中<code>Modify</code>方法中的两行代码次序调换，那么此方法中的两处修改都不能反映到此方法之外。
 <pre class="line-numbers"><code class="language-go">func (books Books) Modify() {
 	books = append(books, Book{789})
 	books[0].pages = 500
@@ -507,8 +505,8 @@ func main() {
 </code></pre>
 
 <p>
-这两处修改都不能反映到<code>Modify</code>方法之外的原因是<code>append</code>函数调用将开辟一块新的内存来存储传入的切片属主实参的两个元素的副本。
-在此开辟的内存中所做的修改不会反映到<code>Modify</code>方法之外。
+这两处修改都不能反映到<code>Modify</code>方法之外的原因是<code>append</code>函数调用将开辟一块新的内存来存储它返回的结果切片的元素。
+而此结果切片的前两个元素是属主参数切片的元素的副本。对此副本所做的修改不会反映到<code>Modify</code>方法之外。
 </p>
 
 为了将此两处修改反映到<code>Modify</code>方法之外，<code>Modify</code>方法的属主类型应该改为指针类型：
@@ -545,17 +543,17 @@ func main() {
 <li>
 	如果一个值类型的尺寸太大，那么属主参数在传参的时候的复制成本将不可忽略。
 	指针类型都是小尺寸类型。
-	关于各种不同类型的尺寸，请阅读<a href="value-copy-cost.html">值复制代价</a>。
+	关于各种不同类型的尺寸，请阅读<a href="value-copy-cost.html">值复制代价</a>一文。
 </li>
 <li>
-	在并发场合下，同时调用为同一个属主基类型声明的值类型属主和指针类型属主方法比较易于产生数据竞争。
+	在并发场合下，同时调用为值类型属主和指针类型属主方法比较易于产生数据竞争。
 </li>
 <li>
-	<code>sync</code>标准库包中的类型的值不应该被复制，所以如果一个结构体类型<a href="type-embedding.html">内嵌</a>了这些类型，则不能为这个结构体类型声明值类型属主的方法。
+	<code>sync</code>标准库包中的类型的值不应该被复制，所以如果一个结构体类型<a href="type-embedding.html">内嵌</a>了这些类型，则不应该为这个结构体类型声明值类型属主的方法。
 </li>
 </ul>
 </div>
 
 <p>
-如果实在没有主意在一个方法声明中使用值类型属主还是指针类型属主，那么请使用指针类型属主。
+如果实在拿不定在一个方法声明中应该使用值类型属主还是指针类型属主，那么请使用指针类型属主。
 </p>

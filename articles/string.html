@@ -11,11 +11,11 @@
 
 <pre class="line-numbers"><code class="language-go">type _string struct {
 	elements *byte // 引用着底层的字节
-	len      int   // 字符串中字节数
+	len      int   // 字符串中的字节数
 }
 </code></pre>
 <p>
-从这个声明来看，我们可以将一个字符串的内部看作为一个字节序列。或者说一个字符串是一个元素类型为<code>byte</code>的容器。
+从这个声明来看，我们可以将一个字符串的内部定义看作为一个字节序列。或者说一个字符串是一个元素类型为<code>byte</code>的容器。
 </p>
 </div>
 
@@ -36,7 +36,7 @@
 	Go支持<a href="basic-types-and-value-literals.html#string-literals">两种风格的字符串字面表示形式</a>：双引号风格（解释型字面表示）和反引号风格（直白字面表示）。
 </li>
 <li>
-	字符串类型的零值为空字符串。一个空字符串可以用<code>""</code>或者<code>``</code>来表示。
+	字符串类型的零值为空字符串。一个空字符串在字面上可以用<code>""</code>或者<code>``</code>来表示。
 </li>
 <li>
 	我们可以用运算符<code>+</code>和<code>+=</code>来衔接字符串。
@@ -76,7 +76,7 @@ func main() {
 <li>
 	和Java语言一样，字符串值的内容（即底层字节）是不可更改的。
 	字符串值的长度也是不可独立被更改的。
-	一个可寻址的字符串只能通过将另一个字符串复制给它来整体修改它。
+	一个可寻址的字符串只能通过将另一个字符串赋值给它来整体修改它。
 </li>
 <li>
 	字符串类型没有内置的方法。我们可以
@@ -88,12 +88,12 @@ func main() {
 		调用内置函数<code>len</code>来获取一个字符串值的长度（此字符串中存储的字节数）。
 	</li>
 	<li>
-		使用<a href="container.html#element-accessment">容器元素索引</a>语法<code>aString[i]</code>来获取<code>aString</code>中的第<b>i</b><i></i>个字节。
+		使用<a href="container.html#element-accessment">容器元素索引</a>语法<code>aString[i]</code>来获取<code>aString</code>中的第<i><b>i</b></i>个字节。
 		表达式<code>aString[i]</code>是不可寻址的。换句话说，<code>aString[i]</code>不可被修改。
 	</li>
 	<li>
-		使用<a href="container.html#subslice">子切片语法</a><code>aString[start:end]</code>来获取<code>aString</code>的一个4。
-		这里，<code>start</code>和<code>end</code>均为<code>aString</code>中存储的字节的下标。
+		使用<a href="container.html#subslice">子切片语法</a><code>aString[start:end]</code>来获取<code>aString</code>的一个子字符串。
+		这里，<code>start</code>（包括）和<code>end</code>（不包括）均为<code>aString</code>中存储的字节的下标。
 	</li>
 	</ul>
 </li>
@@ -118,7 +118,7 @@ import (
 func main() {
 	var helloWorld = "hello world!"
 
-	var hello = helloWorld[:5] // 子字符串
+	var hello = helloWorld[:5] // 取子字符串
 	// 104是英文字符h的ASCII（和Unicode）码。
 	fmt.Println(hello[0])         // 104
 	fmt.Printf("%T \n", hello[0]) // uint8
@@ -148,19 +148,22 @@ Unicode标准为全球各种人类语言中的每个字符制定了一个独一�
 在具体应用中，码点值的编码方式有很多，比如UTF-8编码和UTF-16编码等。
 目前最流行编码方式为UTF-8编码。在Go中，所有的字符串常量都被视为是UTF-8编码的。
 在编译时刻，非法UTF-8编码的字符串常量将导致编译失败。
-在运行时刻，Go运行时无法阻止一个字符串中是非法UTF-8编码的。
+在运行时刻，Go运行时无法阻止一个字符串是非法UTF-8编码的。
 </p>
 
 <p>
 在UTF-8编码中，一个码点值可能由1到4个字节组成。
-比如，在Go字符串中，每个英语码点值（均对应一个英语字符）均由一个字节组成，而每个中文字符（均对应一个中文字符）均由三个字节组成。
+比如，每个英语码点值（均对应一个英语字符）均由一个字节组成，而每个中文字符（均对应一个中文字符）均由三个字节组成。
 </p>
 
 <p class="anchor" id="conversions"></p>
 <h3>字符串相关的类型转换</h3>
 
 <div>
+<p>
 在<a href="constants-and-variables.html#explicit-conversion">常量和变量</a>一文中，我们已经了解到整数可以被显式转换为字符串类型（但是反之不行）。
+</p>
+
 这里介绍两种新的字符串相关的类型转换规则：
 <ol>
 <li>
@@ -187,7 +190,7 @@ Unicode标准为全球各种人类语言中的每个字符制定了一个独一�
 </p>
 
 <p>
-当一个字符串被转换为一个字节切片时，结果切片中的底层字节序列是此字符串中存储的字节序列的深复制。
+当一个字符串被转换为一个字节切片时，结果切片中的底层字节序列是此字符串中存储的字节序列的一份深复制。
 即Go运行时将为结果切片开辟一块足够大的内存来容纳被复制过来的所有字节。当此字符串的长度较长时，此转换开销是比较大的。
 同样，当一个字节切片被转换为一个字符串时，此字节切片中的字节序列也将被深复制到结果字符串中。
 当此字节切片的长度较长时，此转换开销同样是比较大的。
@@ -197,7 +200,7 @@ Unicode标准为全球各种人类语言中的每个字符制定了一个独一�
 请注意，在字符串和字节切片之间的转换中，
 <ul>
 <li>
-	非法的UTF-8编码字节序列将被保持原样。
+	非法的UTF-8编码字节序列将被保持原样不变。
 </li>
 <li>
 	标准编译器做了一些优化，从而使得这些转换在某些情形下将不用深复制。
@@ -208,7 +211,7 @@ Unicode标准为全球各种人类语言中的每个字符制定了一个独一�
 Go并不支持字节切片和码点切片之间的直接转换。我们可以用下面列出的方法来实现这样的转换：
 <ul>
 <li>
-	利用字符串做为中间过渡。这种方法相对方便但效率较低，因为需要做两个深复制。
+	利用字符串做为中间过渡。这种方法相对方便但效率较低，因为需要做两次深复制。
 </li>
 <li>
 	使用<a href="https://golang.google.cn/pkg/unicode/utf8/">unicode/utf8</a>标准库包中的函数来实现这些转换。
@@ -240,7 +243,7 @@ func Runes2Bytes(rs []rune) []byte {
 }
 
 func main() {
-	s := "Color Infection is a fun game."
+	s := "颜色感染是一个有趣的游戏。"
 	bs := []byte(s) // string -> []byte
 	s = string(bs)  // []byte -> string
 	rs := []rune(s) // string -> []rune
@@ -337,7 +340,7 @@ var x = []byte{1024: 'x'}
 var y = []byte{1024: 'y'}
 
 func fc() {
-	// 下面的四个转换都不需要深复制
+	// 下面的四个转换都不需要深复制。
 	if string(x) != string(y) {
 		s = (" " + string(x) + string(y))[1:]
 	}
@@ -511,7 +514,7 @@ func main() {
 <h3>更多关于字符串的比较</h3>
 
 <div>
-上面已经提到了比较两个字符串事实上将逐个比较这两个字符串中的字节。
+上面已经提到了比较两个字符串事实上逐个比较这两个字符串中的字节。
 Go编译器一般会做出如下的优化：
 <ul>
 <li>
@@ -570,7 +573,7 @@ duration for (s1 == s2): 136ns
 </code></pre>
 
 <p>
-1ms等于1000000ns！所以请尽量避免比较两个很长的不共享底层字节序列的几乎相等的字符串。
+1ms等于1000000ns！所以请尽量避免比较两个很长的不共享底层字节序列的相等的（或者几乎相等的）字符串。
 </p>
 </div>
 

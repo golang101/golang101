@@ -87,7 +87,7 @@ type I interface{}
 
 <p>
 如果两个无名接口类型指定的方法集是等价的，则这两个接口类型为同一个类型。
-请注意：不同代码包中的同名非导出方法名将总被认为是不同名的。
+但是请注意：不同代码包中的同名非导出方法名将总被认为是不同名的。
 </p>
 
 <p class="anchor" id="implementation"></p>
@@ -95,11 +95,11 @@ type I interface{}
 
 <p>
 如果一个任意类型<code>T</code>的方法集为一个接口类型的方法集的超集，则我们说类型<code>T</code>实现了此接口类型。
-<code>T</code>可以是一个非接口类型，也可是一个接口类型。
+<code>T</code>可以是一个非接口类型，也可以是一个接口类型。
 </p>
 
 <p>
-实现关系在Go中是隐式的。两个类型之间的实现关系不需要在代码中显式表示出来。Go中没有类似于<code>implements</code>的关键字。
+实现关系在Go中是隐式的。两个类型之间的实现关系不需要在代码中显式地表示出来。Go中没有类似于<code>implements</code>的关键字。
 Go编译器将自动在需要的时候检查两个类型之间的实现关系。
 </p>
 
@@ -111,7 +111,7 @@ Go编译器将自动在需要的时候检查两个类型之间的实现关系。
 比如，在下面的例子中，类型<code>*Book</code>、<code>MyInt</code>和<code>*MyInt</code>都拥有一个原型为<code>About() string</code>的方法，所以它们都实现了接口类型<code>interface {About() string}</code>。
 <pre class="line-numbers"><code class="language-go">type Book struct {
 	name string
-	// more other fields ...
+	// 更多其它字段……
 }
 
 func (book *Book) About() string {
@@ -121,7 +121,7 @@ func (book *Book) About() string {
 type MyInt int
 
 func (MyInt) About() string {
-	return "I'm a custom integer value"
+	return "我是一个自定义整数类型"
 }
 </code></pre>
 
@@ -133,8 +133,8 @@ func (MyInt) About() string {
 这是Go中的一个重要事实。
 </p>
 
-隐式实现关系的设计是的一个声明在另一个代码包（包括标准库包）中的类型可以被动地实现一个用户代码包中的接口类型。
-比如，如果我们声明一个像下面这样的接口类型，则<a href="https://golang.google.cn/pkg/database/sql/"><code>database/sql</code></a>标准库包中生命的<code>DB</code>和<code>Tx</code>类型都实现了这个接口类型，因为它们拥有此接口类型指定的的三个方法。
+隐式实现关系的设计使得一个声明在另一个代码包（包括标准库包）中的类型可以被动地实现一个用户代码包中的接口类型。
+比如，如果我们声明一个像下面这样的接口类型，则<a href="https://golang.google.cn/pkg/database/sql/"><code>database/sql</code></a>标准库包中声明的<code>DB</code>和<code>Tx</code>类型都实现了这个接口类型，因为它们都拥有此接口类型指定的的三个方法。
 
 <pre class="line-numbers"><code class="language-go">import "database/sql"
 
@@ -142,7 +142,7 @@ func (MyInt) About() string {
 
 type DatabaseStorer interface {
 	Exec(query string, args ...interface{}) (sql.Result, error)
-	Prepare(query string) (*Stmt, error)
+	Prepare(query string) (*sql.Stmt, error)
 	Query(query string, args ...interface{}) (*sql.Rows, error)
 }
 </code></pre>
@@ -159,7 +159,7 @@ type DatabaseStorer interface {
 
 在Go中，如果类型<code>T</code>实现了一个接口类型<code>I</code>，则类型<code>T</code>的值都可以隐式转换到类型<code>I</code>。
 换句话说，类型<code>T</code>的值可以赋给类型<code>I</code>的可修改值。
-当一个<code>T</code>值被转换到类型<code>I</code>（或者赋给一个<code>I</code>值），
+当一个<code>T</code>值被转换到类型<code>I</code>（或者赋给一个<code>I</code>值）的时候，
 <ul>
 <li>
 	如果类型<code>T</code>是一个非接口类型，则此<code>T</code>值的一个复制将被包裹在结果（或者目标）<code>I</code>值中。
@@ -178,7 +178,7 @@ type DatabaseStorer interface {
 </ul>
 
 <p>
-包裹在一个接口值中的非接口值的类型信息和此接口值一起包裹在此接口值中（见下面详解）。
+包裹在一个接口值中的非接口值的类型信息也和此接口值一起被包裹在此接口值中（见下面详解）。
 </p>
 
 <p>
@@ -186,7 +186,7 @@ type DatabaseStorer interface {
 </p>
 
 <p>
-接口值的动态值的直接部分是不可修改的。当然，我们可以将一个接口值的动态值整体替换为另一个动态值。
+接口值的动态值的直接部分是不可修改的的，除非它的动态值被整体替换为另一个动态值。
 </p>
 
 <!--
@@ -196,7 +196,7 @@ type DatabaseStorer interface {
 -->
 
 <p>
-接口类型的零值也是用预声明的<code>nil</code>标识符来表示。
+接口类型的零值也用预声明的<code>nil</code>标识符来表示。
 一个nil接口值中什么也没包裹。将一个接口值修改为nil将清空包裹在此接口值中的非接口值。
 </p>
 
@@ -207,14 +207,14 @@ type DatabaseStorer interface {
 </i></p>
 
 <p>
-因为任何类型都实现了空接口类型，所以任何非接口值可都可以包裹在任何一个空接口类型的接口值中。
+因为任何类型都实现了空接口类型，所以任何非接口值都可以被包裹在任何一个空接口类型的接口值中。
 （以后，一个空接口类型的接口值将被称为一个空接口值。注意空接口值和nil接口值是两个不同的概念。）
 因为这个原因，空接口值可以被认为是很多其它语言中的<code>any</code>类型。
 </p>
 
 <p>
-当一个类型不确定值（除了<code>nil</code>）被转换为一个空接口类型（或者赋给一个空接口值），此类型不确定值将首先转换为它的默认类型。
-（或者说，此类型不确定值将被推断为一个它的默认类型的值。）
+当一个类型不确定值（除了类型不确定的<code>nil</code>）被转换为一个空接口类型（或者赋给一个空接口值），此类型不确定值将首先转换为它的默认类型。
+（或者说，此类型不确定值将被推断为一个它的默认类型的类型确定值。）
 </p>
 
 下面这个例子展示了一些目标值为接口类型的赋值。
@@ -252,14 +252,14 @@ func main() {
 
 请注意，在之前的文章中多次使用过的<code>fmt.Println</code>函数的原型为：
 
-<pre class="line-numbers"><code class="language-go">func Println(a ...interface{}) (n int, err error)
+<pre class="disable-line-numbers111"><code class="language-go">func Println(a ...interface{}) (n int, err error)
 </code></pre>
 
 <p>
-这是为什么任何类型的实参都可有使用在<code>fmt.Println</code>函数调用中。
+这是为什么任何类型的实参都可以使用在<code>fmt.Println</code>函数调用中。
 </p>
 
-下面是一个另一个展示一个空接口类型的值是如果包裹各种非接口类型的值的例子：
+下面是另一个展示一个空接口类型的值是如果包裹各种非接口类型的值的例子：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -294,10 +294,10 @@ func main() {
 </p>
 
 <p>
-在运行时刻，当一个非接口值被包裹到一个接口值，Go运行时（至少对于官方标准运行时来说）将分析和构建这两个值的对应的类型对的实现关系信息，并将此实现关系信息存入到此接口值内。
-对每一对这样的类型，它们的实现关系信息将仅被最多构建一次，并且为了程序效率考虑，此实现关系信息被缓存在内存中的一个全局映射表中，以备后用。
+在运行时刻，当一个非接口值被包裹到一个接口值，Go运行时（至少对于官方标准运行时来说）将分析和构建这两个值的类型的实现关系信息，并将此实现关系信息存入到此接口值内。
+对每一对这样的类型，它们的实现关系信息将仅被最多构建一次。并且为了程序效率考虑，此实现关系信息将被缓存在内存中的一个全局映射表中，以备后用。
 所以此全局映射表中的条目数永不减少。
-事实上，一个非零接口值<a href="value-part.html#interface-structure">在内部只是使用一个指针字段来引用着此全局映射表中一个实现关系信息条目</a>。
+事实上，一个非零接口值<a href="value-part.html#interface-structure">在内部只是使用一个指针字段来引用着此全局映射表中的一个实现关系信息条目</a>。
 </p>
 
 对于一个非接口类型和接口类型对，它们的实现关系信息包括两部分的内容：
@@ -306,17 +306,17 @@ func main() {
 	动态类型（即此非接口类型）的信息。
 </li>
 <li>
-	一个方法表（切片类型），其中存储了所有此接口类型指定的并且为此非接口类型（动态类型）声明了的方法。
+	一个方法表（切片类型），其中存储了所有此接口类型指定的并且为此非接口类型（动态类型）声明的方法。
 </li>
 </ol>
 
-两部分的内容对于实现Go中的两个特性起着至关重要的作用。
+这两部分的内容对于实现Go中的两个特性起着至关重要的作用。
 <ol>
 <li>
 	动态类型信息是实现<a href="#reflection">反射</a>的关键。
 </li>
 <li>
-	此方法表是实现多态（见下一节）的关键。
+	方法表是实现多态（见下一节）的关键。
 </li>
 </ol>
 </div>
@@ -329,19 +329,19 @@ func main() {
 </p>
 
 <p>
-当一个非接口类型<code>T</code>的值<code>t</code>被包裹在一个接口类型<code>I</code>的接口值值<code>i</code>中，通过<code>i</code>调用接口类型<code>I</code>指定的一个方法时，事实上为非接口类型<code>T</code>声明的对应方法将通过非接口值<code>t</code>被调用。
+当非接口类型<code>T</code>的一个值<code>t</code>被包裹在接口类型<code>I</code>的一个接口值<code>i</code>中，通过<code>i</code>调用接口类型<code>I</code>指定的一个方法时，事实上为非接口类型<code>T</code>声明的对应方法将通过非接口值<code>t</code>被调用。
 换句话说，<b>调用一个接口值的方法实际上将调用此接口值的动态值的对应方法</b>。
 比如，当方法<code>i.m</code>被调用时，其实被调用的是方法<code>t.m</code>。
 一个接口值可以通过包裹不同动态类型的动态值来表现出各种不同的行为，这称为多态。
 </p>
 
 <p>
-当方法<code>i.m</code>被调用时，<code>i</code>存储的实现关系信息的方法表的方法<code>t.m</code>将被找到并被调用。
+当方法<code>i.m</code>被调用时，<code>i</code>存储的实现关系信息的方法表中的方法<code>t.m</code>将被找到并被调用。
 此方法表是一个切片，所以此寻找过程只不过是一个切片元素访问操作，不会消耗很多时间。
 </p>
 
 <p>
-注意，在nil接口值上调用方法将产生一个恐慌，因为没有具体的方法可被调用（<code>t.m</code>为nil）。
+注意，在nil接口值上调用方法将产生一个恐慌，因为没有具体的方法可被调用。
 </p>
 
 <div>
@@ -407,7 +407,7 @@ func main() {
 	}
 
 	// 每个切片元素将被赋值给类型为Filter的循环变量fltr。
-	// 每个元素中的动态值也将被同时复制给循环变量fltr。
+	// 每个元素中的动态值也将被同时复制并被包裹在循环变量fltr中。
 	for _, fltr := range filters {
 		numbers = filteAndPrint(fltr, numbers)
 	}
@@ -430,7 +430,7 @@ func main() {
 </p>
 
 <p>
-除了上述这个好处，多态也使得一个代码包的开发者可以在此代码包中声明一个接口类型并声明一个拥有此接口类型参数的函数（或者方法），从而此代码包的一个用户可以在用户包中声明一个实现了此接口类型的用户类型，并且将此用户类型的实参传递给此代码包中声明的函数（或者方法）的调用。
+除了上述这个好处，多态也使得一个代码包的开发者可以在此代码包中声明一个接口类型并声明一个拥有此接口类型参数的函数（或者方法），从而此代码包的一个用户可以在用户包中声明一个实现了此接口类型的用户类型，并且将此用户类型的值做为实参传递给此代码包中声明的函数（或者方法）的调用。
 此代码包的开发者并不用关心一个用户类型具体是如何声明的，只要此用户类型满足此代码包中声明的接口类型规定的行为即可。
 </p>
 </div>
@@ -455,8 +455,8 @@ func main() {
 
 <p>
 本片文章将不介绍<code>reflect</code>标准包中提供的各种反射功能。
-请阅读后面的<a href="https://golang.google.cn/pkg/reflect/">Go中的反射</a>一文来了解如何如何使用此包。
-本文下面将值介绍Go中的内置反射反射机制。在Go中，内置反射机制包括类型断言（type assertion）和类型<code>type-switch</code>流程控制代码块。
+请阅读后面的<a href="https://golang.google.cn/pkg/reflect/">Go中的反射</a>一文来了解如何使用此包。
+本文下面将只介绍Go中的内置反射反射机制。在Go中，内置反射机制包括类型断言（type assertion）和<code>type-switch</code>流程控制代码块。
 </p>
 
 <p class="anchor" id="type-assertion"></p>
@@ -485,15 +485,15 @@ Go中有四种接口相关的类型转换情形：
 </p>
 
 <p>
-本节将介绍后两种情形。这两种情形的合法性是在运行时刻通过类型断言语法来验证的。
-事实上，类型断言语法也适用于上面列出的第二种情形。
+本节将介绍后两种情形。这两种情形的合法性是在运行时刻通过类型断言来验证的。
+事实上，类型断言也适用于上面列出的第二种情形。
 </p>
 
 一个类型断言表达式的语法为<code>i.(T)</code>，其中<code>i</code>为一个接口值，<code>T</code>为一个类型名或者类型字面表示。
 类型<code>T</code>可以为
 <ul>
 <li>
-	一个实现了<code>i</code>的接口类型的非接口类型
+	任意一个非接口类型。
 </li>
 <li>
 	或者一个任意接口类型。
@@ -504,12 +504,12 @@ Go中有四种接口相关的类型转换情形：
 一个断言可能成功或者失败。
 <ul>
 <li>
-	对于<code>T</code>是一个非接口类型的情况，如果断言值<code>i</code>的动态类型存在并且此动态类型和<code>T</code>为同一类型，则此断言将成功，否则，此断言失败。
+	对于<code>T</code>是一个非接口类型的情况，如果断言值<code>i</code>的动态类型存在并且此动态类型和<code>T</code>为同一类型，则此断言将成功；否则，此断言失败。
 	当此断言成功时，此类型断言表达式的估值结果为断言值<code>i</code>的动态值的一个复制。
-	我们可以把此种情况看作是动态值的一次拆封尝试。
+	我们可以把此种情况看作是一次拆封动态值的尝试。
 </li>
 <li>
-	对于<code>T</code>是一个接口类型的情况，当断言值<code>i</code>的动态类型存在并且此动态类型实现了接口类型<code>T</code>，则此断言将成功，否则，此断言失败。
+	对于<code>T</code>是一个接口类型的情况，当断言值<code>i</code>的动态类型存在并且此动态类型实现了接口类型<code>T</code>，则此断言将成功；否则，此断言失败。
 	当此断言成功时，此类型断言表达式的估值结果为一个包裹了断言值<code>i</code>的动态值的一个复制的<code>T</code>值。
 </li>
 </ul>
@@ -529,7 +529,7 @@ Go中有四种接口相关的类型转换情形：
 </p>
 
 <p>
-注意：当一个断言失败并且它的可选的第二个结果未呈现，则一个恐慌将产生。
+注意：如果一个断言失败并且它的可选的第二个结果未呈现，则此断言将造成一个恐慌。
 </p>
 
 一个展示了如何使用类型断言的例子（断言类型为非接口类型）：
@@ -559,7 +559,7 @@ func main() {
 <p>
 </p>
 
-一个展示了如何使用类型断言的例子（断言类型为接口类型）：
+另一个展示了如何使用类型断言的例子（断言类型为接口类型）：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -626,11 +626,11 @@ default:
 其中<code>aSimpleStatement;</code>部分是可选的。
 <code>aSimpleStatement</code>必须是一个<a href="expressions-and-statements.html#simple-statements">简单语句</a>。
 <code>x</code>必须为一个估值结果为接口值的表达式，它称为此代码块中的断言值。
-<code>v</code>称为此代码块中的断言结果，它必须出现一个短变量声明形式中。
+<code>v</code>称为此代码块中的断言结果，它必须出现在一个短变量声明形式中。
 </p>
 
 <p>
-在一个<code>type-switch</code>代码块中，每个<code>case</code>关键字后可以跟随一个<code>nil</code>标识符和若干个类型名或类型字面表示。
+在一个<code>type-switch</code>代码块中，每个<code>case</code>关键字后可以跟随一个<code>nil</code>标识符和若干个类型名或类型字面表示形式。
 在同一个<code>type-switch</code>代码块中，这些跟随在所有<code>case</code>关键字后的条目不可重复。
 </p>
 
@@ -650,7 +650,7 @@ func main() {
 	}
 	for _, x := range values {
 		// 这里，虽然变量v只被声明了一次，但是它在
-		// 不同分支中可以表示为多个类型的变量值。
+		// 不同分支中可以表现为多个类型的变量值。
 		switch v := x.(type) {
 		case []int: // 一个类型字面表示
 			// 在此分支中，v的类型为[]int。
@@ -821,7 +821,7 @@ type Iy = interface {
 </ol>
 
 <p>
-对于第一种情形，非接口值的类型必须实现了接口值的类型（假设此接口类型为<code>I</code>），所以此非接口值可以被转化为（包裹到）一个<code>I</code>值中。
+对于第一种情形，非接口值的类型必须实现了接口值的类型（假设此接口类型为<code>I</code>），所以此非接口值可以被隐式转化为（包裹到）一个<code>I</code>值中。
 这意味着非接口值和接口值的比较可以转化为两个接口值的比较。所以下面我们只探讨两个接口值比较的情形。
 </p>
 
@@ -850,11 +850,17 @@ type Iy = interface {
 </li>
 </ol>
 
-<p>
-简而言之，两个接口值只有在它们都为零值或者它们的动态类型都相同、动态值都相等并且它们的动态类型为可比较类型的时候的比较结果才为<code>true</code>。
-</p>
+简而言之，两个接口值的比较结果只有在下面两种任一情况下才为<code>true</code>：
+<ol>
+<li>
+	这两个接口值都为nil接口值。
+</li>
+<li>
+	这两个接口值的动态类型相同、动态类型为可比较类型、并且动态值相等。
+</li>
+</ol>
 
-根据此规则，两个包裹了不同类型的<code>nil</code>零值的接口值是不相等的。
+根据此规则，两个包裹了不同非接口类型的<code>nil</code>零值的接口值是不相等的。
 一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -895,13 +901,13 @@ todo: need a picture. Three parts
 * the type info layout
 -->
 
-<h4>指针类型的动态值和非指针类型的动态值</h4>
+<h4>指针动态值和非指针动态值</h4>
 
 <p>
-标准编译器/运行时接口值的动态值为指针类型的情况做了特别的优化。
-此优化使得接口值包裹指针类型的动态值比包裹非指针类型的动态值效率更高。
+标准编译器/运行时对接口值的动态值为指针类型的情况做了特别的优化。
+此优化使得接口值包裹指针动态值比包裹非指针动态值的效率更高。
 对于<a href="value-copy-cost.html">小尺寸值</a>，此优化的作用不大；
-但是对于大尺寸值，包裹它的指针比包裹此值的效率高得多。
+但是对于大尺寸值，包裹它的指针比包裹此值本身的效率高得多。
 对于类型断言，此结论亦成立。
 </p>
 
@@ -912,7 +918,7 @@ todo: need a picture. Three parts
 <h4>一个<code>[]T</code>类型的值不能直接被转换为类型<code>[]I</code>，即使类型<code>T</code>实现了接口类型<code>I</code></h4>
 
 <div>
-比如，我们不能直接将一个<code>[]string</code>值转换为类型<code>[]interface</code>。
+比如，我们不能直接将一个<code>[]string</code>值转换为类型<code>[]interface{}</code>。
 我们必须使用一个循环来实现此转换：
 <pre class="line-numbers"><code class="language-go">package main
 
