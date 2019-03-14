@@ -51,6 +51,10 @@
 				border-color: #666;
 			}
 
+			code {
+				tab-size: 6;
+				-moz-tab-size: 6;
+			}
 		}
 		</style>
 		<script>

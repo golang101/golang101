@@ -1,8 +1,8 @@
-﻿<h1>内值范型</h1>
+﻿<h1>内置范型</h1>
 
 <p>
 Go语言目前（Go 1.12）不支持自定义范型，只支持一等公民组合类型的内值范型。
-我们可以用各种一等公民组合类型来组合出无穷中类型。
+我们可以用各种一等公民组合类型来组合出无穷个类型。
 </p>
 
 <p>
@@ -67,7 +67,7 @@ func main() {
 	<code>chan chan int</code>是一个元素类型为另一个数据通道类型的<code>chan int</code>的数据通道类型。
 </li>
 <li>
-	<code>map[int]map[int]string</code>是一个元素类型为另一个映射表雷ing<code>map[string]int</code>的映射表来性。
+	<code>map[int]map[int]string</code>是一个元素类型为另一个映射表类型<code>map[string]int</code>的映射表类型。
 	这两个映射表类型的键值类型均为内置类型<code>int</code>。
 </li>
 <li>
@@ -140,14 +140,14 @@ func main() {
 import "fmt"
 
 func main() {
-	plusone := func(x int) int {return x + 1}
+	addone := func(x int) int {return x + 1}
 	square := func(x int) int {return x * x}
 	double := func(x int) int {return x + x}
 
 	transforms := map[string][]func(int) int {
-		"increase,increase,increase": {plusone, plusone, plusone},
-		"square,increase,double": {square, plusone, double},
-		"double,square,square": {double, double, square},
+		"inc,inc,inc": {addone, addone, addone},
+		"sqr,inc,dbl": {square, addone, double},
+		"dbl,sqr,sqr": {double, double, square},
 	}
 
 	for _, n := range []int{2, 3, 5, 7} {
@@ -157,7 +157,7 @@ func main() {
 			for _, xfer := range transfers {
 				result = xfer(result)
 			}
-			fmt.Printf("   %v: %v \n", name, result)
+			fmt.Printf(" %v: %v \n", name, result)
 		}
 	}
 }
@@ -175,7 +175,7 @@ func main() {
 		y bool
 	}
 }]interface {
-	Build([]byte, struct{a int; b struct {x string; y bool}}) error
+	Build([]byte, struct {x string; y bool}) error
 	Update(dt float64)
 	Destroy()
 }
@@ -196,7 +196,7 @@ func main() {
 </p>
 
 
-我们经常将复杂的类型的各个组成部分单独提前声明为一个类型名，从而获得更高的可读性。
+我们经常将复杂类型的各个组成部分单独提前声明为一个类型名，从而获得更高的可读性。
 下面的代码中的别名类型<code>T</code>和上面刚解读的类型表示同一个类型。
 
 <pre class="line-numbers"><code class="language-go">type B = struct {
@@ -210,7 +210,7 @@ type K = struct {
 }
 
 type E = interface {
-	Build([]byte, K) error
+	Build([]byte, B) error
 	Update(dt float64)
 	Destroy()
 }
@@ -237,7 +237,7 @@ Go目前不支持自定义范型这一事实有时候确实造成了一些不方
 
 <p>
 幸运的是，很多Go项目对自定义范型并没有很强的需求。
-并且，因为缺少自定义范型的不足可以通过（在运行时刻）使用反射机制和（在编译时刻）代码生成来部分地弥补。
+并且，缺少自定义范型的不足可以通过（在运行时刻）使用反射机制和（在编译时刻）代码生成来部分地弥补。
 </p>
 
 <h3>未来的Go自定义范型</h3>

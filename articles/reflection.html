@@ -3,7 +3,6 @@
 <p>
 Go是一门具有良好反射支持的静态语言。
 本文将解释<code>reflect</code>标准库包中提供的反射功能。
-一些和反射相关的细节也将被谈及。
 </p>
 
 <p>
@@ -15,7 +14,7 @@ Go是一门具有良好反射支持的静态语言。
 <p>
 从<a href="generic.html">上一篇文章</a>中，我们得知目前Go缺少自定义范型支持。
 Go中提供的的反射功能带来了很多动态特性，从而从一定程度上弥补了Go缺少自定义范型而导致的不便（尽管反射比范型的运行效率低）。
-很多标准库，比如<code>fmt</code>和很多<code>encoding</code>库包，均十分依赖于反射机制。
+很多标准库，比如<code>fmt</code>和很多<code>encoding</code>包，均十分依赖于反射机制。
 </p>
 
 <p>
@@ -36,18 +35,18 @@ Go反射机制设计的目标之一是任何非反射操作都可以通过反射
 <div>
 <p>
 通过调用<code>reflect.TypeOf</code>函数，我们可以从一个任何非接口类型的值创建一个<code>reflect.Type</code>值。
-此<code>reflect.Type</code>值表示着此非接口值的类型。通过此值，我们可以得到很多此非接口值的类型的信息。
+此<code>reflect.Type</code>值表示着此非接口值的类型。通过此值，我们可以得到很多此非接口类型的信息。
 当然，我们也可以将一个接口值传递给一个<code>reflect.TypeOf</code>函数调用，但是此调用将返回一个表示着此接口值的动态类型的<code>reflect.Type</code>值。
 实际上，<code>reflect.TypeOf</code>函数的唯一参数的类型为<code>interface{}</code>，
-<code>reflect.TypeOf</code>函数将总是返回一个表示着此唯一接口参数值值的动态类型的<code>reflect.Type</code>值。
+<code>reflect.TypeOf</code>函数将总是返回一个表示着此唯一接口参数值的动态类型的<code>reflect.Type</code>值。
 那如何得到一个表示着某个接口类型的<code>reflect.Type</code>值呢？
-我们必须通过下面将要要介绍的间接途径达到这一目的。
+我们必须通过下面将要介绍的一些间接途径来达到这一目的。
 </p>
 
 <p>
 类型<code>reflect.Type</code>为一个接口类型，它指定了<a href="https://golang.google.cn/pkg/reflect/#Type">若干方法</a>。
-通过这些方法，我们能够观察到一个<code>reflect.Type</code>值所表示Go类型的各种信息。
-这些方法中的有的是适用于<a href="https://golang.google.cn/pkg/reflect/#Kind">所有种类</a>的类型的，有的只适用于一种或几种类型。
+通过这些方法，我们能够观察到一个<code>reflect.Type</code>值所表示的Go类型的各种信息。
+这些方法中的有的适用于<a href="https://golang.google.cn/pkg/reflect/#Kind">所有种类</a>的类型，有的只适用于一种或几种类型。
 通过不合适的<code>reflect.Type</code>属主值调用某个方法将在运行时产生一个恐慌。
 请阅读<code>reflect</code>代码库中各个方法的文档来获取如何正确地使用这些方法。
 </p>
@@ -103,7 +102,7 @@ func main() {
 	tt := reflect.TypeOf(T{})
 	fmt.Println(tp.Kind(), tt.Kind()) // ptr slice
 
-	// 使用简介的方法得到表示两个接口类型的reflect.Type值。
+	// 使用间接的方法得到表示两个接口类型的reflect.Type值。
 	ti, tim := tp.Elem(), tt.Elem()
 	fmt.Println(ti.Kind(), tim.Kind()) // interface interface
 
@@ -120,7 +119,7 @@ func main() {
 </code></pre>
 
 <p>
-上面这个例子也展示了如何通过间接的途径得到一个表示一个接口类型的<code>reflect.Type</code>值。
+上面这个例子同时也展示了如何通过间接的途径得到一个表示一个接口类型的<code>reflect.Type</code>值。
 </p>
 
 我们可以通过反射列出一个类型的所有方法和一个结构体类型的所有字段。
@@ -175,10 +174,8 @@ func main() {
 	fmt.Println(ts) // []*[5]int
 	tm := reflect.MapOf(ta, tc)
 	fmt.Println(tm) // map[[5]int]chan<- [5]int
-	tf := reflect.FuncOf(
-		[]reflect.Type{ta},
-		[]reflect.Type{tp, tc},
-		false)
+	tf := reflect.FuncOf([]reflect.Type{ta}, 
+				[]reflect.Type{tp, tc}, false)
 	fmt.Println(tf) // func([5]int) (*[5]int, chan<- [5]int)
 	tt := reflect.StructOf([]reflect.StructField{
 		{Name: "Age", Type: reflect.TypeOf("abc")},
@@ -223,14 +220,14 @@ func main() {
 
 <p>
 <code>reflect.Value</code>类型有<a href="https://golang.google.cn/pkg/reflect/">很多方法</a>。
-我们可以在调用这些方法来观察和操纵用一个<code>reflect.Value</code>属主值表示的Go值。
+我们可以调用这些方法来观察和操纵一个<code>reflect.Value</code>属主值表示的Go值。
 这些方法中的有些适用于所有种类类型的值，有些只适用于一种或几种类型的值。
 通过不合适的<code>reflect.Value</code>属主值调用某个方法将在运行时产生一个恐慌。
 请阅读<code>reflect</code>代码库中各个方法的文档来获取如何正确地使用这些方法。
 </p>
 
 <p>
-一个<code>reflect.Value</code>值的<code>CanSet</code>方法将返回此<code>reflect.Value</code>值代表的Go值是否可以修改（可以被赋值）。
+一个<code>reflect.Value</code>值的<code>CanSet</code>方法将返回此<code>reflect.Value</code>值代表的Go值是否可以被修改（可以被赋值）。
 如果一个Go值可以被修改，则我们可以调用对应的<code>reflect.Value</code>值的<code>Set</code>方法来修改此Go值。
 注意：<code>reflect.ValueOf</code>函数直接返回的<code>reflect.Value</code>值都是不可修改的。
 </p>
@@ -286,7 +283,7 @@ func main() {
 </code></pre>
 
 <p>
-上例中展示了如何间接地获取代表接口值的<code>reflect.Value</code>值。
+上例中同时也展示了如何间接地获取代表接口值的<code>reflect.Value</code>值。
 </p>
 
 从上两例中，我们可以得知有两种方法获取一个代表着一个指针所引用着的值的<code>reflect.Value</code>值：
@@ -361,8 +358,8 @@ func main() {
 <p>
 </p>
 
-如果一个<code>reflect.Value</code>值代表着一个函数（值），则我们可以调用此<code>reflect.Value</code>值的<code>Call</code>方法来调用此函数。
-每个<code>Call</code>方法调用接受一个<code>[]reflect.Value</code>参数（表示传递给相应函数调用的各个实参）并返回一个同类型结果（表示相应函数调用返回的各个结果）。
+如果一个<code>reflect.Value</code>值代表着一个函数值，则我们可以调用此<code>reflect.Value</code>值的<code>Call</code>方法来调用此函数。
+每个<code>Call</code>方法调用接受一个<code>[]reflect.Value</code>类型的参数（表示传递给相应函数调用的各个实参）并返回一个同类型结果（表示相应函数调用返回的各个结果）。
 
 <pre class="line-numbers"><code class="language-go">package main
 
