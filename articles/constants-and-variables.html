@@ -196,7 +196,7 @@ Go支持类型推断（type deduction or type inference）。
 
 <pre class="line-numbers"><code class="language-go">package main
 
-// 声明了两个单独的有名常量。（是的，非ASCII字符可以用作标识符。）
+// 声明了两个单独的有名常量。（是的，非ASCII字符可以用做标识符。）
 const π = 3.1416
 const Pi = π // 等价于：Pi == 3.1416
 
@@ -319,7 +319,7 @@ const MaxUint_b uint = ^0       // error: -1溢出uint
 
 下面这个类型确定常量声明在64位的操作系统上是合法的，但在32位的操作系统上是非法的。
 因为一个<code>uint</code>值在32位操作系统上的尺寸是32位，
-<code>(1 << 64) - 1</code>将溢出<code>uint</code>。（这里，符号<code>&lt;&lt;</code>为左移位运算符。）
+<code>(1 &lt;&lt; 64) - 1</code>将溢出<code>uint</code>。（这里，符号<code>&lt;&lt;</code>为左移位运算符。）
 
 <pre class="line-numbers"><code class="language-go">const MaxUint uint = (1 << 64) - 1
 </code></pre>
@@ -572,7 +572,7 @@ var n int                     // 被初始化为0。
 
 <p>
 常量是不可改变的（不可寻址的），所以常量不能做为目标值出现在纯赋值语句的左边，而只能出现在右边用做源值。
-变量既可以出现在纯赋值语句的左边用作目标值，也可以出现在右边用作源值。
+变量既可以出现在纯赋值语句的左边用做目标值，也可以出现在右边用做源值。
 </p>
 
 <p>

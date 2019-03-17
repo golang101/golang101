@@ -21,15 +21,12 @@
 
 		<style>
 		@media print {
-			a[href]:after {
-				content: none !important;
-			}
-
-			h1, h2, h3, h4, h5 {
+			h1, h2, h4, h5 {
 				page-break-after: avoid !important;
 			}
 
 			h3 {
+				page-break-after: avoid !important;
 				border-bottom: 1px solid #333;
 			}
 
@@ -44,6 +41,18 @@
 			a:link {
 				text-decoration: underline !important;
 			}
+
+			a[href]:after {
+				content: none !important;
+			}
+
+			/*ul.index a::after {
+				content: leader('.') target-counter(attr(href), page);
+			}
+
+			a.pageref::after { 
+				content: " on page " target-counter(attr(href), page) 
+			}*/
 
 			.prettyprinted ol {
 				border-style: solid;
@@ -112,19 +121,41 @@
 	<body onload="process()">
 		<div class="container">
 
-{{ range .Articles }}
+{{ if .ShowCovers }}
+	<div style="margin: 16px 0px; text-align: center; page-break-after: always; display: table;">
+		<img style="display: table-cell; vertical-align: middle; width: 100%;" src="res/101-front-cover.jpg" alt="封面"></img>
+	</div>
+	<!--div style="page-break-after: always;">&nbsp;</div-->
+{{ end }}
+
+{{ range $id, $article := .Articles }}
 
 	<p class="article-anchor" id="{{ .FilenameWithoutExt }}.html"></p>
 
+	{{ if and (eq $id 0) ($.IndexTitle) }}
+	<h1>{{ $.IndexTitle }}</h1>
+	{{ else }}
 	{{ .Title }}
+	{{ end }}
 
 	{{ .Content }}
+
+	{{ if ge $id 7 }}
+	<div style="margin: 16px 0px; text-align: center;">
+		<img src="res/101-reward-qrcode-2.png" alt="赞赏"></img>
+	</div>
+	{{ end }}
 
 	<p style="page-break-after: always;"></p>
 
 {{ end }}
 
-
+{{ if .ShowCovers }}
+	<!--div style="page-break-before: always;">&nbsp;</div-->
+	<div style="margin: 16px 0px; text-align: center; page-break-after: always; display: table;">
+		<img style="display: table-cell; vertical-align: middle; width: 100%;" src="res/101-back-cover.jpg" alt="封底"></img>
+	</div>
+{{ end }}
 
 		</div>
 	</body>

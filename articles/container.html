@@ -507,7 +507,7 @@ func main() {
 	如果<code>k</code>是一个动态类型为不可比较类型的接口值，则<code>v[k]</code>在运行时刻将造成一个恐慌；
 </li>
 <li>
-	如果<code>v[k]</code>被用作一个赋值语句中的目标值并且<code>v</code>是一个零值nil映射表，则<code>v[k]</code>在运行时刻将造成一个恐慌；
+	如果<code>v[k]</code>被用做一个赋值语句中的目标值并且<code>v</code>是一个零值nil映射表，则<code>v[k]</code>在运行时刻将造成一个恐慌；
 </li>
 <li>
 	如果<code>v[k]</code>用来表示读取映射表值<code>v</code>中键值<code>k</code>对应的元素，则它无论如何都不会产生一个恐慌，即使<code>v</code>是一个零值nil映射表（假设<code>k</code>的估值没有造成恐慌）；
@@ -577,7 +577,7 @@ func main() {
 上面展示的切片的内部定义为切片的直接部分的定义。直接部分的<code>len</code>字段表示一个切片当前存储了多少个元素；直接部分的<code>cap</code>表示一个切片的容量。
 下面这张图描绘了一个切片值的内存布局。
 <div class="text-center">
-<img src="res/slice-internal.png">
+<img src="res/slice-internal.png" alt="切片值内存布局"></img>
 </div>
 </p>
 
@@ -818,14 +818,14 @@ func main() {
 所以，上面的程序中在退出之前，切片<code>s1</code>和<code>s2</code>共享一些元素，切片<code>s0</code>和<code>s3</code>共享所有的元素。
 下面这张图描绘了在上面的程序结束之前各个切片的状态。
 <div class="text-center">
-<img src="res/slice-append.png">
+<img src="res/slice-append.png" alt="各个切片状态"></img>
 </div>
 </p>
 
 <p>
 请注意，当一个<code>append</code>函数调用需要为结果切片开辟内存时，结果切片的容量取决于具体编译器实现。
 在这种情况下，对于官方标准编译器，如果基础切片的容量较小，则结果切片的容量至少为基础切片的两倍。
-这样做的目的是使结果切片有足够多的冗余元素槽位，以防止此结果切片被用作后续其它<code>append</code>函数调用的基础切片时再次开辟内存。
+这样做的目的是使结果切片有足够多的冗余元素槽位，以防止此结果切片被用做后续其它<code>append</code>函数调用的基础切片时再次开辟内存。
 </p>
 
 上面提到了，在实际编程中，我们常常将<code>append</code>函数调用的结果赋值给基础切片。
@@ -1184,7 +1184,7 @@ func main() {
 <p>
 下面这张图描绘了上面的程序在退出之前各个数组和切片的状态。
 <div class="text-center">
-<img src="res/slice-subslice-2.png">
+<img src="res/slice-subslice-2.png" alt="数字和切片状态"></img>
 </div>
 </p>
 
@@ -1683,7 +1683,7 @@ fmt.Println(len(pa), cap(pa)) // 5 5
 </code></pre>
 
 <p>
-</p
+</p>
 
 </div>
 

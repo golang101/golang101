@@ -11,10 +11,10 @@
 希望这篇文章能够说服你接收下面的观点：
 <ul>
 <li>
-	使用数据通道进行异步和并发编程是简单的和惬意的；
+	使用数据通道进行异步和并发编程是简单和惬意的；
 </li>
 <li>
-	数据通道同步技术比被很多其它语言采用的其它同步设计（比如<a href="https://en.wikipedia.org/wiki/Actor_model">角色模型</a>和<a href="https://en.wikipedia.org/wiki/Async/await">async/await模式</a>）有着更多的应用场景和更多的使用变种。
+	数据通道同步技术比被很多其它语言采用的其它同步方案（比如<a href="https://en.wikipedia.org/wiki/Actor_model">角色模型</a>和<a href="https://en.wikipedia.org/wiki/Async/await">async/await模式</a>）有着更多的应用场景和更多的使用变种。
 </li>
 </ul>
 
@@ -26,7 +26,7 @@
 </div>
 
 <p class="anchor" id="future-promise"></p>
-<h3>将数据通道用作Future/Promise</h3>
+<h3>将数据通道用做future/promise</h3>
 
 <p>
 很多其它流行语言支持future/promise来实现异步（并发）编程。
@@ -39,7 +39,7 @@ Future/promise常常用在请求/回应场合。
 <p>
 在下面这个例子中，<code>sumSquares</code>函数调用的两个实参请求并发进行。
 每个数据通道读取操作将阻塞到请求返回结果为止。
-两个实参总共需要3秒钟（而不是6秒钟）准备完毕。
+两个实参总共需要大约3秒钟（而不是6秒钟）准备完毕（以较慢的一个为准）。
 </p>
 
 <pre class="line-numbers"><code class="language-go">package main
@@ -54,7 +54,7 @@ func longTimeRequest() <-chan int32 {
 	r := make(chan int32)
 
 	go func() {
-		time.Sleep(time.Second * 3) // simulate a workload
+		time.Sleep(time.Second * 3) // 模拟一个工作负载
 		r <- rand.Int31n(100)
 	}()
 
@@ -78,7 +78,7 @@ func main() {
 
 </div>
 
-<h4>将单向发送数据通道类型用作函数实参</h4>
+<h4>将单向发送数据通道类型用做函数实参</h4>
 
 <div>
 <p>
@@ -95,7 +95,7 @@ import (
 )
 
 func longTimeRequest(r chan<- int32)  {
-	time.Sleep(time.Second * 3)
+	time.Sleep(time.Second * 3) // 模拟一个工作负载
 	r <- rand.Int31n(100)
 }
 
@@ -117,11 +117,11 @@ func main() {
 <p>
 </p>
 
-对于上面这个特定的例子，我们可以只使用一个数据通道来接收回应结果，因为两个参数的作用时对等的。
+对于上面这个特定的例子，我们可以只使用一个数据通道来接收回应结果，因为两个参数的作用是对等的。
 
 <pre class="line-numbers"><code class="language-go">...
 
-	results := make(chan int32, 2) // can be buffered or not
+	results := make(chan int32, 2) // 缓冲与否不重要
 	go longTimeRequest(results)
 	go longTimeRequest(results)
 
@@ -147,7 +147,7 @@ func main() {
 <p>
 有时候，一份数据可能同时从多个数据源获取。这些数据源将返回相同的数据。
 因为各种因素，这些数据源的回应速度参差不一，甚至某个特定数据源的多次回应速度之间也可能相差很大。
-同时从多个数据源获取一份相同的数据可以有效保障低延迟。我们只需采用最快的回应并舍弃其它回应。
+同时从多个数据源获取一份相同的数据可以有效保障低延迟。我们只需采用最快的回应并舍弃其它较慢回应。
 </p>
 
 <p>
@@ -264,7 +264,7 @@ func main() {
 
 <div>
 <p>
-如果一个数据通道的数据缓冲队列已满（非缓冲的数据通道的数据缓冲队列总是满的）但它的发送协程队列为空，则向此数据通道发送一个值将阻塞，直到另外一个协程从此数据通道接受一个值为止。
+如果一个数据通道的数据缓冲队列已满（非缓冲的数据通道的数据缓冲队列总是满的）但它的发送协程队列为空，则向此数据通道发送一个值将阻塞，直到另外一个协程从此数据通道接收一个值为止。
 所以我们可以通过从一个数据通道接收数据来实现单对单通知。一般我们使用非缓冲通道来实现这样的通知。
 </p>
 
@@ -299,7 +299,7 @@ func main() {
 </code></pre>
 
 <p>
-实际上，上例中的数据通道被用作了一个一次性的二元信号量。信号量将在下面介绍。
+实际上，上例中的数据通道被用做了一个一次性的二元信号量。信号量将在下面介绍。
 </p>
 
 </div>
@@ -356,7 +356,6 @@ func main() {
 我们可以把上一个例子中的三个数据发送操作<code>ready &lt;- struct{}{}</code>替换为一个通道关闭操作<code>close(ready)</code>来达到同样的单对多通知效果。
 
 <pre class="line-numbers"><code class="language-go">...
-	// ready <- struct{}{}; ready <- struct{}{}; ready <- struct{}{}
 	close(ready) // 群发通知
 ...
 </code></pre>
@@ -366,7 +365,7 @@ func main() {
 <p>
 
 <p>
-从一个已关闭的数据通道可以接收到无穷个值这一特性也将被用很多其它在后面介绍的用例中。
+从一个已关闭的数据通道可以接收到无穷个值这一特性也将被用在很多其它在后面将要介绍的用例中。
 </p>
 </div>
 
@@ -418,15 +417,15 @@ func main() {
 </div>
 
 <p class="anchor" id="mutex"></p>
-<h3>将数据通道用作互斥锁（mutex）</h3>
+<h3>将数据通道用做互斥锁（mutex）</h3>
 
 <div>
 <p>
-上面的某个例子提到了容量为1的缓冲通道可以用作一次性<a href="https://en.wikipedia.org/wiki/Semaphore_(programming)">二元信号量</a>。
-事实上，容量为1的缓冲通道也可以用作多次性二元信号量，即互斥锁，尽管这样的互斥锁效率不如<code>sync</code>标准库包中提供的互斥锁高效。
+上面的某个例子提到了容量为1的缓冲通道可以用做一次性<a href="https://en.wikipedia.org/wiki/Semaphore_(programming)">二元信号量</a>。
+事实上，容量为1的缓冲通道也可以用做多次性二元信号量（即互斥锁）尽管这样的互斥锁效率不如<code>sync</code>标准库包中提供的互斥锁高效。
 </p>
 
-有两种方式将一个容量为1的缓冲通道用作互斥锁：
+有两种方式将一个容量为1的缓冲通道用做互斥锁：
 <ol>
 <li>
 	通过发送操作来加锁，通过接收操作来解锁；
@@ -495,11 +494,11 @@ func main() {
 </div>
 
 <p class="anchor" id="semaphore"></p>
-<h3>将数据通道用作计数信号量（counting semaphore）</h3>
+<h3>将数据通道用做计数信号量（counting semaphore）</h3>
 
 <div>
 <p>
-缓冲数据通道可以被用作<a href="https://en.wikipedia.org/wiki/Semaphore_(programming)">计数信号量</a>。
+缓冲数据通道可以被用做<a href="https://en.wikipedia.org/wiki/Semaphore_(programming)">计数信号量</a>。
 计数信号量可以被视为多主锁。如果一个缓冲数据通道的容量为<code>N</code>，那么它可以被看作是一个在任何时刻最多可有<code>N</code>个主人的锁。
 上面提到的二元信号量是特殊的计数信号量，每个二元信号量在任一时刻最多只能有一个主人。
 </p>
@@ -508,7 +507,7 @@ func main() {
 计数信号量经常被使用于限制最大并发数。
 </p>
 
-和将数据通道用作互斥锁一样，也有两种方式用来获取一个用作计数信号量的通道的一份所有权。
+和将数据通道用做互斥锁一样，也有两种方式用来获取一个用做计数信号量的通道的一份所有权。
 
 <ol>
 <li>
@@ -532,12 +531,13 @@ import (
 type Seat int
 type Bar chan Seat
 
-func (bar Bar) ServeConsumer(customerId int) {
-	log.Print("顾客#", customerId, "进入酒吧")
+func (bar Bar) ServeCustomer(c int) {
+	log.Print("顾客#", c, "进入酒吧")
 	seat := <- bar // 需要一个位子来喝酒
-	log.Print("++ 顾客#", customerId, "在第", seat, "个座位开始饮酒")
+	log.Print("++ customer#", c, " drinks at seat#", seat)
+	log.Print("++ 顾客#", c, "在第", seat, "个座位开始饮酒")
 	time.Sleep(time.Second * time.Duration(2 + rand.Intn(6)))
-	log.Print("-- 顾客#", customerId, "离开了第", seat, "个座位")
+	log.Print("-- 顾客#", c, "离开了第", seat, "个座位")
 	bar <- seat // 释放座位，离开酒吧
 }
 
@@ -552,9 +552,9 @@ func main() {
 
 	for customerId := 0; ; customerId++ {
 		time.Sleep(time.Second)
-		go bar24x7.ServeConsumer(customerId)
+		go bar24x7.ServeCustomer(customerId)
 	}
-	for {time.Sleep(time.Second)} // 睡眠 != 阻塞
+	for {time.Sleep(time.Second)} // 睡眠不属于阻塞状态
 }
 </code></pre>
 
@@ -569,15 +569,15 @@ func main() {
 </p>
 
 在上例中，尽管在任一时刻同时在喝酒的顾客数不会超过座位数10，但是在某一时刻可能有多于10个顾客进入了酒吧，因为某些顾客在排队等位子。
-在上例中，每个顾客对应着一个协程。虽然协程的开销比系统线程小得多，但是如果协程的数量很多，它们的总体开销还是不能忽略不计的。
+在上例中，每个顾客对应着一个协程。虽然协程的开销比系统线程小得多，但是如果协程的数量很多，则它们的总体开销还是不能忽略不计的。
 所以，最好当有空位的时候才创建顾客协程。
 
 <pre class="line-numbers"><code class="language-go">... // 省略了和上例相同的代码
 
-func (bar Bar) ServeConsumerAtSeat(customerId int, seat Seat) {
-	log.Print("++ 顾客#", customerId, "在第", seat, "个座位开始饮酒")
+func (bar Bar) ServeCustomerAtSeat(c int, seat Seat) {
+	log.Print("++ 顾客#", c, "在第", seat, "个座位开始饮酒")
 	time.Sleep(time.Second * time.Duration(2 + rand.Intn(6)))
-	log.Print("-- 顾客#", customerId, "离开了第", seat, "个座位")
+	log.Print("-- 顾客#", c, "离开了第", seat, "个座位")
 	bar <- seat // 释放座位，离开酒吧
 }
 
@@ -593,7 +593,7 @@ func main() {
 	for customerId := 0; ; customerId++ {
 		time.Sleep(time.Second)
 		seat := <- bar24x7 // 需要一个空位招待顾客
-		go bar24x7.ServeConsumerAtSeat(customerId, seat)
+		go bar24x7.ServeCustomerAtSeat(customerId, seat)
 	}
 	for {time.Sleep(time.Second)}
 }
@@ -613,12 +613,12 @@ import (
 	"math/rand"
 )
 
-type Consumer struct{id int}
-type Bar chan Consumer
+type Customer struct{id int}
+type Bar chan Customer
 
-func (bar Bar) ServeConsumer(c Consumer) {
+func (bar Bar) ServeCustomer(c Customer) {
 	log.Print("++ 顾客#", c.id, "开始饮酒")
-	time.Sleep(time.Second * time.Duration(10 + rand.Intn(10)))
+	time.Sleep(time.Second * time.Duration(3 + rand.Intn(16)))
 	log.Print("-- 顾客#", c.id, "离开酒吧")
 	<- bar // 离开酒吧，腾出位子
 }
@@ -626,12 +626,12 @@ func (bar Bar) ServeConsumer(c Consumer) {
 func main() {
 	rand.Seed(time.Now().UnixNano())
 
-	bar24x7 := make(Bar, 10) // can serve most 10 consumers
+	bar24x7 := make(Bar, 10) // 最对同时服务10位顾客
 	for customerId := 0; ; customerId++ {
-		time.Sleep(time.Second)
-		consumer := Consumer{customerId}
-		bar24x7 <- consumer // 等待进入酒吧
-		go bar24x7.ServeConsumer(consumer)
+		time.Sleep(time.Second * 2)
+		customer := Customer{customerId}
+		bar24x7 <- customer // 等待进入酒吧
+		go bar24x7.ServeCustomer(customer)
 	}
 	for {time.Sleep(time.Second)}
 }
@@ -644,9 +644,9 @@ func main() {
 <p>
 There is a variant of the channel semaphore use case.
 In the above two examples, although the throughput is limited,
-but there may be many requests (consumers) are queuing.
+but there may be many requests (customers) are queuing.
 This is not always a good idea, sometimes it would be better to
-suggest queuing consumers go to other bars,
+suggest queuing customers go to other bars,
 by using the try-receive or try-send mechanisms introduced below.
 </p>
 -->
@@ -787,7 +787,7 @@ Go中的<a href="channel.html#select">选择机制（select）</a>是一个非�
 <div>
 <p>
 我们可以用一个无分支的<code>select</code>流程控制代码块使当前协程永久处于阻塞状态。
-这是<code>select</code>流程控制的最简单的一个应用。
+这是<code>select</code>流程控制的最简单的应用。
 事实上，上面很多例子中的<code>for {time.Sleep(time.Second)}</code>都可以换为<code>select{}</code>。
 </p>
 
@@ -827,7 +827,7 @@ func main() {
 <h3>尝试发送和尝试接收</h3>
 
 <div>
-含有一个<code>default</code>分支和一个<code>case</code>分支的<code>select</code>代码块可以被用作一个尝试发送或者尝试接收操作，取决于<code>case</code>关键字后跟随的是一个发送操作还是一个接收操作。
+含有一个<code>default</code>分支和一个<code>case</code>分支的<code>select</code>代码块可以被用做一个尝试发送或者尝试接收操作，取决于<code>case</code>关键字后跟随的是一个发送操作还是一个接收操作。
 
 <ul>
 <li>
@@ -902,10 +902,11 @@ func main() {
 </p>
 </div>
 
+<p class="anchor" id="check-closed-status"></p>
 <h4>无阻塞地检查一个通道是否已经关闭</h4>
 
 <div>
-假设我们可以保证没有协程会向一个通道发送数据，则我们可以使用下面的代码来检查此通道是否已经关闭，此检查不会阻塞当前协程。
+假设我们可以保证没有任何协程会向一个通道发送数据，则我们可以使用下面的代码来（并发安全地）检查此通道是否已经关闭，此检查不会阻塞当前协程。
 
 <pre class="line-numbers"><code class="language-go">func IsClosed(c chan T) bool {
 	select {
@@ -918,7 +919,7 @@ func main() {
 </code></pre>
 
 <p>
-此方法常用来查看某个期待中的通知是否已经来临。此通知将由另一个协程通过关闭此通道来发送。
+此方法常用来查看某个期待中的通知是否已经来临。此通知将由另一个协程通过关闭一个通道来发送。
 </p>
 </div>
 
@@ -928,11 +929,11 @@ func main() {
 <div>
 
 <p>
-将<a href="#semaphore">数据通道用作计数信号量</a>用例和尝试通道操作结合起来可用实现峰值限制。
+将<a href="#semaphore">数据通道用做计数信号量</a>用例和通道尝试（发送或者接收）操作结合起来可用实现峰值限制。
 峰值限制的目的是防止过大的并发请求数。
 </p>
 
-下面是对<a href="#semaphore">将数据通道用作计数信号量</a>一节中的最后一个例子的简单修改，从而使得顾客不再等待而是离去或者寻找其它酒吧。
+下面是对<a href="#semaphore">将数据通道用做计数信号量</a>一节中的最后一个例子的简单修改，从而使得顾客不再等待而是离去或者寻找其它酒吧。
 
 <pre class="line-numbers"><code class="language-go">...
 	bar24x7 := make(Bar, 10) // 此酒吧只能同时招待10个顾客
@@ -959,7 +960,7 @@ func main() {
 
 <div>
 在上面的“采用最快回应”用例一节已经提到，我们也可以使用选择机制来实现“采用最快回应”用例。
-每个数据源协程只需使用向一个缓冲为1的数据通道尝试发送回应数据即可。示例代码如下：
+每个数据源协程只需使用一个缓冲为1的数据通道并向其尝试发送回应数据即可。示例代码如下：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1036,7 +1037,7 @@ func main() {
 </code></pre>
 
 <p>
-本节和上一小节中展示的两种方法也可以用来实现多对单通知。
+本小节和上一小节中展示的两种方法也可以用来实现多对单通知。
 </p>
 
 </div>
@@ -1119,10 +1120,10 @@ func main() {
 <p>
 上面已经展示了如何使用尝试发送实现<a href="#peak-limiting">峰值限制</a>。
 同样地，我们也可以使用使用尝试机制来实现速率限制，但需要前面刚提到的定时器实现的配合。
-速率限制常用来限制吞吐和确保资源使用不会超标。
+速率限制常用来限制吞吐和确保在一段时间内的资源使用不会超标。
 </p>
 
-下面的例子借鉴了<a href="https://github.com/golang/go/wiki/RateLimiting">官方Go百科中的例子</a>。
+下面的例子借鉴了<a href="https://github.com/golang/go/wiki/RateLimiting">官方Go维基中的例子</a>。
 在此例中，任何一分钟时段内处理的请求数不会超过200。
 
 <pre class="line-numbers"><code class="language-go">package main
@@ -1134,7 +1135,7 @@ type Request interface{}
 func handle(r Request) {fmt.Println(r.(int))}
 
 const RateLimitPeriod = time.Minute
-const RateLimit = 200 // most 200 requests in one minute
+const RateLimit = 200 // 任何一分钟内最多处理200个请求
 
 func handleRequests(requests <-chan Request) {
 	quotas := make(chan time.Time, RateLimit)
@@ -1167,7 +1168,7 @@ func main() {
 
 <p>
 上例的代码虽然可以保证任何一分钟时段内处理的请求数不会超过200，但是如果在开始的一分钟内没有任何请求，则接下来的某个瞬时时间点可能会同时处理最多200个请求（试着将<code>time.Sleep</code>行的注释去掉看看）。
-这可能会造成卡顿情况。我们可以将速率限制常常和峰值限制一并使用来避免着这样的情况。
+这可能会造成卡顿情况。我们可以将速率限制和峰值限制一并使用来避免着这样的情况。
 </p>
 
 
@@ -1257,7 +1258,7 @@ func main() {
 </code></pre>
 
 <p>
-在上面这个例子中，函数<code>f</code>的执行几率大致为函数<code>g</code>的两倍。
+在上面这个例子中，函数<code>f</code>的调用执行几率大致为函数<code>g</code>的两倍。
 </p>
 </div>
 
@@ -1315,7 +1316,7 @@ func main() {
 
 <p>
 一个模块中的工作协程从一些其它模块接收数据做为输入，并向另一些模块发送输出数据。
-换句话数，一个模块可能同时兼任数据消费者和数据产生着的角色。
+换句话数，一个模块可能同时兼任数据消费者和数据产生者的角色。
 </p>
 
 <p>
@@ -1388,16 +1389,16 @@ func RandomGenerator() <-chan uint64 {
 假设数据类型为<code>int64</code>，下面这个函数将任意数量的数据流合为一个。
 
 <pre class="line-numbers"><code class="language-go">func Aggregator(inputs ...<-chan uint64) <-chan uint64 {
-	output := make(chan uint64)
+	out := make(chan uint64)
 	for _, in := range inputs {
 		in := in // 此行是必要的
 		go func() {
 			for {
-				output <- <-in // <=> output <- (<-in)
+				out <- <-in // <=> out <- (<-in)
 			}
 		}()
 	}
-	return output
+	return out
 }
 </code></pre>
 
@@ -1554,17 +1555,17 @@ func Aggregator(inputs ...<-chan uint64) <-chan uint64 {
 
 下面的简单示例中，每个输入的<code>uint64</code>值将被进行位反转后输出。
 
-<pre class="line-numbers"><code class="language-go">func Calculator(input <-chan uint64, output chan uint64) (<-chan uint64) {
-	if output == nil {
-		output = make(chan uint64)
+<pre class="line-numbers"><code class="language-go">func Calculator(in <-chan uint64, out chan uint64) (<-chan uint64) {
+	if out == nil {
+		out = make(chan uint64)
 	}
 	go func() {
 		for {
-			x := <-input
-			output <- ^x
+			x := <-in
+			out <- ^x
 		}
 	}()
-	return output
+	return out
 }
 </code></pre>
 
@@ -1582,7 +1583,7 @@ func Aggregator(inputs ...<-chan uint64) <-chan uint64 {
 
 <pre class="line-numbers"><code class="language-go">import "math/big"
 
-func Filter(input <-chan uint64, output chan uint64) <-chan uint64 {
+func Filter(in <-chan uint64, output chan uint64) <-chan uint64 {
 	if output == nil {
 		output = make(chan uint64)
 	}
@@ -1637,7 +1638,7 @@ func Printer(input <-chan uint64) {
 组装数据流仅仅是创建一些工作者协程函数调用，并为这些调用指定输入数据流和输出数据流。
 </p>
 
-数据流系统例子一（一个流线型系统）：
+数据流系统例子1（一个流线型系统）：
 <pre class="line-numbers"><code class="language-go">package main
 
 ... // 上面的模块工作者函数实现
@@ -1659,12 +1660,12 @@ func main() {
 <p>
 上面这个流线型系统描绘在下图中：
 
-<br/>
-<img src="res/data-flow-linear.png">
-<br/>
+<div class="text-center">
+<img src="res/data-flow-linear.png" alt="线性数据流"></img>
+</div>
 </p>
 
-数据流系统例子二（一个单向无环图系统）：
+数据流系统例子2（一个单向无环图系统）：
 <pre class="line-numbers"><code class="language-go">package main
 
 ... // 上面的模块工作者函数实现
@@ -1687,9 +1688,9 @@ func main() {
 <p>
 上面这个单向无环图系统描绘在下图中：
 
-<br/>
-<img src="res/data-flow-dag.png">
-<br/>
+<div class="text-center">
+<img src="res/data-flow-dag.png" alt="有向无环数据流"></img>
+</div>
 </p>
 
 <p>
@@ -1705,7 +1706,7 @@ func main() {
 从上例可以看出，通过使用数据聚合模块，我们可以很轻松地实现各个模块的工作协程数量的扇入（fan-in）和扇出（fan-out）。
 </p>
 
-事实上，我们也可以使用一个简单的数据通道来代替数据聚合的角色。比如，下面的代码使用两个数据通道代替了上例中的两个数据聚合器。
+事实上，我们也可以使用一个简单的数据通道来代替数据聚合模块的角色。比如，下面的代码使用两个数据通道代替了上例中的两个数据聚合器。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1729,9 +1730,9 @@ func main() {
 <p>
 修改后的数据流的拓扑结构如下图所示：
 
-<br/>
-<img src="res/data-flow-dag-b.png">
-<br/>
+<div class="text-center">
+<img src="res/data-flow-dag-b.png" alt="有向无环数据流"></img>
+</div>
 </p>
 
 <p>

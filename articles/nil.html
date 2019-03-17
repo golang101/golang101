@@ -2,9 +2,9 @@
 
 <p>
 <code>nil</code>是Go中的一个使用频率很高的预声明标识符。
-很多种类型的类型的零值都用<code>nil</code>表示。
-很多有其它语言编程经验的Go程序员将<code>nil</code>看成是其它语言中的<code>null</code>或者<code>NULL</code>。
-这种看法只是部分上正确的，但是Go中的<code>nil</code>和其它语言中的<code>null</code>或者<code>NULL</code>也有很多区别。
+很多种类的类型的零值都用<code>nil</code>表示。
+很多有其它语言编程经验的程序员在初学Go语言的时候常将<code>nil</code>看成是其它语言中的<code>null</code>或者<code>NULL</code>。
+这种看法只是部分上正确的，但是Go中的<code>nil</code>和其它语言中的<code>null</code>或者<code>NULL</code>也是有很大的区别的。
 </p>
 
 <p>
@@ -20,9 +20,9 @@
 <h3>预声明的<code>nil</code>标识符可以表示很多种类型的零值</h3>
 
 <div>
-在Go中，预声明的<code>nil</code>可以表示下列类型的零值：
+在Go中，预声明的<code>nil</code>可以表示下列种类（kind）的类型的零值：
 <ul>
-<li>指针类型（包括安全和非安全指针）</li>
+<li>指针类型（包括类型安全和非类型安全指针）</li>
 <li>映射表类型</li>
 <li>切片类型</li>
 <li>函数类型</li>
@@ -48,7 +48,7 @@ Go中其它的预声明标识符都有各自的默认类型，比如
 <p>
 但是，预声明标识符<code>nil</code>没有一个默认类型，尽管它有很多潜在的可能类型。
 事实上，预声明标识符<code>nil</code>是Go中唯一一个没有默认类型的类型不确定值。
-我们必须在代码中提供足够的信息以便让编译器能够推断出一个类型不确定的<code>nil</code>值的类型。
+我们必须在代码中提供足够的信息以便让编译器能够推断出一个类型不确定的<code>nil</code>值的期望类型。
 </p>
 
 一个例子：
@@ -71,7 +71,7 @@ func main() {
 	var _ func() = nil
 	var _ interface{} = nil
 
-	//下面这行编译不通过。
+	// 下面这行编译不通过。
 	var _ = nil
 }
 </code></pre>
@@ -104,12 +104,12 @@ func main() {
 </div>
 
 <p class="anchor" id="sizes"></p>
-<h3>不同种类的类型的nil值的尺寸很可能不一样大</h3>
+<h3>不同种类的类型的nil值的尺寸很可能不相同</h3>
 
 <div>
 <p>
 一个类型的所有值的内存布局都是一样的，此类型nil值也不例外（假设此类型的零值使用<code>nil</code>表示）。
-同一个类型的nil值和非nil值的尺寸是一样的。但是不同类型的nil值的尺寸可能是不一样的。
+所以同一个类型的nil值和非nil值的尺寸是一样的。但是不同类型的nil值的尺寸可能是不一样的。
 </p>
 
 一个例子：
@@ -145,14 +145,13 @@ func main() {
 </p>
 
 <p>
-上例打印出来的尺寸值取决于系统构架和具体编译器实现。
-上例中的输出是使用官方标准编译器编译并在64位的系统构架上运行的结果。
-在32位的系统构架上，这些输出值将减半。
+上例打印出来的尺寸值取决于系统架构和具体编译器实现。
+上例中的输出是使用官方标准编译器编译并在64位的系统架构上运行的结果。
+在32位的系统架构上，这些输出值将减半。
 </p>
 
 <p>
-对于官方标准编译器，零值可以表示成<code>nil</code>的同种（kind）不同类型（types）的值的尺寸都是一样的。
-比如说，任何切片类型的任何值的尺寸都是一样。
+对于官方标准编译器，如果两个类型属于同一种（kind）类型，并且它们的零值用<code>nil</code>表示，则这两个类型的尺寸肯定相等。
 </p>
 </div>
 
@@ -190,14 +189,14 @@ var _ = (chan int)(nil) == (<-chan int)(nil)
 
 <div>
 在Go中，映射表类型、切片类型和函数类型是不支持比较类型。
-比较同一个不支持比较类型的两个值（包括nil值）是非法的。
+比较同一个不支持比较的类型的两个值（包括nil值）是非法的。
 比如，下面的几个比较都编译不通过。
 <pre class="line-numbers"><code class="language-go">var _ = ([]int)(nil) == ([]int)(nil)
 var _ = (map[string]int)(nil) == (map[string]int)(nil)
 var _ = (func())(nil) == (func())(nil)
 </code></pre>
 
-但是，映射表类型、切片类型和函数类型的任何值都可以和裸<code>nil</code>标识符比较。
+但是，映射表类型、切片类型和函数类型的任何值都可以和类型不确定的裸<code>nil</code>标识符比较。
 <pre class="line-numbers"><code class="language-go">// 这几行编译都没问题。
 var _ = ([]int)(nil) == nil
 var _ = (map[string]int)(nil) == nil
@@ -211,10 +210,10 @@ var _ = (func())(nil) == nil
 <p>
 如果可被比较的两个nil值中的一个的类型为接口类型，而另一个不是，则比较结果总是<code>false</code>。
 原因是，在进行此比较之前，此非接口nil值将被转换为另一个nil值的接口类型，从而将此比较转化为两个接口值的比较。
-从<a href="interface.html#boxing">接口</a>一文中，我们的值每个接口值可以看作是包裹非接口值的盒子。
-一个非接口值将被转换为一个接口类型的过程可以看作是用一个接口值将此非接口值包裹起来的过程。
-一个nil接口值什么也没包裹，但是一个包裹了nil非接口值的接口值并非什么都没包裹。
-一个什么都没包裹的接口值和一个包裹了一个非接口值（即使它是nil）的接口值时不相等的。
+从<a href="interface.html#boxing">接口</a>一文中，我们得知每个接口值可以看作是一个包裹非接口值的盒子。
+一个非接口值被转换为一个接口类型的过程可以看作是用一个接口值将此非接口值包裹起来的过程。
+一个nil接口值中什么也没包裹，但是一个包裹了nil非接口值的接口值并非什么都没包裹。
+一个什么都没包裹的接口值和一个包裹了一个非接口值（即使它是nil）的接口值是不相等的。
 </p>
 
 一个例子：
@@ -226,7 +225,7 @@ var _ = (func())(nil) == nil
 
 <div>
 <p>
-访问一个nil映射表将得到一个此映射表的类型的元素类型的零值。
+访问一个nil映射表将得到此映射表的类型的元素类型的零值。
 </p>
 
 比如：
@@ -244,12 +243,12 @@ fmt.Println( (map[int]*int64)(nil)[123] )   // &lt;nil&gt;
 </p>
 
 <p>
-遍历一个nil数组指针的循环步数为对应指针类型的长度。
-（但是，如果此指针类型的长度不为零并且第二个循环变量未被舍弃或者忽略，则对应<code>for-range</code>将导致恐慌。）
+遍历一个nil数组指针的循环步数为对应数组类型的长度。
+（但是，如果此数组类型的长度不为零并且第二个循环变量未被舍弃或者忽略，则对应<code>for-range</code>循环将导致一个恐慌。）
 </p>
 
 <p>
-遍历一个nil数据通道将是当前协程永久阻塞。
+遍历一个nil数据通道将使当前协程永久阻塞。
 </p>
 
 比如，下面的代码将输出<code>0</code>、<code>1</code>、<code>2</code>、<code>3</code>和<code>4</code>后进入阻塞状态。
@@ -266,7 +265,7 @@ for i := range (*[5]int)(nil) {
 	fmt.Println(i)
 }
 
-for range chan bool(nil) { // block here
+for range chan bool(nil) { // 阻塞在此
 	fmt.Println("Bye")
 }
 </code></pre>
@@ -307,16 +306,34 @@ func main() {
 	((*Slice)(nil)).DoNothing()
 
 	// 下面这两行都会造成恐慌。但是恐慌不是因为nil
-	// 属主实参造成的。恐慌都来自于这两个方法的内部。
+	// 属主实参造成的。恐慌都来自于这两个方法内部的
+	// 对空指针的解引用操作。
 	/*
 	((Slice)(nil)).Modify(0, true)
 	((*Slice)(nil)).Append(true)
 	*/
 }
 </code></pre>
+
+<p>
+</p>
+
+事实上，上面的<code>Append</code>方法实现不完美。我们应该像下面这样实现之：
+
+<pre class="line-numbers"><code class="language-go">func (p *Slice) Append(x bool) {
+	if p == nil {
+		*p = []bool{x}
+		return
+	}
+	*p = append(*p, x)
+}
+</code></pre>
+
+<p>
+</p>
 </div>
 
-<h3>如果类型<code>T</code>的零值可以用预声明的<code>nil</code>标识符表示，则<code>*new(T)</code>的估值结果为一个nil<code>T</code>值</h3>
+<h3>如果类型<code>T</code>的零值可以用预声明的<code>nil</code>标识符表示，则<code>*new(T)</code>的估值结果为一个<code>T</code>类型的nil值</h3>
 
 <div>
 一个例子：

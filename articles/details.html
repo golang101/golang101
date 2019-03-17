@@ -109,13 +109,13 @@
 		<a href="#modify-slice-length-and-capacity-separately">切片的长度和容量可以被单独修改。</a>
 	</li>
 	<li>
-		<a href="#indexes-in-composite-literals"">切片和数组组合字面值中的索引必须是非负常量。</a>
+		<a href="#indexes-in-composite-literals">切片和数组组合字面值中的索引必须是非负常量。</a>
 	</li>
 	<li>
-		<a href="#constant-keys-in-composite-literals"">切片/数组/映射表组合字面值的常量索引和键值不能重复。</a>
+		<a href="#constant-keys-in-composite-literals">切片/数组/映射表组合字面值的常量索引和键值不能重复。</a>
 	</li>
 	<li>
-		<a href="#array-slice-element-addressability">不可寻址的数组的元素依旧时不可寻址的，但是不可寻址的切片的元素总是可寻址的。</a>
+		<a href="#array-slice-element-addressability">不可寻址的数组的元素依旧是不可寻址的，但是不可寻址的切片的元素总是可寻址的。</a>
 	</li>
 	<li>
 		<a href="#array-slice-derivable">可以从不可寻址的切片派生子切片，但是不能从不可寻址的数组派生子切片。</a>
@@ -701,7 +701,7 @@ func main() {
 	var a Ta
 	var b Tb
 
-	//a = Ta(b) // error: 直接转换时不允许的。
+	//a = Ta(b) // error: 直接转换是不允许的。
 
 	// 但是间接转换是允许的。
 	y := (*MyInt)(b)
@@ -962,7 +962,7 @@ func main() {
 
 <div>
 
-例如，下面的程序在运行时不会产生恐慌。
+例如，下面的程序在运行时刻不会产生恐慌。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1074,7 +1074,7 @@ var c = map[string]int{"foo": 1, "foo": 2}
 </div>
 
 <p class="anchor" id="array-slice-element-addressability"></p>
-<h3>不可寻址的数组的元素依旧时不可寻址的，但是不可寻址的切片的元素总是可寻址的。</h3>
+<h3>不可寻址的数组的元素依旧是不可寻址的，但是不可寻址的切片的元素总是可寻址的。</h3>
 
 <div>
 <p>
@@ -1611,11 +1611,13 @@ func main() {
 	if T{} == T{123, 789} {}
 	if T{} == (T{123, 789}) {}
 	if (T{}) == T{123, 789} {}
+	var _ = func()(nil) // nil被认为是一个类型
 	*/
 
 	// 必须加上一对小括号()才能编译通过。
 	if (T{} == T{123, 789}) {}
 	if (T{}) == (T{123, 789}) {}
+	var _ = (func())(nil) // nil被认为是一个值
 }
 </code></pre>
 

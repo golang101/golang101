@@ -22,10 +22,10 @@ Go白皮书并没有说明一个子字符串表达式的结果（子）字符串
 <pre class="line-numbers"><code class="language-go">var s0 string // 一个包级变量
 
 // 一个演示目的的函数。
-func f(s string) {
+func f(s1 string) {
 	s0 = s1[:50]
-	// 目前，s0和s共享着承载它们的字节序列的同一个内存块。
-	// 虽然s到这里已经不再被使用了，但是s0仍然在使用中，
+	// 目前，s0和s1共享着承载它们的字节序列的同一个内存块。
+	// 虽然s1到这里已经不再被使用了，但是s0仍然在使用中，
 	// 所以它们共享的内存块将不会被回收。虽然此内存块中
 	// 只有50字节被真正使用，而其它字节却无法再被使用。
 }
@@ -41,8 +41,8 @@ func demo() {
 
 为防止上面的<code>f</code>函数产生临时性内存泄露，我们可以将子字符串表达式的结果转换为一个字节切片，然后再转换回来。
 
-<pre class="line-numbers"><code class="language-go">func f(s string) {
-	s0 = string([]byte(s[:50]))
+<pre class="line-numbers"><code class="language-go">func f(s1 string) {
+	s0 = string([]byte(s1[:50]))
 }
 </code></pre>
 
@@ -75,7 +75,7 @@ func f(s1 string) {
 
 <p>
 此第三种方法的缺点是它的实现有些啰嗦（和前两种方法相比）。
-一个好消息是，从Go 1.12（将在2019年2月发布）开始，我们可以调用<code>strings</code>标准库包中的<code>Repeat</code>函数来克隆一个字符串。
+一个好消息是，从Go 1.12开始，我们可以调用<code>strings</code>标准库包中的<code>Repeat</code>函数来克隆一个字符串。
 从Go 1.12开始，此函数将利用<code>strings.Builder</code>类型来防止一次不必要的复制。
 </p>
 

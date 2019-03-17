@@ -79,7 +79,7 @@
 
 <p>
 尽管这三个函数之一的任何调用的返回结果在同一个编译好的程序中总是一致的，
-但是这样的一个调用在不同构架的操作系统中（或者使用不同的编译器编译时）的返回值可能是不一样的。
+但是这样的一个调用在不同架构的操作系统中（或者使用不同的编译器编译时）的返回值可能是不一样的。
 </p>
 
 <p>
@@ -551,7 +551,7 @@ func DoSomething(addr uintptr) {
 
 我们可以认为编译器在每个<code>syscall.Syscall</code>函数调用后面为在此调用中的每个被转换为<code>uintptr</code>类型的非类型安全指针实参添加了一条<code>runtime.KeepAlive</code>调用，从而确保被此非类型安全指针实参引用着的值在此<code>syscall.Syscall</code>函数调用中不会被垃圾回收掉。
 
-<pre class="line-numbers"><code class="language-go">syscall.Syscall(syscall.SYS_READ, uintptr(fd), 
+<pre class="line-numbers"><code class="language-go">syscall.Syscall(syscall.SYS_READ, uintptr(fd),
 				uintptr(unsafe.Pointer(p)), uintptr(n))
 // 编译器将自动添加下面的这句调用。
 runtime.KeepAlive(unsafe.Pointer(p))

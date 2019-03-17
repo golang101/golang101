@@ -82,7 +82,7 @@ func main() {
 		一个<a href="keywords-and-identifiers.html#identifier">标识符</a>；
 	</li>
 	<li>
-		一个整数、浮点数、复数虚部、码点或者字符串<a href="basic-types-and-value-literals.html#basic-value-literals">字面表示形式</a>；
+		一个整数、浮点数、虚部、码点或者字符串<a href="basic-types-and-value-literals.html#basic-value-literals">字面表示形式</a>；
 	</li>
 	<li>
 		这几个跳转关键字之一：<code>break</code>、<code>continue</code>、<code>fallthrough</code>和<code>return</code>；
@@ -96,7 +96,7 @@ func main() {
 	</ul>
 </li>
 <li>
-	为了允许一条复杂语句完全显式在一个代码行中，分号可能被插入在一个右小括号<code>)</code>或者右大括号<code>}</code>之前。
+	为了允许一条复杂语句完全显示在一个代码行中，分号可能被插入在一个右小括号<code>)</code>或者右大括号<code>}</code>之前。
 </li>
 </ol>
 </div>
@@ -298,10 +298,12 @@ func main() {
 </code></pre>
 
 <p>
+</p>
+
 编译错误信息表明跳转标签的声明之后必须跟一条语句。
 但是，看上去，上例中的三个标签声明没什么不同，它们都没有跟随一条语句。
 那为什么只有<code>B:</code>标签声明是不合法的呢？
-原因是，根据上述第二条分号自动插入规则，编译器将在<code>A:</code>和<code>C:</code>标签声明之后的右大括号<code>}</code> characters之前插入一个分号，如下所示：
+原因是，根据上述第二条分号自动插入规则，编译器将在<code>A:</code>和<code>C:</code>标签声明之后的右大括号<code>}</code>字符之前插入一个分号，如下所示：
 
 <pre class="line-numbers"><code class="language-go">func f(x int) {
 	switch x {
@@ -320,8 +322,9 @@ func main() {
 }
 </code></pre>
 
-一个落单的分号实际上表示一条<a href="expressions-and-statements.html#simple-statement">空语句</a>。
-这就是为什么<code>A:</code>和<code>C:</code>标签声明之后确实跟随了一条语句的原因，所以它们是合法的.
+<p>
+一个单独的分号实际上表示一条<a href="expressions-and-statements.html#simple-statement">空语句</a>。
+这就是为什么<code>A:</code>和<code>C:</code>标签声明之后确实跟随了一条语句的原因，所以它们是合法的。
 而<code>B:</code>标签声明跟随的<code>case 0:</code>不是一条语句，所以它是不合法的。
 </p>
 
@@ -337,7 +340,7 @@ func main() {
 <div>
 <p>
 一些包含多个类似项目的语法形式多用逗号<code>,</code>来做为这些项目之间的分割符，比如组合字面形式和函数参数列表等。
-在这样的一个语法形式中，最后一个项目后总可以跟一个的逗号。
+在这样的一个语法形式中，最后一个项目后总可以跟一个可选的逗号。
 如果此逗号为它所在代码行的最后一个有效字符，则此逗号是必需的；否则，此逗号可以省略。
 编译器在任何情况下都不会自动插入逗号。
 </p>
@@ -361,7 +364,7 @@ var _, _ = f1(123, "Go",  // 最后一个逗号是必需的
 var _, _ = f1(123, "Go")
 </code></pre>
 
-而下面这段代码是不合法的，因为编译器将自动在每一行行插入一个分号（除了第二行）。
+而下面这段代码是不合法的，因为编译器将自动在每一行行尾插入一个分号（除了第二行）。
 
 <pre class="line-numbers"><code class="language-go">func f1(a int, b string,) (x bool, y int // error: unexpected newline
 ) {

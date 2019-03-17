@@ -2,8 +2,8 @@
 
 <p>
 <a href="channel-use-cases.html">数据通道用例大全</a>一文中介绍了很多通过使用数据通道来实现并发同步的用例。
-事实上，数据通道并不是Go支持的唯一的一种并发同步技术，而且对于一些特定的情形，数据通道并不是最有效和可读性最高的的同步技术。
-本文下面将介绍<code>sync</code>标准库包中提供的各种并发同步技术。
+事实上，数据通道并不是Go支持的唯一的一种并发同步技术。而且对于一些特定的情形，数据通道并不是最有效和可读性最高的的同步技术。
+本文下面将介绍<code>sync</code>标准库包中提供的各种并发同步技术。相对于数据通道，这些技术对于某些情形更加适用。
 </p>
 
 <p>
@@ -36,7 +36,7 @@
 	方法调用<code>wg.Done()</code>和<code>wg.Add(-1)</code>是完全等价的。
 </li>
 <li>
-	如果一个<code>wg.Add(delta)</code>（或者<code>wg.Done()</code>）调用将<code>wg</code>维护的计数更改成一个负数，一个恐慌将产生。
+	如果一个<code>wg.Add(delta)</code>或者<code>wg.Done()</code>调用将<code>wg</code>维护的计数更改成一个负数，一个恐慌将产生。
 </li>
 <li>
 	当一个协程调用了<code>wg.Wait()</code>时，
@@ -135,7 +135,7 @@ values: [71 89 50 62 60]
 	for i := 0; i < N; i++ {
 		i := i
 		go func() {
-			wgB.Wait() // 等待通知
+			wgB.Wait() // 等待广播通知
 			log.Printf("values[%v]=%v \n", i, values[i])
 			wgA.Done()
 		}()
@@ -157,20 +157,20 @@ values: [71 89 50 62 60]
 
 <div>
 <p>
-每个<code>*sync.Once</code>有一个<code>Do(f func())</code>方法。
+每个<code>*sync.Once</code>值有一个<code>Do(f func())</code>方法。
 此方法只有一个类型为<code>func()</code>的参数。
 </p>
 
 <p>
-对一个可寻址的<code>sync.Once</code>值<code>o</code>，方法<code>o.Do</code>（<code>(&amp;o).Do</code>的简写形式）可以在多个协程中被多次调用，
+对一个可寻址的<code>sync.Once</code>值<code>o</code>，<code>o.Do()</code>（即<code>(&amp;o).Do()</code>的简写形式）方法调用可以在多个协程中被多次并发地执行，
 这些方法调用的实参应该（但并不强制）为同一个函数值。
-在这些方法调用中，有且只有一个调用的实参函数（值）将被调用。
-此被调用的实参函数保证在任何<code>o.Do</code>方法返回调用之前退出。
-换句话说，被调用的实参函数内的代码将在任何<code>o.Do</code>方法返回调用之前被执行。
+在这些方法调用中，有且只有一个调用的实参函数（值）将得到调用。
+此被调用的实参函数保证在任何<code>o.Do()</code>方法调用返回之前退出。
+换句话说，被调用的实参函数内的代码将在任何<code>o.Do()</code>方法返回调用之前被执行。
 </p>
 
 <p>
-一般来说，一个<code>sync.Once</code>值被用来确保一段代码在一个并发程序中被执行且仅被被执行一次。
+一般来说，一个<code>sync.Once</code>值被用来确保一段代码在一个并发程序中被执行且仅被执行一次。
 </p>
 
 一个例子：
@@ -222,18 +222,18 @@ func main() {
 </p>
 
 <p>
-除了<code>Lock()</code>和<code>Unlock()</code>这两个方法，<code>*sync.RWMutex</code>类型还有两个另外的方法：<code>RLock()</code>和<code>RUnlock()</code>，用来支持多个读取者并发访问一份数据但防止此份数据被某个数据写入者和其它数据访问者（包括读取者和写入者）同时使用。
+除了<code>Lock()</code>和<code>Unlock()</code>这两个方法，<code>*sync.RWMutex</code>类型还有两个另外的方法：<code>RLock()</code>和<code>RUnlock()</code>，用来支持多个读取者并发读取一份数据但防止此份数据被某个数据写入者和其它数据访问者（包括读取者和写入者）同时使用。
 </p>
 
-<p><i>
-(注意：这里的<b><i>数据读取者</i></b>和<b><i>数据写入者</i></b>不应该从字面上理解。有时候某些数据读取者可能修改数据，而有些数据写入者可能只读取数据。)
-</i></p>
+<p>
+（注意：这里的<b><i>数据读取者</i></b>和<b><i>数据写入者</i></b>不应该从字面上理解。有时候某些数据读取者可能修改数据，而有些数据写入者可能只读取数据。）
+</p>
 
 <p>
 一个<code>Mutex</code>值常称为一个互斥锁。
 一个<code>Mutex</code>零值为一个尚未加锁的互斥锁。
-一个<code>Mutex</code>值只有在未加锁状态时才能通过<code>Lock()</code>方法调用被加锁。
-换句话说，一旦一个（可寻址的）<code>Mutex</code>值<code>m</code>被加了锁（亦即某个<code>m.Lock()</code>方法调用成功返回），
+一个（可寻址的）<code>Mutex</code>值<code>m</code>只有在未加锁状态时才能通过<code>m.Lock()</code>方法调用被成功加锁。
+换句话说，一旦<code>m</code>值被加了锁（亦即某个<code>m.Lock()</code>方法调用成功返回），
 一个新的加锁试图将导致当前协程进入阻塞状态，直到此<code>Mutex</code>值被解锁为止（通过<code>m.Unlock()</code>方法调用）。
 </p>
 
@@ -303,15 +303,15 @@ func main() {
 <ul>
 <li>
 	一个数据写入者只能在<code>rwm</code>的写锁和读锁都尚未被获取持有的情况下才能被成功获取。
-	换句话说，<code>rwm</code>的写锁在任何时刻最多只能被一个数据写入值成功获取和持有，并且<code>rwm</code>的写锁和读锁不能同时被持有。
+	换句话说，<code>rwm</code>的写锁在任何时刻最多只能被一个数据写入值成功获取持有，并且<code>rwm</code>的写锁和读锁不能同时被持有。
 </li>
 <li>
 	当<code>rwm</code>的写锁被一个数据写入者所持有的时候，任何新的试图获取它的写锁或者读锁的操作都将导致当前协程进入阻塞状态，直到此写锁被释放，新的获取写锁或者读锁的试图才有机会成功。
 </li>
 <li>
-	当<code>rwm</code>的读锁被某个数据读取者所获取并持有，新的获取它的写锁的试图将导致当前协程进入阻塞状态。
+	当<code>rwm</code>的读锁被某个数据读取者所获取持有，新的获取它的写锁的试图将导致当前协程进入阻塞状态。
 	但是，一个新的获取它的读锁的试图将成功，除非此试图操作发生在某个被阻塞的获取写锁的试图之后（见下一条规则）。
-	换句话说，一个读写互斥锁的读锁可以同时被多个数据读取者成功获取和持有。
+	换句话说，一个读写互斥锁的读锁可以同时被多个数据读取者同时持有。
 </li>
 <li>
 	假设<code>rwm</code>的读锁正在被某些数据读取者所持有，为了防止后续数据写入者没有机会成功获取写锁，后续发生在某个被阻塞的获取写锁的试图之后的所有获取读锁的试图将被阻塞。
@@ -320,6 +320,14 @@ func main() {
 	假设<code>rwm</code>的写锁正在被某个数据写入者所持有，（至少对于标准编译器来说，）为了防止后续数据读取者没有机会成功获取读锁，发生在此写锁下一次被释放之前的所有获取读锁的试图将在此写锁下一次被释放之后肯定取得成功，即使这些所有获取读锁的试图发生在一些仍被阻塞的获取写锁的试图之后。
 </li>
 </ul>
+
+<p>
+后两条规则是为了确保数据读取者和写入者都有机会执行它们的操作。
+</p>
+
+<p>
+请注意：一个锁的获取者和此锁的持有者可能不是一个协程，尽管在实践中这种情况比较少见。
+</p>
 
 <!--
 https://github.com/golang/go/issues/17973
@@ -394,7 +402,7 @@ func main() {
 此程序使用了<code>time.Sleep</code>调用来做协程间的同步。<a href="concurrent-common-mistakes.html#sleep">这种所谓的同步方法不应该被使用在生产代码中</a>。
 </p>
 
-<code>sync.Mutex</code>和<code>sync.RWMutex</code>值也可以用来实现通知，尽管这部时Go中最优雅的方法来实现通知。
+<code>sync.Mutex</code>和<code>sync.RWMutex</code>值也可以用来实现通知，尽管这不是Go中最优雅的方法来实现通知。
 下面是一个使用了<code>Mutex</code>值来实现通知的例子。
 
 <pre class="line-numbers"><code class="language-go">package main
@@ -531,10 +539,10 @@ func main() {
 			time.Sleep(d) // 模拟一个工作负载
 			cond.L.Lock() // 下面的修改必须在cond.L被锁定的时候执行
 			values[i] = string('a' + i)
-			cond.Signal() // 可以在cond.L被锁定的时候发出通知
+			cond.Broadcast() // 可以在cond.L被解锁后发出通知
 			cond.L.Unlock()
 			// 上面的通知也可以在cond.L未锁定的时候发出。
-			//cond.Signal() // 上面的调用也可以放在这里
+			//cond.Broadcast() // 上面的调用也可以放在这里
 		}(i)
 	}
 
@@ -568,8 +576,8 @@ func main() {
 </code></pre>
 
 <p>
-因为上例中只有一个协程（主协程）在等待通知，所以其中的<code>cond.Signal()</code>调用也可以换为<code>cond.Broadcast()</code>。
-如上例中的注释所示，<code>cond.Signal()</code>和<code>cond.Broadcast()</code>不必在<code>cond.L</code>的锁被成功获取的时候调用。
+因为上例中只有一个协程（主协程）在等待通知，所以其中的<code>cond.Broadcast()</code>调用也可以换为<code>cond.Signal()</code>。
+如上例中的注释所示，<code>cond.Broadcast()</code>和<code>cond.Signal()</code>不必在<code>cond.L</code>的锁被成功获取的时候调用。
 </p>
 
 <p>
@@ -579,7 +587,7 @@ func main() {
 
 <p>
 事实上，对于上面这个特定的例子，<code>cond.L</code>字段的也可以为一个<code>*sync.RWMutex</code>值。
-对条件的十个部分的修改可以在定义<code>RWMutex</code>值的读锁被成功获取的时候执行。这十个修改可以并发进行，因为它们是互不干扰的。
+对自定义条件的十个部分的修改可以在<code>RWMutex</code>值的读锁被成功获取的时候执行。这十个修改可以并发进行，因为它们是互不干扰的。
 如下面的代码所示：
 </p>
 

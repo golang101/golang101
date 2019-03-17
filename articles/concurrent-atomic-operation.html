@@ -6,7 +6,7 @@
 </p>
 
 <p>
-注意，本文中的很多例子并非并发程序。它们值是用来演示如何使用<code>sync/atomic</code>标准库包中提供的原子操作。
+注意，本文中的很多例子并非并发程序。它们只是用来演示如何使用<code>sync/atomic</code>标准库包中提供的原子操作。
 </p>
 
 <p class="anchor" id="overview"></p>
@@ -40,14 +40,15 @@ func CompareAndSwapInt32(addr *int32, old, new int32) (swapped bool)
 <pre class="line-numbers"><code class="language-go">func LoadPointer(addr *unsafe.Pointer) (val unsafe.Pointer)
 func StorePointer(addr *unsafe.Pointer, val unsafe.Pointer)
 func SwapPointer(addr *unsafe.Pointer, new T) (old unsafe.Pointer)
-func CompareAndSwapPointer(addr *unsafe.Pointer, old, new unsafe.Pointer) (swapped bool)
+func CompareAndSwapPointer(addr *unsafe.Pointer,
+				old, new unsafe.Pointer) (swapped bool)
 </code></pre>
 
 <p>
 因为Go指针不支持算术运算，所以相对于整数类型，指针类型的的原子操作少了一个<code>AddPointer</code>函数。
 </p>
 
-<code>sync/atomic</code>标准库包也提供了一个<code>Value</code>类型。它的指针类型<code>*Value</code>拥有两个方法：<code>Load</code>和<code>Store</code>。
+<code>sync/atomic</code>标准库包也提供了一个<code>Value</code>类型。以它为基的指针类型<code>*Value</code>拥有两个方法：<code>Load</code>和<code>Store</code>。
 <code>Value</code>值用来原子读取和修改任何类型的Go值。
 
 <pre class="line-numbers"><code class="language-go">func (v *Value) Load() (x interface{})
@@ -57,6 +58,7 @@ func (v *Value) Store(x interface{})
 <p>
 本文的余下部分将通过一些示例来展示如何使用这些原子操作函数。
 </p>
+</div>
 
 <p class="anchor" id="integer"></p>
 <h3>整数原子操作</h3>
@@ -119,10 +121,10 @@ func (page *Page) Views() uint32 {
 <ol>
 <li>
 	第二个实参为类型为<code>T</code>的一个变量值<code>v</code>。
-	因为<code>-v</code>在Go中是合法的，所以<code>-v</code>可以直接被用作<code>AddT</code>调用的第二个实参。
+	因为<code>-v</code>在Go中是合法的，所以<code>-v</code>可以直接被用做<code>AddT</code>调用的第二个实参。
 </li>
 <li>
-	第二个实参为一个正整数常量<code>c</code>，这时<code>-c</code>在Go中是编译不通过的，所以它不能被用作<code>AddT</code>调用的第二个实参。
+	第二个实参为一个正整数常量<code>c</code>，这时<code>-c</code>在Go中是编译不通过的，所以它不能被用做<code>AddT</code>调用的第二个实参。
 	这时我们可以使用<code>^T(c-1)</code>（仍为一个正数）做为<code>AddT</code>调用的第二个实参。
 </li>
 </ol>
@@ -159,16 +161,17 @@ func main() {
 		c uint32 = 5
 		d int    = 6
 	)
-
-	atomic.AddUint64(&n, -m);             fmt.Println(n) // 96 (97 - 1)
-	atomic.AddUint64(&n, -uint64(k));     fmt.Println(n) // 94 (95 - 2)
-	atomic.AddUint64(&n, ^uint64(a - 1)); fmt.Println(n) // 91 (94 - 3)
-	atomic.AddUint64(&n, ^(b - 1));       fmt.Println(n) // 87 (91 - 4)
-	atomic.AddUint64(&n, ^uint64(c - 1)); fmt.Println(n) // 82 (87 - 5)
-	atomic.AddUint64(&n, ^uint64(d - 1)); fmt.Println(n) // 76 (82 - 6)
-	x := b; atomic.AddUint64(&n, -x);     fmt.Println(n) // 72 (76 - 4)
-	atomic.AddUint64(&n, ^(m - 1));       fmt.Println(n) // 71 (72 - 1)
-	atomic.AddUint64(&n, ^uint64(k - 1)); fmt.Println(n) // 69 (71 - 2)
+	
+	show := fmt.Println
+	atomic.AddUint64(&n, -m);             show(n) // 96 (97 - 1)
+	atomic.AddUint64(&n, -uint64(k));     show(n) // 94 (95 - 2)
+	atomic.AddUint64(&n, ^uint64(a - 1)); show(n) // 91 (94 - 3)
+	atomic.AddUint64(&n, ^(b - 1));       show(n) // 87 (91 - 4)
+	atomic.AddUint64(&n, ^uint64(c - 1)); show(n) // 82 (87 - 5)
+	atomic.AddUint64(&n, ^uint64(d - 1)); show(n) // 76 (82 - 6)
+	x := b; atomic.AddUint64(&n, -x);     show(n) // 72 (76 - 4)
+	atomic.AddUint64(&n, ^(m - 1));       show(n) // 71 (72 - 1)
+	atomic.AddUint64(&n, ^uint64(k - 1)); show(n) // 69 (71 - 2)
 }
 </code></pre>
 
@@ -212,7 +215,7 @@ func main() {
 
 </div>
 
-<p class="anchor" id="integer"></p>
+<p class="anchor" id="pointer"></p>
 <h3>指针值的原子操作</h3>
 
 <div>
@@ -249,21 +252,23 @@ func main() {
 	// 置换
 	pa2 := atomic.SwapPointer(unsafePPT, unsafe.Pointer(&tb))
 	fmt.Println((*T)(pa2) == &ta) // true
-	// 比较置换
-	b := atomic.CompareAndSwapPointer(unsafePPT, pa2, unsafe.Pointer(&tb))
+	// compare and swap
+	b := atomic.CompareAndSwapPointer(unsafePPT, pa2,
+					unsafe.Pointer(&tb))
 	fmt.Println(b) // false
-	b = atomic.CompareAndSwapPointer(unsafePPT, unsafe.Pointer(&tb), pa2)
+	b = atomic.CompareAndSwapPointer(unsafePPT,
+					unsafe.Pointer(&tb), pa2)
 	fmt.Println(b) // true
 }
 </code></pre>
 
 <p>
-是的，目前，指针的原子操作使用起来是相当得啰嗦。
+是的，目前指针的原子操作使用起来是相当的啰嗦。
 事实上，啰嗦还是次要的，更主要的是，因为指针的原子操作需要引入<code>unsafe</code>标准库包，所以这些操作函数不在<a href="https://golang.google.cn/doc/go1compat">Go 1兼容性保证</a>之列。
 </p>
 
 <p>
-我个人认为目前支持得这些指针原子操作在今后变为不合法的可能性很小。
+我个人认为目前支持的这些指针原子操作在今后变为不合法的可能性很小。
 即使它们变得不再合法，官方Go SDK中的<code>go fix</code>命令应该会将它们转换为今后的新的合法形式。
 但是，这只是我的个人观点，它没有任何权威性。
 </p>
@@ -274,7 +279,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="integer"></p>
+<p class="anchor" id="arbitrary"></p>
 <h3>任何类型值的原子操作</h3>
 
 <div>

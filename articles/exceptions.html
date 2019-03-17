@@ -11,7 +11,7 @@
 <div>
 基本规则：
 <div class="alert alert-info">
-如果一个函数调用的返回值个数不为零，并且它的返回值列表可以用作另一个函数调用的实参列表，则此前者调用可以被内嵌在后者调用之中，但是此前者调用不可和其它的实参混合出现在后者调用的实参列表中。
+如果一个函数（包括方法）调用的返回值个数不为零，并且它的返回值列表可以用做另一个函数调用的实参列表，则此前者调用可以被内嵌在后者调用之中，但是此前者调用不可和其它的实参混合出现在后者调用的实参列表中。
 </div>
 
 语法糖：
@@ -21,7 +21,7 @@
 
 例外：
 <div class="alert alert-success">
-上述基本规则不适用于内置函数<code>copy</code>、<code>delete</code>、<code>print</code>和<code>println</code>。
+对于标准编译器，上述基本规则不适用于内置函数<code>copy</code>、<code>delete</code>、<code>print</code>和<code>println</code>。
 这几个函数的调用不能内嵌多返回值函数调用。
 </div>
 
@@ -83,7 +83,6 @@ The basic rule:
 Local variables can't be declared but not used.
 </div>
 
-<div>
 Exception:
 <div class="alert alert-success">
 Function parameter and result variables,
@@ -134,7 +133,7 @@ func main() {
 
 语法糖：
 <div class="alert alert-success">
-尽管为类型<code>*T</code>显式声明的方法肯定不是类型<code>T</code>的方法，但是可寻址的<code>T</code>值可以用作这些方法的调用的属主实参。
+尽管为类型<code>*T</code>显式声明的方法肯定不是类型<code>T</code>的方法，但是可寻址的<code>T</code>值可以用做这些方法的调用的属主实参。
 </div>
 
 例子：
@@ -183,10 +182,9 @@ func main() {
 <div>
 基本规则：
 <div class="alert alert-info">
-一般说来，<a href="type-system-overview.html#underlying-type">定义</a>指针类型的值不能使用在选择器语法形式中。
+一般说来，<a href="type-system-overview.html#underlying-type">定义</a>的指针类型的值不能使用在选择器语法形式中。
 </div>
 
-<div>
 语法糖：
 <div class="alert alert-info">
 如果值<code>x</code>的类型为一个一级定义指针类型，并且<code>(*x).f</code>是一个合法的选择器，则<code>x.f</code>也是合法的。
@@ -223,10 +221,10 @@ func main() {
 	_ = pp
 
 	_ = (*p).x // 合法
-	_ = p.x    // 合法
+	_ = p.x    // 合法（因为x为一个字段）
 
 	_ = (*p).y // 合法
-	// _ = p.y // 不合法
+	// _ = p.y // 不合法（因为y为一个方法）
 
 	// 下面的选择器均不合法。
 	/*
@@ -390,6 +388,8 @@ Go不支持范型。
 同一个代码包中可以声明若干个名为<code>init</code>原型为<code>func()</code>的函数。
 </div>
 
+</div>
+
 <h3>函数调用</h3>
 
 <div>
@@ -403,22 +403,24 @@ Go不支持范型。
 <code>init</code>函数不可被调用。
 </div>
 
+</div>
+
 <h3>函数值</h3>
 
 <div>
 基本规则：
 <div class="alert alert-info">
-声明的函数可以被用作函数值。
+声明的函数可以被用做函数值。
 </div>
 
 例外1：
 <div class="alert alert-success">
-内置函数（声明在<code>builtin</code>和<code>unsafe</code>标准库包中的函数）不可被用作函数值。
+内置函数（声明在<code>builtin</code>和<code>unsafe</code>标准库包中的函数）不可被用做函数值。
 </div>
 
 例外2：
 <div class="alert alert-success">
-<code>init</code>函数不可被用作函数值。
+<code>init</code>函数不可被用做函数值。
 </div>
 
 例子：
@@ -525,7 +527,7 @@ func main() {
 映射表、切片和函数值可以和预声明标识符<code>nil</code>比较。
 </div>
 
-Example:
+例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 func main() {
@@ -558,11 +560,9 @@ func main() {
 如果一个值可以被赋给另一个值，则这两个值可以用<code>==</code>和<code>!=</code>比较符来做比较。
 </div>
 
-<div>
 例外：
 <div class="alert alert-success">
 一个不可比较类型（一定是一个非接口类型）的值不能和一个接口类型的值比较，即使此不可比较类型实现了此接口类型（从而此不可比较类型的值可以赋给此接口类型的值）。
-</div>
 </div>
 
 请阅读<a href="value-conversions-assignments-and-comparisons.html#comparison-rules">值比较规则</a>获取详情。
@@ -645,12 +645,12 @@ func main() {
 基本规则：
 <div class="alert alert-info">
 只有容器值可以跟在<code>range</code>关键字后，<code>for-range</code>循环遍历出来的是容器值的各个元素。
-每个容器元素对对应的键值（或者索引）也将被一并遍历出来。
+每个容器元素对应的键值（或者索引）也将被一并遍历出来。
 </div>
 
 例外1：
 <div class="alert alert-success">
-当<code>range</code>关键字后跟的是字符串时，遍历出来的是码点值，而不是字符串的各个元素byte值。
+当<code>range</code>关键字后跟的是字符串时，遍历出来的是码点值，而不是字符串的各个元素byte字节值。
 </div>
 
 例外2：
@@ -722,7 +722,7 @@ can be exported.
 例外1：
 <div class="alert alert-success">
 预声明的<code>iota</code>是一个绑定了<code>0</code>的常量，但是它的值并不固定。
-在一个常量声明组中，如果一个<code>iota</code>的值出现在一个常量描述中，则它的值将被自动调整为此常量描述在此常量声明组中次序值，尽管此调整发生在编译时刻。
+在一个包含多个常量描述的常量声明中，如果一个<code>iota</code>的值出现在一个常量描述中，则它的值将被自动调整为此常量描述在此常量声明中的次序值，尽管此调整发生在编译时刻。
 </div>
 
 例外2：
@@ -767,7 +767,6 @@ func main() {
 	_ = v.(int) // 将产生一个恐慌！
 }
 </code></pre>
-</div>
 
 </div>
 

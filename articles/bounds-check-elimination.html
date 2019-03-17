@@ -2,22 +2,22 @@
 
 <p>
 Go是一个内存安全的语言。在数组和切片的索引和子切片操作中，Go运行时将检查操作中使用的下标是否越界。
-如果下标越界，一个恐慌将产生，以防止这样的操作破坏内存安全。这样的查称为边界检查。
-边界检查使得我们的代码能够安全地运行，但是另一方面，也使得我们的代码运行效率略微降低。
+如果下标越界，一个恐慌将产生，以防止这样的操作破坏内存安全。这样的检查称为边界检查。
+边界检查使得我们的代码能够安全地运行；但是另一方面，也使得我们的代码运行效率略微降低。
 </p>
 
 <p>
 从Go SDK 1.7开始，官方标准编译器使用了一个新的基于SSA（single-assignment form，静态单赋值形式）的后端。
-SSA使得Go编译器可以有效使用诸如<a href="https://en.wikipedia.org/wiki/Bounds-checking_elimination">BCE</a>（bounds check elimination，边界检查消除）和<a href="https://en.wikipedia.org/wiki/Common_subexpression_elimination">CSE</a>（common subexpression elimination，公共子表达式消除）等优化。
-BCE可以避免很多不必要的边界检查，CSE可以避免很多重复表达式的计算，从而使得编译器编译出的程序效率更高。有时候这些优化的效果非常明显。
+SSA使得Go编译器可以有效利用诸如<a href="https://en.wikipedia.org/wiki/Bounds-checking_elimination">BCE</a>（bounds check elimination，边界检查消除）和<a href="https://en.wikipedia.org/wiki/Common_subexpression_elimination">CSE</a>（common subexpression elimination，公共子表达式消除）等优化。
+BCE可以避免很多不必要的边界检查，CSE可以避免很多重复表达式的计算，从而使得编译器编译出的程序执行效率更高。有时候这些优化的效果非常明显。
 </p>
 
 <p>
-本文将展示一些例子来解释边界检查消除在官方标准编译器1.7+中是如何工作的。
+本文将展示一些例子来解释边界检查消除在官方标准编译器1.7+中的表现。
 </p>
 
 <p>
-对于Go SDK 1.7+，我们可以运行<b>go build <i>-gcflags="-d=ssa/check_bce/debug=1"</i></b>来列出哪些代码行仍然需要边界检查。
+对于Go SDK 1.7+，我们可以运行<code>go build <b>-gcflags="-d=ssa/check_bce/debug=1"</b></code>来列出哪些代码行仍然需要边界检查。
 </p>
 
 <h3>例子1</h3>
@@ -63,12 +63,11 @@ func main() {}
 </p>
 
 <p>
-但是，函数<code>f1</code>中的三行仍然都需要边界检查，因为第<i>5</i>行中的边界检查不能保证第<i>6</i>行和第<i>7</i>行中的下标没有越界，因为第<i>6</i>行中的边界检查也不能保证第第<i>7</i>行中的下标没有越界。
+但是，函数<code>f1</code>中的三行仍然都需要边界检查，因为第<i>5</i>行中的边界检查不能保证第<i>6</i>行和第<i>7</i>行中的下标没有越界，第<i>6</i>行中的边界检查也不能保证第第<i>7</i>行中的下标没有越界。
 </p>
 
 <p>
 在函数<code>f3</code>中，编译器知道如果第一个<code>s[index]</code>是安全的，则第二个<code>s[index]</code>也一定是安全的。
-is safe.
 </p>
 
 <p>
@@ -206,7 +205,7 @@ func main() {
 </code></pre>
 
 <p>
-所以论述<b>如果<code>s[:index]</code>是安全的则<code>s[index:]</code>也是安全的</b>只有在<code>len(s)</code>和<code>cap(s)</code>相等的情况下才正确。
+所以<b>如果<code>s[:index]</code>是安全的则<code>s[index:]</code>也是安全的</b>这条论述只有在<code>len(s)</code>和<code>cap(s)</code>相等的情况下才正确。
 这就是为什么函数<code>fb</code>和<code>fc</code>中的代码仍旧需要边界检查的原因。
 </p>
 
@@ -274,7 +273,7 @@ package main
 func fd(is []int, bs []byte) {
 	if len(is) >= 256 {
 		for _, n := range bs {
-			_ = is[n] // line 7: 需要边界检查，编译器不够智能
+			_ = is[n] // line 7: 需要边界检查
 		}
 	}
 }
@@ -291,7 +290,7 @@ func fd2(is []int, bs []byte) {
 func fe(isa []int, isb []int) {
 	if len(isa) > 0xFFF {
 		for _, n := range isb {
-			_ = isa[n & 0xFFF] // line 24: 需要边界检查，编译器不够智能
+			_ = isa[n & 0xFFF] // line 24: 需要边界检查
 		}
 	}
 }
@@ -329,12 +328,9 @@ func ff2(s []int) []int {
 }
 -->
 
-<pre class="output"><code>
-$ go build -gcflags="-d=ssa/check_bce/debug=1" example5.go
+<pre class="output"><code>$ go build -gcflags="-d=ssa/check_bce/debug=1" example5.go
 ./example5.go:7: Found IsInBounds
 ./example5.go:24: Found IsInBounds
-./example5.go:41: Found IsInBounds
-./example5.go:48: Found IsSliceInBounds
 </code></pre>
 </div>
 
@@ -347,14 +343,14 @@ $ go build -gcflags="-d=ssa/check_bce/debug=1" example5.go
 <p>
 尽管标准编译器中的边界检查消除特性依然不是100%完美，但是对很多常见的情形，它确实很有效。
 自从标准编译器支持此特性以来，在每个版本更新中，此特性都在不断地改进增强。
-无需质疑，在以后的版本中，标准编译器会更加得智能。
+无需质疑，在以后的版本中，标准编译器会更加得智能，以至于上面第5个例子中提供给编译器的暗示有可能将变得不再必要。
 谢谢Go语言开发团队出色的工作！
 </p>
 
 <h3>参考：</h3>
-<p>
+<div>
 <ol>
 <li><a href="https://docs.google.com/document/d/1vdAEAjYdzjnPA9WDOQ1e4e05cYVMpqSxJYZT33Cqw2g">Bounds Check Elimination</a></li>
 <li><a href="https://klauspost-talks.appspot.com/2016/go17-compiler.slide">Utilizing the Go 1.7 SSA Compiler</a></li>
 </ol>
-</p>
+</div>

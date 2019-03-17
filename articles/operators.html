@@ -264,7 +264,7 @@ Go也支持三个一元算术运算符：
 	在很多其它流行语言中，位反运算符是用<code>~</code>表示的。
 </li>
 <li>
-	和一些其它流行语言一样，加号运算符<code>+</code>也可用作字符串衔接运算符（见下）。
+	和一些其它流行语言一样，加号运算符<code>+</code>也可用做字符串衔接运算符（见下）。
 </li>
 <li>
 	和C及C++语言一样，<code>*</code>除了可以当作乘号运算符，它也可以用做指针解引用运算符；
@@ -405,7 +405,7 @@ const _ = 1 << B  // error: the right operand must be unsigned.
 上面提到的移位运算结果的最后一点类型推断规则有点反常。
 这条规则的主要目的是为了防止一些移位运算在32位架构和64位架构的机器上的运算结果出现不一致但不一致却没有被及时发现的情况。
 比如如果上面一段代码中第<i>8</i>行（或第<i>7</i>行）的<code>1</code>的类型被推断为它的默认类型<code>int</code>，
-则在32位架构的机器上，<code>x</code>的取值将被截断为<i>0</i>，而在64位构架的机器上，<code>x</code>的取值将为<i>2<sup>32</sup></i>。
+则在32位架构的机器上，<code>x</code>的取值将被截断为<i>0</i>，而在64位架构的机器上，<code>x</code>的取值将为<i>2<sup>32</sup></i>。
 因为<code>m</code>是一个变量，在32位架构的机器上，第<i>7</i>行和第<i>8</i>行并不会编译报错。
 这将导致Go程序员在不经意间写出没有料到的和难以觉察的bug。
 因此，第<i>7</i>行和第<i>8</i>行中的<code>1</code>的类型被推断为<code>int64</code>（最终的设想结果类型），而不是它们的默认类型<code>int</code>。
@@ -488,7 +488,7 @@ const Z = uint8(255) + 1 // error: 256溢出uint8。
 
 <p>
 假设两个操作数<code>x</code>和<code>y</code>的类型为同一个整数类型，
-则它们通过除法和余数运算得到的商<code>q</code>（<code>= x / y</code>）和余数<code>r</code>（<code>= x % y</code>）满足<code>x == q*y + r</code>（<code>|r| < |y|</code>）。如果余数<code>r</code>不为零，则它的符号和被除数<code>x</code>相同。商<code>q</code>的结果为<code>x / y</code>向零靠拢截断。
+则它们通过除法和余数运算得到的商<code>q</code>（<code>= x / y</code>）和余数<code>r</code>（<code>= x % y</code>）满足<code>x == q*y + r</code>（<code>|r| &lt; |y|</code>）。如果余数<code>r</code>不为零，则它的符号和被除数<code>x</code>相同。商<code>q</code>的结果为<code>x / y</code>向零靠拢截断。
 </p>
 
 <p>
@@ -563,9 +563,9 @@ println(b) // 20
 
 func main() {
 	a, b, c := 12, 1.2, 1+2i
-	a++ // ok
-	b-- // ok
-	c++ // ok
+	a++ // ok. <=> a += 1 <=> a = a + 1
+	b-- // ok. <=> b -= 1 <=> b = b - 1
+	c++ // ok.
 
 	// 下面这些行编译不通过。
 	/*
@@ -646,7 +646,7 @@ Go支持两种布尔二元运算符和一种布尔一元运算符。
 </thead>
 <tbody>
 	<tr>
-		<th scope="row" style="vertical-align: middle;" class="text-center" style="white-space: nowrap;">&amp;&amp;</th>
+		<th scope="row" class="text-center" style="vertical-align: middle; white-space: nowrap;">&amp;&amp;</th>
 		<td style="vertical-align: middle;" class="text-center">
 			布尔与（二元）
 		</td>
@@ -655,13 +655,13 @@ Go支持两种布尔二元运算符和一种布尔一元运算符。
 		</td>
 	</tr>
 	<tr>
-		<th scope="row" style="vertical-align: middle;" class="text-center" style="white-space: nowrap;">||</th>
+		<th scope="row" class="text-center" style="vertical-align: middle; white-space: nowrap;">||</th>
 		<td style="vertical-align: middle;" class="text-center">
 			布尔或（二元）
 		</td>
 	</tr>
 	<tr>
-		<th scope="row" style="vertical-align: middle;" class="text-center" style="white-space: nowrap;">!</th>
+		<th scope="row" class="text-center" style="vertical-align: middle; white-space: nowrap;">!</th>
 		<td style="vertical-align: middle;" class="text-center">
 			布尔否（一元）
 		</td>

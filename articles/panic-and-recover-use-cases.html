@@ -1,7 +1,7 @@
 <h1>一些恐慌/恢复用例</h1>
 
 <p>
-恐慌和恢复（panic和recover）已经<a href="control-flows-more.html#panic-recover">在之前的文章中介绍过了</a>。
+恐慌和恢复（panic/recover）已经<a href="control-flows-more.html#panic-recover">在之前的文章中介绍过了</a>。
 下面将展示一些恐慌/恢复用例。
 </p>
 
@@ -9,7 +9,7 @@
 
 <div>
 <p>
-这可能是panic/recover的最常见用例了。
+这可能是最常见的panic/recover用例了。
 此用例广泛地使用于并发程序中，尤其是响应大量用户请求的应用。
 <p>
 
@@ -48,7 +48,7 @@ func ClientHandler(c net.Conn) {
 </code></pre>
 
 <p>
-运行此服务器程序，并在另一个终端窗口运行<code>telnet localhost 12345</code>，我们可以观察到服务器程序不会因为客户连接处理协程中的恐慌而导致崩溃。
+运行此服务器程序，并在另一个终端窗口运行<code>telnet localhost 12345</code>，我们可以观察到服务器程序不会因为客户连接处理协程中的产生的恐慌而导致崩溃。
 </p>
 
 <p>
@@ -136,7 +136,7 @@ func main() {
 </code></pre>
 </div>
 
-<h3>用例4：使用<code>panic</code>/<code>recover</code>函数调用来减少错误检查</h3>
+<h3>用例4：使用<code>panic</code>/<code>recover</code>函数调用来减少错误检查代码</h3>
 
 <div>
 

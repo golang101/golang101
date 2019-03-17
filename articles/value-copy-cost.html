@@ -1,28 +1,28 @@
 <h1>值复制成本</h1>
 
 <p>
-在Go编程中，值复制时很常见的操作。赋值、传参和数据通道发送操作均涉及到值复制。
-本片文章将谈谈各种不同的Go值的复制成本。
+在Go编程中，值复制是很常见的操作。赋值、传参和数据通道发送操作均涉及到值复制。
+本篇文章将谈谈各种不同种类的类型的Go值的复制成本。
 </p>
 
 <p class="anchor" id="value-sizes"></p>
 <h3>值尺寸（value size）</h3>
 
 <p>
-一个值的尺寸表示此值的<a href="value-part.html">直接部分</a>将在内存中占用多少字节的内存，它的间接部分（如果存在的话）对它的尺寸没有贡献。
+一个值的尺寸表示此值的<a href="value-part.html">直接部分</a>在内存中占用多少个字节，它的间接部分（如果存在的话）对它的尺寸没有贡献。
 </p>
 
 <p>
-在Go中，如果两个值的类型为同一<a href="type-system-overview.html#type-kinds">种类的</a>类型，并且它们的类型的种类不为字符串、接口、数组和结构体，则这两个值的尺寸总是相等的。
+在Go中，如果两个值的类型为同一<a href="type-system-overview.html#type-kinds">种类</a>的类型，并且它们的类型的种类不为字符串、接口、数组和结构体，则这两个值的尺寸总是相等的。
 </p>
 
 <p>
-事实上，对于官方标准编译器来说，任意两个字符串值，即使它们的字符串类型并不是同一个类型。
+事实上，对于官方标准编译器来说，任意两个字符串值的尺寸总是相等的，即使它们的字符串类型并不是同一个类型。
 同样地，任意两个接口值的尺寸也都是相等的。
 </p>
 
 <p>
-目前（Go 1.12），任何特定一个类型的两个值的尺寸都是相同的。所以我们也常说一个值的尺寸为此值的类型的尺寸。
+目前（Go 1.12），至少对于官方标准编译器来说，任何一个特定类型的所有值的尺寸都是相同的。所以我们也常说一个值的尺寸为此值的类型的尺寸。
 </p>
 
 <p>
@@ -31,14 +31,14 @@
 
 <p>
 一个结构体类型的尺寸取决于它的各个字段的类型尺寸和这些字段的排列顺序。
-为了程序执行性能，编译器需要保证某些类型的值在内存中存放时必须满足特定的<a href="memory-layout.html#size-and-padding">内存对齐</a>要求。
-内存对齐可能会造成相邻的两个字段之间在内存中被插入填充一些多余的字节。
+为了程序执行性能，编译器需要保证某些类型的值在内存中存放时必须满足特定的<a href="memory-layout.html#size-and-padding">内存地址对齐</a>要求。
+地址对齐可能会造成相邻的两个字段之间在内存中被插入填充一些多余的字节。
 所以，一个结构体类型的尺寸必定不小于（常常会大于）此结构体类型的各个字段的类型尺寸之和。
 </p>
 
 <p>
-下表列出了各种种类类型的尺寸（对标准编译器1.12来说）。
-在此表中，一个word表示一个原生字；在32位系统构架中，一个word为4个字节，而在64位系统构架中，一个word为8个字节。
+下表列出了各种种类的类型的尺寸（对标准编译器1.12来说）。
+在此表中，一个word表示一个原生字。在32位系统架构中，一个word为4个字节；而在64位系统架构中，一个word为8个字节。
 </p>
 
 <table class="table table-bordered text-center" style="width: auto !important;">
@@ -53,7 +53,7 @@
 </thead>
 <tbody>
 	<tr class="active">
-	<th scope="row" class="text-center">bool</th>
+	<th scope="row" class="text-center">布尔</th>
 	<td>1 byte</td>
 	<td>未做特别要求</td>
 	</tr>
@@ -85,7 +85,7 @@
 	<tr class="active">
 	<th scope="row" class="text-center">int, uint</th>
 	<td>1 word</td>
-	<td>构架相关，在32位系统构架中为4个字节，而在64位系统构架中为8个字节</td>
+	<td>架构相关，在32位系统架构中为4个字节，而在64位系统架构中为8个字节</td>
 	</tr>
 	<tr class="active">
 	<th scope="row" class="text-center">uintptr</th>
@@ -93,49 +93,49 @@
 	<td>必须足够存下任一个内存地址</td>
 	</tr>
 	<tr class="active">
-	<th scope="row" class="text-center">string</th>
+	<th scope="row" class="text-center">字符串</th>
 	<td>2 words</td>
 	<td>未做特别要求</td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center">pointer</th>
+	<th scope="row" class="text-center">指针</th>
 	<td>1 word</td>
 	<td>未做特别要求</td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center">slice</th>
+	<th scope="row" class="text-center">切片</th>
 	<td>3 words</td>
 	<td>未做特别要求</td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center">map</th>
+	<th scope="row" class="text-center">映射表</th>
 	<td>1 word</td>
 	<td>未做特别要求</td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center">channel</th>
+	<th scope="row" class="text-center">数据通道</th>
 	<td>1 word</td>
 	<td>未做特别要求</td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center">function</th>
+	<th scope="row" class="text-center">函数</th>
 	<td>1 word</td>
 	<td>未做特别要求</td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center">interface</th>
+	<th scope="row" class="text-center">接口</th>
 	<td>2 words</td>
 	<td>未做特别要求</td>
 	</tr>
 	<tr class="active">
-	<th scope="row" class="text-center">struct</th>
+	<th scope="row" class="text-center">结构体</th>
 	<td>the sum of sizes of all fields + number of
 		<a href="memory-layout.html#size-and-padding">padding</a> bytes
 	</td>
 	<td>一个不含任何尺寸大于零的字段的结构体类型的尺寸为零</td>
 	</tr>
 	<tr class="active">
-	<th scope="row" class="text-center">array</th>
+	<th scope="row" class="text-center">数组</th>
 	<td>元素类型的尺寸 * 长度</td>
 	<td>一个元素类型的尺寸为零的数组类型的尺寸为零</td>
 	</tr>
@@ -149,7 +149,7 @@
 <p>
 一般说来，复制一个值的成本正比于此值的尺寸。
 但是，值尺寸并非是值复制成本的唯一决定因素。
-不同的CPU架构可能会对不同尺寸的值的复制做了特定的优化。
+不同的CPU架构可能会对某些特定尺寸的值的复制做了优化。
 </p>
 
 <p>
@@ -157,20 +157,20 @@
 </p>
 
 <p>
-对于标准编译器，除了大尺寸的结构体和数组类型，其它大部分类型均为小尺寸类型。
+对于标准编译器，除了大尺寸的结构体和数组类型，其它类型均为小尺寸类型。
 </p>
 
 <p>
-为了防止在函数传参和数据通道操作中因为值复制代价太高而造成的性能损失，我们应该避免使用大尺寸的结构体和数组类型做为参数类型和数据通道元素类型，而应该在这些场合下使用基类型为这样的大尺寸类型的指针类型。
-另一方面，我们也要考虑到太多的指针将会增加垃圾回收的压力。所以到底应该使用大尺寸类型还是以大尺寸类型为基类型的指针类型做为参数类型或数据通道元素类型取决于具体的应用场景。
+为了防止在函数传参和数据通道操作中因为值复制代价太高而造成的性能损失，我们应该避免使用大尺寸的结构体和数组类型做为参数类型和数据通道的元素类型，应该在这些场合下使用基类型为这样的大尺寸类型的指针类型。
+另一方面，我们也要考虑到太多的指针将会增加垃圾回收的压力。所以到底应该使用大尺寸类型还是以大尺寸类型为基类型的指针类型做为参数类型或数据通道的元素类型取决于具体的应用场景。
 </p>
 
 <p>
-一般来说，在实践中，我们很少使用基类型为切片类型、映射表类型、数据通道类型、函数类型、字符串类型和接口类型的指针类型，因为复制这些基类型的值的代价很小。
+一般来说，在实践中，我们很少使用基类型为切片类型、映射表类型、数据通道类型、函数类型、字符串类型和接口类型的指针类型，因为复制这些类型的值的代价很小。
 </p>
 
 <p>
-如果一个数组或者切片的元素类型是一个大尺寸类型，我们应该避免在<code>for-range</code>循环中使用双循环变量来遍历这样的数组或者切片类型的值。
+如果一个数组或者切片的元素类型是一个大尺寸类型，我们应该避免在<code>for-range</code>循环中使用双循环变量来遍历这样的数组或者切片类型的值中的元素。
 因为，在遍历过程中，每个元素将被复制给第二个循环变量一次。
 <p>
 

@@ -2,7 +2,7 @@
 
 <p>
 Go语言是一门天然支持并发的编程语言。
-通过使用<code>go</code>关键字，我们可以很轻松地创建协程（绿色线程）；通过<a href="channel-use-cases.html">使用</a><a href="channel.html">数据通道</a>和<a href="concurrent-atomic-operation.html">Go中提供的</a>其它<a href="concurrent-synchronization-more.html">各种同步技术</a>，并发编程变得简单、轻松和有趣。
+通过使用<code>go</code>关键字，我们可以很轻松地创建协程；通过<a href="channel-use-cases.html">使用</a><a href="channel.html">数据通道</a>和<a href="concurrent-atomic-operation.html">Go中提供的</a>其它<a href="concurrent-synchronization-more.html">各种同步技术</a>，并发编程变得简单、轻松和有趣。
 </p>
 
 <p>
@@ -14,7 +14,7 @@ Go语言是一门天然支持并发的编程语言。
 
 <div>
 <p>
-我们已经知道，源文件中的代码行在运行时刻<a href="memory-model.html">并非按照它们的出现次序被执行</a>。
+我们已经知道，源文件中的代码行在运行时刻<a href="memory-model.html">并非总是按照它们的出现次序被执行</a>。
 </p>
 
 下面这个示例程序犯了两个错误：
@@ -24,7 +24,7 @@ Go语言是一门天然支持并发的编程语言。
 </li>
 <li>
 	其次，在主协程中，条件<code>b == true</code>成立并不能确保条件<code>a != nil</code>也成立。
-	编译器和CPU可能会对<a href="/article/memory-model.html">调整此程序中匿名协程中的某些指令的顺序</a>已获取更快的执行速度，
+	编译器和CPU可能会对<a href="/article/memory-model.html">调整此程序中匿名协程中的某些指令的顺序</a>已获取更快的执行速度。
 	所以，站在主协程的视角看，对变量<code>b</code>的赋值可能会发生在对变量<code>a</code>的赋值之前，这将造成在修改<code>a</code>的元素时<code>a</code>依然为一个nil切片。
 </li>
 </ul>
@@ -108,9 +108,9 @@ func main() {
 
 <p>
 我们期望着此程序打印出<code>789</code>。
-事实上，如果此程序使用标准编译器1.12版本编译，则其运行结果总是正如我们所期待的。
-但是，此程序中的同步处理得正确吗？否！原因很简单，Go运行时并不能保证对<code>x</code>的写入一定发生在对<code>x</code>的读取之前。
-在某些特定的情形下，比如CPU资源被很一些其它计算密集的程序所占用，则对对<code>x</code>的写入有可能发生在对<code>x</code>的读取之后。
+事实上，则其运行结果常常正如我们所期待的。
+但是，此程序中的同步处理实现的正确吗？否！原因很简单，Go运行时并不能保证对<code>x</code>的写入一定发生在对<code>x</code>的读取之前。
+在某些特定的情形下，比如CPU资源被很一些其它计算密集的程序所占用，则对<code>x</code>的写入有可能发生在对<code>x</code>的读取之后。
 这是为什么我们不应该在正式的项目中使用<code>time.Sleep</code>调用来做同步的原因。
 </p>
 
@@ -158,7 +158,7 @@ func main() {
 </p>
 
 <p>
-使得，此程序中存在数据竞争。表达式<code>*p</code>的估值可能发生在赋值<code>num = 789</code>之前、之后、或者同时。
+是的，此程序中存在数据竞争。表达式<code>*p</code>的估值可能发生在赋值<code>num = 789</code>之前、之后、或者同时。
 <code>time.Sleep</code>调用并不能保证<code>*p</code>的估值发生在此赋值之后。
 </p>
 
@@ -200,7 +200,7 @@ func main() {
 </ul>
 
 <p>
-除了有时我们故意地将主协程永久阻塞以防止程序退出，其它大多数造成协程永久阻塞的情况都不是我们所期待的。
+除了有时我们故意地将主协程永久阻塞以防止程序退出外，其它大多数造成协程永久阻塞的情况都不是我们所期待的。
 Go运行时很难分辨出一个处于阻塞状态的协程是否将永久阻塞下去，所以Go运行时不会释放永久处于阻塞状态的协程占用的资源。
 </p>
 
@@ -220,7 +220,7 @@ Go运行时很难分辨出一个处于阻塞状态的协程是否将永久阻塞
 </code></pre>
 
 <p>
-为了防止有四个协程永久阻塞，被当作future/promise使用的通道的容量必须至少为<code>4</code>.
+为了防止有4个协程永久阻塞，被当作future/promise使用的通道的容量必须至少为<code>4</code>.
 </p>
 
 在<a href="channel-use-cases.html#first-response-wins-2">第二种“采用最快回应”实现方法</a>中，如果被当作future/promise使用的通道是一个非缓冲通道（如下面的代码所示），则有可能导致其通道的接收者可能会错过所有的回应而导致处于永久阻塞状态。
@@ -261,7 +261,7 @@ Go运行时很难分辨出一个处于阻塞状态的协程是否将永久阻塞
 下面是一个有问题的并发编程的例子。
 在此例子中，当<code>Counter.Value</code>方法被调用时，一个<code>Counter</code>属主值将被复制，此属主值的字段<code>Mutex</code>也将被一同复制。
 此复制并没有被同步保护，因此复制结果可能是不完整的，并非被复制的属主值的一个快照。
-即使此<code>Mutex</code>字段得以侥幸复制，它的副本所保护的是对字段<code>n</code>的一个副本的访问，因此一般是没有意义的。
+即使此<code>Mutex</code>字段得以侥幸完整复制，它的副本所保护的是对字段<code>n</code>的一个副本的访问，因此一般是没有意义的。
 
 <pre class="line-numbers"><code class="language-go">import "sync"
 
@@ -293,7 +293,7 @@ func (c Counter) Value() (r int64) {
 </p>
 
 <p>
-官方Go SDK中提供的<code>go vet</code>命令将提示此例中的<code>Value</code>方法的声明肯能是一个潜在的逻辑错误。
+官方Go SDK中提供的<code>go vet</code>命令将提示此例中的<code>Value</code>方法的声明可能是一个潜在的逻辑错误。
 </p>
 
 </div>
@@ -311,9 +311,9 @@ func (c Counter) Value() (r int64) {
 为了让一个<code>WaitGroup</code>值的使用有意义，在此值的计数为0的情况下，对它的下一次<code>Add</code>方法的调用必须出现在对它的下一次<code>Wait</code>方法的调用之前。
 </p>
 
-比如，在下面的例子中，<code>Add</code>方法的调用位置时不合适的。
+比如，在下面的例子中，<code>Add</code>方法的调用位置是不合适的。
 此例子程序的打印结果并不总是<code>100</code>，而可能是<code>0</code>到<code>100</code>间的任何一个值。
-原因是没有任何一个<code>Add</code>方法调用可以确保发生在唯一的<code>Wait</code>方法调用之前，结果导致没有任何一个<code>Done</code>方法调用可以确保发生在唯一的<code>Wait</code>方法调用之前。
+原因是没有任何一个<code>Add</code>方法调用可以确保发生在唯一的<code>Wait</code>方法调用之前，结果导致没有任何一个<code>Done</code>方法调用可以确保发生在唯一的<code>Wait</code>方法调用返回之前。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -343,7 +343,7 @@ func main() {
 <p>
 </p>
 
-我们应该将对<code>Add</code>方法的调用移出匿名协程之外，像下面这样，使得任何一个<code>Done</code>方法调用都确保发生在唯一的<code>Wait</code>方法调用之前。
+我们应该将对<code>Add</code>方法的调用移出匿名协程之外，像下面这样，使得任何一个<code>Done</code>方法调用都确保发生在唯一的<code>Wait</code>方法调用返回之前。
 
 <pre class="line-numbers"><code class="language-go">...
 	for i := 0; i < 100; i++ {
@@ -361,11 +361,11 @@ func main() {
 
 </div>
 
-<h3>不当地使用用作Future/Promise的数据通道</h3>
+<h3>不当地使用用做Future/Promise的数据通道</h3>
 
 <div>
 
-从<a href="channel-use-cases.html#future-promise">数据通道用例大全</a>一文中，我们了解到一些函数可以返回用作future/promise的数据通道结果。
+从<a href="channel-use-cases.html#future-promise">数据通道用例大全</a>一文中，我们了解到一些函数可以返回用做future/promise的数据通道结果。
 假设<code>fa</code>和<code>fb</code>是这样的两个函数，则下面的调用方式并没有体现出这两个函数的真正价值。
 
 <pre class="line-numbers"><code class="language-go">doSomethingWithFutureArguments(<-fa(), <-fb())
@@ -421,8 +421,8 @@ Go程序员常犯的一个错误是关闭一个后续可能还会有协程向其
 
 <div>
 <p>
-<code>time</code>标准库包中的<code>After</code>函数返回<a href="channel-use-cases.html#timer">一个用作延迟通知的数据通道</a>。
-此函数给并发编程带来了很多便利，但是它的每个调用都需要创建一个<code>time.Timer</code>值，此新创建的<code>Timer</code>值在传递给<code>After</code>函数调用的时长(实参)内肯定不会被垃圾回收。
+<code>time</code>标准库包中的<code>After</code>函数返回<a href="channel-use-cases.html#timer">一个用做延迟通知的数据通道</a>。
+此函数给并发编程带来了很多便利，但是它的每个调用都需要创建一个<code>time.Timer</code>值，此新创建的<code>Timer</code>值在传递给<code>After</code>函数调用的时长（实参）内肯定不会被垃圾回收。
 如果此函数在某个时段内被多次频繁调用，则可能导致积累很多尚未过期的<code>Timer</code>值从而造成大量的内存和计算消耗。
 </p>
 
@@ -484,19 +484,12 @@ func longRunning(messages <-chan string) {
 <h3>不正确地使用<code>time.Timer</code>值</h3>
 
 <div>
-<p>
-一个典型的<code>time.Timer</code>的使用已经在上一节中展示了。
-其中要注意的一个细节是，在一个<code>time.Timer</code>值终止（stopped）之后并且在重置和重用此<code>Timer</code>值之前，我们应该确保此<code>Timer</code>值中肯定不存在过期的通知。
-如果一个<code>Timer</code>值已经过期或者已经被终止（stopped），则它的<code>Stop</code>方法调用返回<code>false</code>。
-这就是上一节中的例子中的<code>if</code>代码块意义所在。
-</p>
-
-
 
 一个典型的<code>time.Timer</code>的使用已经在上一节中展示了。一些解释：
 <ul>
 <li>
-	如果一个<code>Timer</code>值已经过期或者已经被终止（stopped），则它的<code>Stop</code>方法调用返回<code>false</code>。
+	如果一个<code>Timer</code>值已经过期或者已经被终止（stopped），则相应的<code>Stop</code>方法调用返回<code>false</code>。
+	在此<code>Timer</code>值尚未终止的时候，<code>Stop</code>方法调用返回<code>false</code>只能意味着此<code>Timer</code>值已经过期。
 </li>
 <li>
 	一个<code>Timer</code>值被终止之后，它的数据通道字段<code>C</code>最多只能含有一个过期的通知。
@@ -508,7 +501,7 @@ func longRunning(messages <-chan string) {
 </ul>
 
 <p>
-一个<code>Timer</code>值的<code>Reset</code>方法必须在此<code>Timer</code>值过期或者终止之后才能被调用；
+一个<code>*Timer</code>值的<code>Reset</code>方法必须在对应<code>Timer</code>值过期或者终止之后才能被调用；
 否则，此<code>Reset</code>方法调用和一个可能的向此<code>Timer</code>值的<code>C</code>通道字段的发送通知操作产生数据竞争。
 </p>
 
@@ -536,7 +529,7 @@ func main() {
 	default:
 		time.Sleep(time.Second) // 此分支被选中的可能性较大
 	}
-	timer.Reset(time.Second * 10)
+	timer.Reset(time.Second * 10) // 可能数据竞争
 	<-timer.C
 	fmt.Println(time.Since(start)) // 1.000188181s（大约）
 }
@@ -547,7 +540,7 @@ func main() {
 </p>
 
 <p>
-在多个协程中使用同一个<code>time.Timer</code>值比较容易写出不当的代码，所以尽量不要跨协程使用一个<code>Timer</code>值。
+在多个协程中使用同一个<code>time.Timer</code>值比较容易写出不当的并发代码，所以尽量不要跨协程使用一个<code>Timer</code>值。
 </p>
 
 <p>

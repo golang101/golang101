@@ -30,7 +30,7 @@
 	<li><a href="#pointer-atomic">如何原子地操作指针值？</a></li>
 	<li><a href="#get-days-of-month">如何使用尽可能短的代码行数来获取任意月份的天数？</a></li>
 	<li><a href="#time-sleep-after">函数调用<code>time.Sleep(d)</code>和数据通道接收<code>&lt;-time.After(d)</code>操作之间有何区别？</a></li>
-	<li><a href="#finalizers">终结器（finalizer）可以用作对象的析构函数吗？</a></li>
+	<li><a href="#finalizers">终结器（finalizer）可以用做对象的析构函数吗？</a></li>
 	<li><a href="#trim">调用<code>strings</code>和<code>bytes</code>标准库包里<code>TrimLeft</code>和<code>TrimRight</code>函数经常会返回不符预期的结果，这些函数的实现存在bugs吗？</a></li>
 	<li><a href="#fmt-print-println">函数<code>fmt.Print</code>和<code>fmt.Println</code>的区别是什么？</a></li>
 	<li><a href="#log-print-println">函数<code>log.Print</code>和函数<code>log.Println</code>有什么区别吗?</a></li>
@@ -159,7 +159,7 @@ var _ = []int {
 对于标准编译器，在局部代码块中声明的每一个变量必须被至少一次用做r-value（right-hand-side value，右值）。
 </p>
 
-因此，下列代码将编译失败，因为<code>y</code>只被用作目标值（目标值都为左值）。
+因此，下列代码将编译失败，因为<code>y</code>只被用做目标值（目标值都为左值）。
 
 <pre class="line-numbers"><code class="language-go">func f(x bool) {
 	var y = 1 // y declared and not used
@@ -518,7 +518,7 @@ func main() {
 
 <p class="anchor" id="finalizers"></p>
 <h3>
-	终结器（finalizer）可以用作对象的析构函数吗？
+	终结器（finalizer）可以用做对象的析构函数吗？
 </h3>
 
 <p>
@@ -704,7 +704,6 @@ func main() {
 <li>映射表（map）</li>
 <li>切片</li>
 <li>函数</li>
-</li>
 <li>
 包含不可比较字段的结构体类型
 </li>
@@ -713,7 +712,7 @@ func main() {
 </li>
 </ul>
 <p>
-不支持比较的类型不能用作映射表类型的键值类型。
+不支持比较的类型不能用做映射表类型的键值类型。
 </p>
 </div>
 
