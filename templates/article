@@ -5,9 +5,12 @@
 
 
 
-<div class="alert alert-success text-center">
+<div class="alert alert-success text-center" style="margin-bottom: 0px;">
 
 Go语言101项目目前同时托管在<a href="https://github.com/golang101/golang101">Github</a>和<a href="https://gitlab.com/golang101/golang101">Gitlab</a>上。
 欢迎各位在这两个项目中通过提交bug和PR的方式来改进完善Go语言101中的各篇文章。
 </div>
 
+<div class="text-center">
+	<img src="res/101-reward-qrcode-2.png" alt="赞赏"></img>
+</div>
