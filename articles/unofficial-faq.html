@@ -13,7 +13,7 @@
 	<li><a href="#error-non-name">编译器错误信息<code>non-name *** on left side of :=</code>意味着什么?</a></li>
 	<li><a href="#error-missing-left-brace">编译器错误信息<code>unexpected newline, expecting { after if clause</code>意味着什么?</a></li>
 	<li><a href="#error-declared-not-used">编译器错误信息<code>declared and not used</code>意味着什么?</a></li>
-	<li><a href="#map-iteration-order">Go运行时是否维护映射表元素的遍历顺序？</a></li>
+	<li><a href="#map-iteration-order">Go运行时是否维护映射条目的遍历顺序？</a></li>
 	<li><a href="#compiler-field-padding">Go编译器是否会进行字节填充以确保结构体字段的地址对齐？</a></li>
 	<li><a href="#final-zero-size-field">为什么一个结构体类型的最后一个字段类型的尺寸为零时会影响此结构体类型的尺寸？</a></li>
 	<li><a href="#new-function"><code>new(T)</code>是<code>var t T; (&t)</code>的语法糖吗？</a></li>
@@ -47,7 +47,7 @@
 	<li><a href="#nil-equality">为什么两个<code>nil</code>值有时候会不相等？</a></li>
 	<li><a href="#slice-conversion">为什么类型<code>[]T1</code>和<code>[]T2</code>没有共享相同底层类型，即使不同的类型<code>T1</code>和<code>T2</code>共享相同的底层类型？</a></li>
 	<li><a href="#unaddressable-values">哪些值可以被取地址，哪些值不可以被取地址？</a></li>
-	<li><a href="#maps-are-unaddressable">为什么映射表元素不可被取地址？</a></li>
+	<li><a href="#maps-are-unaddressable">为什么映射元素不可被取地址？</a></li>
 	<li><a href="#slice-elements-always-addressable">为什么非空切片的元素总是可被取地址，即便对于不可取地址的切片也是如此？</a></li>
 	<li><a href="#method-set-relation">对任意的非指针、非接口定义类型<code>T</code>，为什么类型<code>*T</code>的方法集总是类型<code>T</code>的方法集的超集，但是反之却不然？</a></li>
 	<li><a href="#types-can-have-methods">我们可以为哪些类型声明方法？</a></li>
@@ -162,9 +162,9 @@ var _ = []int {
 因此，下列代码将编译失败，因为<code>y</code>只被用做目标值（目标值都为左值）。
 
 <pre class="line-numbers"><code class="language-go">func f(x bool) {
-	var y = 1 // y declared and not used
+	var y = 1 // y被声明了但没有被用做右值
 	if x {
-		y = 2
+		y = 2 // 这里，y被用做左值
 	}
 }
 </code></pre>
@@ -178,15 +178,19 @@ exception: https://github.com/golang/go/issues/8560
 
 <p class="anchor" id="map-iteration-order"></p>
 <h3>
-	Go运行时是否维护映射表元素的遍历顺序？
+	Go运行时是否维护映射条目的遍历顺序？
 </h3>
 
 <p>
-不。<a href="https://golang.google.cn/ref/spec#For_range">Go白皮书</a>明确提到映射表元素的迭代顺序时未定义的。
-所以对于同一个映射表值，它的一个遍历过程和下一个遍历过程中的元素呈现次序不保证是相同的。
-对于标准编译器，映射表元素的遍历顺序是随机的。
-如果你需要固定的映射表元素遍历顺序，那么你就需要自己来维护这个顺序。
+不。<a href="https://golang.google.cn/ref/spec#For_range">Go白皮书</a>明确提到映射元素的迭代顺序时未定义的。
+所以对于同一个映射值，它的一个遍历过程和下一个遍历过程中的元素呈现次序不保证是相同的。
+对于标准编译器，映射元素的遍历顺序是随机的。
+如果你需要固定的映射元素遍历顺序，那么你就需要自己来维护这个顺序。
 更多信息请阅读Go官方博客文章<a href="https://blog.golang.com/go-maps-in-action#TOC_7.">Go maps in action</a>。
+</p>
+
+<p>
+但是请注意：从Go 1.12开始，标准库包中的各个打印函数的结果中，映射条目总是排了序的。
 </p>
 
 <p class="anchor" id="compiler-field-padding"></p>
@@ -239,7 +243,7 @@ Go规范 <a href="https://golang.google.cn/ref/spec#Size_and_alignment_guarantee
 <p>
 Go编译器将不会重新排列结构体的字段来最小化结构体值的尺寸。
 因为这样做会导致意想不到的结果。
-然而，程序员可以手工重新排序字段来实现最小化填充。
+但是，根据需要，程序员可以手工重新排序字段来实现填充最小化。
 </p>
 
 <p class="anchor" id="final-zero-size-field"></p>
@@ -701,7 +705,7 @@ func main() {
 <div>
 下列类型不支持比较：
 <ul>
-<li>映射表（map）</li>
+<li>映射（map）</li>
 <li>切片</li>
 <li>函数</li>
 <li>
@@ -712,7 +716,7 @@ func main() {
 </li>
 </ul>
 <p>
-不支持比较的类型不能用做映射表类型的键值类型。
+不支持比较的类型不能用做映射类型的键值类型。
 </p>
 </div>
 
@@ -720,7 +724,7 @@ func main() {
 请注意，
 <ul>
 <li>
-尽管映射表，切片和函数值不支持比较，但是它们的值可以与类型不确定的<code>nil</code>标识符比较。
+尽管映射，切片和函数值不支持比较，但是它们的值可以与类型不确定的<code>nil</code>标识符比较。
 </li>
 <li>
 如果两个接口值的动态类型相同且不可比较，那么在运行时<a href="interface.html#comparison">比较这两个接口的值</a>会产生一个恐慌。
@@ -728,7 +732,7 @@ func main() {
 </ul>
 
 <p>
-关于为什么映射表，切片和函数不支持比较，请阅读Go的官方FAQ中<a href="https://golang.google.cn/doc/faq#map_keys">关于这个问答</a>。
+关于为什么映射，切片和函数不支持比较，请阅读Go的官方FAQ中<a href="https://golang.google.cn/doc/faq#map_keys">关于这个问答</a>。
 </p>
 
 </div>
@@ -746,7 +750,7 @@ func main() {
 在回答这个问题之前，可以先看看Go中的一些事实：
 <ul>
 <li>
-	<code>nil</code>可以用做很多类型的值（指针、切片、映射表、数据通道、函数以及接口）
+	<code>nil</code>可以用做很多类型的值（指针、切片、映射、数据通道、函数以及接口）
 </li>
 <li>
 	<code>nil</code>值可能没有类型（untyped）。
@@ -759,7 +763,7 @@ func main() {
 	一个接口值包裹着一个非接口值。此非接口值称为此接口值的动态值。此动态值的类型信息也被存储在此接口值里。动态值的类型被称作此接口值的动态类型。
 </li>
 <li>
-	类型不确定的<code>nil</code>值可以被转换成任意类型的指针、切片、映射表、数据通道、函数以及接口类型。
+	类型不确定的<code>nil</code>值可以被转换成任意类型的指针、切片、映射、数据通道、函数以及接口类型。
 </li>
 <li>
 	当一个类型不确定的<code>nil</code>值被赋值给一个接口类型值时，这个接口值将便为一个零值接口值。
@@ -867,7 +871,7 @@ func main() {
 以下的值不可以被取地址：
 <ul>
 <li>字符串的字节元素</li>
-<li>映射表元素</li>
+<li>映射元素</li>
 <li>接口值的动态值（类型断言的结果）</li>
 <li>常量值</li>
 <li>字面值</li>
@@ -907,13 +911,13 @@ func main() {
 
 <p class="anchor" id="maps-are-unaddressable"></p>
 <h3>
-	为什么映射表元素不可被取地址？
+	为什么映射元素不可被取地址？
 </h3>
 
 <p>
-如果映射表元素可以被取地址，则每个映射表元素的地址在它的生命期内必须保持不变。
-这阻碍了Go编译器在实现映射表时使用更加有效率的算法。
-对于标准编译器，映射表元素的内部地址在运行时刻有可能发生改变。
+如果映射元素可以被取地址，则每个映射元素的地址在它的生命期内必须保持不变。
+这阻碍了Go编译器在实现映射时使用更加有效率的算法。
+对于标准编译器，映射元素的内部地址在运行时刻有可能发生改变。
 </p>
 
 <p class="anchor" id="slice-elements-always-addressable"></p>
@@ -1038,7 +1042,7 @@ func (pt *T) MethodX(param0 ParamType0, ...) (result0 ResultType0, ...) {
 </h3>
 
 <div>
-集合（set）可以看作是不关心元素值的映射表。
+集合（set）可以看作是不关心元素值的映射。
 在Go语言里，<code>map[Tkey]struct{}</code>经常被用做一个集合类型。
 </div>
 

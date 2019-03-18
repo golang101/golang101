@@ -43,7 +43,7 @@ Go支持下列组合类型：
 	<ul>
 	<li>数组类型 - 定长容器类型</li>
 	<li>切片类型 - 动态长度和容量容器类型</li>
-	<li>映射表类型（map）- 也常称为字典类型。在标准编译器中映射表是使用哈希表实现的。</li>
+	<li>映射类型（map）- 也常称为字典类型。在标准编译器中映射是使用哈希表实现的。</li>
 	</ul>
 </li>
 <li><a href="channel.html">数据通道类型</a> - 数据通道用来同步并发的协程</li>
@@ -59,7 +59,7 @@ Go支持下列组合类型：
 *T         // 一个指针类型
 [5]T       // 一个元素类型为T、元素个数为5的数组类型
 []T        // 一个元素类型为T的切片类型
-map[Tkey]T // 一个键值类型为Tkey、元素类型为T的映射表类型
+map[Tkey]T // 一个键值类型为Tkey、元素类型为T的映射类型
 
 // 一个结构体类型
 struct {
@@ -244,10 +244,10 @@ type Table = map[Name]Age
 	别名类型<code>Age</code>和内置类型<code>int</code>。
 </li>
 <li>
-	别名类型<code>table</code>和映射表类型<code>map[string]int</code>。
+	别名类型<code>table</code>和映射类型<code>map[string]int</code>。
 </li>
 <li>
-	别名类型<code>Table</code>和映射表类型<code>map[Name]Age</code>。
+	别名类型<code>Table</code>和映射类型<code>map[Name]Age</code>。
 </li>
 </ul>
 </div>
@@ -383,7 +383,7 @@ Ages → AgeSlice → []Age <span style="color:#aaa">→ <strike>[]MyInt</strike
 
 <p>
 每个类型有一个零值。一个类型的零值可以看作是此类型的默认值。
-预声明的标识符<code>nil</code>可以看作是切片、映射表、函数、数据通道、指针（包括非类型安全指针）和接口类型的零值的字面表示形式。
+预声明的标识符<code>nil</code>可以看作是切片、映射、函数、数据通道、指针（包括非类型安全指针）和接口类型的零值的字面表示形式。
 我们以后可以在<a href="nil.html">Go中的nil</a>一文中了解到关于<code>nil</code>的各种事实。
 </p>
 
@@ -405,7 +405,7 @@ Ages → AgeSlice → []Age <span style="color:#aaa">→ <strike>[]MyInt</strike
 </p>
 
 <p>
-组合字面表示形式用来表示结构体类型值和容器类型（数组、切片和映射表）值。
+组合字面表示形式用来表示结构体类型值和容器类型（数组、切片和映射）值。
 详见<a href="struct.html">结构体</a>和<a href="container.html">容器类型</a>两文。
 </p>
 
@@ -523,7 +523,7 @@ Go白皮书没有规定非数值类型值的尺寸。对数值类型值的尺寸
 <h3>概念：容器类型</h3>
 
 <p>
-数组、切片和映射表是Go中的三种正式意义上的内置容器类型。
+数组、切片和映射是Go中的三种正式意义上的内置容器类型。
 </p>
 
 <p>
@@ -535,13 +535,13 @@ Go白皮书没有规定非数值类型值的尺寸。对数值类型值的尺寸
 </p>
 
 <p>
-<a href="container.html">数组、切片和映射表</a>一文详细解释了各种正式容器类型和它们的值。
+<a href="container.html">数组、切片和映射</a>一文详细解释了各种正式容器类型和它们的值。
 </p>
 
-<h3>概念：映射表类型的键值（key）类型</h3>
+<h3>概念：映射类型的键值（key）类型</h3>
 
 <p>
-如果一个映射表类型的底层类型表示为<code>map[Tkey]T</code>，则此映射表类型的键值类型为<code>Tkey</code>。
+如果一个映射类型的底层类型表示为<code>map[Tkey]T</code>，则此映射类型的键值类型为<code>Tkey</code>。
 <code>Tkey</code>必须为一个可比较类型（见下）。
 </p>
 
@@ -552,7 +552,7 @@ Go白皮书没有规定非数值类型值的尺寸。对数值类型值的尺寸
 <ul>
 <li>如果一个数组类型的底层类型表示为<code>[N]T</code>，则此数组类型的元素类型为<code>T</code>所表示的类型。</li>
 <li>如果一个切片类型的底层类型表示为<code>[]T</code>，则此切片类型的元素类型为<code>T</code>所表示的类型。</li>
-<li>如果一个映射表类型的底层类型表示为<code>map[Tkey]T</code>，则此映射表类型的元素类型为<code>T</code>所表示的类型。</li>
+<li>如果一个映射类型的底层类型表示为<code>map[Tkey]T</code>，则此映射类型的元素类型为<code>T</code>所表示的类型。</li>
 <li>如果一个数据通道类型的底层类型表示为<code>chan T</code>、<code>chan&lt;- T</code>或者<code>&lt;-chan T</code>，则此数据通道类型的元素类型为<code>T</code>所表示的类型。</li>
 <li>一个字符串类型的元素类型总是内置类型<code>byte</code>（亦即<code>uint8</code>）。</li>
 </ul>
@@ -589,7 +589,7 @@ Go白皮书没有规定非数值类型值的尺寸。对数值类型值的尺寸
 目前（Go 1.12），下面这些类型的值不支持（使用<code>==</code>和<code>!=</code>运算标识符）比较。这些类型称为不可比较类型。
 <ul>
 <li>切片类型</li>
-<li>映射表类型</li>
+<li>映射类型</li>
 <li>函数类型</li>
 <li>
 任何包含有不可比较类型的字段的结构体类型和任何元素类型为不可比较类型的数组类型。
@@ -601,7 +601,7 @@ Go白皮书没有规定非数值类型值的尺寸。对数值类型值的尺寸
 </p>
 
 <p>
-映射表类型的键值类型必须为可比较类型。
+映射类型的键值类型必须为可比较类型。
 </p>
 
 <p>

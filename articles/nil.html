@@ -23,7 +23,7 @@
 在Go中，预声明的<code>nil</code>可以表示下列种类（kind）的类型的零值：
 <ul>
 <li>指针类型（包括类型安全和非类型安全指针）</li>
-<li>映射表类型</li>
+<li>映射类型</li>
 <li>切片类型</li>
 <li>函数类型</li>
 <li>数据通道类型</li>
@@ -188,7 +188,7 @@ var _ = (chan int)(nil) == (<-chan int)(nil)
 <h3>同一个类型的两个nil值可能不能相互比较</h3>
 
 <div>
-在Go中，映射表类型、切片类型和函数类型是不支持比较类型。
+在Go中，映射类型、切片类型和函数类型是不支持比较类型。
 比较同一个不支持比较的类型的两个值（包括nil值）是非法的。
 比如，下面的几个比较都编译不通过。
 <pre class="line-numbers"><code class="language-go">var _ = ([]int)(nil) == ([]int)(nil)
@@ -196,7 +196,7 @@ var _ = (map[string]int)(nil) == (map[string]int)(nil)
 var _ = (func())(nil) == (func())(nil)
 </code></pre>
 
-但是，映射表类型、切片类型和函数类型的任何值都可以和类型不确定的裸<code>nil</code>标识符比较。
+但是，映射类型、切片类型和函数类型的任何值都可以和类型不确定的裸<code>nil</code>标识符比较。
 <pre class="line-numbers"><code class="language-go">// 这几行编译都没问题。
 var _ = ([]int)(nil) == nil
 var _ = (map[string]int)(nil) == nil
@@ -221,11 +221,11 @@ var _ = (func())(nil) == nil
 </code></pre>
 </div>
 
-<h3>访问nil映射表值的条目不会产生恐慌</h3>
+<h3>访问nil映射值的条目不会产生恐慌</h3>
 
 <div>
 <p>
-访问一个nil映射表将得到此映射表的类型的元素类型的零值。
+访问一个nil映射将得到此映射的类型的元素类型的零值。
 </p>
 
 比如：
@@ -235,11 +235,11 @@ fmt.Println( (map[int]*int64)(nil)[123] )   // &lt;nil&gt;
 </code></pre>
 </div>
 
-<h3><code>range</code>关键字后可以跟随nil数据通道、nil映射表、nil切片和nil数组指针</h3>
+<h3><code>range</code>关键字后可以跟随nil数据通道、nil映射、nil切片和nil数组指针</h3>
 
 <div>
 <p>
-遍历nil映射表和nil切片的循环步数均为零。
+遍历nil映射和nil切片的循环步数均为零。
 </p>
 
 <p>

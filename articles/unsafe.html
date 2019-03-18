@@ -19,7 +19,7 @@
 </p>
 
 <p>
-使用非安全指针的另外一个较大的风险是Go中目前提供的非安全指针机制并不受到<a href="https://golang.google.cn/doc/go1compat">Go 1 兼容性保证</a>的保护。
+使用非类型安全指针的另外一个较大的风险是Go中目前提供的非类型安全指针机制并不受到<a href="https://golang.google.cn/doc/go1compat">Go 1 兼容性保证</a>的保护。
 使用了非类型安全指针的代码可以从今后的某个Go版本开始将不再能编译通过，或者运行行为发生了变化。
 </p>
 
@@ -34,7 +34,7 @@
 我们必须引入<a href="https://golang.google.cn/pkg/unsafe/"><code>unsafe</code>标准库包</a>来使用非类型安全指针。
 非类型安全指针<code>unsafe.Pointer</code>被声明定义为：
 
-<pre class="line-numbers"><code class="language-go">type Pointer *ArbitraryType
+<pre class="disable-line-numbers111"><code class="language-go">type Pointer *ArbitraryType
 </code></pre>
 
 <p>
@@ -180,7 +180,7 @@ They are as dangerous as C pointers, which is Go always tries to avoid.
 </li>
 <li>
 	一个uintptr值可以被显式转换为一个非类型安全指针类型，反之亦然。
-	但是，注意，一个nil非安全指针类型不应该被转换为uintptr并进行算术运算后再转换回来。
+	但是，注意，一个nil非类型安全指针类型不应该被转换为uintptr并进行算术运算后再转换回来。
 </li>
 </ul>
 

@@ -67,8 +67,8 @@ func main() {
 	<code>chan chan int</code>是一个元素类型为另一个数据通道类型的<code>chan int</code>的数据通道类型。
 </li>
 <li>
-	<code>map[int]map[int]string</code>是一个元素类型为另一个映射表类型<code>map[string]int</code>的映射表类型。
-	这两个映射表类型的键值类型均为内置类型<code>int</code>。
+	<code>map[int]map[int]string</code>是一个元素类型为另一个映射类型<code>map[string]int</code>的映射类型。
+	这两个映射类型的键值类型均为内置类型<code>int</code>。
 </li>
 <li>
 	<code>func(int32) func(int32)</code>是一个只有一个输入参数和一个返回值的函数类型，此返回值的类型为一个只有一个输入参数的函数类型。
@@ -128,12 +128,12 @@ func main() {
 </p>
 
 <p>
-类似的，类型<code>map[string][]func(int) int</code>为一个映射表类型。
-此映射表类型的键值类型为内值类型<code>string</code>，右边剩余的部分为此映射表类型的元素类型。
-<code>[]</code>表明此映射表的元素类型为一个切片类型，此切片类型的元素类型为一个函数类型<code>func(int) int</code>。
+类似的，类型<code>map[string][]func(int) int</code>为一个映射类型。
+此映射类型的键值类型为内值类型<code>string</code>，右边剩余的部分为此映射类型的元素类型。
+<code>[]</code>表明此映射的元素类型为一个切片类型，此切片类型的元素类型为一个函数类型<code>func(int) int</code>。
 </p>
 
-一个使用了此映射表类型的例子：
+一个使用了此映射类型的例子：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -183,10 +183,10 @@ func main() {
 
 <p>
 让我们从左到右解读此类型。
-最左边开始的<code>[]</code>表明这是一个切片类型，紧跟着的<code>map</code>关键字表明此切片类型的元素为一个映射表类型。
-<code>map</code>关键字后紧跟的一对方括号<code>[]</code>中的结构体类型字面形式表明此映射表的键值类型为一个结构体类型。
-此中括号右边的整个部分表明此映射表的元素类型为一个接口类型。此接口类型指定了三个方法。
-此映射表的键值结构体类型有两个字段，第一个字段的名称和类型为<code>a</code>和内置类型<code>int</code>；
+最左边开始的<code>[]</code>表明这是一个切片类型，紧跟着的<code>map</code>关键字表明此切片类型的元素为一个映射类型。
+<code>map</code>关键字后紧跟的一对方括号<code>[]</code>中的结构体类型字面形式表明此映射的键值类型为一个结构体类型。
+此中括号右边的整个部分表明此映射的元素类型为一个接口类型。此接口类型指定了三个方法。
+此映射的键值结构体类型有两个字段，第一个字段的名称和类型为<code>a</code>和内置类型<code>int</code>；
 第二个字段的名称为<code>b</code>，它的类型为另外一个结构体类型<code>struct {x string; y bool}</code>。
 此另外一个结构体类型也有两个字段：内置<code>string</code>类型的字段<code>x</code>和内置<code>bool</code>类型的字段<code>y</code>。
 </p>

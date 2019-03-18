@@ -304,7 +304,7 @@ func main() {
 
 例外：
 <div class="alert alert-success">
-一个映射表值的元素总是不可寻址的，即使此映射表本身是可寻址的。
+一个映射值的元素总是不可寻址的，即使此映射本身是可寻址的。
 </div>
 
 语法糖：
@@ -319,7 +319,7 @@ func main() {
 	_ = &m // okay
 
 	// 例外。
-	// p = &m["abc"] // error: 映射表元素不可寻址
+	// p = &m["abc"] // error: 映射元素不可寻址
 
 	// 语法糖。
 	f := func() []int {
@@ -341,7 +341,7 @@ func main() {
 
 例外：
 <div class="alert alert-success">
-尽管映射表元素是不可寻址的，但是它们可以被修改（但是它们必须被整个覆盖修改）。
+尽管映射元素是不可寻址的，但是它们可以被修改（但是它们必须被整个覆盖修改）。
 </div>
 
 例子：
@@ -519,12 +519,12 @@ func main() {
 <div>
 基本规则：
 <div class="alert alert-success">
-映射表、切片和函数类型是不支持比较的。
+映射、切片和函数类型是不支持比较的。
 </div>
 
 例外：
 <div class="alert alert-success">
-映射表、切片和函数值可以和预声明标识符<code>nil</code>比较。
+映射、切片和函数值可以和预声明标识符<code>nil</code>比较。
 </div>
 
 例子：
@@ -539,7 +539,7 @@ func main() {
 
 	var m1 = map[string]int{}
 	var m2 = m1
-	// _ = m1 == m2 // error: 映射表值不可比较。
+	// _ = m1 == m2 // error: 映射值不可比较。
 	_ = m1 == nil   // ok
 	_ = m2 == nil   // ok
 
@@ -613,7 +613,7 @@ func main() {
 
 例外：
 <div class="alert alert-success">
-对于一个映射表或者切片类型<code>T</code>，<code>T{}</code>不是它的零值，它的零值使用预声明的<code>nil</code>表示。
+对于一个映射或者切片类型<code>T</code>，<code>T{}</code>不是它的零值，它的零值使用预声明的<code>nil</code>表示。
 </div>
 
 例子：

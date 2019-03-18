@@ -77,7 +77,7 @@ func (ff FilterFunc) Filte(in int) bool {
 	return ff(in)
 }
 
-// 为自定义的映射表类型StringSet声明方法。
+// 为自定义的映射类型StringSet声明方法。
 type StringSet map[string]struct{}
 func (ss StringSet) Has(key string) bool {
 	_, present := ss[key]
@@ -282,7 +282,7 @@ SetPages(pages int)
 <li>内置基本类型；</li>
 <li>定义的指针类型；</li>
 <li>基类型为指针类型或者接口类型的指针类型；</li>
-<li>非定义的数组/切片/映射表/函数/数据通道类型。</li>
+<li>非定义的数组/切片/映射/函数/数据通道类型。</li>
 </ul>
 
 <p>

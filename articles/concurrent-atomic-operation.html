@@ -35,7 +35,7 @@ func CompareAndSwapInt32(addr *int32, old, new int32) (swapped bool)
 <p>
 </p>
 
-下列四个原子操作函数提供给了（安全）指针类型。因为Go目前（1.12）并不支持自定义范型，所以这些函数是通过<a href="unsafe.html">非安全指针</a><code>unsafe.Pointer</code>来实现的。
+下列四个原子操作函数提供给了（安全）指针类型。因为Go目前（1.12）并不支持自定义范型，所以这些函数是通过<a href="unsafe.html">非类型安全指针</a><code>unsafe.Pointer</code>来实现的。
 
 <pre class="line-numbers"><code class="language-go">func LoadPointer(addr *unsafe.Pointer) (val unsafe.Pointer)
 func StorePointer(addr *unsafe.Pointer, val unsafe.Pointer)
@@ -161,7 +161,7 @@ func main() {
 		c uint32 = 5
 		d int    = 6
 	)
-	
+
 	show := fmt.Println
 	atomic.AddUint64(&n, -m);             show(n) // 96 (97 - 1)
 	atomic.AddUint64(&n, -uint64(k));     show(n) // 94 (95 - 2)

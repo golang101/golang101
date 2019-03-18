@@ -85,10 +85,10 @@
 		<a href="#use-pointer-as-array">在某些情形下，我们可以将数组指针当作数组来用。</a>
 	</li>
 	<li>
-		<a href="#nil-map-element-retrieving">从nil映射表中读取元素不会导致崩溃，读取结果是一个零元素值。</a>
+		<a href="#nil-map-element-retrieving">从nil映射中读取元素不会导致崩溃，读取结果是一个零元素值。</a>
 	</li>
 	<li>
-		<a href="#nil-map-element--deletion">从一个nil映射表中删除一个条目不会导致崩溃，这是一个空操作。</a>
+		<a href="#nil-map-element--deletion">从一个nil映射中删除一个条目不会导致崩溃，这是一个空操作。</a>
 	</li>
 	<li>
 		<a href="#append-slice-elements"><code>append</code>函数调用的结果可能会与原始切片共享一些元素，也可能不共享任何元素。</a>
@@ -100,7 +100,7 @@
 		<a href="#derive-from-nil-slice">从一个nil切片中派生子切片是允许的，只要子切片表达式中使用的所有索引都为零，则不会有恐慌产生，结果子切片同样是一个nil切片。</a>
 	</li>
 	<li>
-		<a href="#range-over-nil-map-and-slice">用<code>range</code>遍历nil映射表或者nil切片是没问题的，这属于空操作。</a>
+		<a href="#range-over-nil-map-and-slice">用<code>range</code>遍历nil映射或者nil切片是没问题的，这属于空操作。</a>
 	</li>
 	<li>
 		<a href="#range-over-nil-array-pointer">用<code>range</code>遍历nil数组指针时，如果忽略或省略第二个迭代变量，则此遍历是没问题的。遍历中的循环步数为相应数组类型的长度。</a>
@@ -112,7 +112,7 @@
 		<a href="#indexes-in-composite-literals">切片和数组组合字面值中的索引必须是非负常量。</a>
 	</li>
 	<li>
-		<a href="#constant-keys-in-composite-literals">切片/数组/映射表组合字面值的常量索引和键值不能重复。</a>
+		<a href="#constant-keys-in-composite-literals">切片/数组/映射组合字面值的常量索引和键值不能重复。</a>
 	</li>
 	<li>
 		<a href="#array-slice-element-addressability">不可寻址的数组的元素依旧是不可寻址的，但是不可寻址的切片的元素总是可寻址的。</a>
@@ -121,7 +121,7 @@
 		<a href="#array-slice-derivable">可以从不可寻址的切片派生子切片，但是不能从不可寻址的数组派生子切片。</a>
 	</li>
 	<li>
-		<a href="#nan-as-map-keys">把以<code>NaN</code>做为键值的条目放如映射表就宛如把条目放入黑洞一样。</a>
+		<a href="#nan-as-map-keys">把以<code>NaN</code>做为键值的条目放如映射就宛如把条目放入黑洞一样。</a>
 	</li>
 	<li>
 		<a href="#capacity-of-slice-from-string">字符串转换为byte切片或rune切片后的结果切片的容量可能会大于长度。</a>
@@ -786,7 +786,7 @@ func main() {
 	一个切片类型的元素类型可以是此切片类型自身，
 </li>
 <li>
-	一个映射表类型的元素类型可以是此映射表类型自身，
+	一个映射类型的元素类型可以是此映射类型自身，
 </li>
 <li>
 	一个数据通道类型的元素类型可以是此数据通道类型自身，
@@ -885,7 +885,7 @@ func main() {
 </p>
 
 <p class="anchor" id="nil-map-element-retrieving"></p>
-<h3>从nil映射表中读取元素不会导致崩溃，读取结果是一个零元素值。</h3>
+<h3>从nil映射中读取元素不会导致崩溃，读取结果是一个零元素值。</h3>
 
 <div>
 
@@ -908,7 +908,7 @@ func Foo2(m map[string]int) int {
 </div>
 
 <p class="anchor" id="nil-map-element--deletion"></p>
-<h3>从一个nil映射表中删除一个条目不会导致崩溃，这是一个空操作。</h3>
+<h3>从一个nil映射中删除一个条目不会导致崩溃，这是一个空操作。</h3>
 
 <div>
 
@@ -984,7 +984,7 @@ func main() {
 </div>
 
 <p class="anchor" id="range-over-nil-map-and-slice"></p>
-<h3>用<code>range</code>遍历nil映射表或者nil切片是没问题的，这属于空操作。</h3>
+<h3>用<code>range</code>遍历nil映射或者nil切片是没问题的，这属于空操作。</h3>
 
 <div>
 
@@ -1050,12 +1050,12 @@ var y = []int{k: 1}  // error: 索引必须为一个常量
 </code></pre>
 
 <p>
-注意，映射表组合字面值中的键值不必为常量。
+注意，映射组合字面值中的键值不必为常量。
 </p>
 </div>
 
 <p class="anchor" id="constant-keys-in-composite-literals"></p>
-<h3>切片/数组/映射表组合字面值的常量索引和键值不能重复。</h3>
+<h3>切片/数组/映射组合字面值的常量索引和键值不能重复。</h3>
 
 <div>
 例如，下面的程序将编译失败。
@@ -1117,7 +1117,7 @@ func main() {
 <pre class="line-numbers"><code class="language-go">package main
 
 func main() {
-	// 映射表元素是不可寻址的。
+	// 映射元素是不可寻址的。
 
 	// 下面几行编译没问题。
 	_ = []int{6, 7, 8, 9}[1:3]
@@ -1137,7 +1137,7 @@ func main() {
 </div>
 
 <p class="anchor" id="nan-as-map-keys"></p>
-<h3>把以<code>NaN</code>做为键值的条目放如映射表就宛如把条目放入黑洞一样。</h3>
+<h3>把以<code>NaN</code>做为键值的条目放如映射就宛如把条目放入黑洞一样。</h3>
 
 <div>
 原因是<code>NaN != NaN</code>（详见<a href="#nan-inf">下面的另一个细节</a>）。

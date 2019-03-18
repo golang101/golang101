@@ -38,7 +38,7 @@
 <li>字符串类型</li>
 <li>函数类型</li>
 <li>切片类型</li>
-<li>映射表类型</li>
+<li>映射类型</li>
 <li>数据通道类型</li>
 <li>接口类型</li>
 </ul>
@@ -92,7 +92,7 @@
 	<td>可以</td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center">映射表值</th>
+	<th scope="row" class="text-center">映射值</th>
 	<td>可以</td>
 	<td></td>
 	<td></td>
@@ -157,7 +157,7 @@
 	<td>是</td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center" style="white-space: nowrap;">映射表</th>
+	<th scope="row" class="text-center" style="white-space: nowrap;">映射</th>
 	<td>是</td>
 	<td>是</td>
 	<td>否</td>
@@ -193,7 +193,7 @@
 </h3>
 
 <p>
-下面在四种类型的值（除了切片和映射表类型的零值）可以用组合字面形式表示。
+下面在四种类型的值（除了切片和映射类型的零值）可以用组合字面形式表示。
 </p>
 
 <table class="table table-bordered text-center" style="width: auto !important;">
@@ -217,7 +217,7 @@
 	<td>否<br/>（零值用<code>nil</code>表示）</td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center" style="vertical-align: middle">映射表类型</th>
+	<th scope="row" class="text-center" style="vertical-align: middle">映射类型</th>
 	<td>否<br/>（零值用<code>nil</code>表示）</td>
 	</tr>
 </tbody>
@@ -258,7 +258,7 @@
 	<td>3 words</td>
 	</tr>
 	<tr class="active">
-	<th scope="row" class="text-center">映射表</th>
+	<th scope="row" class="text-center">映射</th>
 	<td>1 word</td>
 	</tr>
 	<tr>
@@ -510,11 +510,11 @@
 </thead>
 <tbody>
 	<tr class="active">
-	<th scope="row" class="text-center" style="vertical-align: middle">映射表元素访问</th>
+	<th scope="row" class="text-center" style="vertical-align: middle">映射元素访问</th>
 	<td style="vertical-align: middle; white-space: nowrap;" class="text-center">
 		<code>e, ok = aMap[key]</code>
 	</td>
-	<td>键值<code>key</code>对应的条目是否存储在映射表值中</td>
+	<td>键值<code>key</code>对应的条目是否存储在映射值中</td>
 	<td>否</td>
 	</tr>
 	<tr>

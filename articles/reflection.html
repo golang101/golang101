@@ -75,7 +75,7 @@ func main() {
 	fmt.Println(tx.ConvertibleTo(ty)) // true
 	fmt.Println(tb.ConvertibleTo(ta)) // false
 
-	// 切片类型和映射表类型都是不可比较类型。
+	// 切片类型和映射类型都是不可比较类型。
 	fmt.Println(tb.Comparable()) // false
 	fmt.Println(tm.Comparable()) // false
 	fmt.Println(ta.Comparable()) // true
@@ -397,7 +397,7 @@ func main() {
 如果上例中的<code>vt.FieldByName("A")</code>被替换为<code>vt.FieldByName("b")</code>，则将产生一个恐慌。
 </p>
 
-下面是一个使用映射表反射值的例子。
+下面是一个使用映射反射值的例子。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -407,7 +407,7 @@ import "reflect"
 func main() {
 	m := map[string]int{"Unix": 1973, "Windows": 1985}
 	v := reflect.ValueOf(m)
-	// 第二个实参为Value零值时，表示删除一个映射表条目。
+	// 第二个实参为Value零值时，表示删除一个映射条目。
 	v.SetMapIndex(reflect.ValueOf("Windows"), reflect.Value{})
 	v.SetMapIndex(reflect.ValueOf("Linux"), reflect.ValueOf(1991))
 	for i := v.MapRange(); i.Next(); {
