@@ -207,7 +207,7 @@ func retrieveArticleContent(file string) (Article, error) {
 	return article, nil
 }
 
-const Anchor, _Anchor, LineToRemoveTag, endl = `<li><a href="`, `">`, `(to remove)`, "\n"
+const Anchor, _Anchor, LineToRemoveTag, endl = `<li><a class="index" href="`, `">`, `(to remove)`, "\n"
 const IndexContentStart, IndexContentEnd = `<!-- index starts (don't remove) -->`, `<!-- index ends (don't remove) -->`
 
 func (go101 *Go101) RenderPrintPage(w http.ResponseWriter, r *http.Request, printTarget, item string) {

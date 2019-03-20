@@ -4,58 +4,58 @@
 
 <ul>
 <li>
-	<a href="#force-to-use-keyed-struct-literals">如何强制一个代码包的使用者总是使用带字段名称的组合字面值来表示此代码包中的结构体类型的值？</a>
+	<a class="index" href="#force-to-use-keyed-struct-literals">如何强制一个代码包的使用者总是使用带字段名称的组合字面值来表示此代码包中的结构体类型的值？</a>
 </li>
 <li>
-	<a href="#make-struct-type-uncomparable">如何使得一个结构体类型不可比较？</a>
+	<a class="index" href="#make-struct-type-uncomparable">如何使一个结构体类型不可比较？</a>
 </li>
 <li>
-	<a href="#dont-use-assignments-with-expression-dependencies">不要使用其中涉及到的表达式之间存在依赖关系的赋值语句。</a>
+	<a class="index" href="#dont-use-assignments-with-expression-dependencies">不要使用其中涉及到的表达式之间存在依赖关系的赋值语句。</a>
 </li>
 <li>
-	<a href="#simulate-loop-from-0-to-n">如何模拟一些其它语言中支持的<code>for i in 0..N</code>循环代码块？</a>
+	<a class="index" href="#simulate-loop-from-0-to-n">如何模拟一些其它语言中支持的<code>for i in 0..N</code>循环代码块？</a>
 </li>
 <li>
-	<a href="#reset-pointers-for-dead-elements">当我们废弃一个仍在使用的切片中的一些元素时，我们应该重置这些元素中的指针来避免暂时性的内存泄漏。</a>
+	<a class="index" href="#reset-pointers-for-dead-elements">当我们废弃一个仍在使用的切片中的一些元素时，我们应该重置这些元素中的指针来避免暂时性的内存泄漏。</a>
 </li>
 <li>
-	<a href="#avoid-copying-values-of-some-types">一些标准包中的某些类型的值不期望被复制。</a>
+	<a class="index" href="#avoid-copying-values-of-some-types">一些标准包中的某些类型的值不期望被复制。</a>
 </li>
 <li>
-	<a href="#memclr">我们可以利用<code>memclr</code>优化来重置数组或者切片中一段连续的元素。</a>
+	<a class="index" href="#memclr">我们可以利用<code>memclr</code>优化来重置数组或者切片中一段连续的元素。</a>
 </li>
 <li>
-	<a href="#check-method-existance">如何在不导入<code>refect</code>标准库包的情况下检查一个值是否拥有某个方法。</a>
+	<a class="index" href="#check-method-existance">如何在不导入<code>refect</code>标准库包的情况下检查一个值是否拥有某个方法。</a>
 </li>
 <li>
-	<a href="#clone-slice-efficiently-and-perfectly">如何高效且完美的克隆一个切片？</a>
+	<a class="index" href="#clone-slice-efficiently-and-perfectly">如何高效且完美的克隆一个切片？</a>
 </li>
 <li>
-	<a href="#use-three-index-subslice-form">在部分场景下我们应该使用三下标子切片形式。</a>
+	<a class="index" href="#use-three-index-subslice-form">在部分场景下我们应该使用三下标子切片形式。</a>
 </li>
 <li>
-	<a href="#execute-deferred-calls-earlier">使用匿名函数来使部分延迟函数调用尽早执行。</a>
+	<a class="index" href="#execute-deferred-calls-earlier">使用匿名函数来使部分延迟函数调用尽早执行。</a>
 </li>
 <li>
-	<a href="#assert-implementation">确保并表明一个自定义类型实现了指定的接口类型。</a>
+	<a class="index" href="#assert-implementation">确保并表明一个自定义类型实现了指定的接口类型。</a>
 </li>
 <li>
-	<a href="#assert-at-compile-time">一些编译时刻断言技巧。</a>
+	<a class="index" href="#assert-at-compile-time">一些编译时刻断言技巧。</a>
 </li>
 <li>
-	<a href="#declare-max-int-uint">如何声明一个最大的int和uint常量？</a>
+	<a class="index" href="#declare-max-int-uint">如何声明一个最大的int和uint常量？</a>
 </li>
 <li>
-	<a href="#detect-word-size-at-compile-time">如何在编译时刻决定系统原生字的尺寸？</a>
+	<a class="index" href="#detect-word-size-at-compile-time">如何在编译时刻决定系统原生字的尺寸？</a>
 </li>
 <li>
-	<a href="#64bit-alignment-guarantee">如何保证64位原子函数调用中操作的64位整数的地址在32位架构上总是64位对齐的？</a>
+	<a class="index" href="#64bit-alignment-guarantee">如何保证64位原子函数调用中操作的64位整数的地址在32位架构上总是64位对齐的？</a>
 </li>
 <li>
     <a href="#avoid-boxing-large-size-values">尽量避免将大尺寸的值包裹在接口值中。</a>
 </li>
 <li>
-	<a href="#make-use-of-bce">利用BCE（边界检查消除）进行性能优化。</a>
+	<a class="index" href="#make-use-of-bce">利用BCE（边界检查消除）进行性能优化。</a>
 </li>
 </ul>
 
@@ -108,7 +108,7 @@ func main() {
 
 
 <p class="anchor" id="make-struct-type-uncomparable"></p>
-<h3>如何使得一个结构体类型不可比较？</h3>
+<h3>如何使一个结构体类型不可比较？</h3>
 
 <div>
 有时候，我们想要避免一个自定义的结构体类型被用做一个映射的键值类型，那么我们可以放置一个非导出的零尺寸的不可比较类型的字段在结构体类型中以使此结构体类型不可比较。

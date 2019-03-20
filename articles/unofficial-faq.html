@@ -10,58 +10,58 @@
 <ul>
 <li>编译器与运行时
 	<ul>
-	<li><a href="#error-non-name">编译器错误信息<code>non-name *** on left side of :=</code>意味着什么?</a></li>
-	<li><a href="#error-missing-left-brace">编译器错误信息<code>unexpected newline, expecting { after if clause</code>意味着什么?</a></li>
-	<li><a href="#error-declared-not-used">编译器错误信息<code>declared and not used</code>意味着什么?</a></li>
-	<li><a href="#map-iteration-order">Go运行时是否维护映射条目的遍历顺序？</a></li>
-	<li><a href="#compiler-field-padding">Go编译器是否会进行字节填充以确保结构体字段的地址对齐？</a></li>
-	<li><a href="#final-zero-size-field">为什么一个结构体类型的最后一个字段类型的尺寸为零时会影响此结构体类型的尺寸？</a></li>
-	<li><a href="#new-function"><code>new(T)</code>是<code>var t T; (&t)</code>的语法糖吗？</a></li>
-	<li><a href="#fatal-error-deadlock">运行时错误信息<code>all goroutines are asleep - deadlock</code>意味着什么?</a></li>
-	<li><a href="#64-bit-alignment">64位整数值的地址是否能保证总是64位对齐的，以便可以被安全地原子访问？</a></li>
-	<li><a href="#atomical-assignment">赋值是原子操作吗？</a></li>
-	<li><a href="#zero-values-zero-bytes">是否每一个零值在内存中占据的字节都是零？</a></li>
-	<li><a href="#function-inline">标准的Go编译器是否支持函数内联？</a></li>
+	<li><a class="index" href="#error-non-name">编译器错误信息<code>non-name *** on left side of :=</code>意味着什么?</a></li>
+	<li><a class="index" href="#error-missing-left-brace">编译器错误信息<code>unexpected newline, expecting { after if clause</code>意味着什么?</a></li>
+	<li><a class="index" href="#error-declared-not-used">编译器错误信息<code>declared and not used</code>意味着什么?</a></li>
+	<li><a class="index" href="#map-iteration-order">Go运行时是否维护映射条目的遍历顺序？</a></li>
+	<li><a class="index" href="#compiler-field-padding">Go编译器是否会进行字节填充以确保结构体字段的地址对齐？</a></li>
+	<li><a class="index" href="#final-zero-size-field">为什么一个结构体类型的最后一个字段类型的尺寸为零时会影响此结构体类型的尺寸？</a></li>
+	<li><a class="index" href="#new-function"><code>new(T)</code>是<code>var t T; (&t)</code>的语法糖吗？</a></li>
+	<li><a class="index" href="#fatal-error-deadlock">运行时错误信息<code>all goroutines are asleep - deadlock</code>意味着什么?</a></li>
+	<li><a class="index" href="#64-bit-alignment">64位整数值的地址是否能保证总是64位对齐的，以便可以被安全地原子访问？</a></li>
+	<li><a class="index" href="#atomical-assignment">赋值是原子操作吗？</a></li>
+	<li><a class="index" href="#zero-values-zero-bytes">是否每一个零值在内存中占据的字节都是零？</a></li>
+	<li><a class="index" href="#function-inline">标准的Go编译器是否支持函数内联？</a></li>
 	</ul>
 </li>
 
 <li>标准库
 	<ul>
-	<li><a href="#pointer-atomic">如何原子地操作指针值？</a></li>
-	<li><a href="#get-days-of-month">如何使用尽可能短的代码行数来获取任意月份的天数？</a></li>
-	<li><a href="#time-sleep-after">函数调用<code>time.Sleep(d)</code>和数据通道接收<code>&lt;-time.After(d)</code>操作之间有何区别？</a></li>
-	<li><a href="#finalizers">终结器（finalizer）可以用做对象的析构函数吗？</a></li>
-	<li><a href="#trim">调用<code>strings</code>和<code>bytes</code>标准库包里<code>TrimLeft</code>和<code>TrimRight</code>函数经常会返回不符预期的结果，这些函数的实现存在bugs吗？</a></li>
-	<li><a href="#fmt-print-println">函数<code>fmt.Print</code>和<code>fmt.Println</code>的区别是什么？</a></li>
-	<li><a href="#log-print-println">函数<code>log.Print</code>和函数<code>log.Println</code>有什么区别吗?</a></li>
-	<li><a href="#fmt-print-synced">函数<code>fmt.Print</code>、<code>fmt.Println</code>和<code>fmt.Printf</code>的实现进行同步了吗？</a></li>
-	<li><a href="#print-builtin-fmt-log">内置的<code>print</code>和<code>println</code>函数与<code>fmt</code>和<code>log</code>标准库包中相应的打印函数有什么区别？</a></li>
-	<li><a href="#math-crypto-rand">通过标准库包<code>math/rand</code>和<code>crypto/rand</code>生成的随机数之间有什么区别？</a></li>
-	<li><a href="#math-round">标准库中为什么没有<code>math.Round</code>函数？</a></li>
+	<li><a class="index" href="#pointer-atomic">如何原子地操作指针值？</a></li>
+	<li><a class="index" href="#get-days-of-month">如何使用尽可能短的代码行数来获取任意月份的天数？</a></li>
+	<li><a class="index" href="#time-sleep-after">函数调用<code>time.Sleep(d)</code>和数据通道接收<code>&lt;-time.After(d)</code>操作之间有何区别？</a></li>
+	<li><a class="index" href="#finalizers">终结器（finalizer）可以用做对象的析构函数吗？</a></li>
+	<li><a class="index" href="#trim">调用<code>strings</code>和<code>bytes</code>标准库包里<code>TrimLeft</code>和<code>TrimRight</code>函数经常会返回不符预期的结果，这些函数的实现存在bugs吗？</a></li>
+	<li><a class="index" href="#fmt-print-println">函数<code>fmt.Print</code>和<code>fmt.Println</code>的区别是什么？</a></li>
+	<li><a class="index" href="#log-print-println">函数<code>log.Print</code>和函数<code>log.Println</code>有什么区别吗?</a></li>
+	<li><a class="index" href="#fmt-print-synced">函数<code>fmt.Print</code>、<code>fmt.Println</code>和<code>fmt.Printf</code>的实现进行同步了吗？</a></li>
+	<li><a class="index" href="#print-builtin-fmt-log">内置的<code>print</code>和<code>println</code>函数与<code>fmt</code>和<code>log</code>标准库包中相应的打印函数有什么区别？</a></li>
+	<li><a class="index" href="#math-crypto-rand">通过标准库包<code>math/rand</code>和<code>crypto/rand</code>生成的随机数之间有什么区别？</a></li>
+	<li><a class="index" href="#math-round">标准库中为什么没有<code>math.Round</code>函数？</a></li>
 	</ul>
 </li>
 
 <li>类型系统
 	<ul>
-	<li><a href="#uncomparable-types">哪些类型不支持比较？</a></li>
-	<li><a href="#nil-equality">为什么两个<code>nil</code>值有时候会不相等？</a></li>
-	<li><a href="#slice-conversion">为什么类型<code>[]T1</code>和<code>[]T2</code>没有共享相同底层类型，即使不同的类型<code>T1</code>和<code>T2</code>共享相同的底层类型？</a></li>
-	<li><a href="#unaddressable-values">哪些值可以被取地址，哪些值不可以被取地址？</a></li>
-	<li><a href="#maps-are-unaddressable">为什么映射元素不可被取地址？</a></li>
-	<li><a href="#slice-elements-always-addressable">为什么非空切片的元素总是可被取地址，即便对于不可取地址的切片也是如此？</a></li>
-	<li><a href="#method-set-relation">对任意的非指针、非接口定义类型<code>T</code>，为什么类型<code>*T</code>的方法集总是类型<code>T</code>的方法集的超集，但是反之却不然？</a></li>
-	<li><a href="#types-can-have-methods">我们可以为哪些类型声明方法？</a></li>
-	<li><a href="#declare-immutables">在Go里如何声明不可变量？</a></li>
-	<li><a href="#set-container-type">为什么没有内置的<code>set</code>容器类型？</a></li>
-	<li><a href="#byte-rune-slice-string">什么是byte？什么是rune？如何将<code>[]byte</code>和<code>[]rune</code>的值转换为字符串？</a></li>
+	<li><a class="index" href="#uncomparable-types">哪些类型不支持比较？</a></li>
+	<li><a class="index" href="#nil-equality">为什么两个<code>nil</code>值有时候会不相等？</a></li>
+	<li><a class="index" href="#slice-conversion">为什么类型<code>[]T1</code>和<code>[]T2</code>没有共享相同底层类型，即使不同的类型<code>T1</code>和<code>T2</code>共享相同的底层类型？</a></li>
+	<li><a class="index" href="#unaddressable-values">哪些值可以被取地址，哪些值不可以被取地址？</a></li>
+	<li><a class="index" href="#maps-are-unaddressable">为什么映射元素不可被取地址？</a></li>
+	<li><a class="index" href="#slice-elements-always-addressable">为什么非空切片的元素总是可被取地址，即便对于不可取地址的切片也是如此？</a></li>
+	<li><a class="index" href="#method-set-relation">对任意的非指针、非接口定义类型<code>T</code>，为什么类型<code>*T</code>的方法集总是类型<code>T</code>的方法集的超集，但是反之却不然？</a></li>
+	<li><a class="index" href="#types-can-have-methods">我们可以为哪些类型声明方法？</a></li>
+	<li><a class="index" href="#declare-immutables">在Go里如何声明不可变量？</a></li>
+	<li><a class="index" href="#set-container-type">为什么没有内置的<code>set</code>容器类型？</a></li>
+	<li><a class="index" href="#byte-rune-slice-string">什么是byte？什么是rune？如何将<code>[]byte</code>和<code>[]rune</code>的值转换为字符串？</a></li>
 	</ul>
 </li>
 <li>其它
 	<ul>
-	<li><a href="#about-iota"><code>iota</code>是什么意思？</a></li>
-	<li><a href="#check-if-channels-closed">为什么没有一个内置的<code>closed</code>函数用来检查数据通道是否已经关闭？</a></li>
-	<li><a href="#return-local-pointers">函数返回局部变量的指针是否安全？</a></li>
-	<li><a href="#gopher">单词<b><i>gopher</i></b>在Go社区中表示什么？</a></li>
+	<li><a class="index" href="#about-iota"><code>iota</code>是什么意思？</a></li>
+	<li><a class="index" href="#check-if-channels-closed">为什么没有一个内置的<code>closed</code>函数用来检查数据通道是否已经关闭？</a></li>
+	<li><a class="index" href="#return-local-pointers">函数返回局部变量的指针是否安全？</a></li>
+	<li><a class="index" href="#gopher">单词<b><i>gopher</i></b>在Go社区中表示什么？</a></li>
 	</ul>
 </li>
 
@@ -691,7 +691,7 @@ func main() {
 </p>
 
 <p>
-在Go 1.10之前，关于 <code>math.Round</code>函数是否应该被添加进标准包，经历了很长时候的<a href="https://github.com/golang/go/issues/4594">讨论</a>。
+在Go 1.10之前，关于 <code>math.Round</code>函数是否应该被添加进标准包，经历了<a href="https://github.com/golang/go/issues/4594">很长时候的讨论</a>。
 </p>
 
 <!-- 类型系统 -->
@@ -747,42 +747,17 @@ func main() {
 </i></p>
 
 <div>
-在回答这个问题之前，可以先看看Go中的一些事实：
-<ul>
-<li>
-	<code>nil</code>可以用做很多类型的值（指针、切片、映射、数据通道、函数以及接口）
-</li>
-<li>
-	<code>nil</code>值可能没有类型（untyped）。
-</li>
-<li>
-	一个类型为<code>T</code>的非接口值，可以被转换成接口类型<code>I</code>，如果<code>T</code>实现了<code>I</code>。
-	转换之后，此非接口值的一个副本将会存储在一个接口类型的值中。
-</li>
-<li>
-	一个接口值包裹着一个非接口值。此非接口值称为此接口值的动态值。此动态值的类型信息也被存储在此接口值里。动态值的类型被称作此接口值的动态类型。
-</li>
-<li>
-	类型不确定的<code>nil</code>值可以被转换成任意类型的指针、切片、映射、数据通道、函数以及接口类型。
-</li>
-<li>
-	当一个类型不确定的<code>nil</code>值被赋值给一个接口类型值时，这个接口值将便为一个零值接口值。
-	一个零值接口值时没有动态类型和动态值。
-</li>
-<li>
-	如果两个非接口<code>nil</code>值是可比较的，那么它们肯定相等。
-</li>
-<li>
-	如果一个接口值和一个非接口值是可比较的，那么此非接口值在比较前会被转换成接口值的类型。
-	因此比较一个接口值和一个非接口值实际上是在比较两个接口值。
-</li>
-<li>
-	如果两个接口值是可比较的，那么仅当它们的动态类型相同并且它们的动态值相等的时候它们才相等。
-</li>
-</ul>
 
 <p>
-从这些事实中，我们可以得知，如果两个接口值中有且只有一个没有动态类型，则它们肯定不相等。
+一个接口值可以看作是一个包裹非接口值的盒子。被包裹在一个接口值中的非接口值的类型必须实现了此接口值的类型。
+在Go中，很多种类型的类型的零值都是用<code>nil</code>来表示的。
+一个什么都没包裹的接口值为一个零值接口值，即nil接口值。
+一个包裹着其它非接口类型的nil值的接口值并非什么都没包裹，所以它不是（或者说它不等于）一个nil接口值。
+</p>
+
+<p>
+当对一个nil接口值和一个nil非接口值进行比较时（假设它们可以比较），此nil非接口值将先被转换为nil接口值的类型，然后再进行比较；
+此转换的结果为一个包裹了此nil非接口值的一个副本的接口值，此接口值不是（或者说它不等于）一个nil接口值，所以此比较不相等。
 </p>
 
 <p>
@@ -953,12 +928,12 @@ func main() {
 </h3>
 
 <div>
-在Go语言中，为了方便，
+在Go语言中，为了方便，对于一个非指针和非接口定义类型<code>T</code>，
 <ul>
 <li>
-	一个<code>T</code>类型的值可以调用定义在<code>*T</code>类型的方法，但是仅当此<code>T</code>的值是可寻址的情况下。
+	一个<code>T</code>类型的值可以调用为<code>*T</code>类型声明的方法，但是仅当此<code>T</code>的值是可寻址的情况下。
 	编译器在调用指针属主方法前，会自动取此<code>T</code>值的地址。
-	因为不是任何<code>T</code>值都是可寻址的，所以并非任何<code>T</code>值都能够调用定义在类型<code>*T</code>上的方法。
+	因为不是任何<code>T</code>值都是可寻址的，所以并非任何<code>T</code>值都能够调用为类型<code>*T</code>声明的方法。
 	这种便利只是一个语法糖，而不是一种固有的规则。
 </li>
 <li>
@@ -1113,7 +1088,7 @@ Iota是希腊字母表中的第九个字母。
 </p>
 
 <p>
-如果你确实需要这种函数，那么不怎么费功夫地自己写一个。
+如果你确实需要这种函数，你可以不怎么费功夫地自己写一个。
 请阅读<a href="channel-closing.html">如何优雅地关闭数据通道</a>一文来了解如何编写一个<code>closed</code>函数以及如何避免使用这样的函数。
 </p>
 

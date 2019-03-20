@@ -8,10 +8,10 @@
 	代码包相关的细节：
 	<ul>
 	<li>
-		<a href="#import-package-multiple-times">一个包可以在一个源文件里被引入多次。</a>
+		<a class="index" href="#import-package-multiple-times">一个包可以在一个源文件里被引入多次。</a>
 	</li>
 	<li>
-		<a href="#force-import-path">在<code>package mypkg</code>之后的注释<code>// import "x.y.z/mypkg"</code>对标准Go编译器是有意义的。</a>
+		<a class="index" href="#force-import-path">在<code>package mypkg</code>之后的注释<code>// import "x.y.z/mypkg"</code>对标准Go编译器是有意义的。</a>
 	</li>
 	</ul>
 </li>
@@ -19,31 +19,31 @@
 	控制流相关的细节：
 	<ul>
 	<li>
-		<a href="#default-branch-position">在<code>switch</code>和<code>select</code>流程控制代码块中，<code>default</code>分支可以放在所有的<code>case</code>分支之前或者所有的<code>case</code>分支之后，也可以放在<code>case</code>分支之间。</a>
+		<a class="index" href="#default-branch-position">在<code>switch</code>和<code>select</code>流程控制代码块中，<code>default</code>分支可以放在所有的<code>case</code>分支之前或者所有的<code>case</code>分支之后，也可以放在<code>case</code>分支之间。</a>
 	</li>
 	<li>
-		<a href="#constant-case-expressions"><code>switch</code>流程控制代码块中的数字常量case表达式不能重复，但是布尔常量case表达式可以重复。</a>
+		<a class="index" href="#constant-case-expressions"><code>switch</code>流程控制代码块中的数字常量case表达式不能重复，但是布尔常量case表达式可以重复。</a>
 	</li>
 	<li>
-		<a href="#switch-expressions-are-typed"><code>switch</code>流程控制代码块里的switch表达式总是被估值为类型确定值。</a>
+		<a class="index" href="#switch-expressions-are-typed"><code>switch</code>流程控制代码块里的switch表达式总是被估值为类型确定值。</a>
 	</li>
 	<li>
-		<a href="#default-switch-expression-value"><code>switch</code>流程控制代码块中的switch表达式的缺省默认值为类型确定值<code>true</code>（其类型为预定义类型<code>bool</code>）。</a>
+		<a class="index" href="#default-switch-expression-value"><code>switch</code>流程控制代码块中的switch表达式的缺省默认值为类型确定值<code>true</code>（其类型为预定义类型<code>bool</code>）。</a>
 	</li>
 	<li>
-		<a href="#open-brace-on-the-next-line">有时候，显式代码块的开括号<code>{</code>可以放在下一行。</a>
+		<a class="index" href="#open-brace-on-the-next-line">有时候，显式代码块的开括号<code>{</code>可以放在下一行。</a>
 	</li>
 	<li>
-		<a href="#some-case-branch-blocks-must-be-explicit">有些<code>case</code>分支代码块必须是显式的。</a>
+		<a class="index" href="#some-case-branch-blocks-must-be-explicit">有些<code>case</code>分支代码块必须是显式的。</a>
 	</li>
 	<li>
-		<a href="#defer-modify-results">嵌套的延迟函数调用可以修改外层函数的返回结果。</a>
+		<a class="index" href="#defer-modify-results">嵌套的延迟函数调用可以修改外层函数的返回结果。</a>
 	</li>
 	<li>
-		<a href="#no-op-recover-calls">某些<code>recover</code>函数调用是空操作。</a>
+		<a class="index" href="#no-op-recover-calls">某些<code>recover</code>函数调用是空操作。</a>
 	</li>
 	<li>
-		<a href="#os-exit-runtime-goexit">我们可以使用<code>os.Exit</code>函数调用退出一个程序和使用<code>runtime.Goexit</code>函数调用退出一个协程。</a>
+		<a class="index" href="#os-exit-runtime-goexit">我们可以使用<code>os.Exit</code>函数调用退出一个程序和使用<code>runtime.Goexit</code>函数调用退出一个协程。</a>
 	</li>
 	</ul>
 </li>
@@ -51,10 +51,10 @@
 	操作符相关的细节：
 	<ul>
 	<li>
-		<a href="#some-operator-precedence">递增运算符<code>++</code>和递减运算符<code>--</code>的优先级低于解引用运算符<code>*</code>和取地址运算符<code>&amp;</code>，解引用运算符和取地址运算符的优先级低于选择器<code>.</code>中的属性选择操作符。</a>
+		<a class="index" href="#some-operator-precedence">递增运算符<code>++</code>和递减运算符<code>--</code>的优先级低于解引用运算符<code>*</code>和取地址运算符<code>&amp;</code>，解引用运算符和取地址运算符的优先级低于选择器<code>.</code>中的属性选择操作符。</a>
 	</li>
 	<li>
-		<a href="#type-deduction-in-bit-shift">移位运算中的左类型不确定操作数的类型推断规则取决于右操作数是否是常量。</a>
+		<a class="index" href="#type-deduction-in-bit-shift">移位运算中的左类型不确定操作数的类型推断规则取决于右操作数是否是常量。</a>
 	</li>
 	</ul>
 </li>
@@ -62,16 +62,16 @@
 	指针相关的细节：
 	<ul>
 	<li>
-		<a href="#conversion-of-pointers-with-different-underlying-types">如果两个指针的类型具有不同的底层类型但是它们的基类型却共享相同的底层类型，则这两个指针值可以间接相互转换为对方的类型。</a>
+		<a class="index" href="#conversion-of-pointers-with-different-underlying-types">如果两个指针的类型具有不同的底层类型但是它们的基类型却共享相同的底层类型，则这两个指针值可以间接相互转换为对方的类型。</a>
 	</li>
 	<li>
-		<a href="#addresses-of-zeor-sized-values">两个零尺寸值的地址可能相等，也可能不相等。</a>
+		<a class="index" href="#addresses-of-zeor-sized-values">两个零尺寸值的地址可能相等，也可能不相等。</a>
 	</li>
 	<li>
-		<a href="#self-based-pointer-type">一个指针类型的基类型可以为此指针类型自身。</a>
+		<a class="index" href="#self-based-pointer-type">一个指针类型的基类型可以为此指针类型自身。</a>
 	</li>
 	<li>
-		<a href="#pointer-selector-shorthands">有关选择器缩写形式的细节。</a>
+		<a class="index" href="#pointer-selector-shorthands">有关选择器缩写形式的细节。</a>
 	</li>
 	</ul>
 </li>
@@ -79,55 +79,55 @@
 	容器相关的细节：
 	<ul>
 	<li>
-		<a href="#composite-literal-simplification">有时候，嵌套组合字面值可以被简化。</a>
+		<a class="index" href="#composite-literal-simplification">有时候，嵌套组合字面值可以被简化。</a>
 	</li>
 	<li>
-		<a href="#use-pointer-as-array">在某些情形下，我们可以将数组指针当作数组来用。</a>
+		<a class="index" href="#use-pointer-as-array">在某些情形下，我们可以将数组指针当作数组来用。</a>
 	</li>
 	<li>
-		<a href="#nil-map-element-retrieving">从nil映射中读取元素不会导致崩溃，读取结果是一个零元素值。</a>
+		<a class="index" href="#nil-map-element-retrieving">从nil映射中读取元素不会导致崩溃，读取结果是一个零元素值。</a>
 	</li>
 	<li>
-		<a href="#nil-map-element--deletion">从一个nil映射中删除一个条目不会导致崩溃，这是一个空操作。</a>
+		<a class="index" href="#nil-map-element--deletion">从一个nil映射中删除一个条目不会导致崩溃，这是一个空操作。</a>
 	</li>
 	<li>
-		<a href="#append-slice-elements"><code>append</code>函数调用的结果可能会与原始切片共享一些元素，也可能不共享任何元素。</a>
+		<a class="index" href="#append-slice-elements"><code>append</code>函数调用的结果可能会与原始切片共享一些元素，也可能不共享任何元素。</a>
 	</li>
 	<li>
-		<a href="#subslice">从一个基础切片派生出的子切片的长度可能大于基础切片的长度。</a>
+		<a class="index" href="#subslice">从一个基础切片派生出的子切片的长度可能大于基础切片的长度。</a>
 	</li>
 	<li>
-		<a href="#derive-from-nil-slice">从一个nil切片中派生子切片是允许的，只要子切片表达式中使用的所有索引都为零，则不会有恐慌产生，结果子切片同样是一个nil切片。</a>
+		<a class="index" href="#derive-from-nil-slice">从一个nil切片中派生子切片是允许的，只要子切片表达式中使用的所有索引都为零，则不会有恐慌产生，结果子切片同样是一个nil切片。</a>
 	</li>
 	<li>
-		<a href="#range-over-nil-map-and-slice">用<code>range</code>遍历nil映射或者nil切片是没问题的，这属于空操作。</a>
+		<a class="index" href="#range-over-nil-map-and-slice">用<code>range</code>遍历nil映射或者nil切片是没问题的，这属于空操作。</a>
 	</li>
 	<li>
-		<a href="#range-over-nil-array-pointer">用<code>range</code>遍历nil数组指针时，如果忽略或省略第二个迭代变量，则此遍历是没问题的。遍历中的循环步数为相应数组类型的长度。</a>
+		<a class="index" href="#range-over-nil-array-pointer">用<code>range</code>遍历nil数组指针时，如果忽略或省略第二个迭代变量，则此遍历是没问题的。遍历中的循环步数为相应数组类型的长度。</a>
 	</li>
 	<li>
-		<a href="#modify-slice-length-and-capacity-separately">切片的长度和容量可以被单独修改。</a>
+		<a class="index" href="#modify-slice-length-and-capacity-separately">切片的长度和容量可以被单独修改。</a>
 	</li>
 	<li>
-		<a href="#indexes-in-composite-literals">切片和数组组合字面值中的索引必须是非负常量。</a>
+		<a class="index" href="#indexes-in-composite-literals">切片和数组组合字面值中的索引必须是非负常量。</a>
 	</li>
 	<li>
-		<a href="#constant-keys-in-composite-literals">切片/数组/映射组合字面值的常量索引和键值不能重复。</a>
+		<a class="index" href="#constant-keys-in-composite-literals">切片/数组/映射组合字面值的常量索引和键值不能重复。</a>
 	</li>
 	<li>
-		<a href="#array-slice-element-addressability">不可寻址的数组的元素依旧是不可寻址的，但是不可寻址的切片的元素总是可寻址的。</a>
+		<a class="index" href="#array-slice-element-addressability">不可寻址的数组的元素依旧是不可寻址的，但是不可寻址的切片的元素总是可寻址的。</a>
 	</li>
 	<li>
-		<a href="#array-slice-derivable">可以从不可寻址的切片派生子切片，但是不能从不可寻址的数组派生子切片。</a>
+		<a class="index" href="#array-slice-derivable">可以从不可寻址的切片派生子切片，但是不能从不可寻址的数组派生子切片。</a>
 	</li>
 	<li>
-		<a href="#nan-as-map-keys">把以<code>NaN</code>做为键值的条目放如映射就宛如把条目放入黑洞一样。</a>
+		<a class="index" href="#nan-as-map-keys">把以<code>NaN</code>做为键值的条目放如映射就宛如把条目放入黑洞一样。</a>
 	</li>
 	<li>
-		<a href="#capacity-of-slice-from-string">字符串转换为byte切片或rune切片后的结果切片的容量可能会大于长度。</a>
+		<a class="index" href="#capacity-of-slice-from-string">字符串转换为byte切片或rune切片后的结果切片的容量可能会大于长度。</a>
 	</li>
 	<li>
-		<a href="#different-loops">对于切片<code>s</code>，循环<code>for i = range s {...}</code>并不等价于循环<code>for i = 0; i < len(s); i++ {...}</code>。</a>
+		<a class="index" href="#different-loops">对于切片<code>s</code>，循环<code>for i = range s {...}</code>并不等价于循环<code>for i = 0; i < len(s); i++ {...}</code>。</a>
 	</li>
 	</ul>
 </li>
@@ -135,13 +135,13 @@
 	函数和方法相关的细节：
 	<ul>
 	<li>
-		<a href="#call-as-expression">一个多返回值函数调用表达式不能和其它表达式混用在一个赋值语句的右侧或者另一个函数调用的实参列表中。</a>
+		<a class="index" href="#call-as-expression">一个多返回值函数调用表达式不能和其它表达式混用在一个赋值语句的右侧或者另一个函数调用的实参列表中。</a>
 	</li>
 	<li>
-		<a href="#compile-time-evaluated-calls">某些函数调用是在在编译时刻被估值的。</a>
+		<a class="index" href="#compile-time-evaluated-calls">某些函数调用是在在编译时刻被估值的。</a>
 	</li>
 	<li>
-		<a href="#method-as-function">每一个方法都对应着一个隐式声明的函数。</a>
+		<a class="index" href="#method-as-function">每一个方法都对应着一个隐式声明的函数。</a>
 	</li>
 	</ul>
 </li>
@@ -149,24 +149,24 @@
 	接口相关的细节：
 	<ul>
 	<li>
-		<a href="#comparison-interfaces-may-panic">如果两个接口值具有相同的动态类型并且此动态类型不支持比较，则比较这两个接口值将导致一个恐慌。</a>
+		<a class="index" href="#comparison-interfaces-may-panic">如果两个接口值具有相同的动态类型并且此动态类型不支持比较，则比较这两个接口值将导致一个恐慌。</a>
 	</li>
 	<li>
-		<a href="#type-assertion-to-interface-type">类型断言可以用于将一个接口值转换为另一个接口类型，即使此接口值的类型并未实现另一个接口类型。</a>
+		<a class="index" href="#type-assertion-to-interface-type">类型断言可以用于将一个接口值转换为另一个接口类型，即使此接口值的类型并未实现另一个接口类型。</a>
 	</li>
 	<li>
-		<a href="#failed-type-assertion-may-panic">一个失败的类型断言的可选的第二个结果是否被舍弃将影响此类型断言的行为。</a>
+		<a class="index" href="#failed-type-assertion-may-panic">一个失败的类型断言的可选的第二个结果是否被舍弃将影响此类型断言的行为。</a>
 	</li>
 	<!--
 	<li>
-		<a href="#interface-comparison-complexity">对于标准编译器来说，比较两个接口值的时间复杂度可能是<code><i>O</i>(1)</code>，也可能是<code><i>O</i>(n)</code>。</a>
+		<a class="index" href="#interface-comparison-complexity">对于标准编译器来说，比较两个接口值的时间复杂度可能是<code><i>O</i>(1)</code>，也可能是<code><i>O</i>(n)</code>。</a>
 	</li>
 	<li>
-		<a href="#interface-copy-complexity">对于标准编译器来说，复制一个接口值的时间复杂度为<code><i>O</i>(1)</code>。</a>
+		<a class="index" href="#interface-copy-complexity">对于标准编译器来说，复制一个接口值的时间复杂度为<code><i>O</i>(1)</code>。</a>
 	</li>
 	-->
 	<li>
-		<a href="#errors-new-different-returns">以相同实参调用两次<code>errors.New</code>函数返回的两个<code>error</code>值是不相等的。</a>
+		<a class="index" href="#errors-new-different-returns">以相同实参调用两次<code>errors.New</code>函数返回的两个<code>error</code>值是不相等的。</a>
 	</li>
 	</ul>
 </li>
@@ -174,10 +174,10 @@
 	管道相关的细节：
 	<ul>
 	<li>
-		<a href="#receive-only-channel-canot-be-closed">单向接收数据通道无法被关闭。</a>
+		<a class="index" href="#receive-only-channel-canot-be-closed">单向接收数据通道无法被关闭。</a>
 	</li>
 	<li>
-		<a href="#send-to-closed-channel-is-non-blocking">发送一个值到一个已关闭的数据通道被视为一个非阻塞操作，该操作会导致恐慌。</a>
+		<a class="index" href="#send-to-closed-channel-is-non-blocking">发送一个值到一个已关闭的数据通道被视为一个非阻塞操作，该操作会导致恐慌。</a>
 	</li>
 	</ul>
 </li>
@@ -185,16 +185,16 @@
 	更多关于类型和值的细节：
 	<ul>
 	<li>
-		<a href="#local-type-declaration">类型可以在声明函数体内。</a>
+		<a class="index" href="#local-type-declaration">类型可以在声明函数体内。</a>
 	</li>
 	<li>
-		<a href="#final-zero-size-field">对于标准编译器，结构体中的某些零尺寸字段的尺寸有可能会被视为一个字节。</a>
+		<a class="index" href="#final-zero-size-field">对于标准编译器，结构体中的某些零尺寸字段的尺寸有可能会被视为一个字节。</a>
 	</li>
 	<li>
-		<a href="#nan-inf">NaN != NaN，Inf == Inf。</a>
+		<a class="index" href="#nan-inf">NaN != NaN，Inf == Inf。</a>
 	</li>
 	<li>
-		<a href="#non-exported-names-from-different-packages">不同代码包中的两个非导出方法名和结构体字段名总是被视为不同的名称。</a>
+		<a class="index" href="#non-exported-names-from-different-packages">不同代码包中的两个非导出方法名和结构体字段名总是被视为不同的名称。</a>
 	</li>
 	</ul>
 </li>
@@ -202,18 +202,18 @@
 	杂项：
 	<ul>
 	<li>
-		<a href="#sometimes-parentheses-are-required">在某些很少见的场景中，圆括号是必需的。</a>
+		<a class="index" href="#sometimes-parentheses-are-required">在某些很少见的场景中，圆括号是必需的。</a>
 	</li>
 	<!--
 	<li>
-		<a href="#main-entry-function-absence">一个程序可能并不需要一个<code>main</code>入口函数即可运行。</a>
+		<a class="index" href="#main-entry-function-absence">一个程序可能并不需要一个<code>main</code>入口函数即可运行。</a>
 	</li>
 	-->
 	<li>
-		<a href="#stack-overflow-is-not-panic">栈溢出不会造成恐慌，它将使程序崩溃。</a>
+		<a class="index" href="#stack-overflow-is-not-panic">栈溢出不会造成恐慌，它将使程序崩溃。</a>
 	</li>
 	<li>
-		<a href="#some-evaluation-order-are-compiler-dependent">某些表达式的估值顺序取决于具体编译器实现。</a>
+		<a class="index" href="#some-evaluation-order-are-compiler-dependent">某些表达式的估值顺序取决于具体编译器实现。</a>
 	</li>
 
 	</ul>
@@ -222,19 +222,19 @@
 	标准包相关的细节：
 	<ul>
 	<li>
-		<a href="#reflect-deep-equal"><code>reflect.DeepEqual(x, y)</code>和<code>x == y</code>的结果可能会不同。</a>
+		<a class="index" href="#reflect-deep-equal"><code>reflect.DeepEqual(x, y)</code>和<code>x == y</code>的结果可能会不同。</a>
 	</li>
 	<li>
-		<a href="#reflect-value-bytes"><code>reflect.Value.Bytes()</code>方法返回一个<code>[]byte</code>值，它的元素类型<code>byte</code>可能并非属主参数代表的Go切片值的元素类型。</a>
+		<a class="index" href="#reflect-value-bytes"><code>reflect.Value.Bytes()</code>方法返回一个<code>[]byte</code>值，它的元素类型<code>byte</code>可能并非属主参数代表的Go切片值的元素类型。</a>
 	</li>
 	<li>
-		<a href="#check-file-existent">我们应该使用<code>os.IsNotExist(err)</code>而不是<code>err == os.ErrNotExist</code>来检查文件是否存在。</a>
+		<a class="index" href="#check-file-existent">我们应该使用<code>os.IsNotExist(err)</code>而不是<code>err == os.ErrNotExist</code>来检查文件是否存在。</a>
 	</li>
 	<li>
-		<a href="#boolean-flag"><code>flag</code>标准库包对待布尔选项不同于整数和字符串选项。</a>
+		<a class="index" href="#boolean-flag"><code>flag</code>标准库包对待布尔选项不同于整数和字符串选项。</a>
 	</li>
 	<li>
-		<a href="#printf-positional-arguments"><code>[Sp|Fp|P]rintf</code>支持位置参数。</a>
+		<a class="index" href="#printf-positional-arguments"><code>[Sp|Fp|P]rintf</code>支持位置参数。</a>
 	</li>
 	</ul>
 </li>

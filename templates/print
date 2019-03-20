@@ -20,52 +20,98 @@
 		<script src="/static/jquery/jquery.min-v1.11.2.js"></script>
 		<link href="/static/go101/css/{{ .PrintTarget }}.css" rel="stylesheet" media="print">
 		<script>
+		// "flash" or "print". "print" means paper.
+		const printForPaper = "{{ .PrintTarget }}" == "print";
+
+		function parseArticleAndAnchor(url) {
+			var index = url.lastIndexOf('/');
+			var anchor = url.substr(index + 1);
+			index = anchor.indexOf('#');
+			if (index < 0) {
+				return {
+					Article: anchor,
+					Anchor: ""
+				};
+			}
+			return {
+				Article: anchor.substr(0, index),
+				Anchor: anchor.substr(index + 1)
+			};
+		}
+
 		function process() {
+			var articleChapterNumber = {"": "<i>（本章中）</i>"};
+			var part = 1;
+			$("#book-index ul.part > li").each(function(){
+				$(this).html(part + ". " + $(this).html());
+				$(this).children("a").each(function() {
+					var link = parseArticleAndAnchor(this.href);
+					articleChapterNumber["article:" + link.Article] = "<i>（第" + part + "章）</i>"
+				});
+				
+				var chapter = 1;
+				$(this).find("ul.chapters > li").each(function(){
+					$(this).html(part + "." + chapter + " " + $(this).html());
+					$(this).children("a").each(function() {
+						var link = parseArticleAndAnchor(this.href);
+						articleChapterNumber["article:" + link.Article] = "<i>（第" + part + "." + chapter + "章）</i>"
+					});
+					chapter++;
+				})
+				part++;
+			})
+			
+			//console.log(articleChapterNumber)
+
 			var currentArticle = "";
 			$("p.article-anchor, p.anchor").each(function(){
 				if (this.className == "article-anchor") {
-					this.id = "article:" + this.id
-					currentArticle = this.id
+					//console.log($(this).siblings("h1").text());
+					
+					this.id = "article:" + this.id;
+					currentArticle = this.id;
 				} else if (currentArticle != "") {
-					this.id = currentArticle + ":" + this.id
+					this.id = currentArticle + ":" + this.id;
 				}
 				//console.log("id: " + this.id)
 			})
 
-			var printPage = location.pathname.substr(location.pathname.lastIndexOf('/') + 1)
+			var printPage = location.pathname.substr(location.pathname.lastIndexOf('/') + 1);
 
 			currentArticle = ""
 			$("p.article-anchor, a:not([href^='http'])").each(function(){
 				if (this.className == "article-anchor") {
 					currentArticle = this.id;
 					//console.log("================ " + currentArticle + ", " + printPage)
-					return
+					return;
 				}
 
-				var index = this.href.lastIndexOf('/')
-				var anchor = this.href.substr(index + 1);
-				index = anchor.indexOf('#');
-
-				if (index == 0) { // impossible?
-					anchor = currentArticle + ":" + anchor.substr(0)
-				} else if (index < 0) {
-					anchor = "article:" + anchor
+				var link = parseArticleAndAnchor(this.href);
+				var anchor = link.Article;
+				if (anchor == printPage) {
+					anchor = currentArticle;
 				} else {
-					var article = anchor.substr(0, index)
-					anchor = anchor.substr(index+1)
-					if (article == printPage) {
-						article = currentArticle
-					} else {
-						article = "article:" + article
-					}
-					anchor = article + ":" + anchor
+					anchor = "article:" + anchor;
 				}
+				if (link.Anchor != "") {
+					anchor = anchor + ":" + link.Anchor;
+				}
+
 				//console.log("anchor: " + anchor)
-				this.href = location.protocol+'//'+location.host + location.pathname + "#" + anchor
+				this.href = location.protocol+'//'+location.host + location.pathname + "#" + anchor;
+				if (printForPaper && !$(this).hasClass("index")) {
+					var article = link.Article;
+					if (article == printPage) {
+						article = "";
+					} else {
+						article = "article:" + article;
+					}
+					$(this).after(articleChapterNumber[article]);
+				}
 			});
 
-			$("pre.line-numbers").addClass("prettyprint linenums")
-			$("pre.disable-line-numbers111").addClass("prettyprint")
+			$("pre.line-numbers").addClass("prettyprint linenums");
+			$("pre.disable-line-numbers111").addClass("prettyprint");
 			PR.prettyPrint();
 		}
 		</script>
