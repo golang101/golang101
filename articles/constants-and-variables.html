@@ -146,7 +146,7 @@ string(66+0i) // 66+0i的默认类型是complex128（不是一个整数类型）
 <p>
 注意，有时一个显式转换形式必须被写成<code>(T)(v)</code>以免发生歧义。
 比如当<code>T</code>为一个无名指针类型的时候。
-（我们将在以后<a href="pointer.html">指针</a>一文中了解指针类型。）
+我们将在以后<a href="pointer.html">指针</a>一文中了解指针类型。
 </p>
 
 <p>
@@ -486,7 +486,8 @@ Go语言有两种变量声明形式。一种称为标准形式，另一种称为
 
 <p>
 每条标准变量声明形式语句起始于一个<code>var</code>关键字。
-每个<code>var</code>关键字跟随着一个变量名（必须为一个<a href="keywords-and-identifiers.html#identifier">标识符</a>）。
+每个<code>var</code>关键字跟随着一个变量名。
+每个变量名必须为一个<a href="keywords-and-identifiers.html#identifier">标识符</a>。
 </p>
 
 下面是几条完整形式的标准变量声明语句。
@@ -936,8 +937,8 @@ func main() {}
 </p>
 
 <p>
-如果一个运算中的所有运算数（见下一篇文章<a href="operators.html">常见运算符</a>）都为常量，
-则此运算的结果也为常量。或者说，此运算将在编译阶段就被估值。
+如果一个运算中的所有运算数都为常量，则此运算的结果也为常量。或者说，此运算将在编译阶段就被估值。
+下一篇文章将介绍Go中的<a href="operators.html">常用运算符</a>。
 </p>
 
 <div>

@@ -7,9 +7,9 @@
 <div>
 索引：
 
-<ul>
+<ul class="summaries" id="unofficial-faq.html">
 <li>编译器与运行时
-	<ul>
+	<ul class="index">
 	<li><a class="index" href="#error-non-name">编译器错误信息<code>non-name *** on left side of :=</code>意味着什么?</a></li>
 	<li><a class="index" href="#error-missing-left-brace">编译器错误信息<code>unexpected newline, expecting { after if clause</code>意味着什么?</a></li>
 	<li><a class="index" href="#error-declared-not-used">编译器错误信息<code>declared and not used</code>意味着什么?</a></li>
@@ -26,7 +26,7 @@
 </li>
 
 <li>标准库
-	<ul>
+	<ul class="index">
 	<li><a class="index" href="#pointer-atomic">如何原子地操作指针值？</a></li>
 	<li><a class="index" href="#get-days-of-month">如何使用尽可能短的代码行数来获取任意月份的天数？</a></li>
 	<li><a class="index" href="#time-sleep-after">函数调用<code>time.Sleep(d)</code>和数据通道接收<code>&lt;-time.After(d)</code>操作之间有何区别？</a></li>
@@ -42,7 +42,7 @@
 </li>
 
 <li>类型系统
-	<ul>
+	<ul class="index">
 	<li><a class="index" href="#uncomparable-types">哪些类型不支持比较？</a></li>
 	<li><a class="index" href="#nil-equality">为什么两个<code>nil</code>值有时候会不相等？</a></li>
 	<li><a class="index" href="#slice-conversion">为什么类型<code>[]T1</code>和<code>[]T2</code>没有共享相同底层类型，即使不同的类型<code>T1</code>和<code>T2</code>共享相同的底层类型？</a></li>
@@ -57,7 +57,7 @@
 	</ul>
 </li>
 <li>其它
-	<ul>
+	<ul class="index">
 	<li><a class="index" href="#about-iota"><code>iota</code>是什么意思？</a></li>
 	<li><a class="index" href="#check-if-channels-closed">为什么没有一个内置的<code>closed</code>函数用来检查数据通道是否已经关闭？</a></li>
 	<li><a class="index" href="#return-local-pointers">函数返回局部变量的指针是否安全？</a></li>
@@ -68,6 +68,10 @@
 
 </ul>
 </div>
+
+
+
+<div class="summaries-items">
 
 <!-- compiler and runtime  -->
 
@@ -796,7 +800,7 @@ func main() {
 
 <div>
 <p>
-在Go语言中，仅当两个切片类型共享相同的<a href="type-system-overview.html#underlying-type">底层类型</a>时，其中一个切片类型才可以转换成另一个切片的类型而不需要使用<a href="unsafe.html"><code>unsafe</code>机制</a>。（<a href="value-conversions-assignments-and-comparisons.html">类型转换、赋值和值比较规则大全</a>一文列举出了所有的类型转换规则。）
+在Go语言中，仅当两个切片类型共享相同的<a href="type-system-overview.html#underlying-type">底层类型</a>时，其中一个切片类型才可以转换成另一个切片的类型而不需要使用<a href="unsafe.html"><code>unsafe</code>机制</a>。
 </p>
 
 <p>
@@ -1119,6 +1123,11 @@ Iota是希腊字母表中的第九个字母。
 <i>Renee French</i>是Go项目首任负责人<i>Rob Pike</i>的妻子。
 </p>
 
+
+
+
+
+</div> <!-- summaries-items -->
 
 <!--
 

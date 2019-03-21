@@ -150,7 +150,7 @@ func main() {
 	// title和author字段的值都为空字符串""，pages字段的值为0。
 	book = Book{}
 	// title字段空字符串""，pages字段为0。
-	book = Book{author: "老貘"} 
+	book = Book{author: "老貘"}
 
 	// 使用选择器来访问和修改字段值。
 	var book2 Book // <=> book2 := Book{}
@@ -163,7 +163,7 @@ func main() {
 <p></p>
 
 如果一个组合字面形式中最后一项和结尾的<code>}</code>处于同一行，则此项后的逗号<code>,</code>是可选的；否则此逗号不可省略。
-（我们可以阅读后面的<a href="line-break-rules.html">Go代码断行规则</a>一文了解更多断行规则。）
+我们可以阅读后面的<a href="line-break-rules.html">Go代码断行规则</a>一文了解更多断行规则。
 
 <pre class="line-numbers"><code class="language-go">var _ = Book {
 	author: "老貘",

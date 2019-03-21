@@ -1,8 +1,9 @@
 ﻿<h1>Go 技巧 101</h1>
 
+<div>
 索引：
 
-<ul>
+<ul class="index summaries" id="tips.html">
 <li>
 	<a class="index" href="#force-to-use-keyed-struct-literals">如何强制一个代码包的使用者总是使用带字段名称的组合字面值来表示此代码包中的结构体类型的值？</a>
 </li>
@@ -52,17 +53,22 @@
 	<a class="index" href="#64bit-alignment-guarantee">如何保证64位原子函数调用中操作的64位整数的地址在32位架构上总是64位对齐的？</a>
 </li>
 <li>
-    <a href="#avoid-boxing-large-size-values">尽量避免将大尺寸的值包裹在接口值中。</a>
+	<a class="index" href="#avoid-boxing-large-size-values">尽量避免将大尺寸的值包裹在接口值中。</a>
 </li>
 <li>
 	<a class="index" href="#make-use-of-bce">利用BCE（边界检查消除）进行性能优化。</a>
 </li>
 </ul>
 
+<p>
+</p>
+
+</div>
 
 
 
 
+<div class="summaries-items">
 
 <p class="anchor" id="force-to-use-keyed-struct-literals"></p>
 <h3>如何强制一个代码包的使用者总是使用带字段名称的组合字面值来表示此代码包中的结构体类型的值？</h3>
@@ -696,6 +702,11 @@ BenchmarkNumSameBytes_2-4   	20000000	       450 ns/op
 </p>
 
 </div>
+
+
+
+
+</div> <!-- summaries-items -->
 
 
 <!--

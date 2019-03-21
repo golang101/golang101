@@ -3,10 +3,10 @@
 <div>
 索引：
 
-<ul>
+<ul class="summaries" id="details.html">
 <li>
 	代码包相关的细节：
-	<ul>
+	<ul class="index">
 	<li>
 		<a class="index" href="#import-package-multiple-times">一个包可以在一个源文件里被引入多次。</a>
 	</li>
@@ -17,7 +17,7 @@
 </li>
 <li>
 	控制流相关的细节：
-	<ul>
+	<ul class="index">
 	<li>
 		<a class="index" href="#default-branch-position">在<code>switch</code>和<code>select</code>流程控制代码块中，<code>default</code>分支可以放在所有的<code>case</code>分支之前或者所有的<code>case</code>分支之后，也可以放在<code>case</code>分支之间。</a>
 	</li>
@@ -49,7 +49,7 @@
 </li>
 <li>
 	操作符相关的细节：
-	<ul>
+	<ul class="index">
 	<li>
 		<a class="index" href="#some-operator-precedence">递增运算符<code>++</code>和递减运算符<code>--</code>的优先级低于解引用运算符<code>*</code>和取地址运算符<code>&amp;</code>，解引用运算符和取地址运算符的优先级低于选择器<code>.</code>中的属性选择操作符。</a>
 	</li>
@@ -60,7 +60,7 @@
 </li>
 <li>
 	指针相关的细节：
-	<ul>
+	<ul class="index">
 	<li>
 		<a class="index" href="#conversion-of-pointers-with-different-underlying-types">如果两个指针的类型具有不同的底层类型但是它们的基类型却共享相同的底层类型，则这两个指针值可以间接相互转换为对方的类型。</a>
 	</li>
@@ -77,7 +77,7 @@
 </li>
 <li>
 	容器相关的细节：
-	<ul>
+	<ul class="index">
 	<li>
 		<a class="index" href="#composite-literal-simplification">有时候，嵌套组合字面值可以被简化。</a>
 	</li>
@@ -133,7 +133,7 @@
 </li>
 <li>
 	函数和方法相关的细节：
-	<ul>
+	<ul class="index">
 	<li>
 		<a class="index" href="#call-as-expression">一个多返回值函数调用表达式不能和其它表达式混用在一个赋值语句的右侧或者另一个函数调用的实参列表中。</a>
 	</li>
@@ -147,7 +147,7 @@
 </li>
 <li>
 	接口相关的细节：
-	<ul>
+	<ul class="index">
 	<li>
 		<a class="index" href="#comparison-interfaces-may-panic">如果两个接口值具有相同的动态类型并且此动态类型不支持比较，则比较这两个接口值将导致一个恐慌。</a>
 	</li>
@@ -172,7 +172,7 @@
 </li>
 <li>
 	管道相关的细节：
-	<ul>
+	<ul class="index">
 	<li>
 		<a class="index" href="#receive-only-channel-canot-be-closed">单向接收数据通道无法被关闭。</a>
 	</li>
@@ -183,7 +183,7 @@
 </li>
 <li>
 	更多关于类型和值的细节：
-	<ul>
+	<ul class="index">
 	<li>
 		<a class="index" href="#local-type-declaration">类型可以在声明函数体内。</a>
 	</li>
@@ -200,7 +200,7 @@
 </li>
 <li>
 	杂项：
-	<ul>
+	<ul class="index">
 	<li>
 		<a class="index" href="#sometimes-parentheses-are-required">在某些很少见的场景中，圆括号是必需的。</a>
 	</li>
@@ -220,7 +220,7 @@
 </li>
 <li>
 	标准包相关的细节：
-	<ul>
+	<ul class="index">
 	<li>
 		<a class="index" href="#reflect-deep-equal"><code>reflect.DeepEqual(x, y)</code>和<code>x == y</code>的结果可能会不同。</a>
 	</li>
@@ -240,6 +240,8 @@
 </li>
 </ul>
 </div>
+
+<div class="summaries-items">
 
 <p class="anchor" id="import-package-multiple-times"></p>
 <h3>一个包可以在一个源文件里被引入多次。</h3>
@@ -874,14 +876,14 @@ func main() {
 <h3>有时候，嵌套组合字面值可以被简化。</h3>
 
 <p>
-关于细节，请阅读<a href="container.html#composite-literal-simplification">这一章节</a>。
+关于细节，请阅读<a href="container.html#composite-literal-simplification">内嵌组合字面形式可以被简化</a>这一章节。
 </p>
 
 <p class="anchor" id="use-pointer-as-array"></p>
 <h3>在某些情形下，我们可以将数组指针当作数组来用。</h3>
 
 <p>
-关于细节，请阅读<a href="container.html#use-pointer-as-array">这一章节</a>。
+关于细节，请阅读<a href="container.html#use-pointer-as-array">把数组指针当做数组来使用</a>这一章节。
 </p>
 
 <p class="anchor" id="nil-map-element-retrieving"></p>
@@ -930,7 +932,7 @@ func main() {
 <h3><code>append</code>函数调用的结果可能会与原始切片共享一些元素，也可能不共享任何元素。</h3>
 
 <p>
-关于细节，请阅读<a href="container.html#element-addition-deletion">这一章节</a>。
+关于细节，请阅读<a href="container.html#element-addition-deletion">添加和删除容器元素</a>这一章节。
 </p>
 
 <p class="anchor" id="subslice"></p>
@@ -953,7 +955,7 @@ func main() {
 </code></pre>
 
 <p>
-关于细节，请阅读<a href="container.html#subslice">这一章节</a>。
+关于细节，请阅读<a href="container.html#subslice">从数组或者切片派生切片</a>这一章节。
 </p>
 </div>
 
@@ -979,7 +981,7 @@ func main() {
 </code></pre>
 
 <p>
-关于细节，请阅读<a href="container.html#subslice">这一章节</a>。
+关于细节，请阅读<a href="container.html#subslice">从数组或者切片派生切片</a>这一章节。
 </p>
 </div>
 
@@ -1035,7 +1037,7 @@ func main() {
 
 <p>
 我们可以通过反射途径单独修改一个切片的长度或者容量。
-关于细节，请阅读<a href="container.html#modify-slice-length-and-capacity">这一章节</a>。
+关于细节，请阅读<a href="container.html#modify-slice-length-and-capacity">单独修改一个切片的长度或者容量</a>这一章节。
 </p>
 
 <p class="anchor" id="indexes-in-composite-literals"></p>
@@ -1140,8 +1142,8 @@ func main() {
 <h3>把以<code>NaN</code>做为键值的条目放如映射就宛如把条目放入黑洞一样。</h3>
 
 <div>
-原因是<code>NaN != NaN</code>（详见<a href="#nan-inf">下面的另一个细节</a>）。
-以<code>NaN</code>作为键值的元素只能在<code>for-range</code>循环中被找到。
+原因是<a href="#nan-inf">下面的另一个细节</a>中提到的<code>NaN != NaN</code>。
+但是以<code>NaN</code>作为键值的元素只能在<code>for-range</code>循环中被找到。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1244,21 +1246,21 @@ func main() {
 <h3>一个多返回值函数调用表达式不能和其它表达式混用在一个赋值语句的右侧或者另一个函数调用的实参列表中。</h3>
 
 <p>
-关于细节，请阅读<a href="function.html#call-as-expression">这一章节</a>。
+关于细节，请阅读<a href="function.html#call-as-expression">有返回值的函数的调用是一种表达式</a>这一章节。
 </p>
 
 <p class="anchor" id="compile-time-evaluated-calls"></p>
 <h3>某些函数调用是在在编译时刻被估值的。</h3>
 
 <p>
-关于细节，请阅读<a href="summaries.html#compile-time-evaluation">这一章节</a>。
+关于细节，请阅读<a href="summaries.html#compile-time-evaluation">哪些函数调用将在编译时刻被估值？</a>这一总结。
 </p>
 
 <p class="anchor" id="method-as-function"></p>
 <h3>每一个方法都对应着一个隐式声明的函数。</h3>
 
 <p>
-关于细节，请阅读<a href="function.html#compile-time-evaluated-calls">这一章节</a>。
+关于细节，请阅读<a href="method.html#method-as-function">每个方法对应着一个隐式声明的函数</a>这一章节。
 </p>
 
 <p class="anchor" id="comparison-interfaces-may-panic"></p>
@@ -1926,6 +1928,10 @@ func main() {
 </p>
 </div>
 
+
+
+
+</div> <!-- summaries-items -->
 
 <!--
 <p class="anchor" id="remove-spaces-in-template"></p>

@@ -26,7 +26,8 @@ Go不支持创建系统线程，所以协程是一个Go程序内部唯一的并�
 
 <div>
 在下面的例子程序中，主协程创建了两个新的协程。在此例中，<code>time.Duration</code>是一个在<code>time</code>标准库包中定义的类型。
-此类型的底层类型（见<a href="type-system-overview.html#underlying-type">下一篇文章</a>）为内置类型<code>int64</code>。
+此类型的底层类型为内置类型<code>int64</code>。
+底层类型这个概念将在<a href="type-system-overview.html#underlying-type">下一篇文章</a>中介绍。
 
 <pre class="line-numbers"><code class="language-go">package main
 

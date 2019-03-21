@@ -8,7 +8,7 @@
 
 <div>
 <p>
-Go可以被看作是一门C语言血统的语言，这可以通过此前的两篇文章（<a href="pointer.html">指针</a>和<a href="struct.html">结构体</a>）得以验证。
+Go可以被看作是一门C语言血统的语言，这可以通过此前的<a href="pointer.html">指针</a>和<a href="struct.html">结构体</a>两篇文章得以验证。
 Go中的指针和结构体类型和C语言很类似。
 </p>
 
@@ -30,7 +30,7 @@ Go中的指针和结构体类型和C语言很类似。
 
 <p>
 第一个类别中的类型种类包括：布尔类型、各种数值类型、结构体类型、指针类型、以及后面将要详细解释的数组类型和非类型安全指针类型。
-（数组类型将在下一片文章中详述。非类型安全指针类型将在<a href="unsafe.html">此篇文章</a>中详述。）
+数组类型将在下一片文章中详述。非类型安全指针类型将在<a href="unsafe.html">此篇文章</a>中详述。
 此类别中的类型的值和C值类似，在内存中都只含有一个透明的直接部分。
 </p>
 
@@ -209,7 +209,7 @@ type _function *functionImpl
 </p>
 
 事实上，上面这个内部定义只用于表示空接口类型的值。空接口类型没有指定任何方法。
-（后面的<a href="interface.html">接口</a>一文详细解释了接口类型和值。）
+后面的<a href="interface.html">接口</a>一文详细解释了接口类型和值。
 非空接口类型的内部定义如下：
 
 <pre class="line-numbers"><code class="language-go">type _interface struct {
