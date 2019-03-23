@@ -11,6 +11,8 @@ Go语言101项目目前同时托管在<a href="https://github.com/golang101/gola
 欢迎各位在这两个项目中通过提交bug和PR的方式来改进完善Go语言101中的各篇文章。
 </div>
 
+{{- if ne $.FilenameWithoutExt "101" -}}
 <div class="text-center">
 	<img src="res/101-reward-qrcode-2.png" alt="赞赏" style="max-width: 100%; height: auto; width: auto\9;"></img>
 </div>
+{{- end -}}

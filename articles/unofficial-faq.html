@@ -86,7 +86,7 @@
 </div>
 
 <p>
-这意味着容器元素索引表达式（<code>x[i]</code>）、结构体的字段选择器（<code>x.f</code>）和指针解引用（<code>*p</code>）和限定标识符（<code>aPackage.Value</code>）都不能出现在<code>:=</code>符号的左侧。
+这意味着容器元素索引表达式（<code>x[i]</code>）、结构体的字段选择器（<code>x.f</code>）、指针解引用（<code>*p</code>）和限定标识符（<code>aPackage.Value</code>）都不能出现在<code>:=</code>符号的左侧。
 </p>
 
 <p>
@@ -413,7 +413,7 @@ func main() {
 	<ol>
 	<li>你可以在函数声明前增加一行<code>//go:noinline</code> 指令来避免这个函数被内联。</li>
 	<li><strike>由于包含循环块的函数不会内联，所以你可以再函数里增加一个空循环 <code>for false {}</code>来避免该函数被内联</strike>。
-		（但是这个方法<a href="https://github.com/golang/go/issues/14768">从Go 1.12开始将不再有效</a>。）
+		（但是这个方法<a href="https://github.com/golang/go/issues/14768">从Go 1.13开始将不再有效</a>。）
 	</li>
 	</ol>
 </li>
@@ -541,7 +541,7 @@ func main() {
 终结器的主要用途是为了库包的维护者能够尽可能地避免因为库包使用者不正确地使用库包而带来的危害。
 例如，我们知道，当在程序中使用完某个文件后，我们应该将其关闭。
 但是有时候因为种种原因，比如经验不足或者粗心大意，导致一些文件在使用完成后并未被关闭，那么和这些文件相关的很多资源只有在此程序退出之后才能得到释放。这属于资源泄漏。
-为了避免尽可能地防止资源泄露，<code>os</code>库包的维护者将会在一个<code>os.File</code>对象被被创建的时候为之设置一个终结器。
+为了尽可能地避免防止资源泄露，<code>os</code>库包的维护者将会在一个<code>os.File</code>对象被被创建的时候为之设置一个终结器。
 此终结器函数将关闭此<code>os.File</code>对象。当此<code>os.File</code>对象因为不再被使用而被垃圾回收的时候，此终结器函数将被调用。
 </p>
 
@@ -725,7 +725,7 @@ func main() {
 </div>
 
 <div>
-请注意，
+请注意：
 <ul>
 <li>
 尽管映射，切片和函数值不支持比较，但是它们的值可以与类型不确定的<code>nil</code>标识符比较。
@@ -873,7 +873,7 @@ func main() {
 </ul>
 
 <div class="alert alert-success">
-请注意，<code>&T{}</code>在Go里是一个语法糖，它是<code>tmp := T{}; (&tmp)</code>的简写形式。
+请注意：<code>&T{}</code>在Go里是一个语法糖，它是<code>tmp := T{}; (&tmp)</code>的简写形式。
 所以<code>&T{}</code>是合法的并不代表字面值<code>T{}</code>可以被取地址。
 </div>
 <p></p>
@@ -947,7 +947,7 @@ func main() {
 </li>
 </ul>
 <p>
-所以很合理的是 <code>*T</code>的方法集总是<code>T</code>方法集的超集，但反之不然。
+所以很合理的， <code>*T</code>的方法集总是<code>T</code>方法集的超集，但反之不然。
 </p>
 </div>
 
@@ -1076,7 +1076,7 @@ func main() {
 
 <div>
 Iota是希腊字母表中的第九个字母。
-在Go语言中，<code>iota</code>用在数字常量声明中。
+在Go语言中，<code>iota</code>用在常量声明中。
 在每一个常量声明组中，其值在该常量声明组的第<b><i>N</i></b>个常量规范中的值为<code>N</code>。
 </div>
 

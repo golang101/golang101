@@ -148,7 +148,7 @@ func main() {
 
 <p>
 目前(Go 1.12)，在一些多值赋值中<a href="https://github.com/go101/go101/wiki/Some-evaluation-orders-in-multi-value-assignments-are-unspecified">有一些表达式估值顺序是未指定的</a>。
-因此，如果一个多值赋值语句中涉及的表达式之间存在依赖，或者不太容易确定是否存在依赖关系时，我们应该此多值赋值语句分拆成多个单值赋值语句。
+因此，如果一个多值赋值语句中涉及的表达式之间存在依赖，或者不太容易确定是否存在依赖关系时，我们应该将此多值赋值语句分拆成多个单值赋值语句。
 </p>
 
 事实上，在一些写得很糟糕的代码中，单值赋值中的表达式求值顺序也有可能是有歧义的。
@@ -231,7 +231,7 @@ func main() {
 <div>
 
 <p>
-<code>bytes.Buffer</code>类型，<code>strings.Builder</code>类型以及在<code>sync</code>标准库包里的类型的值不推荐被复制。
+<code>bytes.Buffer</code>类型、<code>strings.Builder</code>类型以及在<code>sync</code>标准库包里的类型的值不推荐被复制。
 （它们确实不应该被复制，尽管在某些特定情形下复制它们或许是没有问题的。）
 </p>
 
@@ -276,7 +276,7 @@ func f(m sync.Mutex) { // warning: f passes lock by value: sync.Mutex
 
 <p>
 复制<code>bytes.Buffer</code>的值不会在运行时被检查到，也不会被<code>go vet</code>命令所检测到。
-千万要小心不要这样做。
+千万要小心不要随意这样做。
 
 </p>
 
@@ -336,7 +336,7 @@ func main() {
 
 
 <p class="anchor" id="clone-slice-efficiently-and-perfectly"></p>
-<h3>如何高效且完美的克隆一个切片？</h3>
+<h3>如何高效且完美地克隆一个切片？</h3>
 
 <div>
 
@@ -363,7 +363,7 @@ func main() {
 </code></pre>
 
 <p>
-上述实现不被推荐的原因是<code>append</code>函数调用可能会修改输入实参<code>opts</code>的底层<code>Option</code>元素序列。
+上述实现不被推荐的原因是<code>append</code>函数调用可能会修改输入实参<code>opts</code>的底层潜在<code>Option</code>元素序列。
 对大多数场景，这可能是没问题的。但是对某些特殊场景，这有可能会导致后续代码执行产生不期望的结果。
 </p>
 
@@ -378,6 +378,10 @@ func main() {
 </code></pre>
 
 <p>
+</p>
+
+<p>
+另一方面，对于<code>NewX</code>函数的调用者来说，不应该依赖于此函数的具体实现，所以最好使用三下标子切片形式<code>options[:len(options):cap(options)]来传递实参。
 </p>
 
 <p>
@@ -496,7 +500,7 @@ var _ uint = N/M - 1
 <p>
 </p>
 
-类似的，下面是断言两个整数常量相等的方法：
+类似地，下面是断言两个整数常量相等的方法：
 
 <pre class="line-numbers"><code class="language-go">var _ [N-M]int; var _ [M-N]int
 type _ [N-M]int; type _ [M-N]int
@@ -631,7 +635,7 @@ func main() {
 <div>
 
 <p>
-请阅读<a href="bounds-check-elimination.html">此文</a>来获知什么边界检查消除（BCE）以及目前的标准编译器对BCE的支持程度。
+请阅读<a href="bounds-check-elimination.html">此文</a>来获知什么是边界检查消除（BCE）以及目前的标准编译器对BCE的支持程度。
 </p>
 
 下面是一个利用了BCE进行性能优化的例子：
