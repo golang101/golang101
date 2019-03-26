@@ -13,10 +13,10 @@
 
 		<link href="/static/bootstrap/v3.3.7/css/bootstrap.min.css" rel="stylesheet">
 		<link href="/static/go101/css/v8.css" rel="stylesheet" media="screen, print">
-		<script src="/static/code-prettify/2019-03-12/prettify.js"></script>
-		<script src="/static/code-prettify/2019-03-12/lang-go.js"></script>
-		<link href="/static/code-prettify/2019-03-12/prettify.css" rel="stylesheet" media="screen, print">
-		<link href="/static/code-prettify/2019-03-12/sons-of-obsidian.css" rel="stylesheet" media="screen, print">
+		<script src="/static/code-prettify/2019-03-25/prettify.js"></script>
+		<script src="/static/code-prettify/2019-03-25/lang-go.js"></script>
+		<link href="/static/code-prettify/2019-03-25/prettify.css" rel="stylesheet" media="screen, print">
+		<link href="/static/code-prettify/2019-03-25/sons-of-obsidian.css" rel="stylesheet" media="screen, print">
 		<script src="/static/jquery/jquery.min-v1.11.2.js"></script>
 		<style media="screen, print">
 
@@ -42,11 +42,6 @@ table tr td, table tr th {
 	border-style: solid;
 	border-width: 1px;
 	border-color: #666;
-}
-
-code {
-	tab-size: 6;
-	-moz-tab-size: 6;
 }
 
 /*ul.index a::after {
@@ -87,6 +82,27 @@ ul.index {
 }
 
 {{- end -}}
+
+		</style>
+
+		<style media="print">
+pre {
+	background-color: #dbdbdb !important;
+	border-width: 1px !important;
+	border-color: #ccc !important;
+}
+
+pre>ol {
+	background: none !important;
+	border-width: 0px !important;
+}
+
+code {
+	tab-size: 6;
+	-moz-tab-size: 6;
+	background-color: #dbdbdb !important;
+	border-width: 0px !important;
+}
 		</style>
 		<script>
 		// "flash" or "print". "print" means paper.

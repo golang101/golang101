@@ -146,7 +146,7 @@ print(a); print(b)
 比如，下面的代码是编译不通过的：
 
 <pre class="line-numbers"><code class="language-go">func f() {
-	a : = 0
+	a := 0
 	println(a++)
 	println(a--)
 }
@@ -155,7 +155,7 @@ print(a); print(b)
 上面代码编译不通过的原因是它等价于下面的代码：
 
 <pre class="line-numbers"><code class="language-go">func f() {
-	a : = 0
+	a := 0
 	println(a++;)
 	println(a--;)
 }

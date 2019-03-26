@@ -32,6 +32,8 @@ Server started:
 
 本书起始页将自动在用户默认浏览器中打开。如果没有，请手动访问http://localhost:12345
 
+本地阅读单页版地址：http://localhost:12345/article/pdf-book101
+
 ### 一些注意事项
 
 * 这本书仍处于beta阶段，很多章节还在不断改进中。请阅读[UPDATES.md](UPDATES.md)以注意各种更新。

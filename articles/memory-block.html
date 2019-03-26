@@ -360,7 +360,7 @@ func main() {
 </p>
 
 <p>
-目前（Go 1.11），对于使用标准编译器编译的Go程序，一轮新的垃圾回收过程开启的默认条件是通过<a href="https://golang.google.cn/pkg/runtime/#hdr-Environment_Variables"><code>GOGC</code>环境变量</a>来控制的。
+目前（Go 1.12），对于使用标准编译器编译的Go程序，一轮新的垃圾回收过程开启的默认条件是通过<a href="https://golang.google.cn/pkg/runtime/#hdr-Environment_Variables"><code>GOGC</code>环境变量</a>来控制的。
 当从上一轮垃圾回收结束后新申请的内存块的内存总和占上一轮垃圾回收结束时仍在被使用的所有内存块的内存总和的百分比超过此值时，新的一轮垃圾回收过程将开始。
 所以此值决定了垃圾回收过程的频率。
 此环境变量的默认值为100。

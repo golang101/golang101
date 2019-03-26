@@ -37,8 +37,6 @@ var (
 )
 
 func (go101 *Go101) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	go101.ConfirmLocalServer(isLocalRequest(r))
-
 	group, item := "", ""
 	tokens := strings.SplitN(r.URL.Path, "/", 3)
 	if len(tokens) > 1 {
@@ -48,7 +46,7 @@ func (go101 *Go101) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	switch strings.ToLower(group) {
+	switch go101.ConfirmLocalServer(isLocalRequest(r)); strings.ToLower(group) {
 	case "static":
 		w.Header().Set("Cache-Control", "max-age=360000") // 10 hours
 		go101.staticHandler.ServeHTTP(w, r)
@@ -59,6 +57,7 @@ func (go101 *Go101) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			go101.articleResHandler.ServeHTTP(w, r)
 			return
 		} else if go101.IsLocalServer() && (strings.HasPrefix(item, "print-") || strings.HasPrefix(item, "pdf-")) {
+			w.Header().Set("Cache-Control", "no-cache, private, max-age=0")
 			idx := strings.IndexByte(item, '-')
 			go101.RenderPrintPage(w, r, item[:idx], item[idx+1:])
 			return
@@ -491,6 +490,7 @@ func findGo101ProjectRoot() string {
 			return pkg.Dir
 		}
 	}
+
 	return "."
 }
 
