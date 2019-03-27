@@ -6,7 +6,7 @@
 本文的余下部分将列出一些这样的情形。
 </p>
 
-<p class="anchor" id="substring"></p>
+<a class="anchor" id="substring"></a>
 <h3>子字符串造成的暂时性内存泄露</h3>
 
 <div>
@@ -81,7 +81,7 @@ func f(s1 string) {
 
 </div>
 
-<p class="anchor" id="subslice"></p>
+<a class="anchor" id="subslice"></a>
 <h3>子切片造成的暂时性内存泄露</h3>
 
 <div>
@@ -111,7 +111,7 @@ func g(s1 []int) {
 
 </div>
 
-<p class="anchor" id="dead-slice-elements"></p>
+<a class="anchor" id="dead-slice-elements"></a>
 <h3>因为未重置丢失的切片元素中的指针而造成的临时性内存泄露</h3>
 
 <div>
@@ -150,7 +150,7 @@ func g(s1 []int) {
 
 </div>
 
-<p class="anchor" id="hanging-goroutine"></p>
+<a class="anchor" id="hanging-goroutine"></a>
 <h3>因为协程被永久阻塞而造成的永久性内存泄露</h3>
 
 <div>

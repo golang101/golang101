@@ -15,7 +15,7 @@ Go是一门支持自动内存管理的语言，比如自动内存开辟和自动
 内存管理的其它方面，比如内存申请和内存释放，将不会在本文中探讨。
 </p>
 
-<p class="anchor" id="memory-block"></p>
+<a class="anchor" id="memory-block"></a>
 <h3>内存块（memory block）</h3>
 
 <p>
@@ -47,7 +47,7 @@ Go是一门支持自动内存管理的语言，比如自动内存开辟和自动
 所以，当一个值部<code>v</code>被另一个值部引用着时，此另一个值部也（间接地）引用着承载着值部<code>v</code>的内存块。
 </p>
 
-<p class="anchor" id="when-to-allocate"></p>
+<a class="anchor" id="when-to-allocate"></a>
 <h3>什么时候需要开辟内存块？</h3>
 
 <div>
@@ -86,7 +86,7 @@ Go是一门支持自动内存管理的语言，比如自动内存开辟和自动
 
 </div>
 
-<p class="anchor" id="where-to-allocate"></p>
+<a class="anchor" id="where-to-allocate"></a>
 <h3>内存块将被开辟在何处？</h3>
 
 <p>
@@ -200,7 +200,7 @@ The values referenced by values allocated on heap will never be allocated in sta
 另一个我们需要知道的重要事实是，为了让64位整数的原子操作在32位架构上成为可能，任何开在堆上的内存块的起始地址都保证是8字节对齐的。
 </p-->
 
-<p class="anchor" id="when-can-collect"></p>
+<a class="anchor" id="when-can-collect"></a>
 <h3>一个内存块在什么条件下可以被回收？</h3>
 
 <p>
@@ -305,7 +305,7 @@ func main() {
 
 </div>
 
-<p class="anchor" id="how-to-detect"></p>
+<a class="anchor" id="how-to-detect"></a>
 <h3>如何判断一个内存块是否仍在被使用？</h3>
 
 <div>
@@ -349,7 +349,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="when-to-collect"></p>
+<a class="anchor" id="when-to-collect"></a>
 <h3>不再被使用的内存块将在什么时候被回收？</h3>
 
 <div>

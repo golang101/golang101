@@ -243,7 +243,7 @@
 
 <div class="summaries-items">
 
-<p class="anchor" id="import-package-multiple-times"></p>
+<a class="anchor" id="import-package-multiple-times"></a>
 <h3>一个包可以在一个源文件里被引入多次。</h3>
 
 <div>
@@ -264,7 +264,7 @@ func main() {
 </code></pre>
 </div>
 
-<p class="anchor" id="force-import-path"></p>
+<a class="anchor" id="force-import-path"></a>
 <h3>在<code>package mypkg</code>之后的注释<code>// import "x.y.z/mypkg"</code>对标准Go编译器是有意义的。</h3>
 
 <div>
@@ -279,7 +279,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="default-branch-position"></p>
+<a class="anchor" id="default-branch-position"></a>
 <h3>在<code>switch</code>和<code>select</code>流程控制代码块中，<code>default</code>分支可以放在所有的<code>case</code>分支之前或者所有的<code>case</code>分支之后，也可以放在<code>case</code>分支之间。</h3>
 
 <div>
@@ -329,7 +329,7 @@ func main() {
 
 </div>
 
-<p class="anchor" id="constant-case-expressions"></p>
+<a class="anchor" id="constant-case-expressions"></a>
 <h3><code>switch</code>流程控制代码块中的数字常量case表达式不能重复，但是布尔常量case表达式可以重复。</h3>
 
 <div>
@@ -363,7 +363,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="switch-expressions-are-typed"></p>
+<a class="anchor" id="switch-expressions-are-typed"></a>
 <h3><code>switch</code>流程控制代码块里的switch表达式总是被估值为类型确定值。</h3>
 
 <div>
@@ -383,7 +383,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="default-switch-expression-value"></p>
+<a class="anchor" id="default-switch-expression-value"></a>
 <h3><code>switch</code>流程控制代码块中的switch表达式的缺省默认值为类型确定值<code>true</code>（其类型为预定义类型<code>bool</code>）。</h3>
 
 <div>
@@ -405,7 +405,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="open-brace-on-the-next-line"></p>
+<a class="anchor" id="open-brace-on-the-next-line"></a>
 <h3>有时候，显式代码块的开括号<code>{</code>可以放在下一行。</h3>
 
 <div>
@@ -457,7 +457,7 @@ func main() {
 
 </div>
 
-<p class="anchor" id="some-case-branch-blocks-must-be-explicit"></p>
+<a class="anchor" id="some-case-branch-blocks-must-be-explicit"></a>
 <h3>有些<code>case</code>分支代码块必须是显式的。</h3>
 
 <div>
@@ -522,7 +522,7 @@ func main() {
 
 </div>
 
-<p class="anchor" id="defer-modify-results"></p>
+<a class="anchor" id="defer-modify-results"></a>
 <h3>嵌套的延迟函数调用可以修改外层函数的返回结果。</h3>
 
 <div>
@@ -549,7 +549,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="no-op-recover-calls"></p>
+<a class="anchor" id="no-op-recover-calls"></a>
 <h3>某些<code>recover</code>函数调用是空操作。</h3>
 
 <p>
@@ -557,7 +557,7 @@ func main() {
 关于细节，请阅读 <a href="panic-and-recover-more.html">在正确的位置调用内置函数<code>recover</code></a>一文。
 </p>
 
-<p class="anchor" id="os-exit-runtime-goexit"></p>
+<a class="anchor" id="os-exit-runtime-goexit"></a>
 <h3>我们可以使用<code>os.Exit</code>函数调用退出一个程序和使用<code>runtime.Goexit</code>函数调用退出一个协程。</h3>
 
 <!--
@@ -630,7 +630,7 @@ func main() {
 
 </div>
 
-<p class="anchor" id="some-operator-precedence"></p>
+<a class="anchor" id="some-operator-precedence"></a>
 <h3>递增运算符<code>++</code>和递减运算符<code>--</code>的优先级低于解引用运算符<code>*</code>和取地址运算符<code>&amp;</code>，解引用运算符和取地址运算符的优先级低于选择器<code>.</code>中的属性选择操作符。</h3>
 
 <div>
@@ -663,7 +663,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="type-deduction-in-bit-shift"></p>
+<a class="anchor" id="type-deduction-in-bit-shift"></a>
 <h3>移位运算中的左类型不确定操作数的类型推断规则取决于右操作数是否是常量。</h3>
 
 <div>
@@ -686,7 +686,7 @@ var _ = 1.0 << N // 编译失败。1.0将被推断为一个float64值。
 </p>
 </div>
 
-<p class="anchor" id="conversion-of-pointers-with-different-underlying-types"></p>
+<a class="anchor" id="conversion-of-pointers-with-different-underlying-types"></a>
 <h3>如果两个指针的类型具有不同的底层类型但是它们的基类型却共享相同的底层类型，则这两个指针值可以间接相互转换为对方的类型。</h3>
 
 <div>
@@ -719,7 +719,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="addresses-of-zeor-sized-values"></p>
+<a class="anchor" id="addresses-of-zeor-sized-values"></a>
 <h3>两个零尺寸值的地址可能相等，也可能不相等。</h3>
 <!--
 https://github.com/golang/go/issues/12726
@@ -762,7 +762,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="self-based-pointer-type"></p>
+<a class="anchor" id="self-based-pointer-type"></a>
 <h3>一个指针类型的基类型可以为此指针类型自身。</h3>
 
 <div>
@@ -827,7 +827,7 @@ func main() {
 
 </div>
 
-<p class="anchor" id="pointer-selector-shorthands"></p>
+<a class="anchor" id="pointer-selector-shorthands"></a>
 <h3>有关选择器缩写形式的细节。</h3>
 
 <div>
@@ -872,21 +872,21 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="composite-literal-simplification"></p>
+<a class="anchor" id="composite-literal-simplification"></a>
 <h3>有时候，嵌套组合字面值可以被简化。</h3>
 
 <p>
 关于细节，请阅读<a href="container.html#composite-literal-simplification">内嵌组合字面形式可以被简化</a>这一章节。
 </p>
 
-<p class="anchor" id="use-pointer-as-array"></p>
+<a class="anchor" id="use-pointer-as-array"></a>
 <h3>在某些情形下，我们可以将数组指针当作数组来用。</h3>
 
 <p>
 关于细节，请阅读<a href="container.html#use-pointer-as-array">把数组指针当做数组来使用</a>这一章节。
 </p>
 
-<p class="anchor" id="nil-map-element-retrieving"></p>
+<a class="anchor" id="nil-map-element-retrieving"></a>
 <h3>从nil映射中读取元素不会导致崩溃，读取结果是一个零元素值。</h3>
 
 <div>
@@ -909,7 +909,7 @@ func Foo2(m map[string]int) int {
 </p>
 </div>
 
-<p class="anchor" id="nil-map-element--deletion"></p>
+<a class="anchor" id="nil-map-element--deletion"></a>
 <h3>从一个nil映射中删除一个条目不会导致崩溃，这是一个空操作。</h3>
 
 <div>
@@ -928,14 +928,14 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="append-slice-elements"></p>
+<a class="anchor" id="append-slice-elements"></a>
 <h3><code>append</code>函数调用的结果可能会与原始切片共享一些元素，也可能不共享任何元素。</h3>
 
 <p>
 关于细节，请阅读<a href="container.html#element-addition-deletion">添加和删除容器元素</a>这一章节。
 </p>
 
-<p class="anchor" id="subslice"></p>
+<a class="anchor" id="subslice"></a>
 <h3>从一个基础切片派生出的子切片的长度可能大于基础切片的长度。</h3>
 
 <div>
@@ -959,7 +959,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="derive-from-nil-slice"></p>
+<a class="anchor" id="derive-from-nil-slice"></a>
 <h3>从一个nil切片中派生子切片是允许的，只要子切片表达式中使用的所有索引都为零，则不会有恐慌产生，结果子切片同样是一个nil切片。</h3>
 
 <div>
@@ -985,7 +985,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="range-over-nil-map-and-slice"></p>
+<a class="anchor" id="range-over-nil-map-and-slice"></a>
 <h3>用<code>range</code>遍历nil映射或者nil切片是没问题的，这属于空操作。</h3>
 
 <div>
@@ -1009,7 +1009,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="range-over-nil-array-pointer"></p>
+<a class="anchor" id="range-over-nil-array-pointer"></a>
 <h3>用<code>range</code>遍历nil数组指针时，如果忽略或省略第二个迭代变量，则此遍历是没问题的。遍历中的循环步数为相应数组类型的长度。</h3>
 
 <div>
@@ -1032,7 +1032,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="modify-slice-length-and-capacity-separately"></p>
+<a class="anchor" id="modify-slice-length-and-capacity-separately"></a>
 <h3>切片的长度和容量可以被单独修改。</h3>
 
 <p>
@@ -1040,7 +1040,7 @@ func main() {
 关于细节，请阅读<a href="container.html#modify-slice-length-and-capacity">单独修改一个切片的长度或者容量</a>这一章节。
 </p>
 
-<p class="anchor" id="indexes-in-composite-literals"></p>
+<a class="anchor" id="indexes-in-composite-literals"></a>
 <h3>切片和数组组合字面值中的索引必须是非负常量。</h3>
 
 <div>
@@ -1056,7 +1056,7 @@ var y = []int{k: 1}  // error: 索引必须为一个常量
 </p>
 </div>
 
-<p class="anchor" id="constant-keys-in-composite-literals"></p>
+<a class="anchor" id="constant-keys-in-composite-literals"></a>
 <h3>切片/数组/映射组合字面值的常量索引和键值不能重复。</h3>
 
 <div>
@@ -1075,7 +1075,7 @@ var c = map[string]int{"foo": 1, "foo": 2}
 </p>
 </div>
 
-<p class="anchor" id="array-slice-element-addressability"></p>
+<a class="anchor" id="array-slice-element-addressability"></a>
 <h3>不可寻址的数组的元素依旧是不可寻址的，但是不可寻址的切片的元素总是可寻址的。</h3>
 
 <div>
@@ -1105,7 +1105,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="array-slice-derivable"></p>
+<a class="anchor" id="array-slice-derivable"></a>
 <h3>
 可以从不可寻址的切片派生子切片，但是不能从不可寻址的数组派生子切片。
 </h3>
@@ -1138,7 +1138,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="nan-as-map-keys"></p>
+<a class="anchor" id="nan-as-map-keys"></a>
 <h3>把以<code>NaN</code>做为键值的条目放如映射就宛如把条目放入黑洞一样。</h3>
 
 <div>
@@ -1178,7 +1178,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="capacity-of-slice-from-string"></p>
+<a class="anchor" id="capacity-of-slice-from-string"></a>
 <h3>字符串转换为byte切片或rune切片后的结果切片的容量可能会大于长度。</h3>
 
 <div>
@@ -1206,7 +1206,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="different-loops"></p>
+<a class="anchor" id="different-loops"></a>
 <h3>对于切片<code>s</code>，循环<code>for i = range s {...}</code>并不等价于循环<code>for i = 0; i < len(s); i++ {...}</code>。</h3>
 
 <div>
@@ -1242,28 +1242,28 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="call-as-expression"></p>
+<a class="anchor" id="call-as-expression"></a>
 <h3>一个多返回值函数调用表达式不能和其它表达式混用在一个赋值语句的右侧或者另一个函数调用的实参列表中。</h3>
 
 <p>
 关于细节，请阅读<a href="function.html#call-as-expression">有返回值的函数的调用是一种表达式</a>这一章节。
 </p>
 
-<p class="anchor" id="compile-time-evaluated-calls"></p>
+<a class="anchor" id="compile-time-evaluated-calls"></a>
 <h3>某些函数调用是在在编译时刻被估值的。</h3>
 
 <p>
 关于细节，请阅读<a href="summaries.html#compile-time-evaluation">哪些函数调用将在编译时刻被估值？</a>这一总结。
 </p>
 
-<p class="anchor" id="method-as-function"></p>
+<a class="anchor" id="method-as-function"></a>
 <h3>每一个方法都对应着一个隐式声明的函数。</h3>
 
 <p>
 关于细节，请阅读<a href="method.html#method-as-function">每个方法对应着一个隐式声明的函数</a>这一章节。
 </p>
 
-<p class="anchor" id="comparison-interfaces-may-panic"></p>
+<a class="anchor" id="comparison-interfaces-may-panic"></a>
 <h3>如果两个接口值具有相同的动态类型并且此动态类型不支持比较，则比较这两个接口值将导致一个恐慌。</h3>
 
 <div>
@@ -1281,7 +1281,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="type-assertion-to-interface-type"></p>
+<a class="anchor" id="type-assertion-to-interface-type"></a>
 <h3>类型断言可以用于将一个接口值转换为另一个接口类型，即使此接口值的类型并未实现另一个接口类型。</h3>
 
 <div>
@@ -1312,7 +1312,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="failed-type-assertion-may-panic"></p>
+<a class="anchor" id="failed-type-assertion-may-panic"></a>
 <h3>一个失败的类型断言的可选的第二个结果是否被舍弃将影响此类型断言的行为。</h3>
 
 <div>
@@ -1335,7 +1335,7 @@ func main() {
 
 
 <!--
-<p class="anchor" id="interface-comparison-complexity"></p>
+<a class="anchor" id="interface-comparison-complexity"></a>
 <h3>对于标准编译器来说，比较两个接口值的时间复杂度可能是<code><i>O</i>(1)</code>，也可能是<code><i>O</i>(n)</code>。</h3>
 
 <div>
@@ -1381,7 +1381,7 @@ duration for (i1 == i2): 609ns
 </p>
 </div>
 
-<p class="anchor" id="interface-copy-complexity"></p>
+<a class="anchor" id="interface-copy-complexity"></a>
 <h3>对于标准编译器来说，复制一个接口值的时间复杂度为<code><i>O</i>(1)</code>。</h3>
 
 <p>
@@ -1406,7 +1406,7 @@ the sizes of the direct parts of all interface values are the same.
 </p>
 -->
 
-<p class="anchor" id="errors-new-different-returns"></p>
+<a class="anchor" id="errors-new-different-returns"></a>
 <h3>以相同实参调用两次<code>errors.New</code>函数返回的两个<code>error</code>值是不相等的。</h3>
 
 <div>
@@ -1429,7 +1429,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="receive-only-channel-canot-be-closed"></p>
+<a class="anchor" id="receive-only-channel-canot-be-closed"></a>
 <h3>单向接收数据通道无法被关闭。</h3>
 
 <div>
@@ -1449,7 +1449,7 @@ func foo(c <-chan int) {
 </p>
 </div>
 
-<p class="anchor" id="send-to-closed-channel-is-non-blocking"></p>
+<a class="anchor" id="send-to-closed-channel-is-non-blocking"></a>
 <h3>发送一个值到一个已关闭的数据通道被视为一个非阻塞操作，该操作会导致恐慌。</h3>
 
 <div>
@@ -1472,7 +1472,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="local-type-declaration"></p>
+<a class="anchor" id="local-type-declaration"></a>
 <h3>类型可以在声明函数体内。</h3>
 
 <div>
@@ -1489,14 +1489,14 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="final-zero-size-field"></p>
+<a class="anchor" id="final-zero-size-field"></a>
 <h3>对于标准编译器，结构体中的某些零尺寸字段的尺寸有可能会被视为一个字节。</h3>
 
 <p>
 关于细节，请阅读<a href="unofficial-faq.html#final-zero-size-field">这个FAQ条目</a>。
 </p>
 
-<p class="anchor" id="nan-inf"></p>
+<a class="anchor" id="nan-inf"></a>
 <h3>NaN != NaN，Inf == Inf。</h3>
 
 <div>
@@ -1522,7 +1522,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="non-exported-names-from-different-packages"></p>
+<a class="anchor" id="non-exported-names-from-different-packages"></a>
 <h3>不同代码包中的两个非导出方法名和结构体字段名总是被视为不同的名称。</h3>
 
 <div>
@@ -1597,7 +1597,7 @@ func main() {
 
 </div>
 
-<p class="anchor" id="sometimes-parentheses-are-required"></p>
+<a class="anchor" id="sometimes-parentheses-are-required"></a>
 <h3>在某些很少见的场景中，圆括号是必需的。</h3>
 
 <div>
@@ -1628,7 +1628,7 @@ func main() {
 </div>
 
 <!--
-<p class="anchor" id="main-entry-function-absence"></p>
+<a class="anchor" id="main-entry-function-absence"></a>
 <h3>一个程序可能并不需要一个<code>main</code>入口函数即可运行。</h3>
 
 <div>
@@ -1658,7 +1658,7 @@ var main int
 </div>
 -->
 
-<p class="anchor" id="stack-overflow-is-not-panic"></p>
+<a class="anchor" id="stack-overflow-is-not-panic"></a>
 <h3>栈溢出不会造成恐慌，它将使程序崩溃。</h3>
 
 <div>
@@ -1692,14 +1692,14 @@ runtime stack:
 </p>
 </div>
 
-<p class="anchor" id="some-evaluation-order-are-compiler-dependent"></p>
+<a class="anchor" id="some-evaluation-order-are-compiler-dependent"></a>
 <h3>某些表达式的估值顺序取决于具体编译器实现。</h3>
 
 <p>
 关于细节，请阅读<a href="evaluation-orders.html">表达式估值顺序规则</a>一文。
 </p>
 
-<p class="anchor" id="reflect-deep-equal"></p>
+<a class="anchor" id="reflect-deep-equal"></a>
 <h3><code>reflect.DeepEqual(x, y)</code>和<code>x == y</code>的结果可能会不同。</h3>
 
 
@@ -1763,7 +1763,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="reflect-value-bytes"></p>
+<a class="anchor" id="reflect-value-bytes"></a>
 <h3><code>reflect.Value.Bytes()</code>方法返回一个<code>[]byte</code>值，它的元素类型<code>byte</code>可能并非属主参数代表的Go切片值的元素类型。</h3>
 
 <div>
@@ -1809,7 +1809,7 @@ func main() {
 
 </div>
 
-<p class="anchor" id="check-file-existent"></p>
+<a class="anchor" id="check-file-existent"></a>
 <h3>我们应该使用<code>os.IsNotExist(err)</code>而不是<code>err == os.ErrNotExist</code>来检查文件是否存在。</h3>
 
 <div>
@@ -1836,7 +1836,7 @@ func main() {
 
 
 
-<p class="anchor" id="boolean-flag"></p>
+<a class="anchor" id="boolean-flag"></a>
 <h3><code>flag</code>标准库包对待布尔命令选项不同于数值和字符串选项。</h3>
 
 <div>
@@ -1909,7 +1909,7 @@ arguments: [arg0 arg1]
 
 </div>
 
-<p class="anchor" id="printf-positional-arguments"></p>
+<a class="anchor" id="printf-positional-arguments"></a>
 <h3><code>[Sp|Fp|P]rintf</code>函数支持位置参数。</h3>
 
 <div>
@@ -1934,7 +1934,7 @@ func main() {
 </div> <!-- summaries-items -->
 
 <!--
-<p class="anchor" id="remove-spaces-in-template"></p>
+<a class="anchor" id="remove-spaces-in-template"></a>
 <h3>Since Go 1.6, we can .</h3>
 
 https://golang.org/doc/go1.6 : {{a -}} sss {{- b}}

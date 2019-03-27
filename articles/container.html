@@ -125,7 +125,7 @@ map[struct{x int}]*int8 // 此映射类型的元素类型为一个指针类型�
 
 </div>
 
-<p class="anchor" id="value-literals"></p>
+<a class="anchor" id="value-literals"></a>
 <h3>容器类型值的字面表示形式</h3>
 
 <div>
@@ -237,7 +237,7 @@ var _ = [5]int{a: 100}         // error: 下标必须为常量
 同样，<code>map[K]T{}</code>和<code>map[K]T(nil)</code>也是不等价的。
 </p>
 
-<p class="anchor" id="take-composite-literal-address"></p>
+<a class="anchor" id="take-composite-literal-address"></a>
 <h3>容器字面值是不可寻址的但可以被取地址</h3>
 
 <div>
@@ -264,7 +264,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="composite-literal-simplification"></p>
+<a class="anchor" id="composite-literal-simplification"></a>
 <h3>内嵌组合字面形式可以被简化</h3>
 
 <div>
@@ -376,7 +376,7 @@ var _ = map[LangCategory]map[string]int{
 
 </div>
 
-<p class="anchor" id="comparison"></p>
+<a class="anchor" id="comparison"></a>
 <h3>容器值的比较</h3>
 
 <p>
@@ -430,7 +430,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="cap-len"></p>
+<a class="anchor" id="cap-len"></a>
 <h3>查看容器值的长度和容量</h3>
 
 <p>
@@ -477,7 +477,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="element-accessment"></p>
+<a class="anchor" id="element-accessment"></a>
 <h3>读取和修改容器的元素</h3>
 
 <div>
@@ -622,7 +622,7 @@ func main() {
 
 </div>
 
-<p class="anchor" id="assignment"></p>
+<a class="anchor" id="assignment"></a>
 <h3>容器赋值</h3>
 
 <div>
@@ -668,7 +668,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="element-addition-deletion"></p>
+<a class="anchor" id="element-addition-deletion"></a>
 <h3>添加和删除容器元素</h3>
 
 <div>
@@ -857,7 +857,7 @@ func main() {
 
 </div>
 
-<p class="anchor" id="make"></p>
+<a class="anchor" id="make"></a>
 <h3>使用内置<code>make</code>函数来创建切片和映射</h3>
 
 <div>
@@ -924,7 +924,7 @@ func main() {
 
 </div>
 
-<p class="anchor" id="new"></p>
+<a class="anchor" id="new"></a>
 <h3>使用内置<code>new</code>函数来创建容器值</h3>
 
 <div>
@@ -1080,7 +1080,7 @@ func main() {
 
 </div>
 
-<p class="anchor" id="subslice"></p>
+<a class="anchor" id="subslice"></a>
 <h3>从数组或者切片派生切片（取子切片）</h3>
 
 <div>
@@ -1209,7 +1209,7 @@ func main() {
 
 </div>
 
-<p class="anchor" id="copy-slice-elements"></p>
+<a class="anchor" id="copy-slice-elements"></a>
 <h3>使用内置<code>copy</code>函数来复制切片元素</h3>
 
 <div>
@@ -1284,7 +1284,7 @@ func Copy(dest, src []T) int {
 
 </div>
 
-<p class="anchor" id="iteration"></p>
+<a class="anchor" id="iteration"></a>
 <h3>遍历容器元素</h3>
 
 <div>
@@ -1579,7 +1579,7 @@ func fb(buffers []Buffer) int {
 
 </div>
 
-<p class="anchor" id="use-pointer-as-array"></p>
+<a class="anchor" id="use-pointer-as-array"></a>
 <h3>把数组指针当做数组来使用</h3>
 
 <div>
@@ -1687,7 +1687,7 @@ fmt.Println(len(pa), cap(pa)) // 5 5
 
 </div>
 
-<p class="anchor" id="memclr"></p>
+<a class="anchor" id="memclr"></a>
 <h3><code>memclr</code>优化</h3>
 
 <div>
@@ -1719,7 +1719,7 @@ for i := range s {
 
 </div>
 
-<p class="anchor" id="compile-time-evaluation"></p>
+<a class="anchor" id="compile-time-evaluation"></a>
 <h3>内置函数<code>len</code>和<code>cap</code>的调用可能会在编译时刻被估值</h3>
 
 <div>
@@ -1750,7 +1750,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="modify-slice-length-and-capacity"></p>
+<a class="anchor" id="modify-slice-length-and-capacity"></a>
 <h3>单独修改一个切片的长度或者容量</h3>
 
 <div>
@@ -1791,7 +1791,7 @@ func main() {
 </p>
 </div>
 
-<p class="anchor" id="slice-manipulations"></p>
+<a class="anchor" id="slice-manipulations"></a>
 <h3>更多切片操纵</h3>
 
 <p>
@@ -1821,7 +1821,7 @@ copy(sClone, s)
 
 </div>
 
-<p class="anchor" id="delete-slice-elements"></p>
+<a class="anchor" id="delete-slice-elements"></a>
 <h4>删除一段切片元素</h4>
 
 <div>
@@ -1863,7 +1863,7 @@ for i := range temp {
 
 </div>
 
-<p class="anchor" id="delete-one-slice-element"></p>
+<a class="anchor" id="delete-one-slice-element"></a>
 <h4>删除一个元素</h4>
 
 <div>

@@ -70,7 +70,7 @@
 
 <div class="summaries-items">
 
-<p class="anchor" id="force-to-use-keyed-struct-literals"></p>
+<a class="anchor" id="force-to-use-keyed-struct-literals"></a>
 <h3>如何强制一个代码包的使用者总是使用带字段名称的组合字面值来表示此代码包中的结构体类型的值？</h3>
 
 <div>
@@ -113,7 +113,7 @@ func main() {
 
 
 
-<p class="anchor" id="make-struct-type-uncomparable"></p>
+<a class="anchor" id="make-struct-type-uncomparable"></a>
 <h3>如何使一个结构体类型不可比较？</h3>
 
 <div>
@@ -141,7 +141,7 @@ func main() {
 
 
 
-<p class="anchor" id="dont-use-assignments-with-expression-dependencies"></p>
+<a class="anchor" id="dont-use-assignments-with-expression-dependencies"></a>
 <h3>不要使用其中涉及到的表达式之间存在依赖关系的赋值语句。</h3>
 
 <div>
@@ -185,7 +185,7 @@ func main() {
 
 
 
-<p class="anchor" id="simulate-loop-from-0-to-n"></p>
+<a class="anchor" id="simulate-loop-from-0-to-n"></a>
 <h3>如何模拟一些其它语言中支持的<code>for i in 0..N</code>循环代码块？</h3>
 
 <div>
@@ -216,7 +216,7 @@ func main() {
 
 
 
-<p class="anchor" id="reset-pointers-for-dead-elements"></p>
+<a class="anchor" id="reset-pointers-for-dead-elements"></a>
 <h3>当我们废弃一个仍在使用的切片中的一些元素时，我们应该重置这些元素中的指针来避免暂时性的内存泄漏。</h3>
 
 <p>
@@ -225,7 +225,7 @@ func main() {
 
 
 
-<p class="anchor" id="avoid-copying-values-of-some-types"></p>
+<a class="anchor" id="avoid-copying-values-of-some-types"></a>
 <h3>一些标准包中的某些类型的值不期望被复制。</h3>
 
 <div>
@@ -284,7 +284,7 @@ func f(m sync.Mutex) { // warning: f passes lock by value: sync.Mutex
 
 
 
-<p class="anchor" id="memclr"></p>
+<a class="anchor" id="memclr"></a>
 <h3>我们可以利用<code>memclr</code>优化来重置数组或者切片中一段连续的元素。</h3>
 
 <div>
@@ -297,7 +297,7 @@ func f(m sync.Mutex) { // warning: f passes lock by value: sync.Mutex
 
 
 
-<p class="anchor" id="check-method-existance"></p>
+<a class="anchor" id="check-method-existance"></a>
 <h3>如何在不导入<code>refect</code>标准库包的情况下检查一个值是否拥有某个方法。</h3>
 
 <div>
@@ -335,7 +335,7 @@ func main() {
 
 
 
-<p class="anchor" id="clone-slice-efficiently-and-perfectly"></p>
+<a class="anchor" id="clone-slice-efficiently-and-perfectly"></a>
 <h3>如何高效且完美地克隆一个切片？</h3>
 
 <div>
@@ -348,7 +348,7 @@ func main() {
 
 
 
-<p class="anchor" id="use-three-index-subslice-form"></p>
+<a class="anchor" id="use-three-index-subslice-form"></a>
 <h3>在部分场景下我们应该使用三下标子切片形式。</h3>
 
 <div>
@@ -398,7 +398,7 @@ func main() {
 
 
 
-<p class="anchor" id="execute-deferred-calls-earlier"></p>
+<a class="anchor" id="execute-deferred-calls-earlier"></a>
 <h3>使用匿名函数来使部分延迟函数调用尽早执行。</h3>
 
 <div>
@@ -411,7 +411,7 @@ func main() {
 
 
 
-<p class="anchor" id="assert-implementation"></p>
+<a class="anchor" id="assert-implementation"></a>
 <h3>确保并表明一个自定义类型实现了指定的接口类型。</h3>
 
 <div>
@@ -458,7 +458,7 @@ func _() {_ = io.Reader(nil).(*MyReader)}
 
 
 
-<p class="anchor" id="assert-at-compile-time"></p>
+<a class="anchor" id="assert-at-compile-time"></a>
 <h3>一些编译时刻断言技巧。</h3>
 
 <div>
@@ -545,7 +545,7 @@ const _ = 1/len(aStringConstant)
 
 
 
-<p class="anchor" id="declare-max-int-uint"></p>
+<a class="anchor" id="declare-max-int-uint"></a>
 <h3>如何声明一个最大的int和uint常量？</h3>
 
 <div>
@@ -561,7 +561,7 @@ const MaxInt = int(^uint(0) >> 1)
 
 
 
-<p class="anchor" id="detect-word-size-at-compile-time"></p>
+<a class="anchor" id="detect-word-size-at-compile-time"></a>
 <h3>如何在编译时刻决定系统原生字的尺寸？</h3>
 
 <div>
@@ -580,7 +580,7 @@ const WordBits = 32 << (^uint(0) >> 63) // 64或32
 
 
 
-<p class="anchor" id="64bit-alignment-guarantee"></p>
+<a class="anchor" id="64bit-alignment-guarantee"></a>
 <h3>如何保证64位原子函数调用中操作的64位整数的地址在32位架构上总是64位对齐的？</h3>
 
 <div>
@@ -589,7 +589,7 @@ const WordBits = 32 << (^uint(0) >> 63) // 64或32
 
 
 
-<p class="anchor" id="avoid-boxing-large-size-values"></p>
+<a class="anchor" id="avoid-boxing-large-size-values"></a>
 <h3>尽量避免将大尺寸的值包裹在接口值中。</h3>
 
 <div>
@@ -629,7 +629,7 @@ func main() {
 
 
 
-<p class="anchor" id="make-use-of-bce"></p>
+<a class="anchor" id="make-use-of-bce"></a>
 <h3>利用BCE（边界检查消除）进行性能优化。</h3>
 
 <div>
@@ -754,7 +754,7 @@ intermediate results should be stored out of the benchmark function
 
 select may slow: https://twitter.com/melvinodsa/status/1031434710184939522
 
-<p class="anchor" id="embed-unexported-alias-of-exported-type"></p>
+<a class="anchor" id="embed-unexported-alias-of-exported-type"></a>
 <h3>Embedding an unexported alias of an exported type to avoiding the corresponding anonymous field being modified in user packages.</h3>
 
 

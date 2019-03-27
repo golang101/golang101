@@ -75,7 +75,7 @@
 
 <!-- compiler and runtime  -->
 
-<p class="anchor" id="error-non-name"></p>
+<a class="anchor" id="error-non-name"></a>
 <h3>
 	编译器错误信息<code>non-name *** on left side of :=</code>意味着什么?
 </h3>
@@ -93,7 +93,7 @@
 目前，这还是一个<a href="https://github.com/golang/go/issues/377">未解决问题</a>（已经和<a href="https://github.com/golang/go/issues/6842">一个相关问题</a>合并）。而且感觉Go核心开发团队并未有在Go 2发布之前解决此问题的打算。
 </p>
 
-<p class="anchor" id="error-missing-left-brace"></p>
+<a class="anchor" id="error-missing-left-brace"></a>
 <h3>
 	编译器错误信息<code>unexpected newline, expecting { ...</code>意味着什么?
 </h3>
@@ -153,7 +153,7 @@ var _ = []int {
 
 </div>
 
-<p class="anchor" id="error-declared-not-used"></p>
+<a class="anchor" id="error-declared-not-used"></a>
 <h3>
 	编译器错误信息<code>declared and not used</code>意味着什么?
 </h3>
@@ -180,7 +180,7 @@ exception: https://github.com/golang/go/issues/8560
 </div>
 
 
-<p class="anchor" id="map-iteration-order"></p>
+<a class="anchor" id="map-iteration-order"></a>
 <h3>
 	Go运行时是否维护映射条目的遍历顺序？
 </h3>
@@ -197,7 +197,7 @@ exception: https://github.com/golang/go/issues/8560
 但是请注意：从Go 1.12开始，标准库包中的各个打印函数的结果中，映射条目总是排了序的。
 </p>
 
-<p class="anchor" id="compiler-field-padding"></p>
+<a class="anchor" id="compiler-field-padding"></a>
 <h3>
 	Go编译器是否会进行字节填充以确保结构体字段的地址对齐？
 </h3>
@@ -250,7 +250,7 @@ Go编译器将不会重新排列结构体的字段来最小化结构体值的尺
 但是，根据需要，程序员可以手工重新排序字段来实现填充最小化。
 </p>
 
-<p class="anchor" id="final-zero-size-field"></p>
+<a class="anchor" id="final-zero-size-field"></a>
 <h3>
 	为什么一个结构体类型的最后一个字段类型的尺寸为零时会影响此结构体的尺寸？
 </h3>
@@ -301,7 +301,7 @@ func main() {
 </code></pre>
 </div>
 
-<p class="anchor" id="new-function"></p>
+<a class="anchor" id="new-function"></a>
 <h3>
 	<code>new(T)</code>是<code>var t T; (&t)</code>的语法糖吗？
 </h3>
@@ -311,7 +311,7 @@ func main() {
 即，通过<code>new</code>函数分配的内存块可以在栈上，也可以在堆上。
 </p>
 
-<p class="anchor" id="fatal-error-deadlock"></p>
+<a class="anchor" id="fatal-error-deadlock"></a>
 <h3>
 	运行时错误信息<code>all goroutines are asleep - deadlock</code>意味着什么?
 </h3>
@@ -326,7 +326,7 @@ func main() {
 因此官方Go标准运行时将在一个程序死锁时令其崩溃退出。
 </p>
 
-<p class="anchor" id="64-bit-alignment"></p>
+<a class="anchor" id="64-bit-alignment"></a>
 <h3>
 	64位整数值的地址是否能保证总是64位对齐的，以便可以被安全地原子访问？
 </h3>
@@ -344,7 +344,7 @@ func main() {
 请阅读<a href="memory-layout.html#64bit-atomic-operation">关于Go值的内存布局</a>一文以获得详情。
 </p>
 
-<p class="anchor" id="atomical-assignment"></p>
+<a class="anchor" id="atomical-assignment"></a>
 <h3>
 	赋值是原子操作吗？
 </h3>
@@ -357,7 +357,7 @@ func main() {
 请阅读<a href="https://golang.google.cn/doc/faq#What_operations_are_atomic_What_about_mutexes">官方FAQ中的此问答</a>以了解更多。
 </p>
 
-<p class="anchor" id="zero-values-zero-bytes"></p>
+<a class="anchor" id="zero-values-zero-bytes"></a>
 <h3>
 	是否每一个零值在内存中占据的字节都是零？
 </h3>
@@ -393,7 +393,7 @@ func main() {
 然而，Go规范并没有保证这一点。我曾听说在某些比较老的处理器上，空指针表示的内存地址并不为零。
 </p>
 
-<p class="anchor" id="function-inline"></p>
+<a class="anchor" id="function-inline"></a>
 <h3>
 	标准的Go编译器是否支持函数内联？
 </h3>
@@ -422,7 +422,7 @@ func main() {
 
 <!-- 标准库  -->
 
-<p class="anchor" id="pointer-atomic"></p>
+<a class="anchor" id="pointer-atomic"></a>
 <h3>
 	如何原子地操作指针值？
 </h3>
@@ -470,7 +470,7 @@ func demo(newP *T) {
 是的，目前指针的原子操作使用起来非常得繁琐。
 </div>
 
-<p class="anchor" id="get-days-of-month"></p>
+<a class="anchor" id="get-days-of-month"></a>
 <h3>
 	如何使用尽可能短的代码行数来获取任意月份的天数？
 </h3>
@@ -513,7 +513,7 @@ func main() {
 </code></pre>
 </div>
 
-<p class="anchor" id="time-sleep-after"></p>
+<a class="anchor" id="time-sleep-after"></a>
 <h3>
 	函数调用<code>time.Sleep(d)</code>和数据通道接收<code>&lt;-time.After(d)</code>操作之间有何区别？
 </h3>
@@ -524,7 +524,7 @@ func main() {
 而数据通道接收<code>&lt;-time.After(d)</code>操作将使当前协程进入阻塞状态。
 </p>
 
-<p class="anchor" id="finalizers"></p>
+<a class="anchor" id="finalizers"></a>
 <h3>
 	终结器（finalizer）可以用做对象的析构函数吗？
 </h3>
@@ -552,7 +552,7 @@ func main() {
 关于更多细节请阅读<a href="https://golang.google.cn/pkg/runtime/#SetFinalizer">runtime.SetFinalizer函数的文档</a>。
 </p>
 
-<p class="anchor" id="trim"></p>
+<a class="anchor" id="trim"></a>
 <h3>
 	调用<code>strings</code>和<code>bytes</code>标准库包里<code>TrimLeft</code>和<code>TrimRight</code>函数经常会返回不符预期的结果，这些函数的实现存在bugs吗？
 </h3>
@@ -605,7 +605,7 @@ func main() {
 </code></pre>
 </div>
 
-<p class="anchor" id="fmt-print-println"></p>
+<a class="anchor" id="fmt-print-println"></a>
 <h3>
 	函数<code>fmt.Print</code>和<code>fmt.Println</code> 的区别是什么？
 </h3>
@@ -618,7 +618,7 @@ func main() {
 另外一个区别是<code>fmt.Println</code>函数会在结尾写入一个换行符，但是<code>fmt.Print</code>函数不会。
 </p>
 
-<p class="anchor" id="log-print-println"></p>
+<a class="anchor" id="log-print-println"></a>
 <h3>
 	函数<code>log.Print</code> 和函数 <code>log.Println</code> 有什么区别吗?
 </h3>
@@ -631,7 +631,7 @@ func main() {
 这两个函数都会在结尾输出一个换行符。
 </p>
 
-<p class="anchor" id="fmt-print-synced"></p>
+<a class="anchor" id="fmt-print-synced"></a>
 <h3>
 	函数<code>fmt.Print</code>、<code>fmt.Println</code>和<code>fmt.Printf</code>的实现进行同步了吗？
 </h3>
@@ -642,7 +642,7 @@ func main() {
 你可以调用<code>log.SetFlags(0)</code>来避免每一个日志行的前缀输出。
 </p>
 
-<p class="anchor" id="print-builtin-fmt-log"></p>
+<a class="anchor" id="print-builtin-fmt-log"></a>
 <h3>
 	内置的<code>print</code>和<code>println</code>函数与<code>fmt</code>和<code>log</code>标准库包中相应的打印函数有什么区别？
 </h3>
@@ -673,7 +673,7 @@ func main() {
 </ol>
 </div>
 
-<p class="anchor" id="math-crypto-rand"></p>
+<a class="anchor" id="math-crypto-rand"></a>
 <h3>
 	标准库包<code>math/rand</code>和<code>crypto/rand</code>生成的随机数之间有什么区别？
 </h3>
@@ -684,7 +684,7 @@ func main() {
 如果处于加密安全目的，我们应该使用<code>crypto/rand</code>标准库包生成的伪随机数序列。
 </p>
 
-<p class="anchor" id="math-round"></p>
+<a class="anchor" id="math-round"></a>
 <h3>
 	标准库中为什么没有<code>math.Round</code>函数?
 </h3>
@@ -700,7 +700,7 @@ func main() {
 
 <!-- 类型系统 -->
 
-<p class="anchor" id="uncomparable-types"></p>
+<a class="anchor" id="uncomparable-types"></a>
 <h3>
 	哪些类型不支持比较？
 </h3>
@@ -741,7 +741,7 @@ func main() {
 
 </div>
 
-<p class="anchor" id="nil-equality"></p>
+<a class="anchor" id="nil-equality"></a>
 <h3>
 	为什么两个<code>nil</code>值有时候会不相等？
 </h3>
@@ -789,7 +789,7 @@ func main() {
 </code></pre>
 </div>
 
-<p class="anchor" id="slice-conversion"></p>
+<a class="anchor" id="slice-conversion"></a>
 <h3>
 	为什么类型<code>[]T1</code>和<code>[]T2</code>没有共享相同底层类型，即使不同的类型<code>T1</code>和<code>T2</code>共享相同的底层类型？
 </h3>
@@ -841,7 +841,7 @@ func main() {
 </code></pre>
 </div>
 
-<p class="anchor" id="unaddressable-values"></p>
+<a class="anchor" id="unaddressable-values"></a>
 <h3>
 	哪些值可以被取地址，哪些值不可以被取地址？
 </h3>
@@ -888,7 +888,7 @@ func main() {
 </ul>
 </div>
 
-<p class="anchor" id="maps-are-unaddressable"></p>
+<a class="anchor" id="maps-are-unaddressable"></a>
 <h3>
 	为什么映射元素不可被取地址？
 </h3>
@@ -899,7 +899,7 @@ func main() {
 对于标准编译器，映射元素的内部地址在运行时刻有可能发生改变。
 </p>
 
-<p class="anchor" id="slice-elements-always-addressable"></p>
+<a class="anchor" id="slice-elements-always-addressable"></a>
 <h3>
 	为什么非空切片的元素总是可被取地址，即便对于不可寻址的切片也是如此？
 </h3>
@@ -926,7 +926,7 @@ func main() {
 但是，我不能确定这是否是Go规范所保证的。
 </p-->
 
-<p class="anchor" id="method-set-relation"></p>
+<a class="anchor" id="method-set-relation"></a>
 <h3>
 	对任意的非指针和非接口定义类型<code>T</code>，为什么类型<code>*T</code>的方法集总是类型<code>T</code>的方法集的超集，但是反之却不然？
 </h3>
@@ -975,7 +975,7 @@ func (pt *T) MethodX(param0 ParamType0, ...) (result0 ResultType0, ...) {
 更多解释请阅读Go官方FAQ中的<a href="https://golang.google.cn/doc/faq#different_method_sets">这个问答</a>。
 </p>
 
-<p class="anchor" id="types-can-have-methods"></p>
+<a class="anchor" id="types-can-have-methods"></a>
 <h3>
 	我们可以为哪些类型声明方法？
 </h3>
@@ -984,7 +984,7 @@ func (pt *T) MethodX(param0 ParamType0, ...) (result0 ResultType0, ...) {
 请阅读<a href="method.html">方法</a>一文获取答案。
 </p>
 
-<p class="anchor" id="declare-immutables"></p>
+<a class="anchor" id="declare-immutables"></a>
 <h3>
 	在Go里如何声明不可变量？
 </h3>
@@ -1015,7 +1015,7 @@ func (pt *T) MethodX(param0 ParamType0, ...) (result0 ResultType0, ...) {
 </p>
 </div>
 
-<p class="anchor" id="set-container-type"></p>
+<a class="anchor" id="set-container-type"></a>
 <h3>
 	为什么没有内置的<code>set</code>容器类型？
 </h3>
@@ -1025,7 +1025,7 @@ func (pt *T) MethodX(param0 ParamType0, ...) (result0 ResultType0, ...) {
 在Go语言里，<code>map[Tkey]struct{}</code>经常被用做一个集合类型。
 </div>
 
-<p class="anchor" id="byte-rune-slice-string"></p>
+<a class="anchor" id="byte-rune-slice-string"></a>
 <h3>
 	什么是byte？什么是rune？
 	如何将<code>[]byte</code>和<code>[]rune</code>类型的值转换为字符串？
@@ -1069,7 +1069,7 @@ func main() {
 
 <!-- 其它 -->
 
-<p class="anchor" id="about-iota"></p>
+<a class="anchor" id="about-iota"></a>
 <h3>
 	<code>iota</code>是什么意思？
 </h3>
@@ -1080,7 +1080,7 @@ Iota是希腊字母表中的第九个字母。
 在每一个常量声明组中，其值在该常量声明组的第<b><i>N</i></b>个常量规范中的值为<code>N</code>。
 </div>
 
-<p class="anchor" id="check-if-channels-closed"></p>
+<a class="anchor" id="check-if-channels-closed"></a>
 <h3>
 	为什么没有一个内置的<code>closed</code>函数用来检查数据通道是否已经关闭？
 </h3>
@@ -1096,7 +1096,7 @@ Iota是希腊字母表中的第九个字母。
 请阅读<a href="channel-closing.html">如何优雅地关闭数据通道</a>一文来了解如何编写一个<code>closed</code>函数以及如何避免使用这样的函数。
 </p>
 
-<p class="anchor" id="return-local-pointers"></p>
+<a class="anchor" id="return-local-pointers"></a>
 <h3>
 	函数返回局部变量的指针是否安全？
 </h3>
@@ -1111,7 +1111,7 @@ Iota是希腊字母表中的第九个字母。
 请阅读<a href="memory-block.html">内存块</a>一文了解更多。
 </p>
 
-<p class="anchor" id="gopher"></p>
+<a class="anchor" id="gopher"></a>
 <h3>
 	单词<b><i>gopher</i></b>在Go社区中表示什么？
 </h3>
