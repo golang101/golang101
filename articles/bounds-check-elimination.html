@@ -67,11 +67,11 @@ func main() {}
 </p>
 
 <p>
-在函数<code>f3</code>中，编译器知道如果第一个<code>s[index]</code>是安全的，则第二个<code>s[index]</code>也一定是安全的。
+在函数<code>f3</code>中，编译器知道如果第一个<code>s[index]</code>是安全的，则第二个<code>s[index]</code>是无需边界检查的。
 </p>
 
 <p>
-编译器也正确地认为函数<code>f4</code>中的唯一一行（第<i>22</i>行）是安全的。
+编译器也正确地认为函数<code>f4</code>中的唯一一行（第<i>22</i>行）是无需边界检查的。
 </p>
 </div>
 
@@ -198,15 +198,14 @@ func main() {
 	// 0 <= a <= b <= cap(s)，否则，将产生一个恐慌。
 
 	_ = s0[:index]
-	// 上一行是安全的不能保证下一行也是安全的。事实上，下一行将产生
-	// 一个恐慌，因为起始下标index大于终止下标（即切片s0的长度）。
+	// 上一行是安全的不能保证下一行是无需边界检查的。事实上，下一行将
+	// 产生一个恐慌，因为起始下标index大于终止下标（即切片s0的长度）。
 	_ = s0[index:] // panic
 }
 </code></pre>
 
 <p>
-所以<b>如果<code>s[:index]</code>是安全的则<code>s[index:]</code>也是安全的</b>这条论述只有在<code>len(s)</code>和<code>cap(s)</code>相等的情况下才正确。
-这就是为什么函数<code>fb</code>和<code>fc</code>中的代码仍旧需要边界检查的原因。
+所以<b>如果<code>s[:index]</code>是安全的则<code>s[index:]</code>是无需边界检查的</b>这条论述只有在<code>len(s)</code>和<code>cap(s)</code>相等的情况下才正确。这就是为什么函数<code>fb</code>和<code>fc</code>中的代码仍旧需要边界检查的原因。
 </p>
 
 <p>
@@ -248,10 +247,10 @@ $ go build -gcflags="-d=ssa/check_bce/debug=1" example4.go
 在此例子中，标准编译器成功推断出：
 <ul>
 <li>
-	在函数<code>fb2</code>中，如果第<i>7</i>行是安全的，则第<i>8</i>行也是安全的；
+	在函数<code>fb2</code>中，如果第<i>7</i>行是安全的，则第<i>8</i>行是无需边界检查的；
 </li>
 <li>
-	在函数<code>fc2</code>中，如果第<i>15</i>行是安全的，则第<i>16</i>行也是安全的。
+	在函数<code>fc2</code>中，如果第<i>15</i>行是安全的，则第<i>16</i>行是无需边界检查的。
 </li>
 </ul>
 
