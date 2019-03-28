@@ -223,9 +223,9 @@ func (go101 *Go101) RenderPrintPage(w http.ResponseWriter, r *http.Request, prin
 			if pageParams == nil {
 				pageParams = map[string]interface{}{}
 			}
-			q := r.URL.Query().Get("showcovers")
-			pageParams["ShowCovers"] = q == "1" || q == "true"
-			pageParams["IndexTitle"] = r.URL.Query().Get("indextitle")
+			//q := r.URL.Query().Get("showcovers")
+			//pageParams["ShowCovers"] = q == "1" || q == "true"
+			//pageParams["IndexTitle"] = r.URL.Query().Get("indextitle")
 			pageParams["PrintTarget"] = printTarget
 			pageParams["IsLocalServer"] = isLocal
 
@@ -368,7 +368,7 @@ func retrievePageTemplate(which PageTemplate, cacheIt bool) *template.Template {
 		case Template_Article:
 			t = parseTemplate(filepath.Join(rootPath, "templates"), "base", "article")
 		case Template_PrintBook:
-			t = parseTemplate(filepath.Join(rootPath, "templates"), "print")
+			t = parseTemplate(filepath.Join(rootPath, "templates"), "pdf")
 		default:
 			t = template.New("blank")
 		}

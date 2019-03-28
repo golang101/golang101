@@ -1152,7 +1152,6 @@ func handleRequests(requests <-chan Request) {
 	}()
 
 	for r := range requests {
-
 		<-quotas
 		go handle(r)
 	}

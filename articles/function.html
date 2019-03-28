@@ -325,7 +325,7 @@ Go汇编代码放在后缀为<code>.a</code>的文件中。
 
 <div>
 如果一个函数有返回值，则它的函数体内的最后一条语句必须为一条<a href="https://golang.google.cn/ref/spec#Terminating_statements">终止语句</a>。
-Go中有多种终止语句，<code>return</code>语句是其中一种。所以一个有返回值的函数的体内不一定需要一个<code>return</code>语句。
+Go中有多种终止语句，<code>return</code>语句只是其中一种。所以一个有返回值的函数的体内不一定需要一个<code>return</code>语句。
 比如下面两个函数（它们均可编译通过）：
 <pre class="line-numbers"><code class="language-go">func fa() int {
 	a:

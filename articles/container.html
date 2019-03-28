@@ -1807,11 +1807,11 @@ Go不支持更多的内置切片操作，比如切片克隆、元素删除和插
 
 <div>
 对于目前的标准编译器（1.12），最有效的克隆一个切片的方法为：
-<pre class="line-numbers"><code class="language-go">sClone := append(s[:0:0], s...)
+<pre class="disable-line-numbers111"><code class="language-go">sClone := append(s[:0:0], s...)
 </code></pre>
 
 对于长度较大（并且元素值的直接部分不含有指针）的切片，上面这种方法比下面这种方法效率更高。
-<pre class="line-numbers"><code class="language-go">sClone := make([]T, len(s))
+<pre class="disable-line-numbers111"><code class="language-go">sClone := make([]T, len(s))
 copy(sClone, s)
 </code></pre>
 
