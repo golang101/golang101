@@ -140,7 +140,7 @@ map[struct{x int}]*int8 // 此映射类型的元素类型为一个指针类型�
 []string{"break", "continue", "fallthrough"}
 
 // 一个映射值。
-map[string]int{"C": 1972, "Python": 1991, "Java", 1995, "Go": 2009}
+map[string]int{"C": 1972, "Python": 1991, "Go": 2009}
 </code></pre>
 
 <p>
@@ -194,7 +194,7 @@ be assignable to the corresponding map key type.
 
 <p>
 映射组合字面形式中元素对应的键值不可缺失，并且它们可以为非常量。
-<p>
+</p>
 
 <pre class="line-numbers"><code class="language-go">var a uint = 1
 var _ = map[uint]int {a : 123} // 没问题
@@ -675,7 +675,7 @@ func main() {
 向一个映射中添加一个条目的语法和修改一个映射元素的语法是一样的。
 比如，对于一个非零映射值<code>m</code>，如果当前<code>m</code>中尚未存储条目<code>(k, e)</code>，则下面的语法形式将把此条目存入<code>m</code>；否则，下面的语法形式将把键值<code>k</code>对应的元素值更新为<code>e</code>。
 
-<pre class="disable-line-numbers111">m[k] = e
+<pre class="disable-line-numbers111"><code class="language-go">m[k] = e
 </code></pre>
 
 <p>
@@ -690,7 +690,7 @@ func main() {
 内置函数<code>delete</code>用来从一个映射中删除一个条目。比如，下面的<code>delete</code>调用将把键值<code>k</code>对应的条目从映射<code>m</code>中删除。
 如果映射<code>m</code>中未存储键值为<code>k</code>的条目，则此调用为一个空操作，它不会产生一个恐慌，即使<code>m</code>是一个nil零值映射。
 
-<pre class="disable-line-numbers111">delete(m, k)
+<pre class="disable-line-numbers111"><code class="language-go">delete(m, k)
 </code></pre>
 
 <p>
@@ -737,7 +737,7 @@ Go中并未提供一个内置方式来从一个切片中删除一个元素。
 
 下面是一个如何使用<code>append</code>内置函数的例子。
 
-<pre class="line-numbers"><code class="language-go">package main
+<pre class="line-numbers must-line-numbers"><code class="language-go">package main
 
 import "fmt"
 
@@ -866,7 +866,7 @@ func main() {
 数组不能使用内置<code>make</code>函数来创建。
 </p>
 
-<p><
+<p>
 顺便说一句，内置<code>make</code>函数也可以用来创建以后将要介绍的<a href="channel.html">数据通道</a>值。
 </p>
 
@@ -943,9 +943,9 @@ func main() {
 import "fmt"
 
 func main() {
-	m := *new(map[string]int)   // <=> var m = map[string]int(nil)
+	m := *new(map[string]int)   // <=> var m map[string]int
 	fmt.Println(m == nil)       // true
-	s := *new([]int)            // <=> var s = []int(nil)
+	s := *new([]int)            // <=> var s []int
 	fmt.Println(s == nil)       // true
 	a := *new([5]bool)          // <=> var a [5]bool
 	fmt.Println(a == [5]bool{}) // true
@@ -1036,12 +1036,11 @@ func main() {
 	ma := map[int][5]int{}
 	ma[1] = [5]int{1: 789} // 整体修改是允许的
 
-	// 这两个赋值编译不通过，因为部分修改一个映射元素是非法的。
-	// 这看上去确实有些反直觉。
+	// 这两个赋值编译不通过，因为部分修改一个映射
+	// 元素是非法的。这看上去确实有些反直觉。
 	/*
-	ma[1][1] = 123      // error: cannot assign to a[1][1]
-	mt["John"].age = 30 // error: cannot assign to struct
-	                    // field mt["John"].age in map.
+	ma[1][1] = 123      // error
+	mt["John"].age = 30 // error
 	*/
 
 	// 读取映射元素的元素或者字段是没问题的。
@@ -1097,7 +1096,7 @@ baseContainer[low : high : max] // 三下标形式
 
 上面所示的双下标形式等价于下面的三下标形式：
 
-<pre class="disable-line-numbers111">baseContainer[low : high : cap(baseContainer)]
+<pre class="disable-line-numbers111"><code class="language-go">baseContainer[low : high : cap(baseContainer)]
 </code></pre>
 
 <p>
@@ -1106,13 +1105,18 @@ baseContainer[low : high : max] // 三下标形式
 
 <p>
 （注意：三下标形式是从Go 1.2开始支持的。）
-<p>
+</p>
 
 上面所示的取子切片表达式的语法形式中得下标必须满足下列关系，否则代码要么编译不通过，要么在运行时刻将造成恐慌。
-<pre class="disable-line-numbers111">0 <= low <= high <= max <= cap(baseContainer)</code>
+<pre class="disable-line-numbers111"><code class="language-go">// 双下标形式
+0 <= low <= high <= cap(baseContainer)
+
+// 三下标形式
+0 <= low <= high <= max <= cap(baseContainer)
 </code></pre>
 
 <p>
+不满足上述关系的取子切片表达式要么编译不通过，要么在运行时刻将导致一个恐慌。
 </p>
 
 注意：
@@ -1182,11 +1186,12 @@ func main() {
 </code></pre>
 
 <p>
+</p>
+
 下面这张图描绘了上面的程序在退出之前各个数组和切片的状态。
 <div class="text-center">
 <img src="res/slice-subslice-2.png" alt="数字和切片状态"></img>
 </div>
-</p>
 
 <p>
 从这张图片可以看出，切片<code>s7</code>和<code>s8</code>共享存储它们的元素的底层内存片段，其它切片和数组<code>a</code>共享同一个存储元素的内存片段。
@@ -1220,7 +1225,7 @@ func main() {
 <code>copy</code>函数的第一个参数为目标切片，第二个参数为源切片。
 传递给一个<code>copy</code>函数调用的两个实参可以共享一些底层元素。
 <code>copy</code>函数返回复制了多少个元素，此值（<code>int</code>类型）为这两个切片的长度的较小值。
-<p>
+</p>
 
 <p>
 结合上一节介绍的子切片语法，我们可以使用<code>copy</code>函数来在两个数组之间或者一个数组与一个切片之间复制元素。
@@ -1289,7 +1294,7 @@ func Copy(dest, src []T) int {
 
 <div>
 在Go中，我们可以使用下面的语法形式来遍历一个容器中的键值和元素：
-<pre class="disable-line-numbers111">for key, element = range aContainer {
+<pre class="disable-line-numbers111"><code class="language-go">for key, element = range aContainer {
 	// 使用key和element ...
 }
 </code></pre>
@@ -1906,10 +1911,10 @@ s[:len(s)+1][len(s)] = t0
 有时，我们需要删除满足某些条件的切片元素。
 
 <pre class="line-numbers"><code class="language-go">// 假设T是一个小尺寸类型。
-func DeleteElements(s []T, shouldKeep func(T) bool, clear bool) []T {
+func DeleteElements(s []T, keep func(T) bool, clear bool) []T {
 	result := make([]T, 0, len(s))
 	for _, v := range s {
-		if shouldKeep(v) {
+		if keep(v) {
 			result = append(result, v)
 		}
 	}

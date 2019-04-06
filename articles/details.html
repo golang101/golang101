@@ -1,4 +1,4 @@
-﻿<h1>Go 细节 101</h1>
+﻿<h1>Go细节101</h1>
 
 <div>
 索引：
@@ -127,7 +127,7 @@
 		<a class="index" href="#capacity-of-slice-from-string">字符串转换为byte切片或rune切片后的结果切片的容量可能会大于长度。</a>
 	</li>
 	<li>
-		<a class="index" href="#different-loops">对于切片<code>s</code>，循环<code>for i = range s {...}</code>并不等价于循环<code>for i = 0; i < len(s); i++ {...}</code>。</a>
+		<a class="index" href="#different-loops">对于切片<code>s</code>，循环<code>for i = range s {...}</code>并不等价于循环<code>for i = 0; i &lt; len(s); i++ {...}</code>。</a>
 	</li>
 	</ul>
 </li>
@@ -1143,7 +1143,8 @@ func main() {
 
 <div>
 原因是<a href="#nan-inf">下面的另一个细节</a>中提到的<code>NaN != NaN</code>。
-但是以<code>NaN</code>作为键值的元素只能在<code>for-range</code>循环中被找到。
+但是，在Go1.12之前，以<code>NaN</code>作为键值的元素只能在<code>for-range</code>循环中被找到；
+从Go1.12开始，以<code>NaN</code>作为键值的元素也可以通过类似<code>fmt.Print</code>的函数打印出来。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1162,9 +1163,9 @@ func main() {
 	v, present = m[a]
 	fmt.Println(v, present) // 0 false
 
-	fmt.Println(m) // map[NaN:&lt;nil&gt; NaN:&lt;nil&gt;]
+	fmt.Println(m) // map[NaN:789 NaN:123]
 	delete(m, a)   // no-op
-	fmt.Println(m) // map[NaN:&lt;nil&gt; NaN:&lt;nil&gt;]
+	fmt.Println(m) // map[NaN:789 NaN:123]
 
 	for k, v := range m {
 		fmt.Println(k, v)
@@ -1175,6 +1176,7 @@ func main() {
 }
 </code></pre>
 <p>
+注意：在Go1.12之前，两个<code>fmt.Println(m)</code>调用均打印出<code>map[NaN:&lt;nil&gt; NaN:&lt;nil&gt;]</code>。
 </p>
 </div>
 
@@ -1207,7 +1209,7 @@ func main() {
 </div>
 
 <a class="anchor" id="different-loops"></a>
-<h3>对于切片<code>s</code>，循环<code>for i = range s {...}</code>并不等价于循环<code>for i = 0; i < len(s); i++ {...}</code>。</h3>
+<h3>对于切片<code>s</code>，循环<code>for i = range s {...}</code>并不等价于循环<code>for i = 0; i &lt; len(s); i++ {...}</code>。</h3>
 
 <div>
 对于这两个循环，迭代变量<code>i</code>的最终值可能是不同的。

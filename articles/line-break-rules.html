@@ -212,7 +212,7 @@ or any opening brace (<code>{</code>, <code>[</code>, <code>(</code>).
 
 上述分号自动插入规则可以让我们写出更简洁的代码，同时也允许我们写出一些合法的但看上去有些怪异的代码，比如：
 
-<pre class="line-numbers"><code class="language-go">package main
+<pre class="line-numbers must-line-numbers"><code class="language-go">package main
 
 import "fmt"
 
@@ -271,7 +271,7 @@ func main() {
 
 <p>
 这就是它为什么输出<code>true</code>的原因。
-<p>
+</p>
 
 <p>
 常使用<code>go fmt</code>和<code>go vet</code>命令来格式化和发现可能的逻辑错误是一个好习惯。
@@ -279,18 +279,17 @@ func main() {
 
 下面是一个很少见的情形，此情形中所示的代码看上去是合法的，但是实际上是编译不通过的。
 
-<pre class="line-numbers"><code class="language-go">func fa() {
-	var c chan bool
-	select {
-	case <-c:
+<pre class="line-numbers"><code class="language-go">func f() {
+	switch x {
+	case 1:
 	{
 		goto A
 		A: // 这里编译没问题
 	}
-	case <-c:
+	case 2:
 		goto B
 		B: // syntax error: 跳转标签后缺少语句
-	case <-c:
+	case 0:
 		goto C
 		C: // 这里编译没问题
 	}
@@ -323,7 +322,7 @@ func main() {
 </code></pre>
 
 <p>
-一个单独的分号实际上表示一条<a href="expressions-and-statements.html#simple-statement">空语句</a>。
+一个单独的分号实际上表示一条<a href="expressions-and-statements.html#simple-statements">空语句</a>。
 这就是为什么<code>A:</code>和<code>C:</code>标签声明之后确实跟随了一条语句的原因，所以它们是合法的。
 而<code>B:</code>标签声明跟随的<code>case 0:</code>不是一条语句，所以它是不合法的。
 </p>
@@ -364,9 +363,10 @@ var _, _ = f1(123, "Go",  // 最后一个逗号是必需的
 var _, _ = f1(123, "Go")
 </code></pre>
 
-而下面这段代码是不合法的，因为编译器将自动在每一行行尾插入一个分号（除了第二行）。
+而下面这段代码是不合法的，因为编译器将自动在每一行的行尾插入一个分号（除了第二行）。
+其中三行在插入分号后将导致编译错误。
 
-<pre class="line-numbers"><code class="language-go">func f1(a int, b string,) (x bool, y int // error: unexpected newline
+<pre class="line-numbers"><code class="language-go">func f1(a int, b string,) (x bool, y int // error
 ) {
 	return true, 789
 }

@@ -172,7 +172,7 @@ func main() {
 </code></pre>
 
 <p>
-<p>
+</p>
 
 <p>
 下面这张图描绘了上面这个例子中各个值之间的关系。
@@ -242,7 +242,7 @@ func main() {
 </p>
 
 <p>
-简而言之，指针提供了一种简介的途径来访问和修改一些值。
+简而言之，指针提供了一种间接的途径来访问和修改一些值。
 虽然很多语言中没有指针这个概念，但是指针被隐藏其它概念之中。
 </p>
 
@@ -315,7 +315,7 @@ func main() {
 <ol>
 <li>
 	类型<code>T1</code>和<code>T2</code>的底层类型必须一致（忽略结构体字段的标签）。
-	特别地，如果类型<code>T1</code>和<code>T2</code>中只要有一个是<a href="type-system-overview.html#non-defined-type">非定义类型</a>并且它们的底层类型一致（考虑结构体字段的标签），则此转换可以使隐式的。
+	特别地，如果类型<code>T1</code>和<code>T2</code>中只要有一个是<a href="type-system-overview.html#non-defined-type">非定义类型</a>并且它们的底层类型一致（考虑结构体字段的标签），则此转换可以是隐式的。
 	关于结构体，请参阅<a href="struct.html">下一篇文章</a>。
 </li>
 <li>

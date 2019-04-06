@@ -24,7 +24,7 @@
 </p>
 
 <p>
-如果出于种种原因，你确实希望在你的代码中使用非类型安全指针，你不仅需要提防是上述风险，你还需遵守Go官方文档中列出的非类型安全指针使用模式，并清楚地知晓使用非类型安全指针带来的效果。否则，你很难使用非类型安全指针写出安全的代码。
+如果出于种种原因，你确实希望在你的代码中使用非类型安全指针，你不仅需要提防上述风险，你还需遵守Go官方文档中列出的非类型安全指针使用模式，并清楚地知晓使用非类型安全指针带来的效果。否则，你很难使用非类型安全指针写出安全的代码。
 </p>
 
 <h3>关于<code>unsafe</code>标准库包</h3>
@@ -75,7 +75,7 @@
 <p>
 注意，这三个函数的返回值的类型均为内置类型<code>uintptr</code>。
 下面我们将了解到<code>uintptr</code>类型的值可以转换为非类型安全指针（反之亦然）。
-<p>
+</p>
 
 <p>
 尽管这三个函数之一的任何调用的返回结果在同一个编译好的程序中总是一致的，
@@ -189,7 +189,7 @@ They are as dangerous as C pointers, which is Go always tries to avoid.
 </p>
 
 <p>
-然而，尽管这些转换在编译时刻是合法的，但是它们中一些在运行时刻是并非合法和安全的。
+然而，尽管这些转换在编译时刻是合法的，但是它们中一些在运行时刻并非是合法和安全的。
 这些转换摧毁了Go的类型系统（不包括非类型安全指针部分）精心设立的内存安全屏障。
 我们必须遵循本文后面要介绍的一些用法指示来使用非类型安全指针才能写出合法并安全的代码。
 </p>
@@ -301,6 +301,7 @@ func foo() {
 <div>
 <p>
 比如中下面这个例子，值<code>t</code>仍旧在使用中并不能保证被值<code>t.y</code>所引用的值仍在被使用。
+</p>
 
 <pre class="line-numbers"><code class="language-go">type T struct {
 	x int
@@ -469,7 +470,7 @@ func main() {
 	t := T{y: [3]int16{123, 456, 789}}
 	p := unsafe.Pointer(&t)
 	// "uintptr(p) + N + M + M"为t.y[2]的内存地址。
-	ty2 := (*int16)(unsafe.Pointer(uintptr(p) + N + M + M))
+	ty2 := (*int16)(unsafe.Pointer(uintptr(p)+N+M+M))
 	fmt.Println(*ty2) // 789
 }
 </code></pre>
@@ -483,7 +484,7 @@ func main() {
 <pre class="line-numbers"><code class="language-go">func main() {
 	t := T{y: [3]int16{123, 456, 789}}
 	p := unsafe.Pointer(&t)
-	// ty2 := (*int16)(unsafe.Pointer(uintptr(p) + N + M + M))
+	// ty2 := (*int16)(unsafe.Pointer(uintptr(p)+N+M+M))
 	addr := uintptr(p) + N + M + M
 	// 从这里到下一行代码执行之前，t值将不再被任何值引用，所以
 	// 垃圾回收器认为它可以被回收了。一旦它真得被回收了，下面
@@ -552,7 +553,7 @@ func DoSomething(addr uintptr) {
 我们可以认为编译器在每个<code>syscall.Syscall</code>函数调用后面为在此调用中的每个被转换为<code>uintptr</code>类型的非类型安全指针实参添加了一条<code>runtime.KeepAlive</code>调用，从而确保被此非类型安全指针实参引用着的值在此<code>syscall.Syscall</code>函数调用中不会被垃圾回收掉。
 
 <pre class="line-numbers"><code class="language-go">syscall.Syscall(syscall.SYS_READ, uintptr(fd),
-				uintptr(unsafe.Pointer(p)), uintptr(n))
+			uintptr(unsafe.Pointer(p)), uintptr(n))
 // 编译器将自动添加下面的这句调用。
 runtime.KeepAlive(unsafe.Pointer(p))
 </code></pre>
@@ -606,8 +607,8 @@ syscall.Syscall(SYS_READ, uintptr(fd), u, uintptr(n))
 
 <p>
 这样的设计需要我们将这两个方法的调用的<code>uintptr</code>结果立即转换为非类型安全指针。
-否则，将出现一个很小的可能导致处于返回的地址处的内存块被回收掉的时间窗。
-此时间窗是如此之小以至于此内存块被回收掉的几率非常之低，因而这样的编程错误造成的bug的重现几率亦十分得低。
+否则，将出现一个短暂的可能导致处于返回的地址处的内存块被回收掉的时间窗。
+此时间窗是如此短暂以至于此内存块被回收掉的几率非常之低，因而这样的编程错误造成的bug的重现几率亦十分得低。
 </p>
 
 比如，下面这个调用是安全的：
@@ -691,7 +692,7 @@ func main() {
 
 <p>
 注意：上例中的<code>runtime.KeepAlive</code>调用必不可少。
-否则，在转换<code>uintptr(unsafe.Pointer(&a))</code>被执行之前，分配给数组<code>a</code>的内存可能已经被回收。
+否则，在转换<code>uintptr(unsafe.Pointer(&amp;a))</code>被执行之前，分配给数组<code>a</code>的内存可能已经被回收。
 </p>
 
 一般说来，我们只应该从一个已经存在的字符串值得到一个<code>*reflect.StringHeader</code>指针，

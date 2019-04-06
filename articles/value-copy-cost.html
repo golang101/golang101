@@ -27,7 +27,7 @@
 
 <p>
 一个数组类型的尺寸取决于它的元素类型的尺寸和它的长度。它的尺寸为它的元素类型的尺寸和它的长度的乘积。
-<p>
+</p>
 
 <p>
 一个结构体类型的尺寸取决于它的各个字段的类型尺寸和这些字段的排列顺序。
@@ -41,7 +41,7 @@
 在此表中，一个word表示一个原生字。在32位系统架构中，一个word为4个字节；而在64位系统架构中，一个word为8个字节。
 </p>
 
-<table class="table table-bordered text-center" style="width: auto !important;">
+<table border="1" class="table table-bordered text-center" style="width: auto !important;">
 <thead>
 	<tr>
 	<th class="text-center">类型种类</th>
@@ -172,7 +172,7 @@
 <p>
 如果一个数组或者切片的元素类型是一个大尺寸类型，我们应该避免在<code>for-range</code>循环中使用双循环变量来遍历这样的数组或者切片类型的值中的元素。
 因为，在遍历过程中，每个元素将被复制给第二个循环变量一次。
-<p>
+</p>
 
 下面这个例子展示了三种遍历一个切片的方法的性能差异。
 
@@ -181,7 +181,9 @@
 import "testing"
 
 type S struct{a, b, c, d, e int64}
-var sX, sY, sZ = make([]S, 1000), make([]S, 1000), make([]S, 1000)
+var sX = make([]S, 1000)
+var sY = make([]S, 1000)
+var sZ = make([]S, 1000)
 var sumX, sumY, sumZ int64
 
 func Benchmark_Loop(b *testing.B) {

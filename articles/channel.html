@@ -94,7 +94,7 @@ Go语言设计团队的首任负责人<i>Rob Pike</i>对并发编程的一个建
 Go提供了一种独特的并发同步技术来实现通过通讯来共享内存。此技术即为数据通道。
 我们可以把一个数据通道看作是在一个程序内部的一个先进先出（FIFO：first in first out）数据队列。
 一些协程可以向此数据通道发送数据，另外一些协程可以从此数据通道接收数据。
-<p>
+</p>
 
 <p>
 随着一个数据值的传递（发送和接收），一些数据值的所有权从一个协程转移到了另一个协程。
@@ -135,7 +135,7 @@ Go数据通道可以帮助程序员轻松地避免数据竞争，但不会绝对
 一个数据通道只能传送它的（数据通道类型的）元素类型的值。
 </p>
 
-数据通道可以使双向的，也可以是单向的。
+数据通道可以是双向的，也可以是单向的。
 <ul>
 <li>
 	字面形式<code>chan T</code>表示一个元素类型为<code>T</code>的双向数据通道类型。
@@ -194,7 +194,7 @@ Go中有五种数据通道相关的操作。假设一个数据通道（值）为
 <ol>
 <li>
 	调用内置函数<code>close</code>来关闭一个数据通道：
-<pre class="disable-line-numbers111">close(ch)
+<pre class="disable-line-numbers111"><code class="language-go">close(ch)
 </code></pre>
 	<p>
 	传给<code>close</code>函数调用的实参必须为一个数据通道值，并且此数据通道值不能为单向接收的。
@@ -202,7 +202,7 @@ Go中有五种数据通道相关的操作。假设一个数据通道（值）为
 </li>
 <li>
 	使用下面的语法向数据通道<code>ch</code>发送一个值<code>v</code>：
-<pre class="disable-line-numbers111">ch &lt;- v
+<pre class="disable-line-numbers111"><code class="language-go">ch &lt;- v
 </code></pre>
 	<p>
 	<code>v</code>必须能够赋值给数据通道<code>ch</code>的元素类型。
@@ -212,7 +212,7 @@ Go中有五种数据通道相关的操作。假设一个数据通道（值）为
 </li>
 <li>
 	使用下面的语法从数据通道<code>ch</code>接收一个值：
-<pre class="disable-line-numbers111">&lt;-ch
+<pre class="disable-line-numbers111"><code class="language-go">&lt;-ch
 </code></pre>
 	如果一个数据通道操作不永久阻塞，它总会返回至少一个值，此值的类型为数据通道<code>ch</code>的元素类型。
 	<code>ch</code>不能为单向发送数据通道。
@@ -230,13 +230,13 @@ Go中有五种数据通道相关的操作。假设一个数据通道（值）为
 	</p>
 
 	数据接收操作在赋值中被用做源值的例子：
-<pre class="disable-line-numbers111">v = &lt;-ch
+<pre class="disable-line-numbers111"><code class="language-go">v = &lt;-ch
 v, sentBeforeClosed = &lt;-ch
 </code></pre>
 </li>
 <li>
 	查询一个数据通道的容量：
-<pre class="disable-line-numbers111">cap(ch)
+<pre class="disable-line-numbers111"><code class="language-go">cap(ch)
 </code></pre>
 	<p>
 	其中<code>cap</code>是一个已经在<a href="container.html#cap-len">容器类型</a>一文中介绍过的内置函数。
@@ -245,7 +245,7 @@ v, sentBeforeClosed = &lt;-ch
 </li>
 <li>
 	查询一个数据通道的长度：
-<pre class="disable-line-numbers111">len(ch)
+<pre class="disable-line-numbers111"><code class="language-go">len(ch)
 </code></pre>
 	<p>
 	其中<code>len</code>是一个已经在<a href="container.html#cap-len">容器类型</a>一文中介绍过的内置函数。
@@ -304,7 +304,7 @@ https://github.com/golang/go/issues/27769
 下表简单地描述了三种数据通道操作施加到三类数据通道的结果。
 </p>
 
-<table class="table table-bordered text-center" style="width: auto !important;">
+<table border="1" class="table table-bordered text-center" style="width: auto !important;">
 <thead>
 	<tr class="active">
 	<th class="text-center">操作</th>
@@ -323,7 +323,7 @@ https://github.com/golang/go/issues/27769
 	<tr>
 	<th scope="row" class="text-center">发送数据</th>
 	<td style="vertical-align: middle;">永久阻塞</td>
-	<td style="vertical-align: middle;"">产生恐慌</td>
+	<td style="vertical-align: middle;">产生恐慌</td>
 	<td style="vertical-align: middle;">阻塞或者成功发送<sup>(B)</sup></td>
 	</tr>
 	<tr>

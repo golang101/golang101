@@ -24,6 +24,54 @@
 
 </div>
 
+<a class="anchor" id="package-level-variables"></a>
+<h3>包级变量初始化顺序</h3>
+
+<div>
+<p>
+在运行时刻，当一个包被加载的时候，不依赖于任何其它未初始化包级变量的未初始化包级变量将按照它们在代码中的声明顺序被初始化。
+此过程可能需要重复若干次，直到此过程中不再有任何包级变量被初始化。
+对于一个成功编译了的Go程序，当所有这样的过程结束之后，所有的包级变量都应该被初始化了。
+</p>
+
+比如，下面这个程序应该打印出<code>yzxw</code>。
+<ol>
+<li>
+	在上述过程运行的第一轮，<code>y</code>和<code>z</code>是仅有的两个不依赖于任何其它未初始化包级变量的未初始化包级变量，所以它们将按照它们的声明顺序被初始化。
+</li>
+<li>
+	在上述过程运行的第二轮，<code>x</code>是仅有的一个不依赖于任何其它未初始化包级变量的未初始化包级变量，所以它将被初始化。
+</li>
+<li>
+	在上述过程运行的第三轮，<code>w</code>是仅有的一个不依赖于任何其它未初始化包级变量的未初始化包级变量，所以它将被初始化。
+</li>
+</ol>
+
+<pre class="line-numbers"><code class="language-go">package main
+
+var (
+	w = f("w", x)
+	x = f("x", z)
+	y = f("y")
+	z = f("z")
+)
+
+func f(s string, deps ...int) int {
+	print(s);
+	return 0
+}
+
+func main() {
+	f("\n")
+}
+</code></pre>
+
+<p>
+注意：标准Go编译器当前版本（1.12）未正确地实现上述规则。目前，如果上面这个程序使用标准Go编译器编译的话，它将打印出<code>zxwy</code>。
+</p>
+
+</div>
+
 <h3>通常估值顺序（The Usual Order）</h3>
 
 <div>
@@ -69,7 +117,7 @@ Go白皮书这样描述<b>通常估值顺序</b>：
 综合考虑上一节和本节上面已经提到的规则，编译器应该保证下列在运行时刻的估值顺序：
 <ul>
 <li>
-	此赋值中涉及到的函数调用、方法调用和数据通道操作必须按照这样的顺序执行：<code>z.f()</code>→<code>h()</code>→<code>i()</code>→<code>j()</code>→<code>&lt;-c</code>→<code>g()</codE>→<code>k()</code>；
+	此赋值中涉及到的函数调用、方法调用和数据通道操作必须按照这样的顺序执行：<code>z.f()</code>→<code>h()</code>→<code>i()</code>→<code>j()</code>→<code>&lt;-c</code>→<code>g()</code>→<code>k()</code>；
 </li>
 <li>
 	调用<code>h()</code>在表达式<code>h</code>、<code>a</code>和<code>b</code>估值之后调用；
@@ -134,7 +182,7 @@ Go白皮书这样描述<b>通常估值顺序</b>：
 <p>
 Go白皮书并没有清楚地指定赋值语句中左边的做为目标值的表达式在细节上该如何估值，此举造成<a href="https://github.com/golang/go/issues/23188#issuecomment-403951267">一些</a><a href="https://github.com/golang/go/issues/15620">争议</a>。
 所以，这里下面将对赋值语句中的表达式估值顺序做出一些补充解释。
-<p>
+</p>
 
 <p>
 为了方便下面的解释，对于一个赋值语句，我们假设一个做为目标值的映射元素索引表达式中的映射值总是可寻址的。
@@ -178,7 +226,7 @@ R0 := a; R1 := b
 
 下面是另外一个例子，其中<code>x[0]</code>而不是<code>x[1]</code>被修改了。
 
-<pre class="line-numbers"><code class="language-go">	x := []int{0, 0}
+<pre class="line-numbers must-line-numbers"><code class="language-go">	x := []int{0, 0}
 	i := 0
 	i, x[i] = 1, 2
 	fmt.Println(x) // [2 0]
@@ -202,7 +250,7 @@ R0 := 1; R1 := 2
 
 下面是一个略为复杂一点的例子。
 
-<pre class="line-numbers"><code class="language-go">package main
+<pre class="line-numbers must-line-numbers"><code class="language-go">package main
 
 import "fmt"
 
@@ -268,7 +316,7 @@ R0 := []int{2, 2, 2}; R1 := s[1]; R2 := m["Go"]; R3 := 5
 
 上面已经提到了，并非所有的估值顺序都在Go白皮书中指定清楚了，所以不同的Go编译器对这些未指定的估值顺序有着自己的理解。
 一些跨编译器兼容性不好的代码将导致使用不同的编译器编译的程序的运行结果不同。
-在下面这个例子中，表达式<code>x+1</code>和<code>f(&x)</code>的估值顺序是编译器相关的，所以此程序输出<code>100 99</code>或者<code>1 99</code>都是合理的。
+在下面这个例子中，表达式<code>x+1</code>和<code>f(&amp;x)</code>的估值顺序是编译器相关的，所以此程序输出<code>100 99</code>或者<code>1 99</code>都是合理的。
 
 <pre class="line-numbers"><code class="language-go">package main
 

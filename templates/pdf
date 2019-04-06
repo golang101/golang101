@@ -18,9 +18,11 @@
 		<link href="/static/code-prettify/2019-03-25/prettify.css" rel="stylesheet" media="screen, print">
 		<link href="/static/code-prettify/2019-03-25/sons-of-obsidian.css" rel="stylesheet" media="screen, print">
 		<script src="/static/jquery/jquery.min-v1.11.2.js"></script>
+
 		<style media="print">
+
 			pre {
-				background-color: #dbdbdb !important;
+				background-color: #dddddd !important;
 				border-width: 1px !important;
 				border-color: #ccc !important;
 				margin-top: 2px;
@@ -34,14 +36,15 @@
 			code {
 				tab-size: 6;
 				-moz-tab-size: 6;
-				background-color: #dbdbdb !important;
+				background-color: #dddddd !important;
 				border-width: 0px !important;
 			}
 
 			.cover-image {
-				display: table-cell;
-				vertical-align: middle;
-				width: 100%;
+				width: 85%;
+				max-width: 100%;
+				height: auto;
+				width: auto\9;
 			}
 			.visible-on-print {
 				margin-top: 3px;
@@ -49,9 +52,7 @@
 		</style>
 		<style media="screen">
 			.cover-image {
-				display: table-cell;
-				vertical-align: middle;
-				width: 39%;
+				width: 50%;
 				max-width: 100%;
 				height: auto;
 				width: auto\9;
@@ -96,6 +97,11 @@
 				border-color: #666;
 			}
 
+			code {
+				tab-size: 6;
+				-moz-tab-size: 6;
+			}
+
 			/*ul.index a::after {
 				content: leader('.') target-counter(attr(href), page);
 			}
@@ -110,8 +116,13 @@
 				text-decoration: underline !important;
 			}
 
-			a[href]:after {
+			a[href^="http://localhost"]::after, a[href^="https://go101.org"]::after {
 				content: none !important;
+			}
+
+			a[href^="http://"]:not([href*="localhost"])::after, a[href^="https://"]:not([href*="go101.org"])::after {
+				content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==) !important;
+				margin: 0 3px;
 			}
 
 {{- else -}}
@@ -120,7 +131,7 @@
 				text-decoration: underline !important;
 			}
 
-			a[href^="http\:\/\/localhost"]:after {
+			a[href^="http\:\/\/localhost"]::after {
 				content: none !important;
 			}
 
@@ -138,7 +149,7 @@
 		</style>
 		<script>
 		// "flash" or "print". "print" means paper.
-		const printForPaper = "{{ .PrintTarget }}" == "print";
+		const printForPaper = true; // "{{ .PrintTarget }}" == "print";
 
 		function parseArticleAndAnchor(url) {
 			var index = url.lastIndexOf('/');
@@ -307,7 +318,13 @@
 	<div class="cover" style="page-break-after: always;">
 		<img class="cover-image" src="res/101-front-cover.jpg" alt="封面"></img>
 	</div>
-	<div style="page-break-after: always;">&nbsp;</div>
+
+	{{ if false }}
+	<div class="cover" style="page-break-after: always;">
+		<img class="cover-image" src="res/101-back-cover.jpg" alt="封底"></img>
+	</div>
+	{{ end }}
+	<!--div style="page-break-after: always;">&nbsp;</div-->
 {{ end }}
 
 {{ range $id, $article := .Articles }}
@@ -333,13 +350,6 @@
 
 	<p style="page-break-after: always;"></p>
 
-{{ end }}
-
-{{ if eq .PrintTarget "pdf" }}
-	<div style="page-break-before: always;">&nbsp;</div>
-	<div class="cover" style="page-break-before: always;">
-		<img class="cover-image" src="res/101-back-cover.jpg" alt="封底"></img>
-	</div>
 {{ end }}
 
 		</div>

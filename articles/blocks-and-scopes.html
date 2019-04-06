@@ -71,7 +71,7 @@ Go代码中有四种代码块。
 
 下面是一张展示上述代码块层级关系的图片：
 <div class="text-center">
-<img src="./res/blocks.png" alt="代码块层级关系"></img>
+<img src="res/blocks.png" alt="代码块层级关系"></img>
 </div>
 
 <p>
@@ -103,7 +103,7 @@ Go代码中有四种代码块。
 </p>
 
 下标展示了各种代码元素可以被直接声明在何种代码块中：
-<table class="table table-bordered text-center" style="width: auto !important;">
+<table border="1" class="table table-bordered text-center" style="width: auto !important;">
 <thead>
 	<tr>
 	<th class="text-center"></th>
@@ -413,9 +413,13 @@ func parseInt(s string) (int, error) {
 }
 
 func main() {
-	// 输出：1 strconv.Atoi: parsing "TRUE": invalid syntax
 	fmt.Println(parseInt("TRUE"))
 }
+</code></pre>
+
+程序输出：
+
+<pre class="output"><code>1 strconv.Atoi: parsing "TRUE": invalid syntax
 </code></pre>
 
 <p>

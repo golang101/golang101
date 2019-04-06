@@ -23,7 +23,7 @@ BCE可以避免很多不必要的边界检查，CSE可以避免很多重复表�
 <h3>例子1</h3>
 
 <div>
-<pre class="line-numbers"><code class="language-go">// example1.go
+<pre class="line-numbers must-line-numbers"><code class="language-go">// example1.go
 package main
 
 func f1(s []int) {
@@ -78,7 +78,7 @@ func main() {}
 <h3>例子2</h3>
 
 <div>
-<pre class="line-numbers"><code class="language-go">// example2.go
+<pre class="line-numbers must-line-numbers"><code class="language-go">// example2.go
 package main
 
 func f5(s []int) {
@@ -136,7 +136,7 @@ func main() {}
 <h3>例子3</h3>
 
 <div>
-<pre class="line-numbers"><code class="language-go">// example3.go
+<pre class="line-numbers must-line-numbers"><code class="language-go">// example3.go
 package main
 
 import "math/rand"
@@ -187,7 +187,7 @@ func main() {}
 让我们先看一个简单的使用了子切片的例子：
 </p>
 
-<pre class="line-numbers"><code class="language-go">package main
+<pre class="line-numbers must-line-numbers"><code class="language-go">package main
 
 func main() {
 	s0 := make([]int, 5, 10) // len(s0) == 5, cap(s0) == 10
@@ -217,7 +217,7 @@ func main() {
 <h3>例子4</h3>
 
 <div>
-<pre class="line-numbers"><code class="language-go">// example4.go
+<pre class="line-numbers must-line-numbers"><code class="language-go">// example4.go
 package main
 
 import "math/rand"
@@ -266,7 +266,7 @@ $ go build -gcflags="-d=ssa/check_bce/debug=1" example4.go
 当前版本的标准编译器并非足够智能到可以消除到一切应该消除的边界检查。
 有时候，我们可以给编译器一些暗示来帮助编译器将这些不必要的边界检查消除掉。
 
-<pre class="line-numbers"><code class="language-go">// example5.go
+<pre class="line-numbers must-line-numbers"><code class="language-go">// example5.go
 package main
 
 func fd(is []int, bs []byte) {

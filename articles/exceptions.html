@@ -353,9 +353,9 @@ func main() {
 	}
 
 	var mt = map[string]T{"abc": {123}}
-	// _ = &mt["abc"]     // error
-	// mt["abc"].x = 456  // 部分修改是不允许的。
-	mt["abc"] = T{x: 789} // 整体覆盖修改是可以的。
+	// _ = &mt["abc"]     // 映射元素是不可寻址的
+	// mt["abc"].x = 456  // 部分修改是不允许的
+	mt["abc"] = T{x: 789} // 整体覆盖修改是可以的
 }
 </code></pre>
 </div>

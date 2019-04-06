@@ -62,7 +62,7 @@
 Go支持五个基本二元算术运算符：
 </p>
 
-<table class="table table-bordered text-center" style="width:100%;">
+<table border="1" class="table table-bordered text-center" style="width:100%;">
 <thead>
 	<tr class="active">
 	<th class="text-center" style="white-space: nowrap;">字面形式</th>
@@ -114,7 +114,7 @@ Go支持五个基本二元算术运算符：
 Go支持六种位运算符（也属于算术运算）：
 </p>
 
-<table class="table table-bordered text-center" style="width:100%;">
+<table border="1" class="table table-bordered text-center" style="width:100%;">
 <thead>
 	<tr class="active">
 	<th class="text-center" style="white-space: nowrap;">字面形式</th>
@@ -148,7 +148,7 @@ Go支持六种位运算符（也属于算术运算）：
 				得到 <code>0110<sub>2</sub></code>
 			</li>
 			<li>
-				<code>1100<sub>2</sub> &^ 1010<sub>2</sub></code>
+				<code>1100<sub>2</sub> &amp;^ 1010<sub>2</sub></code>
 				得到 <code>0100<sub>2</sub></code>
 			</li>
 			</ul>
@@ -179,7 +179,7 @@ Go支持六种位运算符（也属于算术运算）：
 		</td>
 		<td style="vertical-align: middle;" class="text-left" rowspan="2">
 			<p>
-			左操作数必须为一个整数，右操作数必须为一个无符号整数类型的类型确定值或者一个可以表示成<code>uint</code>值的类型不确定（常数）值<sup>(1)</sup>。
+			左操作数必须为一个整数，右操作数必须为一个无符号整数类型的类型确定值或者一个可以表示成<code>uint</code>值的<a href="constants-and-variables.html#untyped-value">类型不确定</a>（常数）值<sup>(1)</sup>。
 			</p>
 
 			机制解释：
@@ -218,7 +218,7 @@ Go支持六种位运算符（也属于算术运算）：
 Go也支持三个一元算术运算符：
 </p>
 
-<table class="table table-bordered text-center" style="width:100%;">
+<table border="1" class="table table-bordered text-center" style="width:100%;">
 <thead>
 	<tr class="active">
 	<th class="text-center" style="white-space: nowrap;">字面形式</th>
@@ -384,7 +384,7 @@ Go也支持三个一元算术运算符：
 </p>
 
 一个移位算术运算的例子：
-<pre class="line-numbers"><code class="language-go">const N = 2
+<pre class="line-numbers must-line-numbers"><code class="language-go">const N = 2
 const A = 3.0 << N       // A == 6，它是一个默认类型为int的类型不确定值。
 const B = int8(3.0) << N // B == 6，它是一个类型为int8的类型确定值。
 
@@ -401,6 +401,11 @@ const _ = 1 << B  // error: the right operand must be unsigned.
 */
 </code></pre>
 
+<p>
+注意：如上面已经提到的，上例中的最后一行很可能从Go 1.13开始将能够编译通过。
+</p>
+
+<a class="anchor" id="bitwise-shift-left-operand-type-deduction"></a>
 <p>
 上面提到的移位运算结果的最后一点类型推断规则有点反常。
 这条规则的主要目的是为了防止一些移位运算在32位架构和64位架构的机器上的运算结果出现不一致但不一致却没有被及时发现的情况。
@@ -587,7 +592,7 @@ func main() {
 
 上面已经提到了，加法运算符也可用做字符串衔接运算符。
 
-<table class="table table-bordered text-center" style="width:100%;">
+<table border="1" class="table table-bordered text-center" style="width:100%;">
 <thead>
 	<tr class="active">
 	<th class="text-center" style="white-space: nowrap;">字面形式</th>
@@ -636,7 +641,7 @@ println(a) // Golang
 Go支持两种布尔二元运算符和一种布尔一元运算符。
 </p>
 
-<table class="table table-bordered text-center" style="width:100%;">
+<table border="1" class="table table-bordered text-center" style="width:100%;">
 <thead>
 	<tr class="active">
 	<th class="text-center" style="white-space: nowrap;">字面形式</th>
@@ -677,7 +682,7 @@ Go支持两种布尔二元运算符和一种布尔一元运算符。
 </p>
 
 机理解释：
-<pre class="disable-line-numbers111">// x    y       x && y   x || y   !x      !y
+<pre class="disable-line-numbers111"><code class="language-go">// x    y       x && y   x || y   !x      !y
 true    true    true     true     false   false
 true    false   false    true     false   true
 false   true    false    true     true    false
@@ -698,7 +703,7 @@ false   false   false    false    true    true
 Go支持6种比较运算符：
 </p>
 
-<table class="table table-bordered text-center" style="width:100%;">
+<table border="1" class="table table-bordered text-center" style="width:100%;">
 <thead>
 	<tr class="active">
 	<th class="text-center" style="white-space: nowrap;">字面形式</th>
@@ -788,7 +793,7 @@ Go支持6种比较运算符：
 Go中的操作符运算的优先级和其它流行语言有一些差别。
 下面列出了本文介绍的操作符的优先级。
 每行中的操作符的优先级是一样的。优先级逐行递减。
-<p>
+</p>
 
 <pre class="line-numbers"><code class="language-go">*   /   %   <<  >>  &   &^
 +   -   |   ^

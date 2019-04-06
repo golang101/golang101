@@ -29,7 +29,7 @@
 <p>
 在大多数高级编程语言中，数据通常被抽象为各种<b>类型</b>（type）和<b>值</b>（value）。
 一个类型可以看作是值的模板。一个值可以看作是某个类型的实例。
-大多数编程语言支持若干内置类型和自定义类型。
+大多数编程语言支持自定义类型和若干预定义类型（即内置类型）。
 一门语言的类型系统可以说是这门语言的灵魂。
 </p>
 
@@ -72,19 +72,23 @@
 
 下面是这个Go示例程序。请注意阅读其中的注释。程序之后有更多解释。
 
-<pre class="line-numbers"><code class="language-go">package main // 指定当前源文件所在的包名
+<pre class="line-numbers must-line-numbers"><code class="language-go">package main // 指定当前源文件所在的包名
 
-import "math/rand" // 引入一个标准库包（引入名为rand）
+import "math/rand" // 引入一个标准库包
 
 const MaxRand = 16 // 声明一个有名整型常量
 
+// 一个函数声明
 /*
- StatRandomNumbers生成一些不大于MaxRand的非负随机整数，并统计和返回小于
- 和大于MaxRand/2的随机数个数。输入参数numRands指定了要生成的随机数的总数。
+ StatRandomNumbers生成一些不大于MaxRand的非负
+ 随机整数，并统计和返回小于和大于MaxRand/2的随机数
+ 个数。输入参数numRands指定了要生成的随机数的总数。
 */
-func StatRandomNumbers(numRands int) (int, int) { // 一个函数声明
-	var a, b int // 声明了两个变量（类型都为int，初始值都为0）
-	for i := 0; i < numRands; i++ { // 一个for循环代码块
+func StatRandomNumbers(numRands int) (int, int) {
+	// 声明了两个变量（类型都为int，初始值都为0）
+	var a, b int
+	// 一个for循环代码块
+	for i := 0; i < numRands; i++ {
 		// 一个if-else条件控制代码块
 		if rand.Intn(MaxRand) < MaxRand/2 {
 			a = a + 1
@@ -98,8 +102,10 @@ func StatRandomNumbers(numRands int) (int, int) { // 一个函数声明
 // main函数，或主函数，是一个程序的入口函数。
 func main() {
 	var num = 100
-	// 调用上面声明的StatRandomNumbers和另外两个内置函数。
-	x, y := StatRandomNumbers(num) // 一个变量短声明语句
+	// 调用上面声明的StatRandomNumbers函数，
+	// 并将结果赋给使用短声明语句声明的两个变量。
+	x, y := StatRandomNumbers(num)
+	// 调用两个内置函数（print和println）。
 	print("Result: ", x, " + ", y, " = ", num, "? ")
 	println(x+y == num)
 }
@@ -117,40 +123,40 @@ Result: 46 + 54 = 100? true
 在上面的示例程序中，单词<code>package</code>、<code>import</code>、<code>const</code>、<code>func</code>、<code>var</code>、<code>for</code>、<code>if</code>、<code>else</code>和<code>return</code>均为关键字。
 其它大多数单词均为标识符。
 请阅读<a href="keywords-and-identifiers.html">关键字和标识符</a>以获得更多关于关键字和标识符的信息。
-<p>
+</p>
 
 <p>
-四个<code>int</code>（一个在<i>12</i>行，另三个在<i>11</i>行）
+四个<code>int</code>（一个在第<i>15</i>行，另三个在第<i>13</i>行）
 表示内置基本类型<code>int</code>。int类型是Go中的基本整数类型之一。
-第<i>5</i>行中的<code>16</code>、第<i>13</i>中的<code>0</code>、
-第<i>16</i>行中的<code>1</code>以及第<i>26</i>行的<code>100</code>均为整型字面值。
-第<i>29</i>行的<code>"Result: "</code>是一个字符串字面值。
+第<i>5</i>行中的<code>16</code>、第<i>17</i>行中的<code>0</code>、
+第<i>20</i>行中的<code>1</code>以及第<i>30</i>行的<code>100</code>均为整型字面值。
+第<i>35</i>行的<code>"Result: "</code>是一个字符串字面值。
 请阅读<a href="basic-types-and-value-literals.html">基本类型和它们的字面值表示</a>以获取更多关于基本类型和它们的字面值的信息。
 Go中的非基本类型（均为组合类型）将在以后的其它文章中介绍和解释。
 </p>
 
 <p>
-第<i>16</i>行是一个赋值语句。
+第<i>20</i>行是一个赋值语句。
 第<i>5</i>行声明了一个有名常量，叫做<code>MaxRand</code>。
-第<i>12</i>行和第<i>26</i>行使用标准变量声明语句声明了三个变量。
-第<i>13</i>行的变量<code>i</code>以及第<i>28</i>行的变量<code>x</code>和<code>y</code>是使用变量短声明语句声明的。
+第<i>15</i>行和第<i>30</i>行使用标准变量声明语句声明了三个变量。
+第<i>17</i>行的变量<code>i</code>以及第<i>33</i>行的变量<code>x</code>和<code>y</code>是使用变量短声明语句声明的。
 变量<code>a</code>和<code>b</code>在声明的时候被指定为<code>int</code>类型。
 编译器会自动推导出变量<code>i</code>、<code>num</code>、<code>x</code>和<code>y</code>的类型均为<code>int</code>类型，因为它们的初始值都是整型字面值表示的。
-请阅读<a href="constants-and-variables.html">常量和变量</a>以获取什么是类型不确定值、类型推导、赋值和如何声明变量和有名常量。
+请阅读<a href="constants-and-variables.html">常量和变量</a>以获取什么是类型不确定值、类型推导、赋值、以及如何声明变量和有名常量。
 </p>
 
 <p>
-上面的示例程序中使用了很多操作符，比如第<i>13</i>和<i>15</i>行的小于比较符<code>&lt;</code>，第<i>30</i>行的等于比较符<code>==</code>，还有第<i>16</i>和<i>30</i>行的加法运算符<code>+</code>。
-第<i>29</i>行中的<code>+</code>不是一个运算符，它是一个字符串字面值中的一个字符。
+上面的示例程序中使用了很多操作符，比如第<i>17</i>和<i>19</i>行的小于比较符<code>&lt;</code>，第<i>36</i>行的等于比较符<code>==</code>，还有第<i>20</i>和<i>36</i>行的加法运算符<code>+</code>。
+第<i>35</i>行中的<code>+</code>不是一个运算符，它是一个字符串字面值中的一个字符。
 一个使用操作符的操作中涉及到的值称为操作值（有时也可称为运算数）。
 请阅读<a href="operators.html">常用操作符</a>以获取更多关于操作符的信息。
 更多操作符将在后续其它文章中介绍。
 </p>
 
 <p>
-第<i>29</i>和<i>30</i>行调用了两个内置函数<code>print</code>和<code>println</code>。
-从第<i>11</i>行到第<i>22</i>行声明的函数<code>StatRandomNumbers</code>在第<i>28</i>行被调用。
-第<i>15</i>行也调用了一个函数 <code>Intn</code>。
+第<i>35</i>和<i>35</i>行调用了两个内置函数<code>print</code>和<code>println</code>。
+从第<i>13</i>行到第<i>26</i>行声明的函数<code>StatRandomNumbers</code>在第<i>33</i>行被调用。
+第<i>19</i>行也调用了一个函数 <code>Intn</code>。
 这个函数声明在<code>math/rand</code>标准库包中。
 请阅读<a href="function-declarations-and-calls.html">函数声明及函数调用</a>以获取更多关于函数声明及函数调用的信息。
 </p>
@@ -164,8 +170,8 @@ Go语言101只在开始的几篇文章中使用了这两个函数。）
 <p>
 第<i>1</i>行指定了当前源文件所处的包的名称。
 一个Go程序的主函数（<code>main</code>函数）必须被声明在一个名称为<code>main</code>的包中。
-第<i>3</i>行引入了<code>math/rand</code>标准库包。
-在这个包中声明的<code>Intn</code>函数将在第<i>15</i>行被调用。
+第<i>3</i>行引入了<code>math/rand</code>标准库包，并以<code>rand</code>做为引入名。
+在这个包中声明的<code>Intn</code>函数将在第<i>19</i>行被调用。
 请阅读<a href="packages-and-imports.html">代码包和包引入</a>，以获取更多关于代码包和包引入的信息。
 </p>
 

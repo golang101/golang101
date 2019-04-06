@@ -280,18 +280,17 @@ import (
 )
 
 func main() {
-	// 为了演示目的，这里是用了一个缓冲通道。实际上我们不必使用缓冲通道。
-	done := make(chan struct{}, 1) // 信号通道
-	done <- struct{}{}             // 填满数据缓冲队列
-	// 现在数据缓冲队列已满，主协程中下一个发送将阻塞。
+	// 创建一个信号通道。
+	done := make(chan struct{}, 1)
 
 	go func() {
 		fmt.Print("Hello")
-		time.Sleep(time.Second * 2) // 模拟一个工作负载
-		<- done // 使用一个接收操作来通知主协程
-	}()
+		// 模拟一个工作负载。
+		time.Sleep(time.Second * 2)
 
-	// 并发地做一些事...
+		// 使用一个接收操作来通知主协程。
+		<- done
+	}()
 
 	done <- struct{}{} // 阻塞在此，等待通知
 	fmt.Println(" world!")
@@ -314,26 +313,30 @@ func main() {
 import "log"
 import "time"
 
-func worker(id int, ready <-chan struct{}, done chan<- struct{}) {
+type T = struct{}
+
+func worker(id int, ready <-chan T, done chan<- T) {
 	<-ready // 阻塞在此，等待通知
 	log.Print("Worker#", id, "开始工作")
-	time.Sleep(time.Second) // 模拟一个工作负载
+	// 模拟一个工作负载。
+	time.Sleep(time.Second * time.Duration(id+1))
 	log.Print("Worker#", id, "工作完成")
-	done <- struct{}{} // 通知主协程（N-to-1）
+	done <- T{} // 通知主协程（N-to-1）
 }
 
 func main() {
 	log.SetFlags(0)
 
-	ready, done := make(chan struct{}), make(chan struct{})
+	ready, done := make(chan T), make(chan T)
 	go worker(0, ready, done)
 	go worker(1, ready, done)
 	go worker(2, ready, done)
 
-	time.Sleep(time.Second * 2) // 模拟一个初始化过程
+	// 模拟一个初始化过程
+	time.Sleep(time.Second * 3 / 2)
 	// 单对多通知
-	ready <- struct{}{}; ready <- struct{}{}; ready <- struct{}{}
-	// 等待被通知
+	ready <- T{}; ready <- T{}; ready <- T{}
+	// 等待被多对单通知
 	<-done; <-done; <-done
 }
 </code></pre>
@@ -362,7 +365,7 @@ func main() {
 
 <p>
 当然，我们也可以通过关闭一个通道来实现单对单通知。事实上，关闭通道来是实践中用得最多通知实现方式。
-<p>
+</p>
 
 <p>
 从一个已关闭的数据通道可以接收到无穷个值这一特性也将被用在很多其它在后面将要介绍的用例中。
@@ -1491,7 +1494,7 @@ func Aggregator(inputs ...<-chan uint64) <-chan uint64 {
 下面是一个数据合成工作函数的实现中，从两个不同数据流读取的两个<code>uint64</code>值组成了一个新的<code>uint64</code>值。
 当然，在实践中，数据的组合比这复杂得多。
 
-<pre class="line-numbers"><code class="language-go">func Composor(inA <-chan uint64, inB <-chan uint64) <-chan uint64 {
+<pre class="line-numbers"><code class="language-go">func Composor(inA, inB <-chan uint64) <-chan uint64 {
 	output := make(chan uint64)
 	go func() {
 		for {
@@ -1607,7 +1610,7 @@ func Filter(in <-chan uint64, output chan uint64) <-chan uint64 {
 
 <h4>数据服务/存盘</h4>
 
-<p>
+<div>
 
 一般，一个数据服务或者存盘模块为一个数据流系统中的最后一个模块。
 这里的实现值是简单地将数据输出到终端。
@@ -1628,6 +1631,8 @@ func Printer(input <-chan uint64) {
 
 <p>
 </p>
+
+</div>
 
 <h4>组装数据流系统</h4>
 
@@ -1656,13 +1661,11 @@ func main() {
 <p>
 </p>
 
-<p>
 上面这个流线型系统描绘在下图中：
 
 <div class="text-center">
 <img src="res/data-flow-linear.png" alt="线性数据流"></img>
 </div>
-</p>
 
 数据流系统例子2（一个单向无环图系统）：
 <pre class="line-numbers"><code class="language-go">package main
@@ -1684,13 +1687,11 @@ func main() {
 <p>
 </p>
 
-<p>
 上面这个单向无环图系统描绘在下图中：
 
 <div class="text-center">
 <img src="res/data-flow-dag.png" alt="有向无环数据流"></img>
 </div>
-</p>
 
 <p>
 更复杂的数据流系统可以表示为任何拓扑结构的图。比如一个复杂的数据流系统可能有多个输出模块。
@@ -1726,13 +1727,12 @@ func main() {
 <p>
 </p>
 
-<p>
 修改后的数据流的拓扑结构如下图所示：
 
 <div class="text-center">
 <img src="res/data-flow-dag-b.png" alt="有向无环数据流"></img>
 </div>
-</p>
+
 
 <p>
 上面的代码示例并没有太多考虑如何关闭一个数据流。请阅读<a href="channel-closing.html">此篇文章</a>来了解如何优雅地关闭数据通道。

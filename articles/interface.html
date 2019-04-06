@@ -587,7 +587,7 @@ func main() {
 
 	// y的动态类型为string。string类型并没有实现Writer。
 	w, ok = y.(Writer)
-	fmt.Println(w, ok) // &ltnil&gt; false
+	fmt.Println(w, ok) // &lt;nil&gt; false
 	w = y.(Writer)     // 将产生一个恐慌
 }
 </code></pre>
@@ -799,7 +799,7 @@ type Iy = interface {
 </code></pre>
 
 <p>
-<p>
+</p>
 
 <p>
 一个接口类型不能内嵌（无论是直接还是间接）它自己。

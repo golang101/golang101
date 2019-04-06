@@ -16,7 +16,7 @@
 	<li><a class="index" href="#map-iteration-order">Go运行时是否维护映射条目的遍历顺序？</a></li>
 	<li><a class="index" href="#compiler-field-padding">Go编译器是否会进行字节填充以确保结构体字段的地址对齐？</a></li>
 	<li><a class="index" href="#final-zero-size-field">为什么一个结构体类型的最后一个字段类型的尺寸为零时会影响此结构体类型的尺寸？</a></li>
-	<li><a class="index" href="#new-function"><code>new(T)</code>是<code>var t T; (&t)</code>的语法糖吗？</a></li>
+	<li><a class="index" href="#new-function"><code>new(T)</code>是<code>var t T; (&amp;t)</code>的语法糖吗？</a></li>
 	<li><a class="index" href="#fatal-error-deadlock">运行时错误信息<code>all goroutines are asleep - deadlock</code>意味着什么?</a></li>
 	<li><a class="index" href="#64-bit-alignment">64位整数值的地址是否能保证总是64位对齐的，以便可以被安全地原子访问？</a></li>
 	<li><a class="index" href="#atomical-assignment">赋值是原子操作吗？</a></li>
@@ -303,7 +303,7 @@ func main() {
 
 <a class="anchor" id="new-function"></a>
 <h3>
-	<code>new(T)</code>是<code>var t T; (&t)</code>的语法糖吗？
+	<code>new(T)</code>是<code>var t T; (&amp;t)</code>的语法糖吗？
 </h3>
 
 <p>
@@ -479,7 +479,7 @@ func demo(newP *T) {
 假设输入的年份是一个自然年，并且输入的月份也是一个自然月（1代表1月）。
 <pre class="line-numbers"><code class="language-go">days := time.Date(year, month+1, 0, 0, 0, 0, 0, time.UTC).Day()
 </code></pre>
-对于Go中的<code>time</code>标准库包，正常月份的的去值范围为<cdoe>[1, 12]</code>，并且每个月的起始日是<code>1</code>。
+对于Go中的<code>time</code>标准库包，正常月份的的去值范围为<code>[1, 12]</code>，并且每个月的起始日是<code>1</code>。
 所以，<code>y</code>年的<code>m</code>月的起始时间就是<code>time.Date(y, m, 1, 0, 0, 0, 0, time.UTC)</code>。
 <p>
 传递给<code>time.Date</code>函数的实参可以超出它们的正常范围，此函数将这些实参进行规范化。
@@ -591,17 +591,16 @@ import (
 
 func main() {
 	var s = "abaay森z众xbbab"
-	fmt.Println(strings.TrimPrefix(s, "ab")) // aay森z众xbbab
-	fmt.Println(strings.TrimSuffix(s, "ab")) // abaay森z众xbb
-	fmt.Println(strings.TrimLeft(s, "ab"))   // y森z众xbbab
-	fmt.Println(strings.TrimRight(s, "ab"))  // abaay森z众x
-	fmt.Println(strings.Trim(s, "ab"))       // y森z众x
-	fmt.Println(strings.TrimFunc(s, func(r rune) bool {
-			return r < 128 // trim all ascii chars
-		},
-	)) // 森z众
+	o := fmt.Println
+	o(strings.TrimPrefix(s, "ab")) // aay森z众xbbab
+	o(strings.TrimSuffix(s, "ab")) // abaay森z众xbb
+	o(strings.TrimLeft(s, "ab"))   // y森z众xbbab
+	o(strings.TrimRight(s, "ab"))  // abaay森z众x
+	o(strings.Trim(s, "ab"))       // y森z众x
+	o(strings.TrimFunc(s, func(r rune) bool {
+		return r < 128 // trim all ascii chars
+	})) // 森z众
 }
-
 </code></pre>
 </div>
 
@@ -873,8 +872,8 @@ func main() {
 </ul>
 
 <div class="alert alert-success">
-请注意：<code>&T{}</code>在Go里是一个语法糖，它是<code>tmp := T{}; (&tmp)</code>的简写形式。
-所以<code>&T{}</code>是合法的并不代表字面值<code>T{}</code>可以被取地址。
+请注意：<code>&amp;T{}</code>在Go里是一个语法糖，它是<code>tmp := T{}; (&amp;tmp)</code>的简写形式。
+所以<code>&amp;T{}</code>是合法的并不代表字面值<code>T{}</code>可以被取地址。
 </div>
 <p></p>
 
@@ -953,15 +952,15 @@ func main() {
 
 <div>
 事实上，你可以认为对于每一个为类型<code>T</code>声明的方法，编译器都会为类型<code>*T</code>自动隐式声明一个同名和同签名的方法。
-详见<a href="method.html">方法</a>一文。
+详见<a href="method.html#implicit-pointer-methods">方法</a>一文。
 
-<pre class="line-numbers"><code class="language-go">func (t T) MethodX(param0 ParamType0, ...) (result0 ResultType0, ...) {
+<pre class="line-numbers"><code class="language-go">func (t T) MethodX(v0 ParamType0, ...) (ResultType0, ...) {
 	...
 }
 
 // 编译器将会为*T隐式声明一个如下的方法。
-func (pt *T) MethodX(param0 ParamType0, ...) (result0 ResultType0, ...) {
-	return (*pt).MethodX(param0, ...)
+func (pt *T) MethodX(v0 ParamType0, ...) (ResultType0, ...) {
+	return (*pt).MethodX(v0, ...)
 }
 </code></pre>
 

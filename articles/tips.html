@@ -1,4 +1,4 @@
-﻿<h1>Go 技巧 101</h1>
+﻿<h1>Go技巧101</h1>
 
 <div>
 索引：
@@ -371,7 +371,7 @@ func main() {
 
 <pre class="line-numbers"><code class="language-go">func NewX(opts ...Option) *X {
 	// 改用三下标子切片格式。
-	options := append(opts[:len(opts):len(opts)], defaultOpts...)
+	opts = append(opts[:len(opts):len(opts)], defaultOpts...)
 	// 使用合并后选项来创建一个X值并返回其指针。
 	// ...
 }

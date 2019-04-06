@@ -122,11 +122,17 @@ func main() {
 	// 104是英文字符h的ASCII（和Unicode）码。
 	fmt.Println(hello[0])         // 104
 	fmt.Printf("%T \n", hello[0]) // uint8
-	// hello[0] = 'H'             // error: hello[0]不可修改
-	// fmt.Println(&hello[0])     // error: hello[0]不可寻址
 
-	fmt.Println(len(hello), len(helloWorld))          // 5 12
-	fmt.Println(strings.HasPrefix(helloWorld, hello)) // true
+	// hello[0]是不可寻址和不可修改的，所以下面
+	// 两行编译不通过。
+	/*
+	hello[0] = 'H'         // error
+	fmt.Println(&hello[0]) // error
+	*/
+
+	// 下一条语句将打印出：5 12 true
+	fmt.Println(len(hello), len(helloWorld),
+			strings.HasPrefix(helloWorld, hello))
 }
 </code></pre>
 </div>
@@ -182,7 +188,7 @@ Unicode标准为全球各种人类语言中的每个字符制定了一个独一�
 在一个从码点切片到字符串的转换中，码点切片中的每个码点值将被UTF-8编码为一到四个字节至结果字符串中。
 如果一个码点值是一个不合法的Unicode码点值，则它将被视为Unicode替换字符（码点）值<code>0xFFFD</code>（Unicode replacement character）。
 替换字符值<code>0xFFFD</code>将被UTF-8编码为三个字节<code>0xef 0xbf 0xbd</code>。
-<p>
+</p>
 
 <p>
 当一个字符串被转换为一个码点切片时，此字符串中存储的字节序列将被解读为一个一个码点的UTF-8编码序列。
@@ -220,6 +226,7 @@ Go并不支持字节切片和码点切片之间的直接转换。我们可以用
 <li>
 	使用<a href="https://golang.google.cn/pkg/bytes/#Runes"><code>bytes</code>标准库包中的<code>Runes</code>函数</a>来将一个字节切片转换为码点切片。
 	但此包中没有将码点切片转换为字节切片的函数。
+</li>
 </ul>
 
 一个展示了上述各种转换的例子：
@@ -254,7 +261,7 @@ func main() {
 </code></pre>
 
 <p>
-<p>
+</p>
 
 <!--
 https://github.com/golang/go/issues/23536

@@ -195,7 +195,7 @@ func main() {
 
 <p>
 注意，到目前为止（Go 1.12），我们无法通过反射动态创建一个接口类型。这是Go反射目前的一个限制。
-<p>
+</p>
 
 <p>
 另一个限制是使用反射动态创建结构体类型的时候可能会有各种不完美的情况出现。
@@ -405,11 +405,12 @@ import "fmt"
 import "reflect"
 
 func main() {
+	vakueOf := reflect.ValueOf
 	m := map[string]int{"Unix": 1973, "Windows": 1985}
-	v := reflect.ValueOf(m)
+	v := vakueOf(m)
 	// 第二个实参为Value零值时，表示删除一个映射条目。
-	v.SetMapIndex(reflect.ValueOf("Windows"), reflect.Value{})
-	v.SetMapIndex(reflect.ValueOf("Linux"), reflect.ValueOf(1991))
+	v.SetMapIndex(vakueOf("Windows"), reflect.Value{})
+	v.SetMapIndex(vakueOf("Linux"), vakueOf(1991))
 	for i := v.MapRange(); i.Next(); {
 		fmt.Println(i.Key(), "\t:", i.Value())
 	}
@@ -441,7 +442,8 @@ func main() {
 	vs, sentBeforeClosed := vc.Recv()
 	fmt.Println(vs.String(), sentBeforeClosed) // Go false
 	vs, succeeded = vc.TryRecv()
-	fmt.Println(vs.String(), succeeded) // &lt;invalid Value&gt; false
+	fmt.Println(vs.String()) // &lt;invalid Value&gt;
+	fmt.Println(succeeded)   // false
 }
 </code></pre>
 
@@ -468,15 +470,15 @@ func main() {
 		{Dir: reflect.SelectRecv, Chan: vc, Send: vZero},
 		{Dir: reflect.SelectSend, Chan: vc, Send: vSend},
 	}
-	selIndex, vRecv, sentBeforeClosed := reflect.Select(branches)
-	fmt.Println(selIndex)         // 1
-	fmt.Println(sentBeforeClosed) // true
-	fmt.Println(vRecv.Int())      // 123
+	selIndex, vRecv, closed := reflect.Select(branches)
+	fmt.Println(selIndex)    // 1
+	fmt.Println(closed)      // true
+	fmt.Println(vRecv.Int()) // 123
 	vc.Close()
 	// 再模拟select流程控制代码块。因为vc已经关闭了，
 	// 所以需将最后一个case分支去除，否则它可能会造成一个恐慌。
-	selIndex, _, sentBeforeClosed = reflect.Select(branches[:2])
-	fmt.Println(selIndex, sentBeforeClosed) // 1 false
+	selIndex, _, closed = reflect.Select(branches[:2])
+	fmt.Println(selIndex, closed) // 1 false
 }
 </code></pre>
 
@@ -559,7 +561,7 @@ https://github.com/golang/go/issues/20541
 
 https://github.com/golang/go/issues/20013
 
-----------------------------------------
+
 
 https://groups.google.com/forum/#!msg/golang-dev/coyYwxU3dfM/K_nSPAbOY4kJ;context-place=searchin/golang-dev/closure$20$20callable$20pointer%7Csort:date
 

@@ -164,7 +164,9 @@ func main() {
 		fmt.Println("现在为晚上。")
 	} else {
 		fmt.Println("现在为下午。")
-		h := h // 左h是一个新声明的变量，右h已经在上面声明了
+		// 左h是一个新声明的变量，右h已经在上面声明了。
+		h := h
+		// 刚声明的h遮掩了上面声明的h。
 		_ = h
 	}
 
@@ -417,7 +419,9 @@ func main() {
 		      // 执行不会跳到下一个分支。
 	case 4, 5, 6:
 		fmt.Println(n, "mod 9 is 4, 5 or 6.")
-	// case 6, 7, 8: // 此行可能编译不过，因为6和上一个case中的6重复了。
+	// case 6, 7, 8:
+		// 上一行行可能编译不过，因为6和上一个case中的6重复了。
+		// 是否能编译通过取决于具体编译器实现。
 	default:
 		fmt.Println(n, "mod 9 is 7 or 8.")
 	}
@@ -449,11 +453,13 @@ case 0, 1, 2, 3, 4:
 	fmt.Println("n =", n)
 	fallthrough // 跳到下个代码块
 case 5, 6, 7, 8:
-	n := 99 // 一个新声明的n，它只在当前分支代码快内可见。
+	// 一个新声明的n，它只在当前分支代码快内可见。
+	n := 99
 	fmt.Println("n =", n) // 99
 	fallthrough
 default:
 	// 下一行中的n和第一个分支中的n是同一个变量。
+	// 它们均为switch表达式"n"。
 	fmt.Println("n =", n)
 }
 </code></pre>

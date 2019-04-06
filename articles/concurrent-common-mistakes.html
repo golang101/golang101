@@ -24,7 +24,7 @@ Go语言是一门天然支持并发的编程语言。
 </li>
 <li>
 	其次，在主协程中，条件<code>b == true</code>成立并不能确保条件<code>a != nil</code>也成立。
-	编译器和CPU可能会对<a href="/article/memory-model.html">调整此程序中匿名协程中的某些指令的顺序</a>已获取更快的执行速度。
+	编译器和CPU可能会对<a href="memory-model.html">调整此程序中匿名协程中的某些指令的顺序</a>已获取更快的执行速度。
 	所以，站在主协程的视角看，对变量<code>b</code>的赋值可能会发生在对变量<code>a</code>的赋值之前，这将造成在修改<code>a</code>的元素时<code>a</code>依然为一个nil切片。
 </li>
 </ul>
@@ -531,7 +531,7 @@ func main() {
 	}
 	timer.Reset(time.Second * 10) // 可能数据竞争
 	<-timer.C
-	fmt.Println(time.Since(start)) // 1.000188181s（大约）
+	fmt.Println(time.Since(start)) // 大约1s
 }
 </code></pre>
 

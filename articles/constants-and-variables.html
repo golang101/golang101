@@ -103,7 +103,7 @@
 </div>
 
 一些合法的转换例子：
-<pre class="disable-line-numbers111">complex128(1 + -1e-1000i)  // 结果为complex128类型的1.0+0.0i。虚部被舍入了。
+<pre class="disable-line-numbers111"><code class="language-go">complex128(1 + -1e-1000i)  // 结果为complex128类型的1.0+0.0i。虚部被舍入了。
 float32(0.49999999)        // 结果为float32类型的0.5。这里也舍入了。
 float32(17000000000000000) // 只要目标类型不是整数类型，舍入都是允许的。
 float32(123)
@@ -124,7 +124,7 @@ string(0x2FFFFFFFF) // "\uFFFD"
 </p>
 
 下面是一些非法的转换：
-<pre class="disable-line-numbers111">int(1.23)     // 1.23不能被表示为int类型值。
+<pre class="disable-line-numbers111"><code class="language-go">int(1.23)     // 1.23不能被表示为int类型值。
 uint8(-1)     // -1不能被表示为uint8类型值。
 float64(1+2i) // 1+2i不能被表示为float64类型值。
 
@@ -257,7 +257,7 @@ Go白皮书把上面每行含有一个等号<code>=</code>的语句称为一个�
 
 <p>
 包级常量声明中的常量描述的顺序并不重要。比如在上面的例子中，
-常量描述<code>No</code>和<Code>Yes</code>的顺序可以掉换一下。
+常量描述<code>No</code>和<code>Yes</code>的顺序可以掉换一下。
 </p>
 
 <p>
@@ -410,25 +410,26 @@ func main() {
 	const (
 		k = 3 // 在此处，iota == 0
 
-		m float32 = iota + 0.1 // 等价于：m float32 = 1 + 0.1
-		n                      // 等价于：n float32 = 2 + 0.1
+		m float32 = iota + .5 // m float32 = 1 + .5
+		n                     // n float32 = 2 + .5
 
 		p = 9             // 在此处，iota == 3
-		q = iota * 2      // 等价于：q = 4 * 2
-		_                 // 等价于：_ = 5 * 2
-		r                 // 等价于：r = 6 * 2
-		s, t = iota, iota // 等价于：s, t = 7, 7
-		u, v              // 等价于：u, v = 8, 8
-		_, w              // 等价于：_, w = 9, 9
+		q = iota * 2      // q = 4 * 2
+		_                 // _ = 5 * 2
+		r                 // r = 6 * 2
+		s, t = iota, iota // s, t = 7, 7
+		u, v              // u, v = 8, 8
+		_, w              // _, w = 9, 9
 	)
 
-	const x = iota // 等价于：x = 0
+	const x = iota // x = 0 （iota == 0）
 	const (
-		y = iota // 等价于：y = 0
-		z        // 等价于：z = 1
+		y = iota // y = 0 （iota == 0）
+		z        // z = 1
 	)
 
-	println(m, n)          // +1.100000e+000 +2.100000e+000
+	println(m)             // +1.500000e+000
+	println(n)             // +2.500000e+000
 	println(q, r)          // 8 12
 	println(s, t, u, v, w) // 7 7 8 8 9
 	println(x, y, z)       // 0 0 1
@@ -564,7 +565,7 @@ var n int                     // 被初始化为0。
 在上面展示的变量声明的例子中，等号<code>=</code>表示赋值。
 一旦一个变量被声明之后，它的值可以被通过纯赋值语句来修改。
 多个变量可以同时在一条赋值语句中被修改。
-<p>
+</p>
 
 <p>
 一个赋值语句等号左边的表达式必须是一个可寻址的值、一个映射元素或者一个空标识符。
@@ -629,7 +630,8 @@ func main() {
 	lang, year := "Go language", 2007
 
 	// 这里，只有变量createdBy是新声明的变量。
-	// 变量year已经在上面声明过了，所以这里仅仅改变了它的值。
+	// 变量year已经在上面声明过了，所以这里仅仅
+	// 改变了它的值，或者说它被重新声明了。
 	year, createdBy := 2009, "Google Research"
 
 	// 这是一个纯赋值语句。
@@ -637,7 +639,7 @@ func main() {
 
 	print(lang, "由", createdBy, "发明")
 	print("并发布于", year, "年。")
-    println()
+	println()
 }
 </code></pre>
 
@@ -675,7 +677,7 @@ func main() {
 <p>
 当<code>y = x</code>是一条合法的赋值语句时，我们可以说<b><i><code>x</code>可以被赋给<code>y</code></i></b>。
 假设<code>y</code>的类型为<code>Ty</code>，有时为了叙述方便，我们也可以说<b><i><code>x</code>可以被赋给类型<code>Ty</code></i></b>。
-<p>
+</p>
 
 <p>
 一般来说，如果<code>x</code>可以被赋给<code>y</code>，则<code>y</code>应该是可修改的，并且<code>x</code>和<code>y</code>的类型相同或者<code>x</code>可以被隐式转换到<code>y</code>的类型。
@@ -811,7 +813,7 @@ var a, b, c = b+1, c+1, y // 7 6 5 8
 
 在下面的例子中，第<i>4</i>行和第<i>11</i>行的隐式转换是不允许的，第<i>3</i>行和第<i>10</i>行的显式转换也是不允许的。
 
-<pre class="line-numbers"><code class="language-go">const a = -1.23
+<pre class="line-numbers must-line-numbers"><code class="language-go">const a = -1.23
 var b = a        // 变量b的类型被推断为内置类型float64。
 var x = int32(a) // error: 常量1.23不能被截断舍入到一个整数。
 var y int32 = b  // error: float64类型值不能被隐式转换到int32。

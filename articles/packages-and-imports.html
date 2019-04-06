@@ -13,7 +13,7 @@
 
 下面这个简短的程序（假设它存在一个名为<code>simple-import-demo.go</code>的源文件中）引入了一个标准库包。
 
-<pre class="line-numbers"><code class="language-go">package main
+<pre class="line-numbers must-line-numbers"><code class="language-go">package main
 
 import "fmt"
 
@@ -147,6 +147,7 @@ func main() {
 </li>
 <li>
 	函数调用<code>time.Now()</code>将返回一个表示当前时间的类型为<code>time.Time</code>的值。
+</li>
 <li>
 	<code>UnixNano</code>是类型<code>time.Time</code>的一个方法。
 	我们可以把方法看作是特殊的函数。方法将在<a href="method.html">Go中的方法</a>一文中详述。
@@ -267,7 +268,7 @@ Go SDK 1.11引入了一个环境变量<code>GO111MODULE</code>。这个环境变
 </li>
 </ul>
 
-<pre class="disable-line-numbers111">_ GOPATH
+<pre class="disable-line-numbers111"><code class="language-go">_ GOPATH
   |_ src
      |_ x
         |_ vendor
@@ -313,7 +314,7 @@ Go SDK 1.11引入了一个环境变量<code>GO111MODULE</code>。这个环境变
 
 注意：当在<code>x.go</code>、<code>y.go</code>或者<code>z.go</code>文件中引入一个引入路径均为<code>w/foo</code>的包的时候，被引入的包均为<code>MyProject/vendor/w/foo</code>文件夹中的包。
 
-<pre class="disable-line-numbers111">_ MyProject
+<pre class="disable-line-numbers111"><code class="language-go">_ MyProject
      |_ go.mod                // module example.com/mypkg
      |_ vendor
      |  |_ w
@@ -358,7 +359,7 @@ Go不支持循环引用（依赖）。
 但是，库代码包文件夹的名称最好设为和其对应的代码包的名称相同。
 因为一个代码包的引入路径中包含的是此包的文件夹名，但是此包的默认引入名为此包的名称。
 如果两者不一致，会使人感到困惑。
-<p>
+</p>
 
 <p>
 另一方面，最好给每个程序代码包指定一个有意义的名字，而不是它的包名<code>main</code>。
@@ -425,7 +426,7 @@ bye
 <p>
 一个程序中所涉及到的所有的在运行时刻要用到的代码包的加载是串行执行的。
 在一个程序启动时，每个包中总是在它所有依赖的包都加载完成之后才开始加载。
-程序代码包总是最后一个被加载的代码包。每个包只会被加载一次。
+程序代码包总是最后一个被加载的代码包。每个被用到的包会被而且仅会被加载一次。
 </p>
 
 <p>
@@ -444,7 +445,7 @@ bye
 在加载一个代码包的时候，此代码包中声明的所有包级变量都将在此包中的任何一个<code>init</code>函数执行之前初始化完毕。
 </p>
 
-在同一个包内，一个包级变量的初始化晚于它所依赖的其它包级变量。
+在同一个包内，包级变量将尽量按照它们在代码中的出现顺序被初始化，但是一个包级变量的初始化肯定晚于它所依赖的其它包级变量。
 比如，在下面的代码片段中，四个包级变量的初始化顺序依次为<code>y</code>、<code>z</code>、<code>x</code>、<code>w</code>。
 
 <pre class="line-numbers"><code class="language-go">func f() int {
@@ -461,6 +462,10 @@ var (
 )
 </code></pre>
 
+<p>
+关于更具体的包级变量的初始化顺序，请阅读<a href="evaluation-orders.html#package-level-variables">表达式估值顺序规则</a>一文。
+</p>
+
 </div>
 
 <h3>完整的引入声明语句形式</h3>
@@ -469,7 +474,7 @@ var (
 
 事实上，一个引入声明语句的完整形式为：
 
-<pre class="disable-line-numbers111">import importname "path/to/package"
+<pre class="disable-line-numbers111"><code class="language-go">import importname "path/to/package"
 </code></pre>
 
 <p>
@@ -479,7 +484,7 @@ var (
 事实上，在本文上面的例子中的包引入声明中，<code>importname</code>部分都被省略掉了，因为它们都分别和引入的代码包的包名相同。
 这些引入声明等价于下面这些：
 
-<pre class="disable-line-numbers111">import fmt "fmt"        // <=> import "fmt"
+<pre class="disable-line-numbers111"><code class="language-go">import fmt "fmt"        // <=> import "fmt"
 import rand "math/rand" // <=> import "math/rand"
 import time "time"      // <=> import "time"
 </code></pre>
@@ -511,7 +516,7 @@ func main() {
 	random.Seed(time.Now().UnixNano())
 	format.Print("一个随机数:", random.Uint32(), "\n")
 
-	// 下面这两行编译不通过。
+	// 下面这两行编译不通过，因为rand不可识别。
 	/*
 	rand.Seed(time.Now().UnixNano())
 	fmt.Print("一个随机数:", rand.Uint32(), "\n")

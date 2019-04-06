@@ -73,7 +73,7 @@ and <code>T</code> itself may not be a pointer type.
 
 <p>
 下面对什么类型可以被内嵌的的描述更为准确：
-<p>
+</p>
 
 <div class="alert alert-success">
 下列类型可被内嵌：
@@ -365,12 +365,12 @@ func main() {
 类似的，选择器<code>gaga.PrintName</code>可以被看作是<code>gaga.Person.PrintName</code>的缩写形式。
 但是，我们也可以不把它看作是一个缩写。毕竟，类型<code>Singer</code>确实拥有一个<code>PrintName</code>方法，
 尽管此方法是被隐式声明的（请阅读下下节以获得详情）。
-同样的原因，选择器<code>(&gaga).PrintName</code>和<code>(&gaga).SetAge</code>可以看作（也可以不看作）是<code>(&gaga.Person).PrintName</code>和<code>(&gaga.Person).SetAge</code>的缩写。
+同样的原因，选择器<code>(&amp;gaga).PrintName</code>和<code>(&amp;gaga).SetAge</code>可以看作（也可以不看作）是<code>(&amp;gaga.Person).PrintName</code>和<code>(&amp;gaga.Person).SetAge</code>的缩写。
 </p>
 
 <p>
 注意：我们也可以使用选择器<code>gaga.SetAge</code>，但是只有在<code>gaga</code>是一个可寻址的类型为<code>Singer</code>的值的情况下。
-它只不过是<code>(&gaga).SetAge</code>的一个<a href="method.html#call">语法糖</a>。
+它只不过是<code>(&amp;gaga).SetAge</code>的一个<a href="method.html#call">语法糖</a>。
 </p>
 
 <p>

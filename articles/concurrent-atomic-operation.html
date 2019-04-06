@@ -163,15 +163,24 @@ func main() {
 	)
 
 	show := fmt.Println
-	atomic.AddUint64(&n, -m);             show(n) // 96 (97 - 1)
-	atomic.AddUint64(&n, -uint64(k));     show(n) // 94 (95 - 2)
-	atomic.AddUint64(&n, ^uint64(a - 1)); show(n) // 91 (94 - 3)
-	atomic.AddUint64(&n, ^(b - 1));       show(n) // 87 (91 - 4)
-	atomic.AddUint64(&n, ^uint64(c - 1)); show(n) // 82 (87 - 5)
-	atomic.AddUint64(&n, ^uint64(d - 1)); show(n) // 76 (82 - 6)
-	x := b; atomic.AddUint64(&n, -x);     show(n) // 72 (76 - 4)
-	atomic.AddUint64(&n, ^(m - 1));       show(n) // 71 (72 - 1)
-	atomic.AddUint64(&n, ^uint64(k - 1)); show(n) // 69 (71 - 2)
+	atomic.AddUint64(&n, -m)
+	show(n) // 96 (97 - 1)
+	atomic.AddUint64(&n, -uint64(k))
+	show(n) // 94 (95 - 2)
+	atomic.AddUint64(&n, ^uint64(a - 1))
+	show(n) // 91 (94 - 3)
+	atomic.AddUint64(&n, ^(b - 1))
+	show(n) // 87 (91 - 4)
+	atomic.AddUint64(&n, ^uint64(c - 1))
+	show(n) // 82 (87 - 5)
+	atomic.AddUint64(&n, ^uint64(d - 1))
+	show(n) // 76 (82 - 6)
+	x := b; atomic.AddUint64(&n, -x)
+	show(n) // 72 (76 - 4)
+	atomic.AddUint64(&n, ^(m - 1))
+	show(n) // 71 (72 - 1)
+	atomic.AddUint64(&n, ^uint64(k - 1))
+	show(n) // 69 (71 - 2)
 }
 </code></pre>
 
@@ -198,10 +207,12 @@ func main() {
 	var n int64 = 123
 	var old = atomic.SwapInt64(&n, 789)
 	fmt.Println(n, old) // 789 123
-	fmt.Println(atomic.CompareAndSwapInt64(&n, 123, 456)) // false
-	fmt.Println(n) // 789
-	fmt.Println(atomic.CompareAndSwapInt64(&n, 789, 456)) // true
-	fmt.Println(n) // 456
+	swapped := atomic.CompareAndSwapInt64(&n, 123, 456)
+	fmt.Println(swapped) // false
+	fmt.Println(n)       // 789
+	swapped = atomic.CompareAndSwapInt64(&n, 789, 456)
+	fmt.Println(swapped) // true
+	fmt.Println(n)       // 456
 }
 </code></pre>
 
@@ -245,19 +256,21 @@ func main() {
 	var unsafePPT = (*unsafe.Pointer)(unsafe.Pointer(&pT))
 	var ta, tb T
 	// 修改
-	atomic.StorePointer(unsafePPT, unsafe.Pointer(&ta))
+	atomic.StorePointer(
+		unsafePPT, unsafe.Pointer(&ta))
 	// 读取
 	pa1 := (*T)(atomic.LoadPointer(unsafePPT))
 	fmt.Println(pa1 == &ta) // true
 	// 置换
-	pa2 := atomic.SwapPointer(unsafePPT, unsafe.Pointer(&tb))
+	pa2 := atomic.SwapPointer(
+		unsafePPT, unsafe.Pointer(&tb))
 	fmt.Println((*T)(pa2) == &ta) // true
 	// compare and swap
-	b := atomic.CompareAndSwapPointer(unsafePPT, pa2,
-					unsafe.Pointer(&tb))
+	b := atomic.CompareAndSwapPointer(
+		unsafePPT, pa2, unsafe.Pointer(&tb))
 	fmt.Println(b) // false
-	b = atomic.CompareAndSwapPointer(unsafePPT,
-					unsafe.Pointer(&tb), pa2)
+	b = atomic.CompareAndSwapPointer(
+		unsafePPT, unsafe.Pointer(&tb), pa2)
 	fmt.Println(b) // true
 }
 </code></pre>
