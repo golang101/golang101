@@ -29,8 +29,6 @@
 
 		{{ block "article" .Article }}to be replaced{{ end }}
 
-		{{- template "social-buttons" . -}}
-
 		{{- template "navbar" .Article -}}
 
 		</div>
@@ -87,9 +85,5 @@
 
 
 
-{{ define "social-buttons" }}
-{{- if .SocialLinkURL -}}
 
-{{- end -}}
-{{ end }}
 
