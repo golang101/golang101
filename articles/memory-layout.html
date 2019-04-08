@@ -75,11 +75,12 @@ Go白皮书仅列出了<a href="https://golang.google.cn/ref/spec#Size_and_align
 bool, byte, uint8, int8            1
 uint16, int16                      2
 uint32, int32, float32, complex64  4
-数组和结构体类型                     取决于元素类型和各个字段类型
-其它类型                            一个自然字（native word）的尺寸
+数组                               取决于元素类型
+结构体类型                          取决于各个字段类型
+其它类型                            一个自然字的尺寸
 </pre>
 <p>
-这里，一个自然字的尺寸在32位的架构上为4字节，在64位的架构上为8字节。
+这里，一个自然字（native word）的尺寸在32位的架构上为4字节，在64位的架构上为8字节。
 </p>
 
 <!--

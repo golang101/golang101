@@ -44,9 +44,9 @@
 <table border="1" class="table table-bordered text-center" style="width: auto !important;">
 <thead>
 	<tr>
-	<th class="text-center">类型种类</th>
-	<th class="text-center">值尺寸</th>
-	<th class="text-center">
+	<th class="text-center" valign="bottom" align="center">类型种类</th>
+	<th class="text-center" valign="bottom" align="center">值尺寸</th>
+	<th class="text-center" valign="bottom" align="center">
 		<a href="https://golang.google.cn/ref/spec#Numeric_types">Go白皮书</a>中的<a href="https://golang.google.cn/ref/spec#Size_and_alignment_guarantees">要求</a>
 	</th>
 	</tr>
@@ -68,14 +68,14 @@
 	<td>2 bytes</td>
 	</tr>
 	<tr class="active">
-	<th scope="row" class="text-center">int32 (rune), uint32, float32</th>
-	<td>4 bytes</td>
-	<td>4 bytes</td>
+	<th scope="row" class="text-center" valign="middle" align="center">int32 (rune), uint32, float32</th>
+	<td valign="middle" align="center">4 bytes</td>
+	<td valign="middle" align="center">4 bytes</td>
 	</tr>
 	<tr class="active">
-	<th scope="row" class="text-center">int64, uint64, float64, complex64</th>
-	<td>8 bytes</td>
-	<td>8 bytes</td>
+	<th scope="row" class="text-center" valign="middle" align="center">int64, uint64, float64, complex64</th>
+	<td valign="middle" align="center">8 bytes</td>
+	<td valign="middle" align="center">8 bytes</td>
 	</tr>
 	<tr class="active">
 	<th scope="row" class="text-center">complex128</th>
@@ -83,14 +83,14 @@
 	<td>16 bytes</td>
 	</tr>
 	<tr class="active">
-	<th scope="row" class="text-center">int, uint</th>
-	<td>1 word</td>
-	<td>架构相关，在32位系统架构中为4个字节，而在64位系统架构中为8个字节</td>
+	<th scope="row" class="text-center" valign="middle" align="center">int, uint</th>
+	<td valign="middle" align="center">1 word</td>
+	<td valign="middle" align="center">架构相关，在32位系统架构中为4个字节，而在64位系统架构中为8个字节</td>
 	</tr>
 	<tr class="active">
-	<th scope="row" class="text-center">uintptr</th>
-	<td>1 word</td>
-	<td>必须足够存下任一个内存地址</td>
+	<th scope="row" class="text-center" valign="middle" align="center">uintptr</th>
+	<td valign="middle" align="center">1 word</td>
+	<td valign="middle" align="center">必须足够存下任一个内存地址</td>
 	</tr>
 	<tr class="active">
 	<th scope="row" class="text-center">字符串</th>
@@ -128,16 +128,16 @@
 	<td>未做特别要求</td>
 	</tr>
 	<tr class="active">
-	<th scope="row" class="text-center">结构体</th>
-	<td>
+	<th scope="row" class="text-center" valign="middle" align="center">结构体</th>
+	<td valign="middle" align="center">
 		所有字段尺寸之和加上所有<a href="memory-layout.html#size-and-padding">填充的字节</a>
 	</td>
-	<td>一个不含任何尺寸大于零的字段的结构体类型的尺寸为零</td>
+	<td valign="middle" align="center">一个不含任何尺寸大于零的字段的结构体类型的尺寸为零</td>
 	</tr>
 	<tr class="active">
-	<th scope="row" class="text-center">数组</th>
-	<td>元素类型的尺寸 * 长度</td>
-	<td>一个元素类型的尺寸为零的数组类型的尺寸为零</td>
+	<th scope="row" class="text-center" valign="middle" align="center">数组</th>
+	<td valign="middle" align="center">元素类型的尺寸 * 长度</td>
+	<td valign="middle" align="center">一个元素类型的尺寸为零的数组类型的尺寸为零</td>
 	</tr>
 </tbody>
 </table>

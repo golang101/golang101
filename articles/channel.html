@@ -307,30 +307,30 @@ https://github.com/golang/go/issues/27769
 <table border="1" class="table table-bordered text-center" style="width: auto !important;">
 <thead>
 	<tr class="active">
-	<th class="text-center">操作</th>
-	<th class="text-center">一个零值nil数据通道</th>
-	<th class="text-center">一个非零值但已关闭的数据通道</th>
-	<th class="text-center">一个非零值且尚未关闭的数据通道</th>
+	<th class="text-center" valign="bottom" align="center">操作</th>
+	<th class="text-center" valign="bottom" align="center">一个零值nil数据通道</th>
+	<th class="text-center" valign="bottom" align="center">一个非零值但已关闭的数据通道</th>
+	<th class="text-center" valign="bottom" align="center">一个非零值且尚未关闭的数据通道</th>
 	</tr>
 </thead>
 <tbody>
 	<tr>
 	<th scope="row" class="text-center">关闭</th>
-	<td style="vertical-align: middle;">产生恐慌</td>
-	<td style="vertical-align: middle;">产生恐慌</td>
-	<td style="vertical-align: middle;">成功关闭<sup>(C)</sup></td>
+	<td style="vertical-align: middle;" valign="middle" align="center">产生恐慌</td>
+	<td style="vertical-align: middle;" valign="middle" align="center">产生恐慌</td>
+	<td style="vertical-align: middle;" valign="middle" align="center">成功关闭<sup>(C)</sup></td>
 	</tr>
 	<tr>
 	<th scope="row" class="text-center">发送数据</th>
-	<td style="vertical-align: middle;">永久阻塞</td>
-	<td style="vertical-align: middle;">产生恐慌</td>
-	<td style="vertical-align: middle;">阻塞或者成功发送<sup>(B)</sup></td>
+	<td style="vertical-align: middle;" valign="middle" align="center">永久阻塞</td>
+	<td style="vertical-align: middle;" valign="middle" align="center">产生恐慌</td>
+	<td style="vertical-align: middle;" valign="middle" align="center">阻塞或者成功发送<sup>(B)</sup></td>
 	</tr>
 	<tr>
 	<th scope="row" class="text-center">接收数据</th>
-	<td style="vertical-align: middle;">永久阻塞</td>
-	<td style="vertical-align: middle;">永不阻塞<sup>(D)</sup></td>
-	<td style="vertical-align: middle;">阻塞或者成功接收<sup>(A)</sup></td>
+	<td style="vertical-align: middle;" valign="middle" align="center">永久阻塞</td>
+	<td style="vertical-align: middle;" valign="middle" align="center">永不阻塞<sup>(D)</sup></td>
+	<td style="vertical-align: middle;" valign="middle" align="center">阻塞或者成功接收<sup>(A)</sup></td>
 	</tr>
 </tbody>
 </table>
