@@ -42,14 +42,14 @@ Go支持如下内置基本类型：
 除了<code>bool</code>和<code>string</code>类型，其它的15种内置基本类型都称为数值类型（整型、浮点数型和复数型）。
 </p>
 
-Go中有两种内置别名类型（alias type）：
+Go中有两种内置类型别名（type alias）：
 <ul>
 <li>
-	<code>byte</code>是<code>uint8</code>的内置别名类型。
+	<code>byte</code>是<code>uint8</code>的内置别名。
 	我们可以将<code>byte</code>和<code>uint8</code>看作是同一个类型。
 </li>
 <li>
-	<code>rune</code>是<code>int32</code>的内置别名类型。
+	<code>rune</code>是<code>int32</code>的内置别名。
 	我们可以将<code>rune</code>和<code>int32</code>看作是同一个类型。
 </li>
 </ul>
@@ -275,7 +275,7 @@ func main() {
 <h4>rune值的字面形式</h4>
 
 <p>
-上面已经提到，<code>rune</code>类型是<code>int32</code>类型的别名类型。
+上面已经提到，<code>rune</code>类型是<code>int32</code>类型的别名。
 因此，rune类型（泛指）是特殊的整数类型。
 一个rune值可以用上面已经介绍的整数类型的字面表示形式表示。
 另一方面，很多各种整数类型的值也可以用本小节介绍的rune字面形式来表示。

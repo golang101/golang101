@@ -89,7 +89,7 @@ Go代码中有四种代码块。
 我们可以声明六种代码元素：
 <ul>
 <li>包引入；</li>
-<li>有名类型；</li>
+<li>定义类型和类型别名；</li>
 <li>有名常量；</li>
 <li>变量；</li>
 <li>函数；</li>
@@ -129,7 +129,7 @@ Go代码中有四种代码块。
 	<td></td>
 	</tr>
 	<tr class="active">
-	<th scope="row" class="text-center" valign="middle" align="center">有名类型（不含内置类型）</th>
+	<th scope="row" class="text-center" valign="middle" align="center">定义类型和类型别名（不含内置的）</th>
 	<td></td>
 	<td valign="middle" align="center">可以</td>
 	<td valign="middle" align="center">可以</td>
@@ -211,7 +211,7 @@ Go代码中有四种代码块。
 
 <p>
 声明在包代码块中并且在所有局部代码块之外的代码元素称为包级（package-level）元素。
-包级元素可以是有名常量、有名类型、变量或者函数。
+包级元素可以是有名常量、变量、函数、定义类型或类型别名。
 </p>
 
 <a class="anchor" id="scope"></a>
@@ -243,7 +243,7 @@ Go代码中有四种代码块。
 	在函数体中声明的一个<a href="type-system-overview.html#type-definition">定义类型</a>的标识符起始于此类型的描述中它的标识符的结尾，并终止于包含此类型的声明的最内层代码块的结尾；
 </li>
 <li>
-	在函数体中声明的一个<a href="type-system-overview.html#type-alias">别名类型</a>的标识符起始于此类型的声明的结尾，并终止于包含此类型的声明的最内层代码块的结尾；
+	在函数体中声明的一个<a href="type-system-overview.html#type-alias">类型别名</a>的标识符起始于此类型的声明的结尾，并终止于包含此类型的声明的最内层代码块的结尾；
 </li>
 <li>
 	一个跳转标签的标识符的作用域为包含此标签的声明的最内层函数体代码块，但要排除掉此内嵌在此最内层函数体代码块中的各个匿名函数体代码块。

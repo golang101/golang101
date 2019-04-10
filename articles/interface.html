@@ -24,7 +24,7 @@
 
 <div>
 一些接口类型的例子：
-<pre class="line-numbers"><code class="language-go">// 一个无名接口类型。
+<pre class="line-numbers"><code class="language-go">// 一个非定义接口类型。
 interface {
 	About() string
 }
@@ -35,7 +35,7 @@ type ReadWriter interface {
 	Write(buf []byte) (n int, err error)
 }
 
-// Runnable是一个有名接口类型。它是一个别名类型。
+// Runnable是一个非定义接口类型的别名。
 type Runnable = interface {
 	Run()
 }
@@ -59,7 +59,7 @@ type Runnable = interface {
 特别地，一个没有指定任何方法原型的接口类型称为一个空接口类型。
 下面是两个空接口类型：
 
-<pre class="line-numbers"><code class="language-go">// 一个无名空接口类型。
+<pre class="line-numbers"><code class="language-go">// 一个非定义空接口类型。
 interface{}
 
 // 类型I是一个定义的空接口类型。
@@ -86,7 +86,7 @@ type I interface{}
 </p>
 
 <p>
-如果两个无名接口类型指定的方法集是等价的，则这两个接口类型为同一个类型。
+如果两个非定义接口类型指定的方法集是等价的，则这两个接口类型为同一个类型。
 但是请注意：不同代码包中的同名非导出方法名将总被认为是不同名的。
 </p>
 
@@ -753,8 +753,8 @@ func main() {
 <h4>接口类型内嵌</h4>
 
 <div>
-一个接口类型可以内嵌另一个有名接口类型。
-此内嵌的效果相当于将此被内嵌的有名接口类型所指定的所有方法原型展开到内嵌它的接口类型的定义体内。
+一个接口类型可以内嵌另一个接口类型的名称。
+此内嵌的效果相当于将此被内嵌的接口类型所指定的所有方法原型展开到内嵌它的接口类型的定义体内。
 比如，在下面的例子中，接口类型<code>Ic</code>、<code>Id</code>和<code>Ie</code>的所指定的方法集完全一样。
 
 <pre class="line-numbers"><code class="language-go">type Ia interface {
@@ -784,8 +784,8 @@ type Ie interface {
 <p>
 </p>
 
-截止到目前（Go 1.12），如果两个有名接口类型都指定了一个同名方法，则这两个接口类型不可被同时内嵌在同一个接口类型中，即使它们指定的同名方法的原型也一致。
-比如，下面的代码是编译不通过的：
+截止到目前（Go 1.12），如果两个接口类型都指定了一个同名方法，则这两个接口类型不可被同时被内嵌在同一个接口类型中，即使它们指定的同名方法的原型也一致。
+比如，下面的代码中假设的接口类型都是非法的。
 
 <pre class="line-numbers"><code class="language-go">type Ix interface {
 	Ia
@@ -795,6 +795,11 @@ type Ie interface {
 type Iy = interface {
 	Ib
 	Ic
+}
+
+type Iz interface {
+	Ic
+	fa()
 }
 </code></pre>
 

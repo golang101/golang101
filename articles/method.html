@@ -30,7 +30,7 @@ Go支持一些面向对象编程特性，方法是这些所支持的特性之一
 </p>
 
 <p>
-注意：我们也可以为满足上列条件的类型<code>T</code>和<code>*T</code>的<a href="type-system-overview.html#type-alias">别名类型</a>声明方法。
+注意：我们也可以为满足上列条件的类型<code>T</code>和<code>*T</code>的<a href="type-system-overview.html#type-alias">别名</a>声明方法。
 这样做的效果和直接为类型<code>T</code>和<code>*T</code>声明方法是一样的。
 </p>
 
@@ -41,15 +41,14 @@ Go支持一些面向对象编程特性，方法是这些所支持的特性之一
 从上面列出的条件，我们得知我们不能为下列类型（显式地）声明方法：
 <ul>
 <li>
-	内置类型。比如<code>int</code>和<code>string</code>。
+	内置基本类型。比如<code>int</code>和<code>string</code>。
 	因为这些类型声明在内置<code>builtin</code>标准包中，而我们不能在标准包中声明方法。
 </li>
 <li>
 	接口类型。但是接口类型可以拥有方法。详见<a href="interface.html">下一篇文章</a>。
 </li>
 <li>
-	除了满足上面条件的指针类型<code>*T</code>之外的<a href="type-system-overview.html#non-defined-type">非定义类型</a>，包括各种<a href="type-system-overview.html#named-type">无名</a>组合类型。
-	但是注意：虽然我们无法显式地为无名结构体类型声明方法，无名结构体类型可以通过内嵌其它类型而获得（一些隐式声明的）方法。详见后面的<a href="type-embedding.html">类型内嵌</a>一文。
+	除了满足上面条件的形如<code>*T</code>的指针类型之外的非定义组合类型。
 </li>
 </ul>
 
@@ -144,8 +143,8 @@ func (*Book).SetPages(b *Book, pages int) {
 </p>
 
 两个隐式函数名<code>Book.Pages</code>和<code>(*Book).SetPages</code>都是<code>aType.MethodName</code>这种形式的。
-我们不能显式声明名称为这种形式的函数，因为这种形式不属于合法标识符。
-这样的函数只能由编译器隐式声明，但是我们可以在代码中调用这些隐式声明的函数：
+我们不能显式声明名称为这种形式的函数，因为这种形式不属于合法标识符。这样的函数只能由编译器隐式声明。
+但是我们可以在代码中调用这些隐式声明的函数：
 
 <pre class="line-numbers"><code class="language-go">package main
 

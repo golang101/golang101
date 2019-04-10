@@ -10,7 +10,7 @@
 
 微信公众号：
 
-![微信公众号](articles/res/101-group-qrcode-2.jpg?raw=true)
+![](articles/res/101-group-qrcode-2.jpg?raw=true)
 
 ### 安装和更新
 
@@ -41,4 +41,4 @@ Server started:
 * 这本书仍处于beta阶段，很多章节还在不断改进中。请阅读[UPDATES.md](UPDATES.md)以注意各种更新。
 * 本人保留本书的出版权（包括纸质和各种电子版）。请勿随意在线转载（转载之前请在本项目中开一个issue问询）。
 
-![微信赞赏码](articles/res/101-reward-qrcode-2.png?raw=true)
+![](articles/res/101-reward-qrcode-2.png?raw=true)

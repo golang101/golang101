@@ -216,12 +216,12 @@ func f() {
 </i></p>
 
 <p>
-上面已经提到了，Go中有两个内置类型别名：类型<code>byte</code>（类型<code>uint8</code>的别名）和类型<code>rune</code>（类型<code>int32</code>的别名）。
-在Go 1.9之前，它们是Go中仅有的两个别名类型。
+上面已经提到了，Go中有两个内置类型别名：<code>byte</code>（类型<code>uint8</code>的别名）和<code>rune</code>（类型<code>int32</code>的别名）。
+在Go 1.9之前，它们是Go中仅有的两个类型别名。
 </p>
 
 <div>
-从Go 1.9开始，我们可以使用下面的语法来声明自定义别名类型。此语法和类型定义类似，但是请注意其中多了一个等号<code>=</code>。
+从Go 1.9开始，我们可以使用下面的语法来声明自定义类型别名。此语法和类型定义类似，但是请注意其中多了一个等号<code>=</code>。
 
 <pre class="line-numbers"><code class="language-go">type (
 	Name = string
@@ -233,31 +233,32 @@ type Table = map[Name]Age
 </code></pre>
 
 <p>
-类型别名名也必须为标识符。同样地，类型别名可以被声明在函数体内。
+类型别名也必须为标识符。同样地，类型别名可以被声明在函数体内。
 </p>
 
 <div>
-在上面的类型别名声明的例子中，<code>Name</code>是内置类型<code>string</code>的一个别名（类型），它们表示同一个类型。
+在上面的类型别名声明的例子中，<code>Name</code>是内置类型<code>string</code>的一个别名，它们表示同一个类型。
 同样的关系对下面的几对类型也成立：
 <ul>
 <li>
-	别名类型<code>Age</code>和内置类型<code>int</code>。
+	别名<code>Age</code>和内置类型<code>int</code>。
 </li>
 <li>
-	别名类型<code>table</code>和映射类型<code>map[string]int</code>。
+	别名<code>table</code>和映射类型<code>map[string]int</code>。
 </li>
 <li>
-	别名类型<code>Table</code>和映射类型<code>map[Name]Age</code>。
+	别名<code>Table</code>和映射类型<code>map[Name]Age</code>。
 </li>
 </ul>
 </div>
 
 <p>
-事实上，类型<code>map[string]int</code>和<code>map[Name]Age</code>也表示同一类型。所以，上面的别名类型的例子中的后两行中的四个类型均表示同一类型。
+事实上，文字表示形式<code>map[string]int</code>和<code>map[Name]Age</code>也表示同一类型。
+所以，<code>table</code>和<code>Table</code>一样表示同一个类型。
 </p>
 
 <p>
-注意，尽管两个别名类型<code>table</code>和<code>Table</code>表示同一个类型，类型<code>Table</code>是一个导出类型，所以它可以被其它包引入使用，但是类型<code>table</code>却不可以。
+注意，尽管两个别名<code>table</code>和<code>Table</code>表示同一个类型，但<code>Table</code>是导出的，所以它可以被其它包引入使用，而<code>table</code>却不可以。
 </p>
 
 <!--
@@ -271,8 +272,7 @@ Type alias declarations are much useful in refactoring large Go projects.
 <h3>概念：定义类型和非定义类型（defined type and undefined type）</h3>
 
 <p>
-一个定义类型是一个在某个类型定义声明中定义的类型，或者是另外一个定义类型的别名。
-不属于这两类情形的类型为非定义类型。
+一个定义类型是一个在某个类型定义声明中定义的类型。
 </p>
 
 <p>
@@ -280,8 +280,8 @@ Type alias declarations are much useful in refactoring large Go projects.
 </p>
 
 <div>
-在下面的例子中，别名类型<code>C</code>和类型字面表示<code>[]string</code>都是非定义类型。
-类型<code>A</code>和类型别名<code>B</code>均为定义类型。
+在下面的例子中，别名<code>C</code>和类型字面表示<code>[]string</code>都表示同一个非定义类型。
+类型<code>A</code>和别名<code>B</code>均表示同一个定义类型。
 
 <pre class="line-numbers"><code class="language-go">type A []string
 type B = A
@@ -290,7 +290,8 @@ type C = []string
 
 </div>
 
-<a class="anchor" id="named-type"></a>
+<!--
+<a class="anchor" id="unnamed-type"></a>
 <h3>概念：有名类型和无名类型（named type and unnamed type）</h3>
 
 <div>
@@ -309,6 +310,7 @@ type C = []string
 一个无名类型肯定是一个组合类型，反之则未必，因为一个组合类型可能是一个声明的类型。
 </p>
 </div>
+-->
 
 <a class="anchor" id="underlying-type"></a>
 <h3>概念：底层类型（underlying type）</h3>
@@ -318,7 +320,7 @@ type C = []string
 <ul>
 <li>一个内置类型的底层类型为它自己。</li>
 <li>所有非类型安全类型的底层类型均为<code>unsafe</code>标准库包中定义的<code>Pointer</code>类型。</li>
-<li>一个无名类型（必为一个组合类型）的底层类型为它自己。</li>
+<li>一个非定义类型（必为一个组合类型）的底层类型为它自己。</li>
 <li>在一个类型声明中，新声明的类型和源类型共享底层类型。</li>
 </ul>
 
@@ -331,7 +333,7 @@ type (
 
 // 下面这三个新声明的类型的底层类型各不相同。
 type (
-	IntSlice = []int   // 底层类型为[]int
+	IntSlice   []int   // 底层类型为[]int
 	MyIntSlice []MyInt // 底层类型为[]MyInt
 	AgeSlice   []Age   // 底层类型为[]Age
 )
@@ -343,7 +345,7 @@ type Ages AgeSlice
 <p>
 </p>
 
-如何溯源一个声明的类型的底层类型？规则很简单，在溯源过程中，但遇到一个内置类型、<code>unsafe.Pointer</code>类型或者无名类型，则溯源结束。
+如何溯源一个声明的类型的底层类型？规则很简单，在溯源过程中，但遇到一个内置类型、<code>unsafe.Pointer</code>类型或者非定义类型，则溯源结束。
 以上面这几个声明的类型为例，下面是它们的底层类型的溯源过程：
 
 <pre>

@@ -24,8 +24,9 @@ func main() {
 	var x struct {
 		string // 一个定义的非指针类型
 		error  // 一个定义的接口类型
-		*int   // 一个无名指针类型
-		P      // 一个无名指针类型的别名类型
+		*int   // 一个非定义指针类型
+		P      // 一个非定义指针类型的别名
+		M      // 一个非定义类型的别名
 
 		http.Header // 一个定义的映射类型
 	}
@@ -33,18 +34,19 @@ func main() {
 	x.error = nil
 	x.int = new(int)
 	x.P = new(bool)
+	x.M = make(M)
 	x.Header = http.Header{}
 }
 </code></pre>
 
 <p>
-在上面这个例子中，有五个类型被内嵌在了一个结构体类型中。每个类型内嵌形成了一个内嵌字段（embedded field）。
+在上面这个例子中，有六个类型被内嵌在了一个结构体类型中。每个类型内嵌形成了一个内嵌字段（embedded field）。
 </p>
 
 <p>
 因为历史原因，内嵌字段有时也称为匿名字段。但是，事实上，每个内嵌字段有一个（隐式的）名字。
 此字段的<a href="https://golang.google.cn/ref/spec#Qualified_identifiers">非限定（unqualified）</a>类型名即为此字段的名称。
-比如，上例中的五个内嵌字段的名称分别为<code>string</code>、<code>error</code>、<code>int</code>、<code>P</code>和<code>Header</code>。
+比如，上例中的六个内嵌字段的名称分别为<code>string</code>、<code>error</code>、<code>int</code>、<code>P</code>、<code>M</code>和<code>Header</code>。
 </p>
 </div>
 
@@ -63,71 +65,43 @@ and <code>T</code> itself may not be a pointer type.
 翻译过来：
 
 <div class="alert alert-info">
-一个内嵌字段必须被声明为一个类型名称<code>T</code>或者一个基类型为非接口类型的指针<code>*T</code>，并且<code>T</code>本身不能为一个指针类型。
+一个内嵌字段必须被声明为一个使用标识符<code>T</code>表示的类型或者一个基类型为非接口类型的指针类型<code>*T</code>，并且<code>T</code>不表示一个指针类型。
 </div>
 
 <p>
-此规则描述在Go 1.09之前是精确的。但是随着从Go 1.09引入的自定义别名类型概念，此描述<a href="https://github.com/golang/go/issues/22005">有些过时和不太准确了</a>。
+此规则描述在Go 1.09之前是精确的。但是随着从Go 1.09引入的自定义类型别名概念，此描述<a href="https://github.com/golang/go/issues/22005">有些过时和不太准确了</a>。
 比如，此描述没有包括上一节的例子中的<code>P</code>内嵌字段的情形。
 </p>
 
-<p>
-下面对什么类型可以被内嵌的的描述更为准确：
-</p>
+这里，本文试图使用一个更精确的描述：
+<ul>
+<li>
+	一个类型名<code>T</code>只有在它不表示一个基类型为指针类型或者接口类型的指针类型的情况下在可以被用作内嵌字段。
+</li>
+<li>
+	一个指针类型<code>*T</code>只有在<code>T</code>为一个类型名并且<code>T</code>既不表示一个指针类型也不表示一个接口类型的时候才能被用作内嵌字段。
+</li>
+</ul>
 
-<div class="alert alert-success">
-下列类型可被内嵌：
-<ol>
-<li>
-	非指针<a href="type-system-overview.html#named-type">有名类型</a>；
-</li>
-<li>
-	基类型呈现为有名非指针非接口类型的指针类型；
-</li>
-<li>
-	上两种情况中的类型的别名类型。
-</li>
-</ol>
-</div>
 
-<p>
-</p>
-
-换句话说，
-
-<div class="alert alert-danger">
-下列类型不可被内嵌：
-<ol>
-<li>
-	<a href="type-system-overview.html#non-defined-type">定义的</a>指针类型；
-</li>
-<li>
-	无名的非指针类型；
-</li>
-<li>
-	基类型为指针或者接口类型的指针类型。
-</li>
-<li>
-	基类型呈现为无名类型的指针类型。
-</li>
-</ol>
-</div>
-
+<!--
 <p>
 上面列出的哪些类型可以被内嵌的规则有些过度严格和不必要的复杂，这使得很难将这些规则描述得既简单又清晰。
-看上去这些规则的目的是为了避免内嵌方法集肯定为空的类型，但是，同时这些规则也允许内嵌很多方法集肯定为空的类型。比如内置基本类型和很多无名类型的别名类型是允许的。
+看上去这些规则的目的是为了避免内嵌方法集肯定为空的类型，但是，同时这些规则也允许内嵌很多方法集肯定为空的类型。比如内置基本类型和很多非定义类型的别名。
 曾有<a href="https://github.com/golang/go/issues/24062">一个提议</a>建议将这些规则简单化，但是此提议被否决了。
-此提议建议将这些规则简化为：<b>如果一个类型可以提供一个（非限定）类型名，则此类型可以被内嵌</b>。
+此提议建议将这些规则简化为：<b>一个类型名（可以带包限定前缀）可以被内嵌在一个结构体类型中</b>。
 </p>
+-->
 
-下面列出了一些可以被或不可以被内嵌的类型：
+下面列出了一些可以被或不可以被内嵌的类型或别名：
 <pre class="line-numbers"><code class="language-go">type Encoder interface {Encode([]byte) []byte}
 type Person struct {name string; age int}
 type Alias = struct {name string; age int}
 type AliasPtr = *struct {name string; age int}
 type IntPtr *int
+type AliasPP = *IntPtr
 
-// 这些类型都可以被内嵌。
+// 这些类型或别名都可以被内嵌。
 Encoder
 Person
 *Person
@@ -137,16 +111,17 @@ AliasPtr
 int
 *int
 
-// 这些类型都不能被内嵌。
+// 这些类型或别名都不能被内嵌。
+AliasPP          // 基类型为一个指针类型
 *Encoder         // 基类型为一个接口类型
 *AliasPtr        // 基类型为一个指针类型
 IntPtr           // 定义的指针类型
 *IntPtr          // 基类型为一个指针类型
-*chan int        // 基类型为一个无名类型
-struct {age int} // 无名非指针类型
-map[string]int   // 无名非指针类型
-[]int64          // 无名非指针类型
-func()           // 无名非指针类型
+*chan int        // 基类型为一个非定义类型
+struct {age int} // 非定义非指针类型
+map[string]int   // 非定义非指针类型
+[]int64          // 非定义非指针类型
+func()           // 非定义非指针类型
 </code></pre>
 
 <p>
@@ -154,7 +129,7 @@ func()           // 无名非指针类型
 
 <p>
 一个结构体类型中不允许有两个同名字段，此规则对匿名字段同样适用。
-根据上述内嵌字段的隐含名称规则，一个无名指针类型不能和它的基类型同时内嵌在同一个结构体类型中。
+根据上述内嵌字段的隐含名称规则，一个非定义指针类型不能和它的基类型同时内嵌在同一个结构体类型中。
 比如，<code>int</code>和<code>*int</code>类型不能同时内嵌在同一个结构体类型中。
 </p>
 </div>
@@ -468,37 +443,32 @@ func f2() {
 但是，我们从没有为这两个类型声明过这几个方法。这几个方法从哪来的呢？
 </p>
 
-事实上，
+事实上，假设结构体类型<code>S</code>内嵌了一个类型<code>T</code>，并且此内嵌是合法的，
 <ul>
 <li>
-	对内嵌类型的每一个方法，如果此方法对应的选择器既不和其它选择器碰撞也未被其它选择器遮挡，则编译器将会隐式地为内嵌此类型的结构体类型声明一个同样原型的方法。
-	继而，编译器也将为基类型为此结构体类型的指针类型<a href="method.html#implicit-pointer-methods">隐式声明</a>一个相应的方法。
+	对内嵌类型<code>T</code>的每一个方法，如果此方法对应的选择器既不和其它选择器碰撞也未被其它选择器遮挡，则编译器将会隐式地为结构体类型<code>S</code>声明一个同样原型的方法。
+	继而，编译器也将为指针类型<code>*S</code><a href="method.html#implicit-pointer-methods">隐式声明</a>一个相应的方法。
 </li>
 <li>
-	假设结构体类型<code>S</code>内嵌了另一个有名非指针类型<code>T</code>，则对类型<code>*T</code>的每一个方法，
-	如果此方法对应的选择器既不和其它选择器碰撞也未被其它选择器遮挡，则编译器将会隐式地为类型<code>*S</code>声明一个同样原型的方法。
-</li>
-</ul>
-
-简单说来，如果没有发生选择器碰撞和遮挡，
-<ul>
-<li>
-	类型<code>struct{T}</code>将获取类型<code>T</code>的所有方法。
-</li>
-<li>
-	类型<code>*struct{T}</code>将获取类型<code>*T</code>的所有方法。
-</li>
-<li>
-	类型<code>struct{*T}</code>和<code>*struct{*T}</code>都将获取类型<code>*T</code>的所有方法。
+	对类型<code>*T</code>的每一个方法，如果此方法对应的选择器既不和其它选择器碰撞也未被其它选择器遮挡，则编译器将会隐式地为类型<code>*S</code>声明一个同样原型的方法。
 </li>
 </ul>
 
 <p>
-注意，<a href="method.html#method-set">类型<code>T</code>的方法集总是类型<code>*T</code>的方法集的子集</a>，
-所以我们以可以说三个类型<code>*struct{T}</code>、<code>struct{*T}</code>和<code>*struct{*T}</code>均获取了类型<code>T</code>的所有方法。
+上述事实在类型<code>*T</code>不可内嵌的情况下（即<code>T</code>便是一个指针或者接口类型时）仍存在。
 </p>
 
-下面展示了为类型<code>Singer</code>和<code>*Singer</code>隐式声明的三个方法：
+简单说来，如果没有发生选择器碰撞和遮挡，
+<ul>
+<li>
+	类型<code>struct{T}</code>和<code>*struct{T}</code>将获取类型<code>T</code>的所有方法。
+</li>
+<li>
+	类型<code>*struct{T}</code>、<code>struct{*T}</code>和<code>*struct{*T}</code>将获取类型<code>*T</code>的所有方法。
+</li>
+</ul>
+
+下面展示了编译器为类型<code>Singer</code>和<code>*Singer</code>隐式声明的三个方法：
 
 <pre class="line-numbers"><code class="language-go">func (s Singer) PrintName() {
 	s.Person.PrintName()

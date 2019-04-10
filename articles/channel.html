@@ -788,7 +788,7 @@ func main() {
 </p>
 
 下面这个程序有50%的几率会因为恐慌而崩溃。
-此程序中<code>select-case</code>代码块中的两个<code>case</code>操作均不堵塞，所以随机一个将被执行。
+此程序中<code>select-case</code>代码块中的两个<code>case</code>操作均不阻塞，所以随机一个将被执行。
 如果第一个<code>case</code>操作（向已关闭的数据通道发送数据）被执行，则一个恐慌将产生。
 
 <pre class="line-numbers"><code class="language-go">package main

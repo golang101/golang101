@@ -46,25 +46,25 @@
 
 <div>
 <p>
-在Go中，一个无名指针类型的字面形式为<code>*T</code>，其中<code>T</code>为一个任意类型。类型<code>T</code>称为指针类型<code>*T</code>的基类型（base type）。
+在Go中，一个非定义指针类型的字面形式为<code>*T</code>，其中<code>T</code>为一个任意类型。类型<code>T</code>称为指针类型<code>*T</code>的基类型（base type）。
 如果一个指针类型的基类型为<code>T</code>，则我们可以称此指针类型为一个<code>T</code>指针类型。
 </p>
 
 <p>
-虽然我们可以声明有名指针类型，但是一般不推荐这么做。无名指针类型的可读性更高。
+虽然我们可以声明定义指针类型，但是一般不推荐这么做。非定义指针类型的可读性更高。
 </p>
 
 <p>
-如果一个有名指针类型的<a href="type-system-overview.html#underlying-type">底层类型</a>是<code>*T</code>，则它的基类型为<code>T</code>。
+如果一个指针类型的<a href="type-system-overview.html#underlying-type">底层类型</a>是<code>*T</code>，则它的基类型为<code>T</code>。
 </p>
 
 <p>
-如果两个无名指针类型的基类型为同一类型，则这两个无名指针类型亦为同一类型。
+如果两个非定义指针类型的基类型为同一类型，则这两个非定义指针类型亦为同一类型。
 </p>
 
 一些指针类型的例子：
-<pre class="line-numbers"><code class="language-go">*int  // 一个基类型为int的无名指针类型。
-**int // 一个多级无名指针类型，它的基类型为*int。
+<pre class="line-numbers"><code class="language-go">*int  // 一个基类型为int的非定义指针类型。
+**int // 一个多级非定义指针类型，它的基类型为*int。
 
 type Ptr *int // Ptr是一个定义的指针类型，它的基类型为int。
 type PP *Ptr  // PP是一个定义的多级指针类型，它的基类型为Ptr。

@@ -69,7 +69,7 @@ func main() {
 	fmt.Println(tm.Kind(), ta.Kind(), tb.Kind()) // map array slice
 	tx, ty := ta.Elem(), tb.Elem()
 
-	// byte是uint8类型的别名类型。
+	// byte是uint8类型的别名。
 	fmt.Println(tx.Kind(), ty.Kind()) // int16 uint8
 	fmt.Println(tx.Bits(), ty.Bits()) // 16 8
 	fmt.Println(tx.ConvertibleTo(ty)) // true
@@ -156,7 +156,7 @@ func main() {
 <p>
 </p>
 
-<code>reflect</code>代码包也提供了一些其它函数来动态地创建出来一些无名组合类型。
+<code>reflect</code>代码包也提供了一些其它函数来动态地创建出来一些非定义组合类型。
 
 <pre class="line-numbers"><code class="language-go">package main
 
