@@ -21,6 +21,7 @@ import "net/http"
 
 func main() {
 	type P = *bool
+	type M = map[int]int
 	var x struct {
 		string // 一个定义的非指针类型
 		error  // 一个定义的接口类型
@@ -56,7 +57,7 @@ func main() {
 <div>
 当前的Go白皮书（1.12）<a href="https://golang.google.cn/ref/spec#Struct_types">规定</a>：
 
-<div class="alert alert-info">
+<div class="alert alert-warning">
 An embedded field must be specified as a type name <code>T</code>
 or as a pointer to a non-interface type name <code>*T</code>,
 and <code>T</code> itself may not be a pointer type.
@@ -64,8 +65,8 @@ and <code>T</code> itself may not be a pointer type.
 
 翻译过来：
 
-<div class="alert alert-info">
-一个内嵌字段必须被声明为一个使用标识符<code>T</code>表示的类型或者一个基类型为非接口类型的指针类型<code>*T</code>，并且<code>T</code>不表示一个指针类型。
+<div class="alert alert-warning">
+一个内嵌字段必须被声明为形式<code>T</code>或者一个基类型为非接口类型的指针类型<code>*T</code>，其中<code>T</code>为一个类型名但是<code>T</code>不能表示一个指针类型。
 </div>
 
 <p>
@@ -83,6 +84,11 @@ and <code>T</code> itself may not be a pointer type.
 </li>
 </ul>
 
+或者，我们也可以对Go白皮书中的描述略加修改：
+
+<div class="alert alert-info">
+一个内嵌字段必须被声明为形式<code>T</code>或者<code>*T</code>，其中<code>T</code>为一个类型名并且<code>T</code>和<code>*T</code>不能表示基类型为指针类型或者接口类型的指针类型。
+</div>
 
 <!--
 <p>
@@ -252,7 +258,9 @@ main.Singer has 1 methods:
  method#0: PrintName
  method#1: SetAge
 </code></pre>
-</div>
+
+<p>
+</p>
 
 <p>
 从此输出结果中，我们可以看出类型<code>Singer</code>确实拥有一个<code>PrintName</code>方法，以及类型<code>*Singer</code>确实拥有两个方法：<code>PrintName</code>和<code>SetAge</code>。
@@ -260,6 +268,7 @@ main.Singer has 1 methods:
 毕竟<code>gaga</code>是<code>Singer</code>类型的一个值。
 请阅读下一节以获取原因。
 </p>
+</div>
 
 <h3>选择器的缩写形式</h3>
 
@@ -455,7 +464,8 @@ func f2() {
 </ul>
 
 <p>
-上述事实在类型<code>*T</code>不可内嵌的情况下（即<code>T</code>便是一个指针或者接口类型时）仍存在。
+上述事实在类型<code>*T</code>不可内嵌的情况下（即<code>T</code>是一个指针或者接口类型时）仍存在。
+如果即<code>T</code>是一个指针或者接口类型时，则类型<code>*T</code>的方法集为空。
 </p>
 
 简单说来，如果没有发生选择器碰撞和遮挡，
