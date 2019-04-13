@@ -8,7 +8,7 @@
 * [gitlab.com/go101/go101](https://gitlab.com/go101/go101)
 * [github.com/go101/go101](https://github.com/go101/go101)
 
-微信公众号：
+微信公众号（用于发布一些Go细节、常识和技巧）：
 
 ![](articles/res/101-group-qrcode-2.jpg?raw=true)
 
