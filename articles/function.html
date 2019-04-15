@@ -85,7 +85,7 @@ func (a int, b string)
 变长参数在声明的时候必须在它的（切片）类型的元素类型前面前置三个点<code>...</code>，以示这是一个变长参数。
 两个变长函数类型的例子：
 <pre class="disable-line-numbers111"><code class="language-go">func (values ...int64) (sum int64)
-func (separator string, tokens ...string) string
+func (sep string, tokens ...string) string
 </code></pre>
 
 <p>
@@ -153,12 +153,12 @@ func Sum(values ...int64) (sum int64) {
 }
 
 // Concat是一个低效的字符串拼接函数。
-func Concat(separator string, tokens ...string) string {
+func Concat(sep string, tokens ...string) string {
 	// tokens的类型为[]string。
 	r := ""
 	for i, t := range tokens {
 		if i != 0 {
-			r += separator
+			r += sep
 		}
 		r += t
 	}
@@ -239,10 +239,10 @@ func main() {
 
 import "fmt"
 
-func Concat(separator string, tokens ...string) (r string) {
+func Concat(sep string, tokens ...string) (r string) {
 	for i, t := range tokens {
 		if i != 0 {
-			r += separator
+			r += sep
 		}
 		r += t
 	}
@@ -266,7 +266,7 @@ func main() {
 
 // 这两个函数的声明见前面几例。
 func Sum(values ...int64) (sum int64) {......}
-func Concat(separator string, tokens ...string) string {......}
+func Concat(sep string, tokens ...string) string {......}
 
 func main() {
 	// 下面两行报同样的错：实参数目太多了。

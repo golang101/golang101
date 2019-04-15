@@ -11,7 +11,7 @@
 	<a class="index" href="#make-struct-type-uncomparable">如何使一个结构体类型不可比较？</a>
 </li>
 <li>
-	<a class="index" href="#dont-use-assignments-with-expression-dependencies">不要使用其中涉及到的表达式之间存在依赖关系的赋值语句。</a>
+	<a class="index" href="#dont-use-assignments-with-expression-dependencies">不要使用其中涉及到的表达式之间会相互干涉的赋值语句。</a>
 </li>
 <li>
 	<a class="index" href="#simulate-loop-from-0-to-n">如何模拟一些其它语言中支持的<code>for i in 0..N</code>循环代码块？</a>
@@ -142,13 +142,13 @@ func main() {
 
 
 <a class="anchor" id="dont-use-assignments-with-expression-dependencies"></a>
-<h3>不要使用其中涉及到的表达式之间存在依赖关系的赋值语句。</h3>
+<h3>不要使用其中涉及到的表达式之间会相互干涉的赋值语句。</h3>
 
 <div>
 
 <p>
 目前(Go 1.12)，在一些多值赋值中<a href="https://github.com/go101/go101/wiki/Some-evaluation-orders-in-multi-value-assignments-are-unspecified">有一些表达式估值顺序是未指定的</a>。
-因此，如果一个多值赋值语句中涉及的表达式之间存在依赖，或者不太容易确定是否存在依赖关系时，我们应该将此多值赋值语句分拆成多个单值赋值语句。
+因此，如果一个多值赋值语句中涉及的表达式会相互干涉，或者不太容易确定是否会相互干涉，我们应该将此多值赋值语句分拆成多个单值赋值语句。
 </p>
 
 事实上，在一些写得很糟糕的代码中，单值赋值中的表达式求值顺序也有可能是有歧义的。

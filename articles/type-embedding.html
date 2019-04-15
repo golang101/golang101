@@ -57,17 +57,21 @@ func main() {
 <div>
 当前的Go白皮书（1.12）<a href="https://golang.google.cn/ref/spec#Struct_types">规定</a>：
 
-<div class="alert alert-warning">
-An embedded field must be specified as a type name <code>T</code>
-or as a pointer to a non-interface type name <code>*T</code>,
-and <code>T</code> itself may not be a pointer type.
-</div>
+<blockquote style="margin-top:0px;margin-bottom:0px;">
+<small>
+	An embedded field must be specified as a type name <code>T</code>
+	or as a pointer to a non-interface type name <code>*T</code>,
+	and <code>T</code> itself may not be a pointer type.
+</small>
+</blockquote>
 
 翻译过来：
 
-<div class="alert alert-warning">
+<blockquote style="margin-top:0px;margin-bottom:0px;">
+<small>
 一个内嵌字段必须被声明为形式<code>T</code>或者一个基类型为非接口类型的指针类型<code>*T</code>，其中<code>T</code>为一个类型名但是<code>T</code>不能表示一个指针类型。
-</div>
+</small>
+</blockquote>
 
 <p>
 此规则描述在Go 1.09之前是精确的。但是随着从Go 1.09引入的自定义类型别名概念，此描述<a href="https://github.com/golang/go/issues/22005">有些过时和不太准确了</a>。

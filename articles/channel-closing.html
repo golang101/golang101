@@ -200,7 +200,7 @@ Go甚至从语法上禁止关闭单向接收通道。
 
 <div>
 这是最简单的一种情形。当发送者欲结束发送，让它关闭通讯用的数据通道即可。
-<pre class="line-numbers must-not-line-numbers-on-kindle"><code class="language-go">package main
+<pre class="line-numbers"><code class="language-go">package main
 
 import (
 	"time"
@@ -260,7 +260,7 @@ func main() {
 此情形比上一种情形复杂一些。我们不能让接收者关闭用来传输数据的通道来停止数据传输，因为这样做违反了<b>数据通道关闭原则</b>。
 但是我们可以让接收者关闭一个额外的信号数据通道来通知发送者不要在发送数据了。
 
-<pre class="line-numbers must-not-line-numbers-on-kindle"><code class="language-go">package main
+<pre class="line-numbers"><code class="language-go">package main
 
 import (
 	"time"
@@ -351,7 +351,7 @@ func main() {
 然而，我们可以引入一个中间调解者角色并让其关闭额外的信号通道来通知所有的接收者和发送者结束工作。
 具体实现见下例。注意其中使用了一个尝试发送操作来向中间调解者发送信号。
 
-<pre class="line-numbers must-not-line-numbers-on-kindle"><code class="language-go">package main
+<pre class="line-numbers"><code class="language-go">package main
 
 import (
 	"time"
@@ -484,7 +484,7 @@ func main() {
 
 我们也可以不使用尝试发送操作向中间调解者发送信号，但信号通道<code>toStop</code>的容量必须至少为数据发送者和数据接收者的数量之和，以防止向其发送数据时（有一个极其微小的可能）导致某些发送者和接收者协程永久阻塞。
 
-<pre class="line-numbers must-not-line-numbers-on-kindle"><code class="language-go">...
+<pre class="line-numbers"><code class="language-go">...
 toStop := make(chan string, NumReceivers + NumSenders)
 ...
 			value := rand.Intn(Max)

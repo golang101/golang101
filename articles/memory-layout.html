@@ -69,8 +69,7 @@ Go白皮书仅列出了<a href="https://golang.google.cn/ref/spec#Size_and_align
 同一个编译器的不同版本做出的具体类型的对齐保证也有可能是不相同的。
 当前版本（1.12）的标准编译器做出的对齐保证列在了下面：
 
-<pre class="fixed-width">
-类型种类                   对齐保证（字节数）
+<pre class="fixed-width"><code class="language-go">类型种类                   对齐保证（字节数）
 ------                    ------
 bool, byte, uint8, int8   1
 uint16, int16             2
@@ -79,7 +78,7 @@ float32, complex64        4
 数组                       取决于元素类型
 结构体类型                  取决于各个字段类型
 其它类型                    一个自然字的尺寸
-</pre>
+</code></pre>
 <p>
 这里，一个自然字（native word）的尺寸在32位的架构上为4字节，在64位的架构上为8字节。
 </p>
@@ -106,8 +105,7 @@ todo: above assertion may be not correct for some architectures?
 <div>
 Go白皮书只对以下种类的类型的尺寸进行了<a href="https://golang.google.cn/ref/spec#Size_and_alignment_guarantees">明确规定</a>。
 
-<pre class="fixed-width">
-类型种类                  尺寸（字节数）
+<pre class="fixed-width"><code class="language-go">类型种类                  尺寸（字节数）
 ------                   ------
 byte, uint8, int8        1
 uint16, int16            2
@@ -117,7 +115,7 @@ float64, complex64       8
 complex128               16
 uint, int                4或者8，取决于系统架构
 uintptr                  能够存下任一个内存地址
-</pre>
+</code></pre>
 <p>
 Go白皮书没有对其它种类的类型的尺寸最初明确规定。
 请阅读<a href="value-copy-cost.html#value-sizes">值复制成本</a>一文来获取标准编译器使用的各种其它类型的尺寸。

@@ -529,6 +529,14 @@ func main() {
 }
 </code></pre>
 
+<p>
+</p>
+
+<p>
+目前（Go 1.12），<code>reflect</code>标准库包并不提供一个<code>Value.IsZero</code>方法。
+此方法可能会<a href="https://github.com/golang/go/issues/7501">在Go 1.13中被加入</a>。
+</p>
+
 <a class="anchor" id="deep-equal"></a>
 <p>
 上面这些例子并未触及到所有的和<code>reflect.Value</code>相关的函数和方法，请阅读<code>reflect</code>标准库包的文档以获取如何使用这些函数和方法。
