@@ -352,9 +352,9 @@ type Ages AgeSlice
 MyInt → int
 Age → MyInt → int
 IntSlice → []int
-MyIntSlice → []MyInt <span style="color:#aaa">→ <strike>[]int</strike></span>
-AgeSlice → []Age <span style="color:#aaa">→ <strike>[]MyInt</strike></span> <span style="color:#aaa">→ <strike>[]int</strike></span>
-Ages → AgeSlice → []Age <span style="color:#aaa">→ <strike>[]MyInt</strike></span> <span style="color:#aaa">→ <strike>[]int</strike></span>
+MyIntSlice → []MyInt <span style="color:#aaa">→ <span style="text-decoration:line-through;">[]int</span></span>
+AgeSlice → []Age <span style="color:#aaa">→ <span style="text-decoration:line-through;">[]MyInt</span></span> <span style="color:#aaa">→ <span style="text-decoration:line-through;">[]int</span></span>
+Ages → AgeSlice → []Age <span style="color:#aaa">→ <span style="text-decoration:line-through;">[]MyInt</span></span> <span style="color:#aaa">→ <span style="text-decoration:line-through;">[]int</span></span>
 </pre>
 
 <p>

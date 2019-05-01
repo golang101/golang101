@@ -48,18 +48,14 @@ Go是一门属于C语言家族的编程语言，所以本文谈及的很多概�
 </p>
 
 Go白皮书仅列出了<a href="https://golang.google.cn/ref/spec#Size_and_alignment_guarantees">些许类型对齐保证要求</a>。
-一个合格的Go编译器必须保证：
-<ol>
-<li>
-	对于任何类型的变量<code>x</code>，<code>unsafe.Alignof(x)</code>的结果最小为<code>1</code>。
-</li>
-<li>
-	对于一个结构体类型的变量<code>x</code>，<code>unsafe.Alignof(x)</code>的结果为<code>x</code>的所有字段的对齐保证<code>unsafe.Alignof(x.f)</code>中的最大值（但是最小为<code>1</code>）。
-</li>
-<li>
-	对于一个数组类型的变量<code>x</code>，<code>unsafe.Alignof(x)</code>的结果和此数组的元素类型的一个变量的对齐保证相等。
-</li>
-</ol>
+<blockquote>
+<small>
+一个合格的Go编译器必须保证：<br/>
+1. 对于任何类型的变量<code>x</code>，<code>unsafe.Alignof(x)</code>的结果最小为<code>1</code>。<br/>
+2. 对于一个结构体类型的变量<code>x</code>，<code>unsafe.Alignof(x)</code>的结果为<code>x</code>的所有字段的对齐保证<code>unsafe.Alignof(x.f)</code>中的最大值（但是最小为<code>1</code>）。<br/>
+3. 对于一个数组类型的变量<code>x</code>，<code>unsafe.Alignof(x)</code>的结果和此数组的元素类型的一个变量的对齐保证相等。
+</small>
+</blockquote>
 
 <p>
 从这些要求可以看出，Go白皮书并未为任何类型指定了确定的对齐保证要求，它只是指定了一些最基本的要求。
