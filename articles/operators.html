@@ -299,7 +299,7 @@ Go也支持三个一元算术运算符：
 
 	// 这些行编译没问题。
 	_ = 12 + 'A' // 两个类型不确定操作数（都为数值类型）
-	_ = 12 - a   // 类型不确定值12将被当做a的类型（float32）使用。
+	_ = 12 - a   // 12将被当做a的类型（float32）使用。
 	_ = a * b    // 两个同类型的类型确定操作数。
 	_ = c % d
 	_, _ = c + int16(e), uint8(c) + e
@@ -365,18 +365,26 @@ Go也支持三个一元算术运算符：
 
 一些非移位算术运算的例子：
 <pre class="line-numbers"><code class="language-go">func main() {
-	const X, Y, Z = 2, 'A', 3i // 三个类型不确定常量。它们的默认类型
-	                           // 分别为：int、rune和complex64.
+	// 三个类型不确定常量。它们的默认类型
+	// 分别为：int、rune和complex64.
+	const X, Y, Z = 2, 'A', 3i
+
 
 	var a, b int = X, Y // 两个类型确定值
 
-	d := X + Y // 变量d的类型被推断为Y的默认类型：rune（亦即int32）。
-	e := Y - a // 变量e的类型被推断为a的类型：int。
-	f := a * b // 变量f的类型和a及b的类型一样：int。
-	g := Z * Y // 变量g的类型被推断为Z的默认类型：complex64。
+	// 变量d的类型被推断为Y的默认类型：rune（亦即int32）。
+	d := X + Y
+	// 变量e的类型被推断为a的类型：int。
+	e := Y - a
+	// 变量f的类型和a及b的类型一样：int。
+	f := a * b
+	// 变量g的类型被推断为Z的默认类型：complex64。
+	g := Z * Y
 
-	println(X, Y, Z)    // 2 65 (+0.000000e+000+3.000000e+000i)
-	println(d, e, f, g) // 67 63 130 (+0.000000e+000+1.950000e+002i)
+	// 2 65 (+0.000000e+000+3.000000e+000i)
+	println(X, Y, Z)
+	// 67 63 130 (+0.000000e+000+1.950000e+002i)
+	println(d, e, f, g)
 }
 </code></pre>
 
@@ -385,13 +393,15 @@ Go也支持三个一元算术运算符：
 
 一个移位算术运算的例子：
 <pre class="line-numbers must-line-numbers"><code class="language-go">const N = 2
-const A = 3.0 << N       // A == 6，它是一个默认类型为int的类型不确定值。
-const B = int8(3.0) << N // B == 6，它是一个类型为int8的类型确定值。
+// A == 6，它是一个默认类型为int的类型不确定值。
+const A = 3.0 << N
+// B == 6，它是一个类型为int8的类型确定值。
+const B = int8(3.0) << N
 
 var m = uint(32)
 // 下面的三行是相互等价的。
-var x int64 = 1 << m  // 1的类型将被设想为int64，而不是int。
-var y = int64(1 << m) // 同上，1的类型将被设想为int64，而不是int。
+var x int64 = 1 << m  // 1的类型将被设想为int64，而非int。
+var y = int64(1 << m) // 同上
 var z = int64(1) << m // 同上
 
 // 下面这两行编译不通过。
@@ -409,11 +419,11 @@ const _ = 1 << B  // error: the right operand must be unsigned.
 <p>
 上面提到的移位运算结果的最后一点类型推断规则有点反常。
 这条规则的主要目的是为了防止一些移位运算在32位架构和64位架构的机器上的运算结果出现不一致但不一致却没有被及时发现的情况。
-比如如果上面一段代码中第<i>8</i>行（或第<i>7</i>行）的<code>1</code>的类型被推断为它的默认类型<code>int</code>，
+比如如果上面一段代码中第<i>10</i>行（或第<i>9</i>行）的<code>1</code>的类型被推断为它的默认类型<code>int</code>，
 则在32位架构的机器上，<code>x</code>的取值将被截断为<i>0</i>，而在64位架构的机器上，<code>x</code>的取值将为<i>2<sup>32</sup></i>。
-因为<code>m</code>是一个变量，在32位架构的机器上，第<i>7</i>行和第<i>8</i>行并不会编译报错。
+因为<code>m</code>是一个变量，在32位架构的机器上，第<i>9</i>行和第<i>10</i>行并不会编译报错。
 这将导致Go程序员在不经意间写出没有料到的和难以觉察的bug。
-因此，第<i>7</i>行和第<i>8</i>行中的<code>1</code>的类型被推断为<code>int64</code>（最终的设想结果类型），而不是它们的默认类型<code>int</code>。
+因此，第<i>9</i>行和第<i>10</i>行中的<code>1</code>的类型被推断为<code>int64</code>（最终的设想结果类型），而不是它们的默认类型<code>int</code>。
 </p>
 
 下面这段代码展示了对于左操作数为类型不确定值的移位运算，编译结果因右操作数是否为常量而带来的不同结果：
@@ -469,11 +479,12 @@ var _ = 1.0 << m // error: shift of type float64
 var a, b uint8 = 255, 1
 var c = a + b  // c==0。a+b是一个非常量表达式，
                // 结果中溢出的高位比特将被截断舍弃。
-var d = a << b // d == 254。同样，结果中溢出的高位比特将被截断舍弃。
+var d = a << b // d == 254。同样，结果中溢出的
+               // 高位比特将被截断舍弃。
 
-// 结果为类型不确定常量
-const X = 0x1FFFFFFFF * 0x1FFFFFFFF // 没问题，尽管X溢出它的默认类型int。
-const R = 'a' + 0x7FFFFFFF          // 没问题，尽管R溢出它的默认类型rune。
+// 结果为类型不确定常量，允许溢出其默认类型。
+const X = 0x1FFFFFFFF * 0x1FFFFFFFF // 没问题，尽管X溢出
+const R = 'a' + 0x7FFFFFFF          // 没问题，尽管R溢出
 
 // 运算结果或者转换结果为类型确定常量
 var e = X                // error: X溢出int。

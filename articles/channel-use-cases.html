@@ -164,7 +164,8 @@ import (
 
 func source(c chan<- int32) {
 	ra, rb := rand.Int31(), rand.Intn(3) + 1
-	time.Sleep(time.Duration(rb) * time.Second) // 睡眠1秒/2秒/3秒
+	// 睡眠1秒/2秒/3秒
+	time.Sleep(time.Duration(rb) * time.Second)
 	c <- ra
 }
 
@@ -980,7 +981,8 @@ import (
 
 func source(c chan<- int32) {
 	ra, rb := rand.Int31(), rand.Intn(3)+1
-	time.Sleep(time.Duration(rb) * time.Second) // 休眠1秒/2秒/3秒
+	// 休眠1秒/2秒/3秒
+	time.Sleep(time.Duration(rb) * time.Second)
 	select {
 	case c <- ra:
 	default:

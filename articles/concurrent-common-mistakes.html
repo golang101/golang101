@@ -279,7 +279,8 @@ func (c *Counter) Increase(d int64) (r int64) {
 	return
 }
 
-// 此方法的实现是有问题的。当它被调用时，一个Counter属主值将被复制。
+// 此方法的实现是有问题的。当它被调用时，
+// 一个Counter属主值将被复制。
 func (c Counter) Value() (r int64) {
 	c.Lock()
 	r = c.n

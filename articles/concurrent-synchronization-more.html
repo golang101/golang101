@@ -141,7 +141,8 @@ values: [71 89 50 62 60]
 		}()
 	}
 
-	// 下面这个循环保证将在上面的任何一个wg.Wait调用结束之前执行。
+	// 下面这个循环保证将在上面的任何一个
+	// wg.Wait调用结束之前执行。
 	for i := 0; i < N; i++ {
 		values[i] = 50 + rand.Int31n(50)
 	}
@@ -537,7 +538,8 @@ func main() {
 		d := time.Second * time.Duration(rand.Intn(10)) / 10
 		go func(i int) {
 			time.Sleep(d) // 模拟一个工作负载
-			cond.L.Lock() // 下面的修改必须在cond.L被锁定的时候执行
+			cond.L.Lock()
+			// 下面的修改必须在cond.L被锁定的时候执行
 			values[i] = string('a' + i)
 			cond.Broadcast() // 可以在cond.L被解锁后发出通知
 			cond.L.Unlock()

@@ -244,9 +244,10 @@ func foo() {
 	var p1 = unsafe.Pointer(y) // 和y一样引用着同一个值
 	var p2 = uintptr(unsafe.Pointer(z))
 
-	// 此时，即使z指针值所引用的int值的地址仍旧存储在p2值中，但是此
-	// int值已经不再被使用了，所以垃圾回收器认为可以回收它所占据的
-	// 内存块了。另一方面，p0和p1各自所引用的int值仍旧将在下面被使用。
+	// 此时，即使z指针值所引用的int值的地址仍旧存储
+	// 在p2值中，但是此int值已经不再被使用了，所以垃圾
+	// 回收器认为可以回收它所占据的内存块了。另一方面，
+	// p0和p1各自所引用的int值仍旧将在下面被使用。
 
 	// uintptr值可以参与算术运算。
 	p2 += 2; p2--; p2--
@@ -486,9 +487,10 @@ func main() {
 	p := unsafe.Pointer(&t)
 	// ty2 := (*int16)(unsafe.Pointer(uintptr(p)+N+M+M))
 	addr := uintptr(p) + N + M + M
-	// 从这里到下一行代码执行之前，t值将不再被任何值引用，所以
-	// 垃圾回收器认为它可以被回收了。一旦它真得被回收了，下面
-	// 继续使用t.y[2]值的曾经的地址是非法和危险的！
+	// 从这里到下一行代码执行之前，t值将不再被任何值
+	// 引用，所以垃圾回收器认为它可以被回收了。一旦
+	// 它真得被回收了，下面继续使用t.y[2]值的曾经
+	// 的地址是非法和危险的！
 	ty2 := (*int16)(unsafe.Pointer(addr))
 	fmt.Println(*ty2)
 }
@@ -506,7 +508,8 @@ func main() {
 	p := unsafe.Pointer(t)
 	addr := uintptr(p) + N + M + M
 	ty2 := (*int16)(unsafe.Pointer(addr))
-	// 下面这条调用将确保整个t值的内存在此时刻不会被回收。
+	// 下面这条调用将确保整个t值的内存
+	// 在此时刻不会被回收。
 	runtime.KeepAlive(p)
 	fmt.Println(*ty2)
 }
@@ -619,7 +622,8 @@ syscall.Syscall(SYS_READ, uintptr(fd), u, uintptr(n))
 而下面这个调用是危险的：
 
 <pre class="line-numbers"><code class="language-go">u := reflect.ValueOf(new(int)).Pointer()
-// 在这个时刻，处于存储在u中的地址处的内存块可能会被回收掉。
+// 在这个时刻，处于存储在u中的地址处的内存块
+// 可能会被回收掉。
 p := (*int)(unsafe.Pointer(u))
 </code></pre>
 

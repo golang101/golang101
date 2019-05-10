@@ -61,7 +61,7 @@ goroutine 1 [running]:
 </code></pre>
 
 显然地，标号为0的<code>recover</code>调用（代码中最后一个）是执行不到的。
-其它6个均执行到了，但是它们的返回值都是<code>nil</code>。为什么呢？让我们先阅读一下<a href="https://golang.google.cn/ref/spec#Handling_panics">Go白皮书中列出的规则</a>：
+其它7个均执行到了，但是它们的返回值都是<code>nil</code>。为什么呢？让我们先阅读一下<a href="https://golang.google.cn/ref/spec#Handling_panics">Go白皮书中列出的规则</a>：
 
 <div class="alert alert-success">
 在下面的情况下，<code>recover</code>函数调用的返回值为<code>nil</code>：
@@ -251,8 +251,8 @@ func main() { // 调用深度为0
 		defer fmt.Println("现在，恐慌3和恐慌6共存")
 		defer panic(6) // 将压制恐慌5
 		defer panic(5) // 将压制恐慌4
-		panic(4) // 不会压制恐慌3，因为恐慌4和恐慌3的深度不同。
-		         // 恐慌3为0，而恐慌4的深度为1。
+		panic(4) // 不会压制恐慌3，因为恐慌4和恐慌3的深度
+		         // 不同。恐慌3为0，而恐慌4的深度为1。
 	}()
 
 	defer fmt.Println("现在，只存在恐慌3")

@@ -846,14 +846,14 @@ func main() {
 </h3>
 
 <div>
-以下的值不可以被取地址：
+以下的值是不可以寻址的：
 <ul>
 <li>字符串的字节元素</li>
 <li>映射元素</li>
 <li>接口值的动态值（类型断言的结果）</li>
 <li>常量值</li>
 <li>字面值</li>
-<li>包级别函数</li>
+<li>声明的包级别函数</li>
 <li>方法（用做函数值）</li>
 <li>中间结果值
 	<ul>
@@ -873,11 +873,11 @@ func main() {
 
 <div class="alert alert-success">
 请注意：<code>&amp;T{}</code>在Go里是一个语法糖，它是<code>tmp := T{}; (&amp;tmp)</code>的简写形式。
-所以<code>&amp;T{}</code>是合法的并不代表字面值<code>T{}</code>可以被取地址。
+所以<code>&amp;T{}</code>是合法的并不代表字面值<code>T{}</code>是可寻址的。
 </div>
 <p></p>
 
-以下的值可以被取地址：
+以下的值是可寻址的，因此可以被取地址：
 <ul>
 <li>变量</li>
 <li>可寻址的结构体的字段</li>

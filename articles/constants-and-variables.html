@@ -103,9 +103,12 @@
 </div>
 
 一些合法的转换例子：
-<pre class="disable-line-numbers111"><code class="language-go">complex128(1 + -1e-1000i)  // 结果为complex128类型的1.0+0.0i。虚部被舍入了。
-float32(0.49999999)        // 结果为float32类型的0.5。这里也舍入了。
-float32(17000000000000000) // 只要目标类型不是整数类型，舍入都是允许的。
+<pre class="disable-line-numbers111"><code class="language-go">// 结果为complex128类型的1.0+0.0i。虚部被舍入了。
+complex128(1 + -1e-1000i)
+// 结果为float32类型的0.5。这里也舍入了。
+float32(0.49999999)
+// 只要目标类型不是整数类型，舍入都是允许的。
+float32(17000000000000000)
 float32(123)
 uint(1.0)
 int8(-123)
@@ -128,11 +131,15 @@ string(0x2FFFFFFFF) // "\uFFFD"
 uint8(-1)     // -1不能被表示为uint8类型值。
 float64(1+2i) // 1+2i不能被表示为float64类型值。
 
-float64(-1e1000)         // -1e+1000不能被表示为float64类型值。不允许溢出。
-int(0x10000000000000000) // 0x10000000000000000做为int值将溢出。
+// -1e+1000不能被表示为float64类型值。不允许溢出。
+float64(-1e1000)
+// 0x10000000000000000做为int值将溢出。
+int(0x10000000000000000)
 
-string(65.0)  // 字面值65.0的默认类型是float64（不是一个整数类型）。
-string(66+0i) // 66+0i的默认类型是complex128（不是一个整数类型）。
+// 字面值65.0的默认类型是float64（不是一个整数类型）。
+string(65.0)
+// 66+0i的默认类型是complex128（不是一个整数类型）。
+string(66+0i)
 </code></pre>
 
 <div class="note">
@@ -195,7 +202,8 @@ Go支持类型推断（type deduction or type inference）。
 
 <pre class="line-numbers"><code class="language-go">package main
 
-// 声明了两个单独的有名常量。（是的，非ASCII字符可以用做标识符。）
+// 声明了两个单独的有名常量。（是的，
+// 非ASCII字符可以用做标识符。）
 const π = 3.1416
 const Pi = π // 等价于：Pi == 3.1416
 
@@ -367,7 +375,8 @@ Go编译器将通过照抄前面最紧挨的一个完整的常量描述来自动
 
 	A, B = "Go", "language"
 	C, _
-	// 上一行中的空标识符是必需的（如果上一行是一个不完整的常量描述）。
+	// 上一行中的空标识符是必需的（如果
+	// 上一行是一个不完整的常量描述）。
 )
 </code></pre>
 
@@ -516,7 +525,8 @@ var announceYear int = 2008
 <pre class="line-numbers"><code class="language-go">// 变量lang和dynamic的类型将被推断为内置类型string和bool。
 var lang, dynamic = "Go", false
 
-// 变量compiled和announceYear的类型将被推断为内置类型bool和int。
+// 变量compiled和announceYear的类型将被推断
+// 为内置类型bool和int。
 var compiled, announceYear = true, 2009
 
 // 变量website的类型将被推断为内置类型string。
@@ -587,9 +597,9 @@ var x int
 var y, z float32
 
 N = 789 // error: N是一个不可变量
-y = N   // ok: N被隐式转换为类型float32（或者N的类型被推断为float32）
+y = N   // ok: N被隐式转换为类型float32
 x = y   // error: 类型不匹配
-x = N   // ok: N被隐式转换为类型int（或者N的类型被推断为int）
+x = N   // ok: N被隐式转换为类型int
 y = x   // error: 类型不匹配
 z = y   // ok
 _ = y   // ok
@@ -807,25 +817,30 @@ var a, b, c = b+1, c+1, y // 7 6 5 8
 </li>
 </ul>
 
-在下面的例子中，第<i>4</i>行和第<i>11</i>行的隐式转换是不允许的，第<i>3</i>行和第<i>10</i>行的显式转换也是不允许的。
+在下面的例子中，第<i>7</i>行和第<i>15</i>行的隐式转换是不允许的，第<i>5</i>行和第<i>14</i>行的显式转换也是不允许的。
 
 <pre class="line-numbers must-line-numbers"><code class="language-go">const a = -1.23
-var b = a        // 变量b的类型被推断为内置类型float64。
-var x = int32(a) // error: 常量1.23不能被截断舍入到一个整数。
-var y int32 = b  // error: float64类型值不能被隐式转换到int32。
-var z = int32(b) // ok: z == -1，变量z的类型被推断为int32。
-                 //     z的小数部分将被舍弃。
+// 变量b的类型被推断为内置类型float64。
+var b = a
+// error: 常量1.23不能被截断舍入到一个整数。
+var x = int32(a)
+// error: float64类型值不能被隐式转换到int32。
+var y int32 = b
+// ok: z == -1，变量z的类型被推断为int32。
+//     z的小数部分将被舍弃。
+var z = int32(b)
 
 const k int16 = 255
 var n = k            // 变量n的类型将被推断为int16。
 var f = uint8(k + 1) // error: 常量256溢出了uint8。
 var g uint8 = n + 1  // error: int16值不能隐式转换为uint8。
 var h = uint8(n + 1) // ok: h == 0，变量h的类型为uint8。
-                     // (n+1)溢出uint8，所以只有低8位bits（都为0）被保留。
+                     // (n+1)溢出uint8，所以只有低8位
+                     // bits（都为0）被保留。
 </code></pre>
 
 <p>
-第<i>2</i>行和第<i>9</i>行的隐式转换中，<code>a</code>和<code>k</code>被转换为它们各自的默认类型。
+第<i>3</i>行和第<i>13</i>行的隐式转换中，<code>a</code>和<code>k</code>被转换为它们各自的默认类型。
 </p>
 
 </div>
@@ -851,11 +866,12 @@ func main() {
 
 	// 一个内嵌代码块。
 	{
-		x, y := x, y-10 // 这里，左边的x和y均为新声明的变量。
-		                // 右边的x为外层声明的bool变量。
-		                // 右边的y为包级变量。
+		x, y := x, y-10 // 这里，左边的x和y均为新声明
+		                // 的变量。右边的x为外层声明的
+		                // bool变量。右边的y为包级变量。
 
-		// 在此内层代码块中，从此开始，刚声明的x和y将遮挡外层声明x和y。
+		// 在此内层代码块中，从此开始，
+		// 刚声明的x和y将遮挡外层声明x和y。
 
 		x, z := !x, y/10 // z是一个新声明的变量。
 		                 // x和y是上一句中声明的变量。
@@ -864,7 +880,8 @@ func main() {
 	println(x) // true
 	println(y) // 70 （包级变量y从未修改）
 	/*
-	println(z) // error: z未定义。z的作用域仅限于上面的最内层代码块。
+	println(z) // error: z未定义。
+	           // z的作用域仅限于上面的最内层代码块。
 	*/
 }
 </code></pre>

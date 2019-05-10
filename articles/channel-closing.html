@@ -241,7 +241,8 @@ func main() {
 		go func() {
 			defer wgReceivers.Done()
 
-			// 接收数据直到通道dataCh已关闭并且dataCh的缓冲队列已空。
+			// 接收数据直到通道dataCh已关闭
+			// 并且dataCh的缓冲队列已空。
 			for value := range dataCh {
 				log.Println(value)
 			}
@@ -283,24 +284,27 @@ func main() {
 	// ...
 	dataCh := make(chan int, 100)
 	stopCh := make(chan struct{})
-		// stopCh是一个额外的信号通道。它的发送者为dataCh数据通道的接收者。
+		// stopCh是一个额外的信号通道。它的
+		// 发送者为dataCh数据通道的接收者。
 		// 它的接收者为dataCh数据通道的发送者。
 
 	// 发送者
 	for i := 0; i < NumSenders; i++ {
 		go func() {
 			for {
-				// 这里的第一个尝试接收用来让此发送者协程尽早地退出。
-				// 对于这个特定的例子，此select代码块并非必需。
+				// 这里的第一个尝试接收用来让此发送者
+				// 协程尽早地退出。对于这个特定的例子，
+				// 此select代码块并非必需。
 				select {
 				case <- stopCh:
 					return
 				default:
 				}
 
-				// 即使stopCh已经关闭，此第二个select代码块中的第一个
-				// 分支仍很有可能在若干个循环步内依然不会被选中。如果这
-				// 是不可接受的，则上面的第一个select代码块是必需的。
+				// 即使stopCh已经关闭，此第二个select
+				// 代码块中的第一个分支仍很有可能在若干个
+				// 循环步内依然不会被选中。如果这是不可接受
+				// 的，则上面的第一个select代码块是必需的。
 				select {
 				case <- stopCh:
 					return
@@ -316,9 +320,9 @@ func main() {
 
 		for value := range dataCh {
 			if value == Max-1 {
-				// 此唯一的接收者同时也是stopCh数据通道的唯一发送者。
-				// 尽管它不能安全地关闭dataCh数据通道，但它可以安全
-				// 地关闭stopCh数据通道。
+				// 此唯一的接收者同时也是stopCh数据通道的
+				// 唯一发送者。尽管它不能安全地关闭dataCh数
+				// 据通道，但它可以安全地关闭stopCh数据通道。
 				close(stopCh)
 				return
 			}
@@ -376,12 +380,14 @@ func main() {
 	// ...
 	dataCh := make(chan int, 100)
 	stopCh := make(chan struct{})
-		// stopCh是一个额外的信号通道。它的发送者为中间调解者。
-		// 它的接收者为dataCh数据通道的所有的发送者和接收者。
+		// stopCh是一个额外的信号通道。它的发送
+		// 者为中间调解者。它的接收者为dataCh
+		// 数据通道的所有的发送者和接收者。
 	toStop := make(chan string, 1)
-		// toStop是一个用来通知中间调解者让其关闭信号通道
-		// stopCh的第二个信号通道。此第二个信号通道的发送者为
-		// dataCh数据通道的所有的发送者和接收者，它的接收者
+		// toStop是一个用来通知中间调解者让其
+		// 关闭信号通道stopCh的第二个信号通道。
+		// 此第二个信号通道的发送者为dataCh数据
+		// 通道的所有的发送者和接收者，它的接收者
 		// 为中间调解者。它必须为一个缓冲通道。
 
 	var stoppedBy string
@@ -407,19 +413,20 @@ func main() {
 					return
 				}
 
-				// 此处的尝试接收操作是为了让此发送协程尽早退出。
-				// 标准编译器对尝试接收和尝试发送做了特殊
-				// 的优化，因而它们的速度很快。
+				// 此处的尝试接收操作是为了让此发送协程尽早
+				// 退出。标准编译器对尝试接收和尝试发送做了
+				// 特殊的优化，因而它们的速度很快。
 				select {
 				case <- stopCh:
 					return
 				default:
 				}
 
-				// 即使stopCh已关闭，如果这个select代码块中第二个
-				// 分支的发送操作是非阻塞的，则第一个分支仍很有可能
-				// 在若干个循环步内依然不会被选中。如果这是不可接受
-				// 的，则上面的第一个尝试接收操作代码块是必需的。
+				// 即使stopCh已关闭，如果这个select代码块
+				// 中第二个分支的发送操作是非阻塞的，则第一个
+				// 分支仍很有可能在若干个循环步内依然不会被选
+				// 中。如果这是不可接受的，则上面的第一个尝试
+				// 接收操作代码块是必需的。
 				select {
 				case <- stopCh:
 					return
@@ -435,18 +442,19 @@ func main() {
 			defer wgReceivers.Done()
 
 			for {
-				// 和发送者协程一样，此处的尝试接收操作是为了让此
-				// 接收协程尽早退出。
+				// 和发送者协程一样，此处的尝试接收操作是为了
+				// 让此接收协程尽早退出。
 				select {
 				case <- stopCh:
 					return
 				default:
 				}
 
-				// 即使stopCh已关闭，如果这个select代码块中第二个
-				// 分支的接收操作是非阻塞的，则第一个分支仍很有可能
-				// 在若干个循环步内依然不会被选中。如果这是不可接受
-				// 的，则上面尝试接收操作代码块是必需的。
+				// 即使stopCh已关闭，如果这个select代码块
+				// 中第二个分支的接收操作是非阻塞的，则第一个
+				// 分支仍很有可能在若干个循环步内依然不会被选
+				// 中。如果这是不可接受的，则上面尝试接收操作
+				// 代码块是必需的。
 				select {
 				case <- stopCh:
 					return

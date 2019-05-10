@@ -97,8 +97,8 @@ package main
 import "foo"
 
 func main() {
-	//_ = foo.Config{[0]int{}, "bar", 123} // 此句编译不通过
-	_ = foo.Config{Name: "bar", Size: 123} // 此句编译没问题
+	//_ = foo.Config{[0]int{}, "bar", 123} // 编译不通过
+	_ = foo.Config{Name: "bar", Size: 123} // 编译没问题
 }
 </code></pre>
 
@@ -446,7 +446,8 @@ func (mr *MyReader) Read(data []byte) (int, error) {
 	return len(data), io.EOF
 }
 
-// 下面三行中的任一行都可以保证类型*MyReader实现了接口io.Reader。
+// 下面三行中的任一行都可以保证类型*MyReader实现
+// 了接口io.Reader。
 var _ io.Reader = NewMyReader()
 var _ io.Reader = (*MyReader)(nil)
 func _() {_ = io.Reader(nil).(*MyReader)}
@@ -608,11 +609,11 @@ import "fmt"
 func main() {
 	var a [1000]int
 
-	// This cost of the two lines is high.
-	fmt.Println(a)                   // 数组a中的所有元素都将被复制
-	fmt.Printf("Type of a: %T\n", a) // 数组a中的所有元素都将被复制
+	// 这两行的开销相对较大，因为数组a中的元素都将被复制。
+	fmt.Println(a)
+	fmt.Printf("Type of a: %T\n", a)
 
-	// The cost of the two lines is low.
+	// 这两行的开销较小，数组a中的元素没有被复制。
 	fmt.Printf("%v\n", a[:])
 	fmt.Println("Type of a:", fmt.Sprintf("%T", &a)[1:])
 }
