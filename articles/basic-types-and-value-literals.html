@@ -197,7 +197,6 @@ func main() {
 	println(15 == 0xF) // true
 }
 </code></pre>
-</div>
 
 <p>
 注意这里的<code>==</code>是一个等于比较操作符。
@@ -208,6 +207,21 @@ func main() {
 整数类型的零值的字面形式一般使用<code>0</code>表示。
 当然，<code>00</code>和<code>0x0</code>也是合法的整数类型零值的字面表示形式。
 </p>
+
+注意：下一个版本（Go 1.13）将开始支持整数的二进制形式（binary），一个二进制表示必须以<code>0b</code>或者<code>0B</code>开头。
+八进制形式也得到了扩展，一个八进制表示将也可以以<code>0o</code>或者<code>0O</code>开头。
+比如，下面为十进制数15的二进制和八进制表示：
+
+<pre class="disable-line-numbers111"><code class="language-go">0b1111
+0B1111
+0o17
+0O17
+</code></pre>
+
+<p>
+</p>
+
+</div>
 
 <h4>浮点数类型值的字面表示形式</h4>
 
@@ -228,7 +242,6 @@ func main() {
 .1e0    // == 0.1
 0e+5    // == 0.0
 </code></pre>
-</div>
 
 <p></p>
 
@@ -236,6 +249,47 @@ func main() {
 浮点类型的零值的标准字面表示形式为<code>0.0</code>。
 当然其它很多形式也是合法的，比如<code>0.</code>、<code>.0</code>、<code>0e0</code>等。
 </p>
+
+注意：下一个版本（Go 1.13）将开始支持浮点数十六进制文字表示，用来表示在内存中能够精确表示的浮点数。
+<ul>
+<li>
+	和整数的十六进制文字表示一样，浮点数的十六进制文字表示也必须使用<code>0x</code>或者<code>0X</code>开头。
+</li>
+<li>
+	和整数的十六进制文字表示不同的是，字母<code>p</code>或者<code>P</code>可以出现在浮点数的十六进制文字表示中，其后跟随着一个幂指数。
+</li>
+<li>
+	另外要注意，<code>e</code>和<code>E</code>不能出现在浮点数的十六进制文字表示中。
+</li>
+</ul>
+
+一些合法的浮点数的十六进制文字表示例子：
+<pre class="disable-line-numbers111"><code class="language-go">0x1p-2     // == 0.25
+0x2.p10    // == 2048.0
+0x1.Fp+0   // == 1.9375
+0X.8p-0    // == 0.5
+0X1FFFP-16 // == 0.1249847412109375
+</code></pre>
+
+<p></p>
+
+而下面这几个均是不合法的浮点数的十六进制文字表示。
+<pre class="disable-line-numbers111"><code class="language-go">0x.p1    // 浮点数的十六进制文字表示必须包含至少一个数字
+1p-2     // p指数形式只能出现在浮点数的十六进制文字表示中
+0x1.5e-2 // e和E不能出现在浮点数的十六进制文字表示中
+</code></pre>
+
+<p></p>
+
+注意：下面这个表示是合法的，但是它不是浮点数的十六进制文字表示。事实上，它是一个减法算术表达式。其中的<code>e</code>为是十进制中的<code>14</code>，<code>0x15e</code>为一个整数十六进制文字表示，<code>-2</code>并不是此整数十六进制文字表示的一部分。
+(算术运算将在后续的文章<a href="operators.html">常用操作符</a>一文中详细介绍。)
+
+<pre class="disable-line-numbers111"><code class="language-go">0x15e-2 // == 0x15e - 2 (整数相减表达式)
+</code></pre>
+
+<p></p>
+
+</div>
 
 <h4>虚部的字面表示形式</h4>
 
@@ -268,6 +322,37 @@ func main() {
 复数零值的标准字面表示为<code>0.0+0.0i</code>。
 当然<code>0i</code>、<code>.0i</code>、<code>0+0i</code>等表示也是合法的。
 </p>
+
+</div>
+
+<a class="anchor" id="underscores-in-literals"></a>
+<h4>数值字面表示中使用下划线分段来增强可读性</h4>
+
+<div>
+<p>
+从（2019年八月）即将发布的下一个Go版本（1.13）开始，下划线<code>_</code>可以出现在整数、浮点数和虚部数值字面表示形式中用做分段符以增强可读性。
+但是要注意，在一个数值字面表示中，一个下划线<code>_</code>不能出现在此字面表示的首尾，并且其两侧的字符必须为（相应进制的）数字字符或者进制表示头。
+</p>
+
+一些合法和不合法使用下划线的例子：
+
+<pre class="disable-line-numbers111"><code class="language-go">// 合法的使用下划线的例子
+6_9          // == 69
+0_33_77_22   // == 0337722
+0x_Bad_Face  // == 0xBadFace
+0X_1F_FFP-16 // == 0X1FFFP-16
+0b1011_0111 + 0xA_B.Fp2i
+
+// 非法的使用下划线的例子
+_69        // 下划线不能出现在首尾
+69_        // 下划线不能出现在首尾
+6__9       // 下划线不能相连
+0_xBadFace // x不是一个合法的八进制数字
+1_.5       // .不是一个合法的十进制数字
+1._5       // .不是一个合法的十进制数字
+</code></pre>
+
+<p></p>
 
 </div>
 

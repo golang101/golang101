@@ -439,25 +439,25 @@ type T int // just a demo
 var p *T
 
 func demo(newP *T) {
-	// load
+	// 加载（读取）
 	var _ = (*T)(atomic.LoadPointer(
 		(*unsafe.Pointer)(unsafe.Pointer(&p)),
 		))
 
-	// store
+	// 存储（修改）
 	atomic.StorePointer(
 		(*unsafe.Pointer)(unsafe.Pointer(&p)),
 		unsafe.Pointer(newP),
 		)
 
 
-	// swap
+	// 交换
 	var oldP = (*T)(atomic.SwapPointer(
 		(*unsafe.Pointer)(unsafe.Pointer(&p)),
 		unsafe.Pointer(newP),
 		))
 
-	// compare and swap
+	// 比较并交换
 	var swapped = atomic.CompareAndSwapPointer(
 		(*unsafe.Pointer)(unsafe.Pointer(&p)),
 		unsafe.Pointer(oldP),

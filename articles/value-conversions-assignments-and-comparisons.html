@@ -127,8 +127,8 @@ func main() {
 	var _ MyIntPtr = pi  // 不能隐式转换
 	var _ = MyIntPtr(pi) // 也不能显式转换
 	*/
-	var _ MyIntPtr = (*MyInt)(pi)  // 间接隐式转换是没问题的
-	var _ = MyIntPtr((*MyInt)(pi)) // 间接显式转换是没问题的
+	var _ MyIntPtr = (*MyInt)(pi)  // 间接隐式转换没问题
+	var _ = MyIntPtr((*MyInt)(pi)) // 间接显式转换没问题
 
 	// 类型IntPtr的值不能被直接转换为类型MyIntPtr，
 	// 但是可以间接地转换过去。

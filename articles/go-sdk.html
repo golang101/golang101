@@ -34,6 +34,29 @@ Go SDK安装目录下的<code>bin</code>子目录路径必须配置在<code>PATH
 <code>GOPATH</code>环境变量中可以指定多个目录。
 </p>
 
+<p>
+<code>GOBIN</code>环境变量用来指定某些<code>go</code>子命令（比如<code>go install</code>，见下）产生的二进制可执行文件应该存储在何处。
+如果此环境变量未指定，<code>go</code>命令将使用<code>GOPATH</code>环境变量中指定的第一个路径下的<code>bin</code>子目录路径来存储这些可执行文件。
+此目录的路径需配置在<code>PATH</code>环境变量中，以便从任意目录运行这些可执行文件。
+</p>
+
+<p>
+在Go SDK 1.11版本之前，<code>go</code>命令推荐所有的Go代码都放在<code>GOPATH</code>环境变量中指定的任一个路径下的<code>src</code>子目录中，尤其是依赖于其它第三方代码库包的Go项目代码。
+代码库包将在后面的<a href="packages-and-imports.html">代码包和包引入</a>详述。
+</p>
+
+<p>
+Go SDK 1.11引入了一个试验性的特性：Go模块（Go modules）。
+此特性让我们得以自由地将我们的Go项目代码放置在任何目录下。
+我们可以从<a href="https://github.com/golang/go/wiki/Modules">此官方维基页面</a>得到更多关于Go模块的信息。
+</p>
+
+<p>
+注意，从Go SDK的下一个主发行版本（1.13）开始，Go模块模式将成为Go项目开发中的推荐模式。
+旧的<code>GOPATH</code>模式将不再推荐。<code>GOPATH</code>环境变量的意义和必要性将大大减弱，甚至逐渐消失。
+另一方面，<code>GOBIN</code>环境变量的重要性将提升，因为我们仍需要一个目录路径用来存储某些<code>go</code>子命令产生的二进制可执行文件。
+</p>
+
 <!--
 <p><i>
 在Go SDK 1.9之前，<code>GOROOT</code>环境变量必须被配置为Go SDK的安装目录。
@@ -44,19 +67,6 @@ Go SDK安装目录下的<code>bin</code>子目录路径必须配置在<code>PATH
 在Go SDK 1.8之前，<code>GOPATH</code>环境变量必须被配置。
 自从Go SDK 1.8，此环境变量变为可选的。它的默认值为当前用户目录下的<code>go</code>子目录路径。
 此环境变量可以包含多个路径。
-</p>
-
-<p>
-强烈建议将<code>GOPATH</code>环境变量指定的第一个路径下的<code>bin</code>子目录路径
-配置在<code>PATH</code>环境变量中，以便可以从任意目录运行<code>go install</code>子命令
-生成的可执行程序。<code>go install</code>子命令将会把第三方Go程序安装在此子目录下。
-</p>
-
-<p>
-目前，Go SDK推荐将所有第三方Go包，包括你自己的Go项目代码文件夹都
-放置在<code>GOPATH</code>环境变量指定
-的某个路径下的<code>src</code>子目录中。
-Go语言101中的所有代码示例都非常简单，所以可与不遵从此规则。
 </p>
 -->
 
@@ -137,7 +147,7 @@ Go SDK工具要求所有的Go源代码文件必须以<code>.go</code>后缀结�
 </p>
 
 <p>
-我们可以使用<code>go get</code>子命令将一个远程Go代码库克隆到本地以便将其做为第三方Go包引入并使用其中的资源。
+我们可以使用<code>go get</code>子命令将一个远程Go代码库拉取到本地以便将其做为第三方Go包引入并使用其中的资源。
 <code>go get</code>子命令需要首先安装相应的代码版本管理工具。
 </p>
 
