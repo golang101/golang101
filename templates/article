@@ -7,8 +7,15 @@
 
 <div class="alert alert-success text-center" style="margin-bottom: 0px;">
 
+<p>
 Go语言101项目目前同时托管在<a href="https://github.com/golang101/golang101">Github</a>和<a href="https://gitlab.com/golang101/golang101">Gitlab</a>上。
 欢迎各位在这两个项目中通过提交bug和PR的方式来改进完善Go语言101中的各篇文章。
+</p>
+
+<p>
+本书微信公众号名称为"Go 101"。每个工作日此公众号将尽量发表一篇和Go语言相关的原创短文。各位如果感兴趣，可以搜索关注一下。
+</p>
+
 </div>
 
 {{- if ne $.FilenameWithoutExt "101" -}}

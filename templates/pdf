@@ -11,7 +11,7 @@
 
 		<title>Go语言101</title>
 
-		<link href="/static/bootstrap/v3.3.7/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/static/bootstrap/v3.3.7-a/css/bootstrap.min.css" rel="stylesheet">
 		<link href="/static/go101/css/v8.css" rel="stylesheet" media="screen, print">
 		<script src="/static/code-prettify/2019-05-11/prettify.js"></script>
 		<script src="/static/code-prettify/2019-05-11/lang-go.js"></script>
