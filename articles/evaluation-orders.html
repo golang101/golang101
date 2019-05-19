@@ -34,6 +34,10 @@
 对于一个成功编译了的Go程序，当所有这样的过程结束之后，所有的包级变量都应该被初始化了。
 </p>
 
+<p>
+在包级变量初始化过程中，呈现为空标识符的包级变量和其它包级变被同等对待。
+</p>
+
 比如，下面这个程序应该打印出<code>yzxw</code>。
 <ol>
 <li>
@@ -50,14 +54,14 @@
 <pre class="line-numbers"><code class="language-go">package main
 
 var (
-	w = f("w", x)
+	_ = f("w", x)
 	x = f("x", z)
 	y = f("y")
 	z = f("z")
 )
 
 func f(s string, deps ...int) int {
-	print(s);
+	print(s)
 	return 0
 }
 
@@ -68,6 +72,46 @@ func main() {
 
 <p>
 注意：标准Go编译器当前版本（1.12）未正确地实现上述规则。目前，如果上面这个程序使用标准Go编译器编译的话，它将打印出<code>zxwy</code>。
+</p>
+
+<!--
+https://github.com/golang/go/issues/31292
+https://github.com/golang/go/commit/451cf3e2cd8950571f436896a3987343f8c2d7f6
+-->
+
+<p>
+通过一个多值表达式源值来初始化的多个包级变量将被一起初始化。
+比如，在包级变量声明<code>var x, y = f()</code>中，变量<code>x</code>和<code>y</code>将被一起初始化。
+或者说，在它们之间不会有其它包级变量被初始化。
+</p>
+
+如果一些包级变量之间存在着编译器难以觉察的依赖关系，则这些包级变量的初始化顺序是未定义的，依赖于具体编译器实现。
+在下面这个Go白皮书中的例子中，
+<ul>
+<li>
+	变量<code>a</code>肯定在变量<code>b</code>之后初始化；
+</li>
+<li>
+	但是变量<code>x</code>有可能在变量<code>b</code>之间、或者在变量<code>b</code>和变量<code>a</code>之间、或者在变量<code>a</code>之后初始化，取决于具体的编译器实现；
+</li>
+<li>
+	函数<code>sideEffect()</code>有可能在变量<code>x</code>初始化之前或者之后被调用，取决于具体的编译器实现。
+</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-go">// x是否依赖于a和b，不同的编译器有不同的见解。
+var x = I(T{}).ab()
+// 假设函数sideEffect和x、a以及b均无关系。
+var _ = sideEffect()
+var a = b
+var b = 42
+
+type I interface    { ab() []int }
+type T struct{}
+func (T) ab() []int { return []int{a, b} }
+</code></pre>
+
+<p>
 </p>
 
 </div>
