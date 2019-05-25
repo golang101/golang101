@@ -7,7 +7,7 @@
 这本书旨在尽可能地帮助Go程序员更深更全面地理解Go语言。
 此书同时适合Go初学者和有一定经验的Go程序员阅读。
 
-此书的英文项目（亦为本人维护）地址为：
+此书的英文项目地址为：
 * [gitlab.com/go101/go101](https://gitlab.com/go101/go101)
 * [github.com/go101/go101](https://github.com/go101/go101)
 
