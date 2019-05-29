@@ -318,7 +318,7 @@ func bar() {
 	// 一个聪明的编译器能够觉察到值t.y将不会再被用到，
 	// 所以认为t.y值所占的内存块可以被回收了。
 
-	*(*byte)(unsafe.Pointer(p))) = 1 // 危险操作！
+	*(*byte)(unsafe.Pointer(p)) = 1 // 危险操作！
 
 	println(t.x) // ok。继续使用值t，但只使用t.x字段。
 }
