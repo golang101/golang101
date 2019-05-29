@@ -254,7 +254,7 @@ func foo() {
 
 	*p0 = 1                          // okay
 	*(*int)(p1) = 2                  // okay
-	*(*int)(unsafe.Pointer(p2))) = 3 // 危险操作！
+	*(*int)(unsafe.Pointer(p2)) = 3 // 危险操作！
 }
 </code></pre>
 
