@@ -785,6 +785,7 @@ type Ie interface {
 </code></pre>
 
 <p>
+上例中展示的限制<a href="https://github.com/golang/proposal/blob/master/design/6977-overlapping-interfaces.md">可能会从以后的Go版本中移除s</a>。
 </p>
 
 截止到目前（Go 1.12），如果两个接口类型都指定了一个同名方法，则这两个接口类型不可被同时被内嵌在同一个接口类型中，即使它们指定的同名方法的原型也一致。
@@ -876,21 +877,21 @@ import "fmt"
 
 func main() {
 	var a, b, c interface{} = "abc", 123, "a"+"b"+"c"
-	fmt.Println(a == b) // 第二步的情形。 输出"false"。
-	fmt.Println(a == c) // 第三步的情形。 输出"true"。
+	fmt.Println(a == b) // 第二步的情形。输出"false"。
+	fmt.Println(a == c) // 第三步的情形。输出"true"。
 
 	var x *int = nil
 	var y *bool = nil
 	var ix, iy interface{} = x, y
 	var i interface{} = nil
-	fmt.Println(ix == iy) // 第二步的情形。 输出"false"。
-	fmt.Println(ix == i)  // 第一步的情形。 输出"false"。
-	fmt.Println(iy == i)  // 第一步的情形。 输出"false"。
+	fmt.Println(ix == iy) // 第二步的情形。输出"false"。
+	fmt.Println(ix == i)  // 第一步的情形。输出"false"。
+	fmt.Println(iy == i)  // 第一步的情形。输出"false"。
 
 	var s []int = nil // []int为一个不可比较类型。
 	i = s
-	fmt.Println(i == nil) // 第一步的情形。 输出"false"。
-	fmt.Println(i == i)   // 第三步的情形。 将产生一个恐慌。
+	fmt.Println(i == nil) // 第一步的情形。输出"false"。
+	fmt.Println(i == i)   // 第三步的情形。将产生一个恐慌。
 }
 </code></pre>
 </div>

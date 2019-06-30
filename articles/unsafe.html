@@ -252,8 +252,8 @@ func foo() {
 	// uintptr值可以参与算术运算。
 	p2 += 2; p2--; p2--
 
-	*p0 = 1                          // okay
-	*(*int)(p1) = 2                  // okay
+	*p0 = 1                         // okay
+	*(*int)(p1) = 2                 // okay
 	*(*int)(unsafe.Pointer(p2)) = 3 // 危险操作！
 }
 </code></pre>

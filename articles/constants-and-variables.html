@@ -90,7 +90,7 @@
 	对于不在合法的Unicode码点取值范围内的整数<code>v</code>，
 	转换结果等同于字符串字面值<code>"\uFFFD"</code>（亦即<code>"\xef\xbf\xbd"</code>）。
 	<code>0xFFFD</code>是Unicode标准中的（非法码点的）替换字符值。
-	（但是请注意，这样的转换<a href="https://github.com/golang/go/issues/3939">可能从今后的某个Go版本开始将不再允许</a>。）
+	（但是请注意，这样的从任意整数到字符串的转换<a href="https://github.com/golang/go/issues/3939">可能从今后的某个Go版本开始将不再总是被允许</a>。）
 </li>
 </ol>
 

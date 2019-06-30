@@ -441,7 +441,7 @@ func main() {
 
 <p>
 我们可以调用内置函数<code>len</code>来获取一个容器值的长度，或者调用内置函数<code>cap</code>来获取一个容器值的容量。
-这两个函数都返回一个<code>int</code>结果值。
+这两个函数都返回一个<code>int</code>类型确定结果值（此返回值可能会在以后的某个Go版本中<a href="https://github.com/golang/go/issues/31795">改为一个类型非确定整数值</a>）。
 因为非零映射值的容量是无限大，所以<code>cap</code>并不适用于映射值。
 </p>
 

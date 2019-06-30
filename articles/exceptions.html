@@ -26,12 +26,11 @@
 </div>
 
 <p><i>
-（注意：此基本规则<a href="https://github.com/golang/go/issues/15992">今后可能会适用于</a>内置<code>copy</code>，但<a href="https://github.com/golang/go/issues/20656">不大可能会适用于</a><code>print</code>和<code>println</code>函数。）
+（注意：从下一个Go SDK版本1.13开始，此例外<a href="https://github.com/golang/go/issues/15992">将不再适用于</a><code>copy</code>和<code>delete</code>内置函数，但<a href="https://github.com/golang/go/issues/20656">将继续适用于</a><code>print</code>和<code>println</code>内置函数。）
 </i></p>
 
 <p><i>
-（虽然上述基本规则在大多数情况下都适用于内置函数<code>complex</code>，但有<a href="https://github.com/golang/go/issues/15992#issuecomment-337673303">一个小例外</a>：当一个属主实参为接口类型的方法调用被用做一个<code>complex</code>调用的唯一实参时，官方标准编译器将报错。
-这可能是一个bug，此bug仍旧存在于官方标准编译器1.12中。）
+（虽然上述基本规则在大多数情况下都适用于内置函数<code>complex</code>，但有<a href="https://github.com/golang/go/issues/15992#issuecomment-337673303">一个小例外</a>：当一个属主实参为接口类型的方法调用被用做一个<code>complex</code>调用的唯一实参时，官方标准编译器将报错。这可能是一个bug，此bug将在官方标准编译器1.13中修复。）
 </i></p>
 
 例子：
@@ -65,9 +64,10 @@ func main() {
 	/*
 	f3(123, f1())
 	f3(f1(), 123)
+	println(f1())
+	// 下面这三行将从Go SDK 1.13开始能够编译通过。
 	copy(f4())
 	delete(f5())
-	println(f1())
 	_ = complex(I(T{}).m())
 	*/
 }

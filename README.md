@@ -21,21 +21,25 @@
 
 ### 安装和更新
 
-运行以下两条中任意一条命令来安装和更新Go语言101。
+安装
 
 ```
-$ go get -u gitlab.com/golang101/golang101
-
-$ go get -u github.com/golang101/golang101
+$ git clone gitlab.com/go101/go101
 ```
 
-这两条命令将安装`golang101`程序到`GOPATH`环境变量下的`bin`目录。
+更新
+
+```
+$ git pull github.com/go101/go101
+```
 
 ### 本地阅读本书
 
-直接运行`golang`即可进行本地阅读（注意需要将`GOPATH`环境变量下的`bin`目录加入`PATH`环境变量以运行`golang101`）。
+
+打开一个终端窗口，进入本书项目目录（包含当前`README.md`文件的目录），然后运行
+
 ```
-$ golang101
+$ go run *.go
 Server started:
    http://localhost:12345 (non-cached version)
    http://127.0.0.1:12345 (cached version)

@@ -109,8 +109,11 @@ uint32, int32, float32   4
 uint64, int64            8
 float64, complex64       8
 complex128               16
-uint, int                4或者8，取决于系统架构
-uintptr                  能够存下任一个内存地址
+uint, int                取决于编译器实现。通常在
+                         32位架构上为4，在64位
+                         架构上为8。
+uintptr                  取决于编译器实现。但必须
+                         能够存下任一个内存地址。
 </code></pre>
 <p>
 Go白皮书没有对其它种类的类型的尺寸最初明确规定。
