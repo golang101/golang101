@@ -97,22 +97,22 @@ type Person struct {
 // 数组类型
 [5]string
 [Size]int
-[16][]byte  // 此数组类型的元素类型为一个切片类型：[]byte
-[100]Person // 此数组类型的元素类型为一个结构体类型：Person
+[16][]byte  // 元素类型为一个切片类型：[]byte
+[100]Person // 元素类型为一个结构体类型：Person
 
 // 切片类型
 []bool
 []int64
-[]map[int]bool // 此切片类型的元素类型为一个映射类型：map[int]bool
-[]*int         // 此切片类型的元素类型为一个指针类型：*int
+[]map[int]bool // 元素类型为一个映射类型：map[int]bool
+[]*int         // 元素类型为一个指针类型：*int
 
 // 映射类型
 map[string]int
 map[int]bool
-map[int16][6]string     // 此映射类型的元素类型为一个数组类型：[6]string
-map[bool][]string       // 此映射类型的元素类型为一个切片类型：[]string
-map[struct{x int}]*int8 // 此映射类型的元素类型为一个指针类型：*int8，
-                        // 它的键值类型为一个结构体类型。
+map[int16][6]string     // 元素类型为一个数组类型：[6]string
+map[bool][]string       // 元素类型为一个切片类型：[]string
+map[struct{x int}]*int8 // 元素类型为一个指针类型：*int8；
+                        // 键值类型为一个结构体类型。
 </code></pre>
 
 <p>

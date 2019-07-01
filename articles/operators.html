@@ -400,14 +400,14 @@ const B = int8(3.0) << N
 
 var m = uint(32)
 // 下面的三行是相互等价的。
-var x int64 = 1 << m  // 1的类型将被设想为int64，而非int。
+var x int64 = 1 << m  // 1的类型将被设想为int64，而非int
 var y = int64(1 << m) // 同上
 var z = int64(1) << m // 同上
 
 // 下面这两行编译不通过。
 /*
-var _ = 1.23 << m // error: shift of type float64
-const _ = 1 << B  // error: the right operand must be unsigned.
+var _ = 1.23 << m // error: 浮点数不能被移位
+const _ = 1 << B  // error: 右操作符不是无符号数
 */
 </code></pre>
 
