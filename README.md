@@ -21,9 +21,18 @@
 
 ### 安装
 
+运行
+
 ```
 $ git clone gitlab.com/go101/go101
 ```
+
+或者
+
+```
+$ git clone github.com/go101/go101
+```
+
 
 ### 更新
 
