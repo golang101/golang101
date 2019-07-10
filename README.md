@@ -19,24 +19,24 @@
 
 见[本书致谢一章](https://gfw.go101.org/article/acknowledgements.html)。
 
-### 安装和更新
-
-安装
+### 安装
 
 ```
 $ git clone gitlab.com/go101/go101
 ```
 
-更新
+### 更新
+
+进入本书项目目录（包含当前`README.md`文件的目录），然后运行：
 
 ```
-$ git pull github.com/go101/go101
+$ git pull
 ```
 
 ### 本地阅读本书
 
 
-打开一个终端窗口，进入本书项目目录（包含当前`README.md`文件的目录），然后运行
+进入本书项目目录（包含当前`README.md`文件的目录），然后运行：
 
 ```
 $ go run *.go
