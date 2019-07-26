@@ -242,7 +242,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	done := make(chan struct{})
+	done := make(chan struct{}) // 也可以是缓冲的
+
+	// 排序协程
 	go func() {
 		sort.Slice(values, func(i, j int) bool {
 			return values[i] < values[j]
@@ -281,8 +283,9 @@ import (
 )
 
 func main() {
-	// 创建一个信号通道。
 	done := make(chan struct{})
+		// 此信号通道也可以缓冲为1。如果这样，则在下面
+		// 这个协程创建之前，我们必须向其中写入一个值。
 
 	go func() {
 		fmt.Print("Hello")

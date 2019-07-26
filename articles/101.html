@@ -5,7 +5,7 @@
 
 <div>
 	<p>
-	《Go语言101》是一本着墨于Go语法和语义的编程指导书（Go 1.12就绪）。
+	《Go语言101》是一本着墨于Go语法和语义的编程指导书（Go 1.13-pre就绪）。
 	这本书也搜集了很多Go编程中的的细节和讲解了一些底层实现原理（不含具体实现细节）。
 	这本书的宗旨是尽量帮助Go程序员更深和更全面地理解Go。
 	此书同时适合Go初学者和有一定经验的Go程序员阅读。
@@ -18,14 +18,7 @@
 	English version is <a href="https://go101.org">here</a>.
 	</li>
 	<li>
-	网站源代码同时托管在<a href="https://gitlab.com/golang101/golang101">Gitlab</a>和<a href="https://github.com/golang101/golang101">Github</a>上。
-	你也可以运行以下任一命令启动一个本地服务器阅读本书：
-	<ul>
-	<li><code>go get -u gitlab.com/golang101/golang101 && golang101</code></li>
-	<li><code>go get -u github.com/golang101/golang101 && golang101</code></li>
-	</ul>
-	</li>
-	</ul>
+	此项目源代码同时托管在<a href="https://gitlab.com/golang101/golang101">Gitlab</a>和<a href="https://github.com/golang101/golang101">Github</a>上。你可以将代码拉取到本地并在项目目录下运行<code>go run *.go</code>命令来启动一个本地服务器来阅读本书以获取更好的阅读体验。
 </div>
 
 
@@ -37,12 +30,12 @@
 <p>
 </p>
 
+<!--
 <div class="alert alert-success"><small>
 	<i>2019/04/09</i>: 本书不再使用“别名类型”、“有名类型”和“无名类型”这几个术语。
 	“类型别名”仍被使用。
 </small></div>
 
-<!--
 <div class="alert alert-success">
 	<i>2018/12/27</i>: 本书刚修正了一个严重的错误。之前，本书认为一个子切片表达式中的起始下标不能大于基础切片的长度。
 	其实这个限制是不存在的。请阅读<a href="container.html#subslice">修正后的章节</a>。
