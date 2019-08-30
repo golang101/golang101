@@ -290,10 +290,33 @@ type C = []string
 
 </div>
 
-<!--
 <a class="anchor" id="unnamed-type"></a>
 <h3>概念：有名类型和无名类型（named type and unnamed type）</h3>
 
+<div>
+<p>
+在Go 1.9之前，<b>有名类型</b>这一术语准确地定义在Go白皮本中。它曾被定义为一个有名字的类型。
+随着Go 1.9中引入的类型别名新特性，此术语被从白皮书中删除了，原因是它可能会造成一些理解上的困惑。
+比如，一些类型字面表示（比如上一节出现中的别名<code>C</code>）是一个标识符（即一个名称），但是它们所表示的类型（比如<code>[]string</code>）在Go 1.9之前却被称为无名类型。
+</p>
+
+为了避免出现这样的困惑，从Go 1.9开始，一个新的术语<b>定义类型</b>被引入来填补移除<b>有名类型</b>后的空白。
+然而此举也给一些概念解释造成了<a href="https://github.com/golang/go/issues/22005">新的</a><a href="https://github.com/golang/go/issues/32496">障碍</a>，或者形成了一些<a href="https://github.com/golang/example/tree/master/gotypes#named-types">尴尬的局面</a>。
+为了避免这些尴尬的局面和解释上的障碍，Go语言101中的文章将遵守如下原则：
+<ul>
+<li>
+	术语<b>有名类型</b>和<b>定义类型</b>将被视为完全相同的概念。（同样地，<b>无名类型</b>和<b>非定义类型</b>亦为同一概念。）
+</li>
+<li>
+	一个类型别名将不会被称为一个类型，尽管我们常说它表示着一个类型。
+</li>
+<li>
+	当我们提及一个类型名（称），它可能是一个定义类型的名称，也可能是一个类型别名的名称。
+</li>
+</ul>
+</div>
+
+<!--
 <div>
 在Go中，
 <ul>

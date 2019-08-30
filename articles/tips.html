@@ -482,7 +482,7 @@ var _ uint = N/M - 1
 </code></pre>
 
 另一个方法是借鉴<a href="https://twitter.com/lukechampine/status/1026695476811390976">@lukechampine</a>的一个点子。
-此点子利用了<a href="container.html#value-literals">容器值的组合字面值中不能出现重复的常量键值</a>这一规则。
+此点子利用了<a href="container.html#value-literals">容器组合字面值中不能出现重复的常量键值</a>这一规则。
 
 <pre class="line-numbers"><code class="language-go">var _ = map[bool]struct{}{false: struct{}{}, N>=M: struct{}{}}
 </code></pre>
