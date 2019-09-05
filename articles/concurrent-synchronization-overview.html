@@ -69,12 +69,12 @@ the "ownerships of values" wording in descriptions throughout 《Go语言101》 
 <h3>Go支持哪些并发同步技术？</h3>
 
 <div>
-<a href="channel.html">数据通道</a>一文已经解释了如何使用数据通道来做并发同步。
-除了使用数据通道，Go还支持几种通用并发同步技术，比如互斥锁和原子操作。
+<a href="channel.html">通道</a>一文已经解释了如何使用通道来做并发同步。
+除了使用通道，Go还支持几种通用并发同步技术，比如互斥锁和原子操作。
 请阅读下面的文章来了解各种并发同步技术的使用。
 <ul>
-<li><a href="channel-use-cases.html">数据通道用例大全</a></li>
-<li><a href="channel-closing.html">如何优雅地关闭数据通道</a></li>
+<li><a href="channel-use-cases.html">通道用例大全</a></li>
+<li><a href="channel-closing.html">如何优雅地关闭通道</a></li>
 <li><a href="concurrent-synchronization-more.html"><code>sync</code>标准库包中提供的并发同步技术</a></li>
 <li><a href="concurrent-atomic-operation.html"><code>sync/atomic</code>标准库包中提供的原子操作技术</a></li>
 </ul>
@@ -91,6 +91,6 @@ the "ownerships of values" wording in descriptions throughout 《Go语言101》 
 
 <p>
 Go中提供的各种并发同步技术并不能阻止Go程序员写出<a href="concurrent-common-mistakes.html">不正确的并发代码</a>。
-但是，这些技术使得Go程序员可以轻松写出正确的并发代码。特别地，Go中提供的独特的数据通道技术使得并发编程变得很轻松和惬意。
+但是，这些技术使得Go程序员可以轻松写出正确的并发代码。特别地，Go中提供的独特的通道技术使得并发编程变得很轻松和惬意。
 </p>
 

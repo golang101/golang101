@@ -145,10 +145,10 @@ func main() {
 </code></pre>
 </div>
 
-<h4>3. 数据通道相关的类型转换规则</h4>
+<h4>3. 通道相关的类型转换规则</h4>
 
 <div class="well">
-假设类型<code>Tx</code>是一个双向数据通道类型，<code>T</code>也是一个数据通道类型（无论是双向的还是单向的），如果<code>Tx</code>和<code>T</code>的元素类型相同并且它们中至少有一个为非定义类型，则<code>x</code>可以被<u><b>隐式</b></u>转换为类型<code>T</code>。
+假设类型<code>Tx</code>是一个双向通道类型，<code>T</code>也是一个通道类型（无论是双向的还是单向的），如果<code>Tx</code>和<code>T</code>的元素类型相同并且它们中至少有一个为非定义类型，则<code>x</code>可以被<u><b>隐式</b></u>转换为类型<code>T</code>。
 </div>
 
 <!--
@@ -634,7 +634,7 @@ func main() {
 	如果<code>T</code>是一个指针类型（类型安全或者非类型安全），则这两个值只有在它们所表示的地址值相等或者它们都为nil的情况下比较结果才为<code>true</code>。
 </li>
 <li>
-	如果<code>T</code>是一个数据通道类型，则这两个值只有在它们引用着相同的底层内部数据通道或者它们都为nil时比较结果才为<code>true</code>。
+	如果<code>T</code>是一个通道类型，则这两个值只有在它们引用着相同的底层内部通道或者它们都为nil时比较结果才为<code>true</code>。
 </li>
 <li>
 	如果<code>T</code>是一个结构体类型，则<a href="struct.html#comparison">它们的相应字段将逐对进行比较</a>。只要有一对字段不相等，这两个结构体值就不相等。

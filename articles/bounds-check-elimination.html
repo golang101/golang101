@@ -240,8 +240,7 @@ func fc2() {
 func main() {}
 </code></pre>
 
-<pre class="output"><code>
-$ go build -gcflags="-d=ssa/check_bce/debug=1" example4.go
+<pre class="output"><code>$ go build -gcflags="-d=ssa/check_bce/debug=1" example4.go
 ./example4.go:7:7: Found IsSliceInBounds
 ./example4.go:15:7: Found IsSliceInBounds
 </code></pre>

@@ -26,7 +26,7 @@
 <li>映射类型</li>
 <li>切片类型</li>
 <li>函数类型</li>
-<li>数据通道类型</li>
+<li>通道类型</li>
 <li>接口类型</li>
 </ul>
 
@@ -181,8 +181,8 @@ var _ = IntPtr(nil) == (*int)(nil)
 // 任何类型都实现了interface{}类型。
 var _ = (interface{})(nil) == (*int)(nil)
 
-// 一个双向数据通道可以隐式转换为和它的
-// 元素类型一样的单项数据通道类型。
+// 一个双向通道可以隐式转换为和它的
+// 元素类型一样的单项通道类型。
 var _ = (chan int)(nil) == (chan<- int)(nil)
 var _ = (chan int)(nil) == (<-chan int)(nil)
 </code></pre>
@@ -238,7 +238,7 @@ fmt.Println( (map[int]*int64)(nil)[123] )   // &lt;nil&gt;
 </code></pre>
 </div>
 
-<h3><code>range</code>关键字后可以跟随nil数据通道、nil映射、nil切片和nil数组指针</h3>
+<h3><code>range</code>关键字后可以跟随nil通道、nil映射、nil切片和nil数组指针</h3>
 
 <div>
 <p>
@@ -251,7 +251,7 @@ fmt.Println( (map[int]*int64)(nil)[123] )   // &lt;nil&gt;
 </p>
 
 <p>
-遍历一个nil数据通道将使当前协程永久阻塞。
+遍历一个nil通道将使当前协程永久阻塞。
 </p>
 
 比如，下面的代码将输出<code>0</code>、<code>1</code>、<code>2</code>、<code>3</code>和<code>4</code>后进入阻塞状态。

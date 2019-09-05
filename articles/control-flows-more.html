@@ -91,7 +91,7 @@ hi!
 
 <p>
 Go支持几种<a href="concurrent-synchronization-overview.html">并发同步技术</a>。
-其中， <a href="channel.html">数据通道</a>是最独特和最常用的。
+其中， <a href="channel.html">通道</a>是最独特和最常用的。
 但是，为了简单起见，这里我们将使用<code>sync</code>标准库包中的<code>WaitGroup</code>来同步上面这个程序中的主协程和两个新创建的协程。
 </p>
 
@@ -422,7 +422,7 @@ b: 3
 因为第一个循环中的<code>i</code>是在<code>fmt.Println</code>函数被延迟调用的时候估的值，而第二个循环中的<code>i</code>是在第二个匿名函数的退出阶段估的值（此时循环变量<code>i</code>的值已经变为<code>3</code>）。
 </p>
 
-我们可以对第一个循环略加修改（使用两种方法），使得它和第一个循环打印出相同的结果。
+我们可以对第二个循环略加修改（使用两种方法），使得它和第一个循环打印出相同的结果。
 
 <pre class="line-numbers"><code class="language-go">		for i := 0; i < 3; i++ {
 			defer func(i int) {

@@ -46,7 +46,7 @@ Go支持下列组合类型：
 	<li>映射类型（map）- 也常称为字典类型。在标准编译器中映射是使用哈希表实现的。</li>
 	</ul>
 </li>
-<li><a href="channel.html">数据通道类型</a> - 数据通道用来同步并发的协程</li>
+<li><a href="channel.html">通道类型</a> - 通道用来同步并发的协程</li>
 <li><a href="interface.html">接口类型</a> - 接口在反射和多态中发挥着重要角色</li>
 </ul>
 </div>
@@ -76,7 +76,7 @@ interface {
 	Method1() (int, bool)
 }
 
-// 几个数据通道类型
+// 几个通道类型
 chan T
 chan<- T
 <-chan T
@@ -408,7 +408,7 @@ Ages → AgeSlice → []Age <span style="color:#aaa">→ <span style="text-decor
 
 <p>
 每个类型有一个零值。一个类型的零值可以看作是此类型的默认值。
-预声明的标识符<code>nil</code>可以看作是切片、映射、函数、数据通道、指针（包括非类型安全指针）和接口类型的零值的字面表示形式。
+预声明的标识符<code>nil</code>可以看作是切片、映射、函数、通道、指针（包括非类型安全指针）和接口类型的零值的字面表示形式。
 我们以后可以在<a href="nil.html">Go中的nil</a>一文中了解到关于<code>nil</code>的各种事实。
 </p>
 
@@ -435,7 +435,7 @@ Ages → AgeSlice → []Age <span style="color:#aaa">→ <span style="text-decor
 </p>
 
 <p>
-指针类型、数据通道类型和接口类型的值没有字面表示形式。
+指针类型、通道类型和接口类型的值没有字面表示形式。
 </p>
 
 <a class="anchor" id="value-part"></a>
@@ -552,7 +552,7 @@ Go白皮书没有规定非数值类型值的尺寸。对数值类型值的尺寸
 </p>
 
 <p>
-有时候，字符串和数据通道类型也可以被非正式地看作是容器类型。
+有时候，字符串和通道类型也可以被非正式地看作是容器类型。
 </p>
 
 <p>
@@ -578,33 +578,33 @@ Go白皮书没有规定非数值类型值的尺寸。对数值类型值的尺寸
 <li>如果一个数组类型的底层类型表示为<code>[N]T</code>，则此数组类型的元素类型为<code>T</code>所表示的类型。</li>
 <li>如果一个切片类型的底层类型表示为<code>[]T</code>，则此切片类型的元素类型为<code>T</code>所表示的类型。</li>
 <li>如果一个映射类型的底层类型表示为<code>map[Tkey]T</code>，则此映射类型的元素类型为<code>T</code>所表示的类型。</li>
-<li>如果一个数据通道类型的底层类型表示为<code>chan T</code>、<code>chan&lt;- T</code>或者<code>&lt;-chan T</code>，则此数据通道类型的元素类型为<code>T</code>所表示的类型。</li>
+<li>如果一个通道类型的底层类型表示为<code>chan T</code>、<code>chan&lt;- T</code>或者<code>&lt;-chan T</code>，则此通道类型的元素类型为<code>T</code>所表示的类型。</li>
 <li>一个字符串类型的元素类型总是内置类型<code>byte</code>（亦即<code>uint8</code>）。</li>
 </ul>
 </div>
 
-<h3>概念：数据通道类型的方向</h3>
+<h3>概念：通道类型的方向</h3>
 
 <div>
-一个数据通道值可以被看作是先入先出（first-in-first-out，FIFO）队列。一个数据通道值可能是可读可写的、只读的（receive-only）或者只写的（send-only）。
+一个通道值可以被看作是先入先出（first-in-first-out，FIFO）队列。一个通道值可能是可读可写的、只读的（receive-only）或者只写的（send-only）。
 <ul>
 <li>
-	一个可读可写的的数据通道值也称为一个双向通道。
+	一个可读可写的的通道值也称为一个双向通道。
 	一个双向通道类型的底层类型可以被表示为<code>chan T</code>。
 </li>
 <li>
-	我们只能向一个只写的数据通道值发送数据，而不能从其中接收数据。
-	只写数据通道类型的底层类型可以被表示为<code>chan&lt;- T</code>。
+	我们只能向一个只写的通道值发送数据，而不能从其中接收数据。
+	只写通道类型的底层类型可以被表示为<code>chan&lt;- T</code>。
 </li>
 <li>
-	我们只能从一个只读的数据通道值接收数据，而不能向其发送数据。
-	只读数据通道类型的底层类型可以被表示为<code>&lt;-chan T</code>。
+	我们只能从一个只读的通道值接收数据，而不能向其发送数据。
+	只读通道类型的底层类型可以被表示为<code>&lt;-chan T</code>。
 </li>
 </ul>
 </div>
 
 <p>
-<a href="channel.html">数据通道</a>一文详细解释了数据通道类型和数据通道值。
+<a href="channel.html">通道</a>一文详细解释了通道类型和通道值。
 </p>
 
 <a class="anchor" id="types-not-support-comparison"></a>

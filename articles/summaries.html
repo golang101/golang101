@@ -41,7 +41,7 @@
 <li>函数类型</li>
 <li>切片类型</li>
 <li>映射类型</li>
-<li>数据通道类型</li>
+<li>通道类型</li>
 <li>接口类型</li>
 </ul>
 
@@ -102,7 +102,7 @@
 	<td valign="middle" align="center">可以</td>
 	</tr>
 	<tr class="active">
-	<th scope="row" class="text-center" valign="middle" align="center">数据通道值</th>
+	<th scope="row" class="text-center" valign="middle" align="center">通道值</th>
 	<td valign="middle" align="center">可以</td>
 	<td valign="middle" align="center">可以</td>
 	<td valign="middle" align="center">可以</td>
@@ -167,7 +167,7 @@
 	<td valign="middle" align="center">是</td>
 	</tr>
 	<tr class="active">
-	<th scope="row" class="text-center" style="white-space: nowrap;" valign="middle" align="center">数据通道</th>
+	<th scope="row" class="text-center" style="white-space: nowrap;" valign="middle" align="center">通道</th>
 	<td valign="middle" align="center">是<sup>(4)</sup></td>
 	<td valign="middle" align="center">否</td>
 	<td valign="middle" align="center">否</td>
@@ -186,7 +186,7 @@
 其实，切片的长度也可以通过调用<code>reflect.SetLen</code>来单独修改。增加切片的长度可以看作是一种变相的向切片添加元素。
 但<code>reflect.SetLen</code>函数的效率很低，因此很少使用。
 <br/>
-<sup>(4)</sup> 对于带缓冲并且缓冲未满的数据通道来说。
+<sup>(4)</sup> 对于带缓冲并且缓冲未满的通道来说。
 </p>
 
 <a class="anchor" id="composite-literals-types"></a>
@@ -264,7 +264,7 @@
 	<td>1 word</td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center">数据通道</th>
+	<th scope="row" class="text-center">通道</th>
 	<td>1 word</td>
 	</tr>
 	<tr class="active">
@@ -524,7 +524,7 @@
 	<td style="vertical-align: middle; white-space: nowrap;" class="text-center" valign="middle" align="center">
 		<code>e, ok = &lt;- aChannel</code>
 	</td>
-	<td valign="middle" align="center">被接收到的值<code>e</code>是否是在数据通道关闭之前发送的</td>
+	<td valign="middle" align="center">被接收到的值<code>e</code>是否是在通道关闭之前发送的</td>
 	<td valign="middle" align="center">否</td>
 	</tr>
 	<tr class="active">
@@ -546,7 +546,7 @@
 <div>
 无需引入任何包，我们可以使用下面几种方法使当前协程永久阻塞：
 <ol>
-<li>向一个永不会被接收数据的数据通道发送数据。
+<li>向一个永不会被接收数据的通道发送数据。
 	<div>
 <pre class="disable-line-numbers111"><code class="language-go">make(chan struct{}) <- struct{}{}
 // 或者
@@ -554,7 +554,7 @@ make(chan<- struct{}) <- struct{}{}
 </code></pre>
 	</div>
 </li>
-<li>从一个未被并且将来也不会被发送数据的（并且保证永不会被关闭的）数据通道读取数据。
+<li>从一个未被并且将来也不会被发送数据的（并且保证永不会被关闭的）通道读取数据。
 	<div>
 <pre class="disable-line-numbers111"><code class="language-go"><-make(chan struct{})
 // 或者
@@ -564,7 +564,7 @@ for range make(<-chan struct{}) {}
 </code></pre>
 	</div>
 </li>
-<li>从一个nil数据通道读取或者发送数据。
+<li>从一个nil通道读取或者发送数据。
 	<div>
 <pre class="disable-line-numbers111"><code class="language-go">chan struct{}(nil) <- struct{}{}
 // 或者

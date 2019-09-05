@@ -19,6 +19,7 @@
 如果一个函数调用刚好返回一个结果，则此函数调用总是可以被当作一个单值实参用在其它函数调用中，并且此函数调用可以和其它实参混合出现在其它函数调用的实参列表中。
 </div>
 
+<!--
 例外：
 <div class="alert alert-success">
 对于标准编译器，上述基本规则不适用于内置函数<code>copy</code>、<code>delete</code>、<code>print</code>和<code>println</code>。
@@ -32,6 +33,7 @@
 <p><i>
 （虽然上述基本规则在大多数情况下都适用于内置函数<code>complex</code>，但有<a href="https://github.com/golang/go/issues/15992#issuecomment-337673303">一个小例外</a>：当一个属主实参为接口类型的方法调用被用做一个<code>complex</code>调用的唯一实参时，官方标准编译器将报错。这可能是一个bug，此bug将在官方标准编译器1.13中修复。）
 </i></p>
+-->
 
 例子：
 <pre class="line-numbers"><code class="language-go">package main
@@ -65,7 +67,7 @@ func main() {
 	f3(123, f1())
 	f3(f1(), 123)
 	println(f1())
-	// 下面这三行将从Go SDK 1.13开始能够编译通过。
+	// 下面这三行将从Go SDK 1.13开始才能够编译通过。
 	copy(f4())
 	delete(f5())
 	_ = complex(I(T{}).m())
@@ -656,7 +658,7 @@ func main() {
 
 例外2：
 <div class="alert alert-success">
-当<code>range</code>关键字后跟的是数据通道时，数据通道的元素的键值（次序）并未被一同遍历出来。
+当<code>range</code>关键字后跟的是通道时，通道的元素的键值（次序）并未被一同遍历出来。
 </div>
 
 语法糖：

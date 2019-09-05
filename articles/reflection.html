@@ -423,7 +423,7 @@ func main() {
 注意：方法<code>reflect.Value.MapRange</code>方法是从Go 1.12开始才支持的。
 </p>
 
-下面是一个使用数据通道反射值的例子。
+下面是一个使用通道反射值的例子。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -535,8 +535,7 @@ func main() {
 </p>
 
 <p>
-目前（Go 1.12），<code>reflect</code>标准库包并不提供一个<code>Value.IsZero</code>方法。
-此方法可能会<a href="https://github.com/golang/go/issues/7501">在Go 1.13中被加入</a>。
+从Go 1.13开始，我们可以使用<code>Value.IsZero</code>方法来查看一个值是否为零值。
 </p>
 
 <a class="anchor" id="deep-equal"></a>

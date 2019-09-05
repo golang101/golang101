@@ -1,21 +1,21 @@
-﻿<h1>如何优雅地关闭数据通道</h1>
+﻿<h1>如何优雅地关闭通道</h1>
 
 <div>
 <p>
-在本文发表数日前，我曾写了一篇文章来解释<a href="channel.html">数据通道的规则</a>。
-那篇文章在<a href="https://www.reddit.com/r/golang/comments/5k489v/the_full_list_of_channel_rules_in_golang/">reddit</a>和<a href="https://news.ycombinator.com/item?id=13252416">HN</a>上获得了很多点赞，但也有很多人对Go数据通道的细节设计提出了一些批评意见。
+在本文发表数日前，我曾写了一篇文章来解释<a href="channel.html">通道的规则</a>。
+那篇文章在<a href="https://www.reddit.com/r/golang/comments/5k489v/the_full_list_of_channel_rules_in_golang/">reddit</a>和<a href="https://news.ycombinator.com/item?id=13252416">HN</a>上获得了很多点赞，但也有很多人对Go通道的细节设计提出了一些批评意见。
 </p>
 
-这些批评主要针对于数据通道设计中的下列细节：
+这些批评主要针对于通道设计中的下列细节：
 <ol>
 <li>
-没有一个简单和通用的方法用来在不改变一个数据通道的状态的情况下检查这个通道是否已经关闭。
+没有一个简单和通用的方法用来在不改变一个通道的状态的情况下检查这个通道是否已经关闭。
 </li>
 <li>
-关闭一个已经关闭的数据通道将产生一个恐慌，所以在不知道一个数据通道是否已经关闭的时候关闭此数据通道是很危险的。
+关闭一个已经关闭的通道将产生一个恐慌，所以在不知道一个通道是否已经关闭的时候关闭此通道是很危险的。
 </li>
 <li>
-向一个已关闭的数据通道发送数据将产生一个恐慌，所以在不知道一个数据通道是否已经关闭的时候向此数据通道发送数据是很危险的。
+向一个已关闭的通道发送数据将产生一个恐慌，所以在不知道一个通道是否已经关闭的时候向此通道发送数据是很危险的。
 </li>
 </ol>
 <p>
@@ -23,13 +23,13 @@
 </div>
 
 <p>
-这些批评看上去有几分道理（实际上属于对数据通道的不正确使用导致的偏见）。
-是的，Go语言中并没有提供一个内置函数来检查一个数据通道是否已经关闭。
+这些批评看上去有几分道理（实际上属于对通道的不正确使用导致的偏见）。
+是的，Go语言中并没有提供一个内置函数来检查一个通道是否已经关闭。
 </p>
 
 <div>
-在Go中，如果我们能够保证从不会向一个数据通道发送数据，那么有一个简单的方法来判断此数据通道是否已经关闭。
-此方法已经在上一篇文章<a href="channel-use-cases.html#check-closed-status">数据通道用例大全</a>中展示过了。
+在Go中，如果我们能够保证从不会向一个通道发送数据，那么有一个简单的方法来判断此通道是否已经关闭。
+此方法已经在上一篇文章<a href="channel-use-cases.html#check-closed-status">通道用例大全</a>中展示过了。
 这里为了本文的连贯性，在下面的例子中重新列出了此方法。
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -55,40 +55,40 @@ func main() {
 }
 </code></pre>
 <p>
-如前所述，此方法并不是一个通用的检查数据通道是否已经关闭的方法。
+如前所述，此方法并不是一个通用的检查通道是否已经关闭的方法。
 </p>
 </div>
 
 <p>
-事实上，即使有一个内置<code>closed</code>函数用来检查一个数据通道是否已经关闭，它的有用性也是十分有限的。
-原因是当此函数的一个调用的结果返回时，被查询的数据通道的状态可能已经又改变了，导致此调用结果并不能反映出被查询的数据通道的最新状态。
+事实上，即使有一个内置<code>closed</code>函数用来检查一个通道是否已经关闭，它的有用性也是十分有限的。
+原因是当此函数的一个调用的结果返回时，被查询的通道的状态可能已经又改变了，导致此调用结果并不能反映出被查询的通道的最新状态。
 虽然我们可以根据一个调用<code>closed(ch)</code>的返回结果为<code>true</code>而得出我们不应该再向通道<code>ch</code>发送数据的结论，
 但是我们不能根据一个调用<code>closed(ch)</code>的返回结果为<code>false</code>而得出我们可以继续向通道<code>ch</code>发送数据的结论。
 </p>
 
-<h3>数据通道关闭原则</h3>
+<h3>通道关闭原则</h3>
 
 <p>
-一个常用的使用Go数据通道的原则是<b>不要在数据接收方或者在有多个发送者的情况下关闭数据通道</b>。
-换句话说，我们只应该让一个数据通道唯一的发送者关闭一个此数据通道。
+一个常用的使用Go通道的原则是<b>不要在数据接收方或者在有多个发送者的情况下关闭通道</b>。
+换句话说，我们只应该让一个通道唯一的发送者关闭一个此通道。
 </p>
 
 <p>
-下面我们将称此原则为<b>数据通道关闭原则</b>。
+下面我们将称此原则为<b>通道关闭原则</b>。
 </p>
 
 <p>
-当然，这并不是一个通用的关闭数据通道的原则。通用的原则是<b>不要关闭已关闭的数据通道</b>。
-如果我们能够保证从某个时刻之后，再没有协程将向一个未关闭的非nil数据通道发送数据，则一个协程可以安全地关闭此通道。
+当然，这并不是一个通用的关闭通道的原则。通用的原则是<b>不要关闭已关闭的通道</b>。
+如果我们能够保证从某个时刻之后，再没有协程将向一个未关闭的非nil通道发送数据，则一个协程可以安全地关闭此通道。
 然而，做出这样的保证常常需要很大的努力，从而导致代码过度复杂。
-另一方面，遵循<b>数据通道关闭原则</b>是一件相对简单的事儿。
+另一方面，遵循<b>通道关闭原则</b>是一件相对简单的事儿。
 </p>
 
-<h3>粗鲁地关闭数据通道的方法</h3>
+<h3>粗鲁地关闭通道的方法</h3>
 
 <div>
-如果由于某种原因，你一定非要从数据接收方或者让众多发送者中的一个关闭一个数据通道，你可以使用<a href="control-flows-more.html#panic-recover">恢复机制</a>来防止可能产生的恐慌而导致程序崩溃。
-下面就是这样的一个实现（假设数据通道的元素类型为<code>T</code>）。
+如果由于某种原因，你一定非要从数据接收方或者让众多发送者中的一个关闭一个通道，你可以使用<a href="control-flows-more.html#panic-recover">恢复机制</a>来防止可能产生的恐慌而导致程序崩溃。
+下面就是这样的一个实现（假设通道的元素类型为<code>T</code>）。
 <pre class="line-numbers"><code class="language-go">func SafeClose(ch chan T) (justClosed bool) {
 	defer func() {
 		if recover() != nil {
@@ -104,10 +104,10 @@ func main() {
 </code></pre>
 
 <p>
-此方法违反了<b>数据通道关闭原则</b>。
+此方法违反了<b>通道关闭原则</b>。
 </p>
 
-同样的方法可以用来粗鲁地向一个关闭状态未知的数据通道发送数据。
+同样的方法可以用来粗鲁地向一个关闭状态未知的通道发送数据。
 <pre class="line-numbers"><code class="language-go">func SafeSend(ch chan T, value T) (closed bool) {
 	defer func() {
 		if recover() != nil {
@@ -122,14 +122,14 @@ func main() {
 <p></p>
 
 <p>
-这样的粗鲁方法不仅违反了<b>数据通道关闭原则</b>，而且Go白皮书和标准编译器<a href="https://github.com/golang/go/issues/30372">不保证</a>它的实现中不<a href="https://github.com/golang/go/issues/27769">存在数据竞争</a>。
+这样的粗鲁方法不仅违反了<b>通道关闭原则</b>，而且Go白皮书和标准编译器<a href="https://github.com/golang/go/issues/30372">不保证</a>它的实现中不<a href="https://github.com/golang/go/issues/27769">存在数据竞争</a>。
 </p>
 </div>
 
-<h3>礼貌地关闭数据通道的方法</h3>
+<h3>礼貌地关闭通道的方法</h3>
 
 <div>
-很多Go程序员喜欢使用<code>sync.Once</code>来关闭数据通道。
+很多Go程序员喜欢使用<code>sync.Once</code>来关闭通道。
 
 <pre class="line-numbers"><code class="language-go">type MyChannel struct {
 	C    chan T
@@ -150,7 +150,7 @@ func (mc *MyChannel) SafeClose() {
 </div>
 
 <div>
-当然，我们也可以使用<code>sync.Mutex</code>来防止多次关闭一个数据通道。
+当然，我们也可以使用<code>sync.Mutex</code>来防止多次关闭一个通道。
 <pre class="line-numbers"><code class="language-go">type MyChannel struct {
 	C      chan T
 	closed bool
@@ -180,26 +180,26 @@ func (mc *MyChannel) IsClosed() bool {
 </div>
 
 <p>
-我们应该理解为什么Go没有提供这样的内置的<code>SafeClose</code>函数的原因是从接收方一端或者让众多发送者中的一个关闭一个数据通道常常属于不良的并发程序设计。
+我们应该理解为什么Go没有提供这样的内置的<code>SafeClose</code>函数的原因是从接收方一端或者让众多发送者中的一个关闭一个通道常常属于不良的并发程序设计。
 Go甚至从语法上禁止关闭单向接收通道。
 </p>
 
-<h3>优雅地关闭数据通道的方法</h3>
+<h3>优雅地关闭通道的方法</h3>
 
 <p>
 上一节中介绍的<code>SafeSend</code>函数有一个弊端，它的调用不能做为<code>case</code>操作而被使用在<code>select</code>代码块中。
-另外，很多Go程序员（包括我）认为上面两节展示的关闭数据通道的方法不是很优雅。
-本节下面将介绍一些在各种情形下使用纯数据通道操作来关闭数据通道的方法。
+另外，很多Go程序员（包括我）认为上面两节展示的关闭通道的方法不是很优雅。
+本节下面将介绍一些在各种情形下使用纯通道操作来关闭通道的方法。
 </p>
 
 <p><i>
 （为了演示程序的完整性，下面这些例子中使用到了<code>sync.WaitGroup</code>。在实践中，<code>sync.WaitGroup</code>并不是必需的。）
 </i></p>
 
-<h4>情形一：M个接收者和一个发送者。发送者通过关闭数据通道来传递发送结束信号</h4>
+<h4>情形一：M个接收者和一个发送者。发送者通过关闭用来传输数据的通道来传递发送结束信号</h4>
 
 <div>
-这是最简单的一种情形。当发送者欲结束发送，让它关闭通讯用的数据通道即可。
+这是最简单的一种情形。当发送者欲结束发送，让它关闭用来传输数据的通道即可。
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
@@ -221,7 +221,7 @@ func main() {
 	wgReceivers.Add(NumReceivers)
 
 	// ...
-	dataCh := make(chan int, 100)
+	dataCh := make(chan int)
 
 	// 发送者
 	go func() {
@@ -258,8 +258,8 @@ func main() {
 <h4>情形二：一个接收者和N个发送者，此唯一接收者通过关闭一个额外的信号通道来通知发送者不要在发送数据了</h4>
 
 <div>
-此情形比上一种情形复杂一些。我们不能让接收者关闭用来传输数据的通道来停止数据传输，因为这样做违反了<b>数据通道关闭原则</b>。
-但是我们可以让接收者关闭一个额外的信号数据通道来通知发送者不要在发送数据了。
+此情形比上一种情形复杂一些。我们不能让接收者关闭用来传输数据的通道来停止数据传输，因为这样做违反了<b>通道关闭原则</b>。
+但是我们可以让接收者关闭一个额外的信号通道来通知发送者不要在发送数据了。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -282,7 +282,7 @@ func main() {
 	wgReceivers.Add(1)
 
 	// ...
-	dataCh := make(chan int, 100)
+	dataCh := make(chan int)
 	stopCh := make(chan struct{})
 		// stopCh是一个额外的信号通道。它的
 		// 发送者为dataCh数据通道的接收者。
@@ -320,9 +320,9 @@ func main() {
 
 		for value := range dataCh {
 			if value == Max-1 {
-				// 此唯一的接收者同时也是stopCh数据通道的
+				// 此唯一的接收者同时也是stopCh通道的
 				// 唯一发送者。尽管它不能安全地关闭dataCh数
-				// 据通道，但它可以安全地关闭stopCh数据通道。
+				// 据通道，但它可以安全地关闭stopCh通道。
 				close(stopCh)
 				return
 			}
@@ -337,21 +337,21 @@ func main() {
 </code></pre>
 <p>
 如此例中的注释所述，对于此额外的信号通道<code>stopCh</code>，它只有一个发送者，即<code>dataCh</code>数据通道的唯一接收者。
-<code>dataCh</code>数据通道的接收者关闭了信号通道<code>stopCh</code>，这是不违反<b>数据通道关闭原则</b>的。
+<code>dataCh</code>数据通道的接收者关闭了信号通道<code>stopCh</code>，这是不违反<b>通道关闭原则</b>的。
 </p>
 
 <p>
 在此例中，数据通道<code>dataCh</code>并没有被关闭。是的，我们不必关闭它。
-当一个数据通道不再被任何协程所使用后，它将逐渐被垃圾回收掉，无论它是否已经被关闭。
-所以这里的优雅性体现在通过不关闭一个数据通道来停止使用此数据通道。
+当一个通道不再被任何协程所使用后，它将逐渐被垃圾回收掉，无论它是否已经被关闭。
+所以这里的优雅性体现在通过不关闭一个通道来停止使用此通道。
 </p>
 </div>
 
 <h4>情形三：M个接收者和N个发送者。它们中的任何协程都可以让一个中间调解协程帮忙发出停止数据传送的信号</h4>
 
 <div>
-这是最复杂的一种情形。我们不能让接收者和发送者中的任何一个关闭数据通道，我们也不能让多个接收者之一关闭一个额外的信号通道。
-这两种做法都违反了<b>数据通道关闭原则</b>。
+这是最复杂的一种情形。我们不能让接收者和发送者中的任何一个关闭用来传输数据的通道，我们也不能让多个接收者之一关闭一个额外的信号通道。
+这两种做法都违反了<b>通道关闭原则</b>。
 然而，我们可以引入一个中间调解者角色并让其关闭额外的信号通道来通知所有的接收者和发送者结束工作。
 具体实现见下例。注意其中使用了一个尝试发送操作来向中间调解者发送信号。
 
@@ -378,7 +378,7 @@ func main() {
 	wgReceivers.Add(NumReceivers)
 
 	// ...
-	dataCh := make(chan int, 100)
+	dataCh := make(chan int)
 	stopCh := make(chan struct{})
 		// stopCh是一个额外的信号通道。它的发送
 		// 者为中间调解者。它的接收者为dataCh
@@ -482,7 +482,7 @@ func main() {
 </code></pre>
 
 <p>
-在此例中，<b>数据通道关闭原则</b>依旧得到了遵守。
+在此例中，<b>通道关闭原则</b>依旧得到了遵守。
 </p>
 
 <p>
@@ -509,25 +509,236 @@ toStop := make(chan string, NumReceivers + NumSenders)
 </code></pre>
 </div>
 
+<h4>情形四：“M个接收者和一个发送者”情形的一个变种：用来传输数据的通道的关闭请求由第三方发出</h4>
+
+<div>
+有时，数据通道（<code>dataCh</code>）的关闭请求需要由某个第三方协程发出。对于这种情形，我们可以使用一个额外的信号通道来通知唯一的发送者关闭数据通道（<code>dataCh</code>）。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import (
+	"time"
+	"math/rand"
+	"sync"
+	"log"
+)
+
+func main() {
+	rand.Seed(time.Now().UnixNano())
+	log.SetFlags(0)
+
+	// ...
+	const Max = 100000
+	const NumReceivers = 100
+	const NumThirdParties = 15
+
+	wgReceivers := sync.WaitGroup{}
+	wgReceivers.Add(NumReceivers)
+
+	// ...
+	dataCh := make(chan int)
+	closing := make(chan struct{}) // 信号通道
+	closed := make(chan struct{})
+	
+	// 此stop函数可以被安全地多次调用。
+	stop := func() {
+		select {
+		case closing<-struct{}{}:
+			<-closed
+		case <-closed:
+		}
+	}
+	
+	// 一些第三方协程
+	for i := 0; i < NumThirdParties; i++ {
+		go func() {
+			r := 1 + rand.Intn(3)
+			time.Sleep(time.Duration(r) * time.Second)
+			stop()
+		}()
+	}
+
+	// 发送者
+	go func() {
+		defer func() {
+			close(closed)
+			close(dataCh)
+		}()
+
+		for {
+			select{
+			case <-closing: return
+			default:
+			}
+
+			select{
+			case <-closing: return
+			case dataCh <- rand.Intn(Max):
+			}
+		}
+	}()
+
+	// 接收者
+	for i := 0; i < NumReceivers; i++ {
+		go func() {
+			defer wgReceivers.Done()
+
+			for value := range dataCh {
+				log.Println(value)
+			}
+		}()
+	}
+
+	wgReceivers.Wait()
+}
+</code></pre>
+
+<p>
+上述代码中的<code>stop</code>函数中使用的技巧偷自Roger Peppe在<a href="https://groups.google.com/forum/#!msg/golang-nuts/lEKehHH7kZY/SRmCtXDZAAAJ"></a>此贴</a>中的一个留言。
+</p>
+</div>
+
+<h4>情形五：“N个发送者”的一个变种：用来传输数据的通道必须被关闭以通知各个接收者数据发送已经结束了</h4>
+
+<div>
+在上面的提到的“N个发送者”情形中，为了遵守<b>通道关闭原则</b>，我们避免了关闭数据通道（<code>dataCh</code>）。
+但是有时候，数据通道（<code>dataCh</code>）必须被关闭以通知各个接收者数据发送已经结束。
+对于这种“N个发送者”情形，我们可以使用一个中间通道将它们转化为“一个发送者”情形，然后继续使用上一节介绍的技巧来关闭此中间通道关闭，而不是关闭原始的<code>dataCh</code>数据通道。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import (
+	"time"
+	"math/rand"
+	"sync"
+	"log"
+	"strconv"
+)
+
+func main() {
+	rand.Seed(time.Now().UnixNano())
+	log.SetFlags(0)
+
+	// ...
+	const Max = 1000000
+	const NumReceivers = 10
+	const NumSenders = 1000
+	const NumThirdParties = 15
+
+	wgReceivers := sync.WaitGroup{}
+	wgReceivers.Add(NumReceivers)
+
+	// ...
+	dataCh := make(chan int)   // 仍就不会被关闭
+	middleCh := make(chan int) // 将被关闭
+	closing := make(chan string)
+	closed := make(chan struct{})
+
+	var stoppedBy string
+
+	stop := func(by string) {
+		select {
+		case closing <- by:
+			<-closed
+		case <-closed:
+		}
+	}
+	
+	// 中间层
+	go func() {
+		exit := func(v int, needSend bool) {
+			close(closed)
+			if needSend {
+				dataCh <- v
+			}
+			close(dataCh)
+		}
+
+		for {
+			select {
+			case stoppedBy = <-closing:
+				exit(0, false)
+				return
+			case v := <- middleCh:
+				select {
+				case stoppedBy = <-closing:
+					exit(v, true)
+					return
+				case dataCh <- v:
+				}
+			}
+		}
+	}()
+	
+	// 一些第三方协程
+	for i := 0; i < NumThirdParties; i++ {
+		go func(id string) {
+			r := 1 + rand.Intn(3)
+			time.Sleep(time.Duration(r) * time.Second)
+			stop("3rd-party#" + id)
+		}(strconv.Itoa(i))
+	}
+
+	// 发送者
+	for i := 0; i < NumSenders; i++ {
+		go func(id string) {
+			for {
+				value := rand.Intn(Max)
+				if value == 0 {
+					stop("sender#" + id)
+					return
+				}
+
+				select {
+				case <- closed:
+					return
+				default:
+				}
+
+				select {
+				case <- closed:
+					return
+				case middleCh <- value:
+				}
+			}
+		}(strconv.Itoa(i))
+	}
+
+	// 接收者
+	for range [NumReceivers]struct{}{} {
+		go func() {
+			defer wgReceivers.Done()
+
+			for value := range dataCh {
+				log.Println(value)
+			}
+		}()
+	}
+
+	// ...
+	wgReceivers.Wait()
+	log.Println("stopped by", stoppedBy)
+}
+</code></pre>
+
+<p></p>
+
+</div>
+
 <h4>更多情形？</h4>
 
 <p>
-实践中存在以上三种情形的更多变种。
-比如，上述第三种情形的一个变种可能要求接收者将<code>dataCh</code>中留存的所有数据读尽。
-本文就不对类似更多变种多加讲解了。
-</p>
-
-<p>
-尽管上述三种情形没有覆盖所有的使用情形，但它们是最基本的几种情形。其它很多情形都可以归为这三种情形。
+在日常编程中可能会遇到更多的变种情形，但是上面介绍的情形是最常见和最基本的。
+通过聪明地使用通道（和其它并发同步技术），我相信，对于各种变种，我们总会找到相应的遵守<b>通道关闭原则</b>的解决方法。
 </p>
 
 <h3>结论</h3>
 
 <p>
-并没有什么情况非得逼得我们违反<b>数据通道关闭原则</b>。
+并没有什么情况非得逼得我们违反<b>通道关闭原则</b>。
 如果你遇到了此情形，请考虑修改你的代码流程和结构设计。
 </p>
 
 <p>
-使用数据通道编程宛如在艺术创作一般！
+使用通道编程宛如在艺术创作一般！
 </p>

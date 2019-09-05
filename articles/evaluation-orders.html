@@ -122,7 +122,7 @@ func (T) ab() []int { return []int{a, b} }
 Go白皮书这样描述<b>通常估值顺序</b>：
 
 <div class="alert alert-success">
-...，当估值一个表达式、赋值语句或者函数返回语句中的操作数时，所有的函数调用、方法调用和数据通道操作将按照它们在代码中的出现顺序进行估值。
+...，当估值一个表达式、赋值语句或者函数返回语句中的操作数时，所有的函数调用、方法调用和通道操作将按照它们在代码中的出现顺序进行估值。
 </div>
 
 <p>
@@ -148,7 +148,7 @@ Go白皮书这样描述<b>通常估值顺序</b>：
 在此赋值语句中，
 <ul>
 <li>
-	<code>c</code>是一个数据通道表达式，它将被估值为一个数据通道值；
+	<code>c</code>是一个通道表达式，它将被估值为一个通道值；
 </li>
 <li>
 	<code>g</code>、<code>h</code>、<code>i</code>、<code>j</code>和<code>k</code>是一些函数表达式，它们将被估值为一些函数值；
@@ -161,7 +161,7 @@ Go白皮书这样描述<b>通常估值顺序</b>：
 综合考虑上一节和本节上面已经提到的规则，编译器应该保证下列在运行时刻的估值顺序：
 <ul>
 <li>
-	此赋值中涉及到的函数调用、方法调用和数据通道操作必须按照这样的顺序执行：<code>z.f()</code>→<code>h()</code>→<code>i()</code>→<code>j()</code>→<code>&lt;-c</code>→<code>g()</code>→<code>k()</code>；
+	此赋值中涉及到的函数调用、方法调用和通道操作必须按照这样的顺序执行：<code>z.f()</code>→<code>h()</code>→<code>i()</code>→<code>j()</code>→<code>&lt;-c</code>→<code>g()</code>→<code>k()</code>；
 </li>
 <li>
 	调用<code>h()</code>在表达式<code>h</code>、<code>a</code>和<code>b</code>估值之后调用；
@@ -454,14 +454,14 @@ f(7) is called.
 <div>
 
 <p>
-当执行一个<code>select-case</code>流程控制代码块时，各个<code>case</code>关键值后跟随的所有数据通道操作中的数据通道表达式和所有数据通道发送操作中的发送值表达式都将被按照它们在代码中的出现次序（从上到下从左到右）估值一次。
+当执行一个<code>select-case</code>流程控制代码块时，各个<code>case</code>关键值后跟随的所有通道操作中的通道表达式和所有通道发送操作中的发送值表达式都将被按照它们在代码中的出现次序（从上到下从左到右）估值一次。
 </p>
 
 <p>
-注意：以数据通道接收操作做为源值的赋值语句中的目标值表达式只有在此数据通道接收操作被选中之后才会被估值。
+注意：以通道接收操作做为源值的赋值语句中的目标值表达式只有在此通道接收操作被选中之后才会被估值。
 </p>
 
-比如，在下面这个例子中，表达式<code>*fptr("aaa")</code>将永不会得到估值，因为它对应的数据通道接收操作<code>fchan("bbb", nil)</code>是个不可能被选中的阻塞操作。
+比如，在下面这个例子中，表达式<code>*fptr("aaa")</code>将永不会得到估值，因为它对应的通道接收操作<code>fchan("bbb", nil)</code>是个不可能被选中的阻塞操作。
 
 <pre class="line-numbers"><code class="language-go">package main
 

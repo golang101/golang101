@@ -52,7 +52,7 @@ Go SDK 1.11引入了一个试验性的特性：Go模块（Go modules）。
 </p>
 
 <p>
-注意，从Go SDK的下一个主发行版本（1.13）开始，Go模块模式将成为Go项目开发中的推荐模式。
+注意，从Go SDK 1.13开始，Go模块模式将成为Go项目开发中的推荐模式。
 旧的<code>GOPATH</code>模式将不再推荐。<code>GOPATH</code>环境变量的意义和必要性将大大减弱，甚至逐渐消失。
 另一方面，<code>GOBIN</code>环境变量的重要性将提升，因为我们仍需要一个目录路径用来存储某些<code>go</code>子命令产生的二进制可执行文件。
 </p>
@@ -193,18 +193,21 @@ Go SDK工具要求所有的Go源代码文件必须以<code>.go</code>后缀结�
 请注意：
 <ul>
 <li>
+	从Go SDK 1.13开始，此<code>godoc</code>命令<a href="https://golang.google.cn/doc/go1.12">已经从不再集成在Go SDK中</a>，而需要另外下载（<code>go get golang.org/x/tools/cmd/godoc</code>）。
+</li>
+<li>
 	对于1.10版本的Go SDK，如果<code>GOROOT</code>环境变量没有设置，
 	那么我们需要在开启本地镜像的时候指定一个<code>goroot</code>选项：
 	<code>godoc -http=:9999 -goroot path/to/go/sdk</code>。
 	这个不便可能是<code>godoc</code>的一个bug造成的。这个bug已经在Go SDK 1.11中修复了。
 </li>
 <li>
-	此<code>godoc</code>命令<a href="https://golang.google.cn/doc/go1.12">可能从Go 1.13开始将不再集成在Go SDK中</a>而需要另外下载。
+	从Go SDK 1.12开始，教程《A Tour of Go》不再打包在Go SDK中，而必须通过运行<code>go get golang.org/x/tour</code>来单独安装，并运行<code>tour</code>来开启一个本地服务进行阅读。
 </li>
 </ul>
 
 <p>
-另注意：当前（Go SDK 1.12），<code>godoc</code>命令不支持不处于<code>GOPATH</code>下的代码包。
+另注意：当前（Go SDK 1.13），<code>godoc</code>命令不支持不处于<code>GOPATH</code>下的代码包。
 </p>
 
 <p>

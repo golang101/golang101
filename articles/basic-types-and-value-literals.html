@@ -178,15 +178,25 @@ Go白皮书没有定义布尔类型值字面表示形式。
 <h4>整数类型值的字面表示形式</h4>
 
 <div>
-整数类型值有三种字面表示形式：十进制形式（decimal）、八进制形式（octal）和十六进制形式（hex）。
+整数类型值有四种字面表示形式：十进制形式（decimal）、八进制形式（octal）、十六进制形式（hex）和二进制形式（binary）。
 比如，下面的三个字面值均表示十进制的15：
 
 <pre class="disable-line-numbers111"><code class="language-go">0xF // 十六进制表示（必须使用0x或者0X开头）
-017 // 八进制表示（必须使用0开头）
+0XF
+
+017 // 八进制表示（必须使用0、0o或者0O开头）
+0o17
+0O17
+
+0b1111 // 二进制表示（必须使用0b或者0B开头）
+0B
+
 15  // 十进制表示（必须不能用0开头）
 </code></pre>
 
-<p></p>
+<p>
+（注意：二进制形式和以<code>0o</code>或<code>0O</code>开头的八进制形式从Go 1.13开始才支持。）
+</p>
 
 下面的程序打印出两个<code>true</code>。
 
@@ -205,20 +215,7 @@ func main() {
 
 <p>
 整数类型的零值的字面形式一般使用<code>0</code>表示。
-当然，<code>00</code>和<code>0x0</code>也是合法的整数类型零值的字面表示形式。
-</p>
-
-注意：下一个版本（Go 1.13）将开始支持整数的二进制文字表示形式（binary），一个二进制文字表示形式必须以<code>0b</code>或者<code>0B</code>开头。
-八进制文字表示形式也得到了扩展，一个八进制文字表示形式将也可以以<code>0o</code>或者<code>0O</code>开头。
-比如，下面为十进制数15的二进制和八进制文字表示形式：
-
-<pre class="disable-line-numbers111"><code class="language-go">0b1111
-0B1111
-0o17
-0O17
-</code></pre>
-
-<p>
+当然，<code>00</code>和<code>0x0</code>等也是合法的整数类型零值的字面表示形式。
 </p>
 
 </div>
@@ -227,7 +224,7 @@ func main() {
 
 <div>
 一个浮点数的完整字面表示形式包含一个整数部分、一个小数点、一个小数部分和一个指数部分。
-常常地，某些部分可以根据情况省略掉。一些例子：
+常常地，某些部分可以根据情况省略掉。一些例子（<code>xEn</code>表示<code>x</code>乘以<code>10<sup>n</sup></code>的意思，而<code>xE-n</code>表示<code>x</code>除以<code>10<sup>n</sup></code>的意思）：
 
 <pre class="disable-line-numbers111"><code class="language-go">1.23
 01.23 // == 1.23
@@ -243,14 +240,11 @@ func main() {
 0e+5    // == 0.0
 </code></pre>
 
-<p></p>
-
 <p>
-浮点类型的零值的标准字面表示形式为<code>0.0</code>。
-当然其它很多形式也是合法的，比如<code>0.</code>、<code>.0</code>、<code>0e0</code>等。
 </p>
 
-注意：下一个版本（Go 1.13）将开始支持浮点数十六进制文字表示，用来表示在内存中能够精确表示的浮点数。
+从Go 1.13开始，Go也支持另一种浮点数字面表示形式（权称为十六进制浮点数文字表示）。
+在一个十六进制浮点数文字表示中，
 <ul>
 <li>
 	和整数的十六进制文字表示一样，浮点数的十六进制文字表示也必须使用<code>0x</code>或者<code>0X</code>开头。
@@ -263,7 +257,7 @@ func main() {
 </li>
 </ul>
 
-一些合法的浮点数的十六进制文字表示例子：
+一些合法的浮点数的十六进制文字表示例子（<code>xPn</code>表示<code>x</code>乘以<code>2<sup>n</sup></code>的意思，而<code>xP-n</code>表示<code>x</code>除以<code>2<sup>n</sup></code>的意思）：
 <pre class="disable-line-numbers111"><code class="language-go">0x1p-2     // == 0.25
 0x2.p10    // == 2048.0
 0x1.Fp+0   // == 1.9375
@@ -289,12 +283,17 @@ func main() {
 
 <p></p>
 
+<p>
+浮点类型的零值的标准字面表示形式为<code>0.0</code>。
+当然其它很多形式也是合法的，比如<code>0.</code>、<code>.0</code>、<code>0e0</code>和<code>0x0p0</code>等。
+</p>
+
 </div>
 
 <h4>虚部的字面表示形式</h4>
 
 <div>
-一个虚部值的字面表示形式由一个浮点数字面值或者一个十进制整数字面值后跟一个小写的<code>i</code>组成。
+一个虚部值的字面表示形式由一个浮点数字面值或者一个整数字面值和其后跟随的一个小写的<code>i</code>组成。
 一些例子：
 
 <pre class="disable-line-numbers111"><code class="language-go">1.23i
@@ -306,7 +305,9 @@ func main() {
 1e-1i
 </code></pre>
 
-<p></p>
+<p>
+（注意，在Go 1.13之前，如果虚部中<code>i</code>前的部分为一个整数字面值，则其必须为十进制形式。）
+</p>
 
 虚部字面值用来表示复数的虚部。下面是一些复数值的字面表示形式：
 
@@ -323,10 +324,6 @@ func main() {
 当然<code>0i</code>、<code>.0i</code>、<code>0+0i</code>等表示也是合法的。
 </p>
 
-<p>
-从（2019年八月）即将发布的下一个Go版本（1.13）开始，一个虚部值的字面表示形式将允许任何进制的整数或浮点数字面值后跟一个小写的<code>i</code>组成。
-</p>
-
 </div>
 
 <a class="anchor" id="underscores-in-literals"></a>
@@ -334,7 +331,7 @@ func main() {
 
 <div>
 <p>
-从（2019年八月）即将发布的下一个Go版本（1.13）开始，下划线<code>_</code>可以出现在整数、浮点数和虚部数值字面表示形式中用做分段符以增强可读性。
+从Go 1.13开始，下划线<code>_</code>可以出现在整数、浮点数和虚部数值字面表示形式中用做分段符以增强可读性。
 但是要注意，在一个数值字面表示中，一个下划线<code>_</code>不能出现在此字面表示的首尾，并且其两侧的字符必须为（相应进制的）数字字符或者进制表示头。
 </p>
 

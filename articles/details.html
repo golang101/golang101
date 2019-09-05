@@ -174,10 +174,10 @@
 	管道相关的细节：
 	<ul class="index">
 	<li>
-		<a class="index" href="#receive-only-channel-canot-be-closed">单向接收数据通道无法被关闭。</a>
+		<a class="index" href="#receive-only-channel-canot-be-closed">单向接收通道无法被关闭。</a>
 	</li>
 	<li>
-		<a class="index" href="#send-to-closed-channel-is-non-blocking">发送一个值到一个已关闭的数据通道被视为一个非阻塞操作，该操作会导致恐慌。</a>
+		<a class="index" href="#send-to-closed-channel-is-non-blocking">发送一个值到一个已关闭的通道被视为一个非阻塞操作，该操作会导致恐慌。</a>
 	</li>
 	</ul>
 </li>
@@ -791,7 +791,7 @@ func main() {
 	一个映射类型的元素类型可以是此映射类型自身，
 </li>
 <li>
-	一个数据通道类型的元素类型可以是此数据通道类型自身，
+	一个通道类型的元素类型可以是此通道类型自身，
 </li>
 <li>
 	一个函数类型的输入参数和返回结果值类型可以是此函数类型自身。
@@ -1438,7 +1438,7 @@ func main() {
 </div>
 
 <a class="anchor" id="receive-only-channel-canot-be-closed"></a>
-<h3>单向接收数据通道无法被关闭。</h3>
+<h3>单向接收通道无法被关闭。</h3>
 
 <div>
 例如，下面的代码会在编译时候失败。
@@ -1449,7 +1449,7 @@ func main() {
 }
 
 func foo(c <-chan int) {
-	close(c) // error: 不能关闭单向接收数据通道
+	close(c) // error: 不能关闭单向接收通道
 }
 </code></pre>
 
@@ -1458,7 +1458,7 @@ func foo(c <-chan int) {
 </div>
 
 <a class="anchor" id="send-to-closed-channel-is-non-blocking"></a>
-<h3>发送一个值到一个已关闭的数据通道被视为一个非阻塞操作，该操作会导致恐慌。</h3>
+<h3>发送一个值到一个已关闭的通道被视为一个非阻塞操作，该操作会导致恐慌。</h3>
 
 <div>
 例如，在下面的程序里，如果第二个<code>case</code>分支会被选中，则在运行时刻将产生一个恐慌。
@@ -1470,7 +1470,7 @@ func main() {
 	close(c)
 	select {
 	case <-c:
-	case c <- true: // panic: 向已关闭的数据通道发送数据
+	case c <- true: // panic: 向已关闭的通道发送数据
 	default:
 	}
 }

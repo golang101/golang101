@@ -2,7 +2,7 @@
 
 <p>
 Go语言是一门天然支持并发的编程语言。
-通过使用<code>go</code>关键字，我们可以很轻松地创建协程；通过<a href="channel-use-cases.html">使用</a><a href="channel.html">数据通道</a>和<a href="concurrent-atomic-operation.html">Go中提供的</a>其它<a href="concurrent-synchronization-more.html">各种同步技术</a>，并发编程变得简单、轻松和有趣。
+通过使用<code>go</code>关键字，我们可以很轻松地创建协程；通过<a href="channel-use-cases.html">使用</a><a href="channel.html">通道</a>和<a href="concurrent-atomic-operation.html">Go中提供的</a>其它<a href="concurrent-synchronization-more.html">各种同步技术</a>，并发编程变得简单、轻松和有趣。
 </p>
 
 <p>
@@ -58,7 +58,7 @@ func main() {
 上面这个程序可能在很多计算机上运行良好，但是可能会在某些计算机上因为恐慌而崩溃退出；或者使用某些编译器编译的时候运行良好，但使用另外的某个编译器编译的时候将造成程序运行时崩溃退出。
 </p>
 
-我们应该使用数据通道或者<code>sync</code>标准库包中的同步技术来确保内存顺序。比如：
+我们应该使用通道或者<code>sync</code>标准库包中的同步技术来确保内存顺序。比如：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -204,7 +204,7 @@ func main() {
 Go运行时很难分辨出一个处于阻塞状态的协程是否将永久阻塞下去，所以Go运行时不会释放永久处于阻塞状态的协程占用的资源。
 </p>
 
-在<a href="channel-use-cases.html#first-response-wins">采用最快回应</a>数据通道用例中，如果被当作future/promise来用的通道的容量不足够大，则较慢回应的协程在准备发送回应结果时将永久阻塞。
+在<a href="channel-use-cases.html#first-response-wins">采用最快回应</a>通道用例中，如果被当作future/promise来用的通道的容量不足够大，则较慢回应的协程在准备发送回应结果时将永久阻塞。
 比如，下面的例子中，每个请求将导致4个协程永久阻塞。
 
 <pre class="line-numbers"><code class="language-go">func request() int {
@@ -362,11 +362,11 @@ func main() {
 
 </div>
 
-<h3>不当地使用用做Future/Promise的数据通道</h3>
+<h3>不当地使用用做Future/Promise的通道</h3>
 
 <div>
 
-从<a href="channel-use-cases.html#future-promise">数据通道用例大全</a>一文中，我们了解到一些函数可以返回用做future/promise的数据通道结果。
+从<a href="channel-use-cases.html#future-promise">通道用例大全</a>一文中，我们了解到一些函数可以返回用做future/promise的通道结果。
 假设<code>fa</code>和<code>fb</code>是这样的两个函数，则下面的调用方式并没有体现出这两个函数的真正价值。
 
 <pre class="line-numbers"><code class="language-go">doSomethingWithFutureArguments(<-fa(), <-fb())
@@ -387,7 +387,7 @@ doSomethingWithFutureArguments(<-ca, <-cb)
 
 </div>
 
-<h3>没有让最后一个活跃的发送者关闭数据通道</h3>
+<h3>没有让最后一个活跃的发送者关闭通道</h3>
 
 <div>
 
@@ -401,7 +401,7 @@ Go程序员常犯的一个错误是关闭一个后续可能还会有协程向其
 </p>
 
 <p>
-请阅读<a href="channel-closing.html">此篇文章</a>来了解如何安全和优雅地关闭数据通道。
+请阅读<a href="channel-closing.html">此篇文章</a>来了解如何安全和优雅地关闭通道。
 </p>
 
 </div>
@@ -422,7 +422,7 @@ Go程序员常犯的一个错误是关闭一个后续可能还会有协程向其
 
 <div>
 <p>
-<code>time</code>标准库包中的<code>After</code>函数返回<a href="channel-use-cases.html#timer">一个用做延迟通知的数据通道</a>。
+<code>time</code>标准库包中的<code>After</code>函数返回<a href="channel-use-cases.html#timer">一个用做延迟通知的通道</a>。
 此函数给并发编程带来了很多便利，但是它的每个调用都需要创建一个<code>time.Timer</code>值，此新创建的<code>Timer</code>值在传递给<code>After</code>函数调用的时长（实参）内肯定不会被垃圾回收。
 如果此函数在某个时段内被多次频繁调用，则可能导致积累很多尚未过期的<code>Timer</code>值从而造成大量的内存和计算消耗。
 </p>
@@ -493,7 +493,7 @@ func longRunning(messages <-chan string) {
 	在此<code>Timer</code>值尚未终止的时候，<code>Stop</code>方法调用返回<code>false</code>只能意味着此<code>Timer</code>值已经过期。
 </li>
 <li>
-	一个<code>Timer</code>值被终止之后，它的数据通道字段<code>C</code>最多只能含有一个过期的通知。
+	一个<code>Timer</code>值被终止之后，它的通道字段<code>C</code>最多只能含有一个过期的通知。
 </li>
 <li>
 	在一个<code>Timer</code>终止（stopped）之后并且在重置和重用此<code>Timer</code>值之前，我们应该确保此<code>Timer</code>值中肯定不存在过期的通知。

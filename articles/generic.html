@@ -64,7 +64,7 @@ func main() {
 	<code>**bool</code>是一个基类型为另一个指针类型<code>*bool</code>的指针类型。
 </li>
 <li>
-	<code>chan chan int</code>是一个元素类型为另一个数据通道类型的<code>chan int</code>的数据通道类型。
+	<code>chan chan int</code>是一个元素类型为另一个通道类型的<code>chan int</code>的通道类型。
 </li>
 <li>
 	<code>map[int]map[int]string</code>是一个元素类型为另一个映射类型<code>map[string]int</code>的映射类型。
@@ -85,13 +85,13 @@ func main() {
 </code></pre>
 
 <p>
-最左边的<code>chan</code>关键字表明此类型是一个数据通道类型。
-<code>chan</code>关键字右边的整个部分<code>*[16]byte</code>表示此数据通道类型的元素类型，此元素类型是一个指针类型。
+最左边的<code>chan</code>关键字表明此类型是一个通道类型。
+<code>chan</code>关键字右边的整个部分<code>*[16]byte</code>表示此通道类型的元素类型，此元素类型是一个指针类型。
 此指针类型的基类型为<code>*</code>右边的整个部分：<code>[16]byte</code>，此基类型为一个数组类型。
 此数组类型的元素类型为内置类型<code>byte</code>。
 </p>
 
-一个使用此数据通道类型的例子：
+一个使用此通道类型的例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import (

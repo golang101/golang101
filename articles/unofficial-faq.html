@@ -29,7 +29,7 @@
 	<ul class="index">
 	<li><a class="index" href="#pointer-atomic">如何原子地操作指针值？</a></li>
 	<li><a class="index" href="#get-days-of-month">如何使用尽可能短的代码行数来获取任意月份的天数？</a></li>
-	<li><a class="index" href="#time-sleep-after">函数调用<code>time.Sleep(d)</code>和数据通道接收<code>&lt;-time.After(d)</code>操作之间有何区别？</a></li>
+	<li><a class="index" href="#time-sleep-after">函数调用<code>time.Sleep(d)</code>和通道接收<code>&lt;-time.After(d)</code>操作之间有何区别？</a></li>
 	<li><a class="index" href="#finalizers">终结器（finalizer）可以用做对象的析构函数吗？</a></li>
 	<li><a class="index" href="#trim">调用<code>strings</code>和<code>bytes</code>标准库包里<code>TrimLeft</code>和<code>TrimRight</code>函数经常会返回不符预期的结果，这些函数的实现存在bugs吗？</a></li>
 	<li><a class="index" href="#fmt-print-println">函数<code>fmt.Print</code>和<code>fmt.Println</code>的区别是什么？</a></li>
@@ -59,7 +59,7 @@
 <li>其它
 	<ul class="index">
 	<li><a class="index" href="#about-iota"><code>iota</code>是什么意思？</a></li>
-	<li><a class="index" href="#check-if-channels-closed">为什么没有一个内置的<code>closed</code>函数用来检查数据通道是否已经关闭？</a></li>
+	<li><a class="index" href="#check-if-channels-closed">为什么没有一个内置的<code>closed</code>函数用来检查通道是否已经关闭？</a></li>
 	<li><a class="index" href="#return-local-pointers">函数返回局部变量的指针是否安全？</a></li>
 	<li><a class="index" href="#gopher">单词<b><i>gopher</i></b>在Go社区中表示什么？</a></li>
 	</ul>
@@ -515,13 +515,13 @@ func main() {
 
 <a class="anchor" id="time-sleep-after"></a>
 <h3>
-	函数调用<code>time.Sleep(d)</code>和数据通道接收<code>&lt;-time.After(d)</code>操作之间有何区别？
+	函数调用<code>time.Sleep(d)</code>和通道接收<code>&lt;-time.After(d)</code>操作之间有何区别？
 </h3>
 
 <p>
 两者都会将当前的goroutine执行暂停一段时间。
 区别在于<code>time.Sleep(d)</code>函数调用将使当前的协程进入睡眠字状态，但是当前协程的<a href="control-flows-more.html#states-of-goroutine">（主）状态</a>依然为运行状态；
-而数据通道接收<code>&lt;-time.After(d)</code>操作将使当前协程进入阻塞状态。
+而通道接收<code>&lt;-time.After(d)</code>操作将使当前协程进入阻塞状态。
 </p>
 
 <a class="anchor" id="finalizers"></a>
@@ -861,7 +861,7 @@ func main() {
 	<li>显式值转换</li>
 	<li>各种操作，不包含指针解引用（dereference）操作，但是包含：
 		<ul>
-		<li>数据通道接收操作</li>
+		<li>通道接收操作</li>
 		<li>子字符串操作</li>
 		<li>子切片操作</li>
 		<li>加法、减法、乘法、以及除法等等。</li>
@@ -1081,18 +1081,18 @@ Iota是希腊字母表中的第九个字母。
 
 <a class="anchor" id="check-if-channels-closed"></a>
 <h3>
-	为什么没有一个内置的<code>closed</code>函数用来检查数据通道是否已经关闭？
+	为什么没有一个内置的<code>closed</code>函数用来检查通道是否已经关闭？
 </h3>
 
 <p>
 原因是此函数的实用性非常有限。
-此类函数调用的返回结果不能总是反映输入数据通道实参的最新状态。
+此类函数调用的返回结果不能总是反映输入通道实参的最新状态。
 所以依靠此函数的返回结果来做决定不是一个好主意。
 </p>
 
 <p>
 如果你确实需要这种函数，你可以不怎么费功夫地自己写一个。
-请阅读<a href="channel-closing.html">如何优雅地关闭数据通道</a>一文来了解如何编写一个<code>closed</code>函数以及如何避免使用这样的函数。
+请阅读<a href="channel-closing.html">如何优雅地关闭通道</a>一文来了解如何编写一个<code>closed</code>函数以及如何避免使用这样的函数。
 </p>
 
 <a class="anchor" id="return-local-pointers"></a>
