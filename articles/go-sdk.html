@@ -19,7 +19,7 @@
 
 <p>
 Go SDK的版本和其所支持的最高Go语言版本是一致的。
-比如，Go SDK 1.12.x支持从1.0到1.12的所有Go语言版本。
+比如，Go SDK 1.13.x支持从1.0到1.13的所有Go语言版本。
 </p>
 
 <p>
@@ -130,7 +130,7 @@ Go SDK工具要求所有的Go源代码文件必须以<code>.go</code>后缀结�
 <p>
 注意：<code>go run</code>子命令并不推荐在正式的大项目中使用。
 <code>go run</code>子命令只是一种方便的方式来运行简单的Go程序。
-对于正式的项目，最好使用<code>go build</code>或者<code>go install</code>子命令生成（并运行）可执行程序文件。
+对于正式的项目，最好使用<code>go build</code>或者<code>go install</code>子命令来编译生成可执行程序文件。
 </p>
 </div>
 
@@ -138,7 +138,7 @@ Go SDK工具要求所有的Go源代码文件必须以<code>.go</code>后缀结�
 
 <p>
 上面提到的三个<code>go</code>子命令（<code>go run</code>、<code>go build</code>和<code>go install</code>）
-将只会显示代码语法错误。它们不会显示可能的代码逻辑错误（即警告）。
+将只会输出代码语法错误。它们不会输出可能的代码逻辑错误（即警告）。
 <code>go vet</code>子命令可以用来检查可能的代码逻辑错误。
 </p>
 
@@ -160,7 +160,7 @@ Go SDK工具要求所有的Go源代码文件必须以<code>.go</code>后缀结�
 </p>
 
 <p>
-从Go SDK 1.12版本开始，我们可以运行<code>go mod</code>子命令来管理包依赖。
+从Go SDK 1.11版本开始，我们可以运行<code>go mod</code>子命令来管理包依赖。
 </p>
 
 <p>

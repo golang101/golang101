@@ -451,7 +451,7 @@ func main() {
 </p>
 
 <p>
-到目前为止（Go 1.12），Go尚未支持自定义函数和类型的范型。
+到目前为止（Go 1.13），Go尚未支持自定义函数和类型的范型。
 反射部分地弥补了一些因为缺少范型而导致的编程不便。
 </p>
 
@@ -788,7 +788,7 @@ type Ie interface {
 上例中展示的限制<a href="https://github.com/golang/proposal/blob/master/design/6977-overlapping-interfaces.md">可能会从以后的Go版本中移除s</a>。
 </p>
 
-截止到目前（Go 1.12），如果两个接口类型都指定了一个同名方法，则这两个接口类型不可被同时被内嵌在同一个接口类型中，即使它们指定的同名方法的原型也一致。
+截止到目前（Go 1.13），如果两个接口类型都指定了一个同名方法，则这两个接口类型不可被同时被内嵌在同一个接口类型中，即使它们指定的同名方法的原型也一致。
 比如，下面的代码中假设的接口类型都是非法的。
 
 <pre class="line-numbers"><code class="language-go">type Ix interface {

@@ -11,7 +11,7 @@
 <div>
 <p>
 在Go中，自定义函数的调用的返回结果都可以被舍弃。
-但是，<a href="exceptions.html#discard-return-results">大多数内置函数（除了<code>copy</code>和<code>recover</code>）的调用的返回结果都不可以舍弃</a>（至少对于标准编译器1.12来说是如此）。
+但是，<a href="exceptions.html#discard-return-results">大多数内置函数（除了<code>copy</code>和<code>recover</code>）的调用的返回结果都不可以舍弃</a>（至少对于标准编译器1.13来说是如此）。
 另一方面，我们已经了解到延迟函数调用的所有返回结果必须都舍弃掉。
 所以，很多内置函数是不能被延迟调用的。
 </p>
@@ -158,9 +158,11 @@ func f2() {
 
 <div>
 <p>
-延迟调用并非没有缺点。到目前为止（Go 1.12），对于官方标准编译器来说，延迟调用将导致一些性能损失。
+延迟调用并非没有缺点。对于低于1.13版本的官方标准编译器来说，延迟调用将导致一些性能损失。
+从1.13版本开始，官方标准编译器被一些简单的延迟调用场景做了优化。
 </p>
 
+<!--
 比如，下面的例子中的<code>CounterB</code>和<code>IncreaseB</code>方法比<code>CounterA</code>和<code>IncreaseA</code>方法的效率要高。
 
 <pre class="line-numbers"><code class="language-go">import "sync"
@@ -201,6 +203,7 @@ func (t *T) IncreaseB() {
 一般说来，A版本方法更推荐使用，尽管它们的效率略低一点，因为它们更鲁棒。
 我们只应该在确实很在意这点性能损失的情况下才使用B版本方法。
 </p>
+-->
 
 </div>
 

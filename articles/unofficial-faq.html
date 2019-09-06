@@ -80,7 +80,7 @@
 	编译器错误信息<code>non-name *** on left side of :=</code>意味着什么?
 </h3>
 
-直到目前（Go 1.12）, Go中对短变量声明有一个<a href="https://golang.google.cn/ref/spec#Short_variable_declarations">强制性约束</a>：
+直到目前（Go 1.13）, Go中对短变量声明有一个<a href="https://golang.google.cn/ref/spec#Short_variable_declarations">强制性约束</a>：
 <div class="alert alert-success">
 所有位于<code>:=</code>符号左侧的条目都必须是纯<a href="https://golang.google.cn/ref/spec#Identifiers">标识符</a>，并且其中至少有一个为新变量名称。
 </div>
@@ -404,7 +404,7 @@ func main() {
 </p>
 
 <div>
-目前（Go 1.12），对于标准编译器，
+目前（Go 1.13），对于标准编译器，
 <ul>
 <li>没有显式的方式来在用户代码中指定哪些函数应该被内联。</li>
 <li>尽管编译参数<code>-gcflags "-l"</code>可以阻止任何函数被内联，
@@ -661,7 +661,7 @@ func main() {
 	对于组合类型的参数，内置的<code>print</code>/<code>println</code>函数将输出参数的底层值部的地址，而<code>fmt</code>和<code>log</code>标准库包中的打印函数将输出参数的字面值。
 </li>
 <li>
-	目前（Go 1.12），对于标准编译器，调用内置的<code>print</code>/<code>println</code>函数不会使调用参数引用的值逃逸到堆上，而<code>fmt</code>和<code>log</code>标准库包中的的打印函数将使调用参数引用的值逃逸到堆上。
+	目前（Go 1.13），对于标准编译器，调用内置的<code>print</code>/<code>println</code>函数不会使调用参数引用的值逃逸到堆上，而<code>fmt</code>和<code>log</code>标准库包中的的打印函数将使调用参数引用的值逃逸到堆上。
 </li>
 <li>
 	如果一个实参有<code>String() string</code>或<code>Error() string</code>方法，那么<code>fmt</code>和<code>log</code>标准库包里的打印函数在打印参数时会调用这两个方法，而内置的<code>print</code>/<code>println</code>函数则会忽略参数的这些方法。
@@ -997,7 +997,7 @@ func (pt *T) MethodX(v0 ParamType0, ...) (ResultType0, ...) {
 </ol>
 
 <p>
-在Go语言中，直到现在（Go 1.12），没有值满足第三种定义。
+在Go语言中，直到现在（Go 1.13），没有值满足第三种定义。
 </p>
 
 <p>

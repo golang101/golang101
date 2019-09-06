@@ -594,7 +594,7 @@ func main() {
 </code></pre>
 
 <p>
-上述代码中的<code>stop</code>函数中使用的技巧偷自Roger Peppe在<a href="https://groups.google.com/forum/#!msg/golang-nuts/lEKehHH7kZY/SRmCtXDZAAAJ"></a>此贴</a>中的一个留言。
+上述代码中的<code>stop</code>函数中使用的技巧偷自Roger Peppe在<a href="https://groups.google.com/forum/#!msg/golang-nuts/lEKehHH7kZY/SRmCtXDZAAAJ">此贴</a>中的一个留言。
 </p>
 </div>
 
@@ -603,7 +603,7 @@ func main() {
 <div>
 在上面的提到的“N个发送者”情形中，为了遵守<b>通道关闭原则</b>，我们避免了关闭数据通道（<code>dataCh</code>）。
 但是有时候，数据通道（<code>dataCh</code>）必须被关闭以通知各个接收者数据发送已经结束。
-对于这种“N个发送者”情形，我们可以使用一个中间通道将它们转化为“一个发送者”情形，然后继续使用上一节介绍的技巧来关闭此中间通道关闭，而不是关闭原始的<code>dataCh</code>数据通道。
+对于这种“N个发送者”情形，我们可以使用一个中间通道将它们转化为“一个发送者”情形，然后继续使用上一节介绍的技巧来关闭此中间通道，从而避免了关闭原始的<code>dataCh</code>数据通道。
 
 <pre class="line-numbers"><code class="language-go">package main
 
