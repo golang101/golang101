@@ -710,7 +710,7 @@ func main() {
 
 <div>
 一个通道类型的元素类型可以是另一个通道类型。
-在下面这个例子中， 单向接收通道类型<code>chan&lt;- int</code>是另一个单向发送通道类型<code>&lt;-chan chan&lt;- int</code>的元素类型。
+在下面这个例子中， 单向发送通道类型<code>chan&lt;- int</code>是另一个通道类型<code>chan chan&lt;- int</code>的元素类型。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1087,11 +1087,11 @@ func main() {
 
 </div>
 
-<h4>定时器（ticker）</h4>
+<h4>脉搏器（ticker）</h4>
 
 <div>
 
-我们可以使用尝试发送操作来实现一个每隔一定时间发送一个信号的定时器。
+我们可以使用尝试发送操作来实现一个每隔一定时间发送一个信号的脉搏器。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1183,7 +1183,7 @@ func main() {
 
 <p>
 上例的代码虽然可以保证任何一分钟时段内处理的请求数不会超过200，但是如果在开始的一分钟内没有任何请求，则接下来的某个瞬时时间点可能会同时处理最多200个请求（试着将<code>time.Sleep</code>行的注释去掉看看）。
-这可能会造成卡顿情况。我们可以将速率限制和峰值限制一并使用来避免着这样的情况。
+这可能会造成卡顿情况。我们可以将速率限制和峰值限制一并使用来避免出现这样的情况。
 </p>
 
 

@@ -151,6 +151,14 @@ values: [71 89 50 62 60]
 }
 </code></pre>
 
+<p>
+</p>
+
+<p>
+一个<code>WaitGroup</code>可以在它的一个<code>Wait</code>方法返回之后被重用。
+但是请注意，当一个<code>WaitGroup</code>值维护的基数为零时，它的带有正整数实参的<code>Add</code>方法调用不能和它的<code>Wait</code>方法调用并发运行，否则将可能出现数据竞争。
+</p>
+
 </div>
 
 <a class="anchor" id="once"></a>

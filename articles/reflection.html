@@ -221,6 +221,10 @@ func main() {
 </p>
 
 <p>
+被一个<code>reflect.Value</code>值代表着的值常称为此<code>reflect.Value</code>值的底层值（underlying value）。
+</p>
+
+<p>
 <code>reflect.Value</code>类型有<a href="https://golang.google.cn/pkg/reflect/">很多方法</a>。
 我们可以调用这些方法来观察和操纵一个<code>reflect.Value</code>属主值表示的Go值。
 这些方法中的有些适用于所有种类类型的值，有些只适用于一种或几种类型的值。
@@ -246,7 +250,7 @@ func main() {
 	p := &n
 	vp := reflect.ValueOf(p)
 	fmt.Println(vp.CanSet(), vp.CanAddr()) // false false
-	vn := vp.Elem() // 取得vp代表的指针引用的值的代表值
+	vn := vp.Elem() // 取得vp的底层指针值引用的值的代表值
 	fmt.Println(vn.CanSet(), vn.CanAddr()) // true true
 	vn.Set(reflect.ValueOf(789)) // <=> vn.SetInt(789)
 	fmt.Println(n)               // 789
@@ -277,7 +281,7 @@ func main() {
 	// vy is addressable but not modifiable.
 	fmt.Println(vy.CanSet(), vy.CanAddr()) // false true
 	vb := reflect.ValueOf(123)
-	vx.Set(vb)     // okay, 因为vx代表的值是修改的。
+	vx.Set(vb)     // okay, 因为vx代表的值是可修改的。
 	// vy.Set(vb)  // 会造成恐慌，因为vy代表的值是不可修改的。
 	fmt.Println(s) // {123 &lt;nil&gt;}
 	fmt.Println(vx.IsNil(), vy.IsNil()) // false true
@@ -285,7 +289,7 @@ func main() {
 </code></pre>
 
 <p>
-上例中同时也展示了如何间接地获取代表接口值的<code>reflect.Value</code>值。
+上例中同时也展示了如何间接地获取底层值为接口值的<code>reflect.Value</code>值。
 </p>
 
 从上两例中，我们可以得知有两种方法获取一个代表着一个指针所引用着的值的<code>reflect.Value</code>值：
@@ -360,7 +364,7 @@ func main() {
 <p>
 </p>
 
-如果一个<code>reflect.Value</code>值代表着一个函数值，则我们可以调用此<code>reflect.Value</code>值的<code>Call</code>方法来调用此函数。
+如果一个<code>reflect.Value</code>值的底层值为一个函数值，则我们可以调用此<code>reflect.Value</code>值的<code>Call</code>方法来调用此函数。
 每个<code>Call</code>方法调用接受一个<code>[]reflect.Value</code>类型的参数（表示传递给相应函数调用的各个实参）并返回一个同类型结果（表示相应函数调用返回的各个结果）。
 
 <pre class="line-numbers"><code class="language-go">package main
@@ -488,6 +492,7 @@ func main() {
 </p>
 
 一些<code>reflect.Value</code>值可能表示着不合法的Go值。
+这样的值为<code>reflect.Value</code>类型的零值（即没有底层值的<code>reflect.Value</code>值）。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -508,7 +513,6 @@ func main() {
 </code></pre>
 
 <p>
-上例告诉我们，<code>reflect.Value</code>类型的零值代表着一个不合法的Go值（其实就是不代表任何值的意思）。
 </p>
 
 从上面的例子中，我们知道，使用空接口<code>interface{}</code>值做为中介，一个Go值可以转换为一个<code>reflect.Value</code>值。

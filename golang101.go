@@ -29,7 +29,7 @@ type Go101 struct {
 var (
 	rootPath = findGo101ProjectRoot()
 	go101    = &Go101{
-		staticHandler:     http.StripPrefix("/static/", http.FileServer(http.Dir(filepath.Join(rootPath, "static")))),
+		staticHandler:     http.StripPrefix("/static/", http.FileServer(http.Dir(filepath.Join(rootPath, "web", "static")))),
 		articleResHandler: http.StripPrefix("/article/res/", http.FileServer(http.Dir(filepath.Join(rootPath, "articles", "res")))),
 		isLocalServer:     false, // may be modified later
 		articlePages:      map[string][]byte{},
@@ -40,13 +40,13 @@ func (go101 *Go101) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	group, item := "", ""
 	tokens := strings.SplitN(r.URL.Path, "/", 3)
 	if len(tokens) > 1 {
-		group = tokens[1]
+		group = strings.ToLower(tokens[1])
 		if len(tokens) > 2 {
 			item = tokens[2]
 		}
 	}
 
-	switch go101.ConfirmLocalServer(isLocalRequest(r)); strings.ToLower(group) {
+	switch go101.ConfirmLocalServer(isLocalRequest(r)); group {
 	case "static":
 		w.Header().Set("Cache-Control", "max-age=360000") // 10 hours
 		go101.staticHandler.ServeHTTP(w, r)
@@ -114,7 +114,7 @@ type Article struct {
 	FilenameWithoutExt string
 }
 
-var articlePagesMutex sync.Mutex
+//var articlePagesMutex sync.Mutex
 var articlePages = map[string][]byte{}
 var schemes = map[bool]string{false: "http://", true: "https://"}
 
@@ -366,9 +366,9 @@ func retrievePageTemplate(which PageTemplate, cacheIt bool) *template.Template {
 	if t == nil {
 		switch which {
 		case Template_Article:
-			t = parseTemplate(filepath.Join(rootPath, "templates"), "base", "article")
+			t = parseTemplate(filepath.Join(rootPath, "web", "templates"), "base", "article")
 		case Template_PrintBook:
-			t = parseTemplate(filepath.Join(rootPath, "templates"), "pdf")
+			t = parseTemplate(filepath.Join(rootPath, "web", "templates"), "pdf")
 		default:
 			t = template.New("blank")
 		}
