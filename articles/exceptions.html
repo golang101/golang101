@@ -19,6 +19,11 @@
 如果一个函数调用刚好返回一个结果，则此函数调用总是可以被当作一个单值实参用在其它函数调用中，并且此函数调用可以和其它实参混合出现在其它函数调用的实参列表中。
 </div>
 
+例外：
+<div class="alert alert-success">
+对于官方标准编译器，上述基本规则不适用于内置函数<code>print</code>和<code>println</code>。这两个函数的调用不能内嵌多返回值函数调用。
+</div>
+
 <!--
 例外：
 <div class="alert alert-success">

@@ -349,9 +349,9 @@ the receiver arguments of the <code>Pages</code> and <code>SetPages</code> metho
 </i></p>
 
 <p>
-事实上，上例中的<code>(&amp;book).SetPages(123)</code>一行可以被简化为<code>book.SetPages(123)</code>。
-为什么呢？毕竟，类型<code>book</code>并不拥有一个<code>SetPages</code>方法。
-啊哈，这是Go中特别设计的为了让代码看上去更简洁并方便了编程的语法糖。此语法糖只对可寻址的值类型的属主有效。
+等一下，上例中的<code>(&amp;book).SetPages(123)</code>一行为什么可以被简化为<code>book.SetPages(123)</code>呢？
+毕竟，类型<code>Book</code>并不拥有一个<code>SetPages</code>方法。
+啊哈，这是Go中为了让代码看上去更简洁而特别设计的的语法糖。此语法糖只对可寻址的值类型的属主有效。
 编译器会自动将<code>book.SetPages(123)</code>改写为<code>(&amp;book).SetPages(123)</code>。
 </p>
 

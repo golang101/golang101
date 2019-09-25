@@ -284,6 +284,8 @@ func main() {
 	book2 := new(Book)  // book2是另外一个指针
 	// 像使用结构值一样来使用结构体值的指针。
 	book2.pages = book1.pages
+	// 上一行等价于下一行。
+	(*book2).pages = (*book1).pages
 }
 </code></pre>
 

@@ -375,7 +375,7 @@ func main() {
 <h3>选择器遮挡和碰撞</h3>
 
 <div>
-一个值<code>x</code>可能有同时有多个最后一项相同的选择器，并且这些选择器的中间项均对应着一个内嵌字段。
+一个值<code>x</code>（这里我们总认为它是可寻址的）可能同时拥有多个最后一项相同的选择器，并且这些选择器的中间项均对应着一个内嵌字段。
 对于这种情形（假设最后一项为<code>y</code>）：
 <ul>
 <li>
@@ -392,7 +392,7 @@ func main() {
 如果一个方法选择器被另一个方法选择器所遮挡，并且它们对应的方法原型是一致的，那么我们可以说第一个方法被第二个覆盖（overridden）了。
 </p>
 
-举个例子，假设<code>A</code>、<code>B</code>和<code>C</code>为三个定义的类型：
+举个例子，假设<code>A</code>、<code>B</code>和<code>C</code>为三个<a href="type-system-overview.html#non-defined-type">定义类型</a>：
 
 <pre class="line-numbers"><code class="language-go">type A struct {
 	x string
@@ -472,7 +472,7 @@ func f2() {
 如果即<code>T</code>是一个指针或者接口类型时，则类型<code>*T</code>的方法集为空。
 </p>
 
-简单说来，如果没有发生选择器碰撞和遮挡，
+简单说来，
 <ul>
 <li>
 	类型<code>struct{T}</code>和<code>*struct{T}</code>将获取类型<code>T</code>的所有方法。
