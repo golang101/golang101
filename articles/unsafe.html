@@ -266,7 +266,14 @@ func foo() {
 
 </div>
 
-<h4>事实三：我们可以将一个值的指针传递给<code>runtime.KeepAlive</code>函数调用来确保此值在此调用之前仍然处于被使用中</h4>
+<a class="anchor" id="fact-value-address-might-change"></a>
+<h4>事实三：一个值的地址在程序运行中可能改变</h4>
+
+<p>
+详情请阅读<a href="memory-block.html#where-to-allocate">内存块</a>一文（见链接所指一节的尾部）。
+</p>
+
+<h4>事实四：我们可以将一个值的指针传递给<code>runtime.KeepAlive</code>函数调用来确保此值在此调用之前仍然处于被使用中</h4>
 
 <div>
 <p>
@@ -297,7 +304,7 @@ func foo() {
 
 </div>
 
-<h4>事实四：一个值的可被使用范围可能并没有代码中看上去的大</h4>
+<h4>事实五：一个值的可被使用范围可能并没有代码中看上去的大</h4>
 
 <div>
 <p>
@@ -329,7 +336,7 @@ func bar() {
 
 </div>
 
-<h4>事实五：<code>*unsafe.Pointer</code>是一个类型安全指针类型</h4>
+<h4>事实六：<code>*unsafe.Pointer</code>是一个类型安全指针类型</h4>
 
 <div>
 <p>
@@ -449,6 +456,7 @@ func main() {
 
 </div>
 
+<a class="anchor" id="pattern-convert-to-uintptr-and-back"></a>
 <h4>使用模式三：将一个非类型安全指针转换为一个uintptr值，然后此uintptr值参与各种算术运算，再将算术运算的结果uintptr值转回非类型安全指针。</h4>
 
 <div>
@@ -490,7 +498,8 @@ func main() {
 	// 从这里到下一行代码执行之前，t值将不再被任何值
 	// 引用，所以垃圾回收器认为它可以被回收了。一旦
 	// 它真得被回收了，下面继续使用t.y[2]值的曾经
-	// 的地址是非法和危险的！
+	// 的地址是非法和危险的！另一个危险的原因是
+	// t的地址在执行下一行之前可能改变（见事实三）。
 	ty2 := (*int16)(unsafe.Pointer(addr))
 	fmt.Println(*ty2)
 }
@@ -499,6 +508,12 @@ func main() {
 <p>
 这样的bug是非常微妙和很难被觉察到的，并且爆发出来的几率是相当得低。
 一旦这样的bug爆发出来，将很让人摸不到头脑。这是为什么使用非类型安全指针是危险的原因之一。
+</p>
+
+<p>
+<b><i>（非常抱歉：下面这一小段中介绍的<code>runtime.KeepAlive</code>技巧是不正确的。
+它虽然可以防止垃圾回收造成的危险，但是不能防止内存块移动造成的危险。
+此小段将从《Go语言101》今后的某个版本中删除。）</i></b>
 </p>
 
 如果我们确实希望将上面提到的转换拆成两行，我们应该在拆分后的两行后添加一条<code>runtime.KeepAlive</code>函数调用并将（直接或间接）引用着<code>t.y[2]</code>值的一个值传递给此调用做为实参。

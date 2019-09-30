@@ -30,25 +30,29 @@
 <p>
 </p>
 
-<div class="alert alert-success"><small>
-	<i>2019/09/25</i>: 本书《在正确的位置调用内置recover函数》一文犯了<a href="https://gfw.go101.org/article/panic-and-recover-more.html#recover-order">一个低级错误</a>。
+<div class="alert alert-warning"><small>
+	<i>2019/09/30</i>: 在“非类型安全指针”一文中添加了<a href="unsafe.html#fact-value-address-might-change">一个事实</a>并指出本书在<a href="unsafe.html#pattern-convert-to-uintptr-and-back">使用模式三：将一个非类型安全指针转换为一个uintptr值，然后此uintptr值参与各种算术运算，再将算术运算的结果uintptr值转回非类型安全指针</a>一节中犯了一个严重的错误。
+</small></div>
+
+<div class="alert alert-warning"><small>
+	<i>2019/09/25</i>: 本书《在正确的位置调用内置recover函数》一文犯了<a href="panic-and-recover-more.html#recover-order">一个低级错误</a>。
 	犯此错误的一节过段时间后将被删除。
 </small></div>
 
-<div class="alert alert-success"><small>
-	<i>2019/00/19</i>: 本书加回了、“有名类型”和“无名类型”这两个术语，但是它们的含义改变了。现在它们完全等价于“定义类型”和“非定义类型”。
+<div class="alert alert-warning"><small>
+	<i>2019/00/19</i>: 本书加回了“有名类型”和“无名类型”这两个术语，但是它们的含义改变了。现在它们完全等价于“定义类型”和“非定义类型”。
 </small></div>
 
 <!--
-<div class="alert alert-success"><small>
+<div class="alert alert-warning"><small>
 	<i>2019/04/09</i>: 本书不再使用“别名类型”、“有名类型”和“无名类型”这几个术语。
 	“类型别名”仍被使用。
 </small></div>
 
-<div class="alert alert-success">
+<div class="alert alert-warning"><small>
 	<i>2018/12/27</i>: 本书刚修正了一个严重的错误。之前，本书认为一个子切片表达式中的起始下标不能大于基础切片的长度。
 	其实这个限制是不存在的。请阅读<a href="container.html#subslice">修正后的章节</a>。
-</div>
+</small></div>
 -->
 
 <div>

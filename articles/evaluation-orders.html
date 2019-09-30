@@ -461,7 +461,7 @@ f(7) is called.
 注意：以通道接收操作做为源值的赋值语句中的目标值表达式只有在此通道接收操作被选中之后才会被估值。
 </p>
 
-比如，在下面这个例子中，表达式<code>*fptr("aaa")</code>将永不会得到估值，因为它对应的通道接收操作<code>fchan("bbb", nil)</code>是个不可能被选中的阻塞操作。
+比如，在下面这个例子中，表达式<code>*fptr("aaa")</code>将永不会得到估值，因为它对应的通道接收操作<code>&lt;-fchan("bbb", nil)</code>是个不可能被选中的阻塞操作。
 
 <pre class="line-numbers"><code class="language-go">package main
 
