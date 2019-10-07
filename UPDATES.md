@@ -1,4 +1,9 @@
 
+
+### 1.13.e (2019/十月/07)
+
+* 我决定撤回1.13.d中的勘误。
+
 ### 1.13.d (2019/九月/30)
 
 * 在“非类型安全指针”一文中添加了<a href="https://gfw.go101.org/article/unsafe.html#fact-value-address-might-change">一个事实</a>并指出此文犯了一个<a href="https://gfw.go101.org/article/unsafe.html#pattern-convert-to-uintptr-and-back">严重错误</a>。

@@ -271,6 +271,7 @@ func foo() {
 
 <p>
 详情请阅读<a href="memory-block.html#where-to-allocate">内存块</a>一文（见链接所指一节的尾部）。
+这里我们只需要知道当一个协程的栈的大小改变时，开辟在此栈上的内存块需要移动，从而相应的值的地址将改变。
 </p>
 
 <h4>事实四：我们可以将一个值的指针传递给<code>runtime.KeepAlive</code>函数调用来确保此值在此调用之前仍然处于被使用中</h4>
@@ -500,6 +501,10 @@ func main() {
 	// 它真得被回收了，下面继续使用t.y[2]值的曾经
 	// 的地址是非法和危险的！另一个危险的原因是
 	// t的地址在执行下一行之前可能改变（见事实三）。
+	// 另一个潜在的危险是：如果在此期间发生了一些
+	// 导致协程堆栈大小改变的情况，则记录在addr中
+	// 的地址将失效。当然，此危险对于这个特定的例子
+	// 并不存在。
 	ty2 := (*int16)(unsafe.Pointer(addr))
 	fmt.Println(*ty2)
 }
@@ -508,12 +513,6 @@ func main() {
 <p>
 这样的bug是非常微妙和很难被觉察到的，并且爆发出来的几率是相当得低。
 一旦这样的bug爆发出来，将很让人摸不到头脑。这是为什么使用非类型安全指针是危险的原因之一。
-</p>
-
-<p>
-<b><i>（非常抱歉：下面这一小段中介绍的<code>runtime.KeepAlive</code>技巧是不正确的。
-它虽然可以防止垃圾回收造成的危险，但是不能防止内存块移动造成的危险。
-此小段将从《Go语言101》今后的某个版本中删除。）</i></b>
 </p>
 
 如果我们确实希望将上面提到的转换拆成两行，我们应该在拆分后的两行后添加一条<code>runtime.KeepAlive</code>函数调用并将（直接或间接）引用着<code>t.y[2]</code>值的一个值传递给此调用做为实参。
@@ -531,6 +530,7 @@ func main() {
 </code></pre>
 
 <p>
+然而，我并不推荐在此使用模式中使用此<code>runtime.KeepAlive</code>技巧。具体原因见上面的注释中提到的潜在的危险。
 </p>
 
 <p>
@@ -563,53 +563,34 @@ func DoSomething(addr uintptr) {
 </code></pre>
 
 <p>
-那么此函数是如何保证处于传递给它的地址参数值<code>a1</code>、<code>a2</code>和<code>a3</code>处的内存块在此函数执行过程中一定没有被回收呢？
+那么此函数是如何保证处于传递给它的地址参数值<code>a1</code>、<code>a2</code>和<code>a3</code>处的内存块在此函数执行过程中一定没有被回收和被移动呢？
 此函数无法做出这样的保证。事实上，是编译器做出了这样的保证。
 这是<code>syscall.Syscall</code>这样的函数的特权。其它自定义函数无法享受到这样的待遇。
 </p>
 
-我们可以认为编译器在每个<code>syscall.Syscall</code>函数调用后面为在此调用中的每个被转换为<code>uintptr</code>类型的非类型安全指针实参添加了一条<code>runtime.KeepAlive</code>调用，从而确保被此非类型安全指针实参引用着的值在此<code>syscall.Syscall</code>函数调用中不会被垃圾回收掉。
+<p>
+我们可以认为编译器针对每个<code>syscall.Syscall</code>函数调用中的每个被转换为<code>uintptr</code>类型的非类型安全指针实参添加了一些指令，从而保证此非类型安全指针所引用着的内存块在此调用返回之前不会被垃圾回收和移动。
+</p>
+
+下面这个调用是安全的：
 
 <pre class="line-numbers"><code class="language-go">syscall.Syscall(syscall.SYS_READ, uintptr(fd),
 			uintptr(unsafe.Pointer(p)), uintptr(n))
-// 编译器将自动添加下面的这句调用。
-runtime.KeepAlive(unsafe.Pointer(p))
 </code></pre>
 
-<p>
-</p>
+但下面这个调用则是危险的：
 
-<!--
-<p>
-Although the <code>syscall.Syscall</code> function has this privilege,
-there is a requirement to call this function.
-The conversions from unsafe pointers to <code>uintptr</code> must be present
-within the literal representations of the arguments of the calls to this function.
-</p>
-
-For example, the following call is invalid if the <code>p</code>
-is not guaranteed to be still used after the call.
 <pre class="line-numbers"><code class="language-go">u := uintptr(unsafe.Pointer(p))
+// 被p所引用着的值在此时有可能会被回收掉，
+// 或者它的地址已经发生了改变。
 syscall.Syscall(SYS_READ, uintptr(fd), u, uintptr(n))
 </code></pre>
 
 <p>
 </p>
--->
 
 <p>
-再提醒一次，此使用模式不适用于其它自定义函数。我们在其它自定义函数的调用后应该手动添加需要的<code>runtime.KeepAlive</code>调用。
-</p>
-
-如果将上例中的<code>syscall.Syscall</code>函数调用改为下面这样，则它将是危险的。
-
-<pre class="line-numbers"><code class="language-go">u := uintptr(unsafe.Pointer(p))
-// 被p所引用着的值在此时有可能会被回收掉。
-syscall.Syscall(SYS_READ, uintptr(fd), u, uintptr(n))
-// 这里编译器不会自动添加runtime.KeepAlive调用。
-</code></pre>
-
-<p>
+再提醒一次，此使用模式不适用于其它自定义函数。
 </p>
 
 </div>

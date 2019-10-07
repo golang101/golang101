@@ -460,7 +460,7 @@ func int(){}       // 遮挡了内置类型int
 
 func main() {
 	fmt.Println("a weird program")
-	var print = fmt.Println
+	var output = fmt.Println
 
 	var fmt = [len]nil{{}, {}, {}} // 遮挡了包引入fmt
 	// var n = len(fmt) // error: len是一个常量
@@ -475,7 +475,7 @@ func main() {
 		var true = true+1
 		// 下一行编译不通过，因为fmt是一个数组。
 		// fmt.Println(true, false)
-		print(true, false)
+		output(true, false)
 	}
 }
 </code></pre>

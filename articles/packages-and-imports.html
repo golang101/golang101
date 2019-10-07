@@ -212,43 +212,47 @@ type of a: int, type of b: string
 </p>
 </div>
 
-<h3>代码包文件夹、代码包引入路径、和代码包依赖关系</h3>
+<h3>代码包目录、代码包引入路径、和代码包依赖关系</h3>
 
 <div>
 <p>
-一个代码包可以由若干Go源文件组成。一个代码包的源文件须都处于同一个文件夹下。
-一个文件夹（不包含子文件夹）下的所有源文件必须都处于同一个代码包中，亦即这些源文件开头的<code>package pkgname</code>语句必须一致。
-所以，一个代码包对应着一个文件夹（不包含子文件夹），反之亦然。
-对应着一个代码包的文件夹称为此代码包的文件夹。
-一个代码包文件夹下的每个子文件夹对应的都是另外一个独立的代码包。
+一个代码包可以由若干Go源文件组成。一个代码包的源文件须都处于同一个目录下。
+一个目录（不包含子目录）下的所有源文件必须都处于同一个代码包中，亦即这些源文件开头的<code>package pkgname</code>语句必须一致。
+所以，一个代码包对应着一个目录（不包含子目录），反之亦然。
+对应着一个代码包的目录称为此代码包的目录。
+一个代码包目录下的每个子目录对应的都是另外一个独立的代码包。
 </p>
 
 <p>
-根据不同的情形，名称为<code>vendor</code>的文件夹可能被视为特殊的文件夹。下面的段落将会解释其特殊性。
+对于官方Go SDK来说，一个引入路径中包含有<code>internal</code>目录名的代码包被视为一个特殊的代码包。
+它只能被此<code>internal</code>目录的直接父目录中的代码包所引入。
+比如，代码包<code>.../a/b/c/internal/d/e/f</code>和<code>.../a/b/c/internal</code>只能被引入路径含有<code>.../a/b/c</code>前缀的代码包引入。
 </p>
-
-Go SDK 1.11版本引入了包模块（module）的概念。
-此概念对代码包的引入路径产生了一些影响。
-一个Go代码包可以选择是否支持模块模式。
-Go SDK 1.11引入了一个环境变量<code>GO111MODULE</code>。这个环境变量的默认值是<code>auto</code>，它的其它两个可能取值为<code>on</code>和<code>off</code>。
-如果此环境变量取值为<code>on</code>，则所有的代码包都支持模块模式；
-如果此环境变量取值为<code>off</code>，则所有的代码包都不支持模块模式；
-如果此环境变量取值为<code>auto</code>，则只有同时满足下面两个条件的代码包才支持模块模式：
-<ol>
-<li>
-	代码包文件夹必须处于<code>GOPATH</code>环境变量指定的所有路径的<code>src</code>子目录以外。
-</li>
-<li>
-	代码包文件夹或者它的某个上级目录文件夹中含有一个名为<code>go.mod</code>文件。
-</li>
-</ol>
 
 <p>
-对于一个不支持模块模式的代码包，通常它应该处于某个<code>GOPATH/src</code>路径之下。
-它的包引入路径为此包的文件夹相对于<code>GOPATH/src</code>或者某个<code>vendor</code>目录的相对路径。
+根据不同的情形，名称为<code>vendor</code>的目录也可能被视为特殊的代码包目录。下面的段落将会解释哪些<code>vendor</code>目录将被视为特殊的目录。
 </p>
 
-在不支持模块模式的情形下，假设有一个如下的包层级结构，则：
+<p>
+Go SDK 1.11版本引入了模块（modules）特性的概念。
+一个模块可以被看做是一些拥有一个共同的根目录的代码包集合，即一个代码包树。
+每个模块关联着一个根引入路径和一个<a href="https://semver.org/">语义化版本号</a>。
+语义化版本号的主版本须体现在根引入路径中，除了<code>v0</code>和<code>v1</code>主版本号。
+两个关联着不同的根引入路径的模块被视为两个不同的模块。
+</p>
+
+<p>
+Go SDK 1.11也引入了一个<code>GO111MODULE</code>环境变量，它的值可以为<code>auto</code>、<code>on</code>或<code>off</code>。
+截至到目前（Go SDK v1.13），它的默认值为<code>auto</code>。
+根据具体情景，不同的SDK版本将根据不同的规则把<code>auto</code>解读为<code>on</code>或者<code>off</code>。
+请阅读<a href="https://github.com/golang/go/wiki/Modules">官方维基</a>以获取详情。
+</p>
+
+<p>
+如果一个代码包处于某个<code>GOPATH/src</code>目录之下（间接或直接），并且模块特性为关闭状态（<code>off</code>）,则它的引入路径或者为相对于此<code>GOPATH/src</code>目录的相对路径，或者为相对于包含此代码包的最内层<code>vendor</code>目录的相对路径。
+</p>
+
+举个例子，当模块特性为关闭状态时，假设有一个如下的包层级结构，则：
 <ul>
 <li>
 	两个<code>foo</code>包的引入路径均为<code>w/foo</code>。
@@ -261,10 +265,10 @@ Go SDK 1.11引入了一个环境变量<code>GO111MODULE</code>。这个环境变
 注意：
 <ul>
 <li>
-	当在<code>y.go</code>文件中引入一个引入路径均为<code>w/foo</code>的包的时候，被引入的包为<code>GOPATH/src/x/y/vendor/w/foo</code>文件夹中的包。
+	当在<code>y.go</code>文件中引入一个引入路径均为<code>w/foo</code>的包的时候，被引入的包为<code>GOPATH/src/x/y/vendor/w/foo</code>目录中的包。
 </li>
 <li>
-	当在<code>x.go</code>或者<code>z.go</code>文件中引入一个引入路径为<code>w/foo</code>的包的时候，被引入的包为<code>GOPATH/src/x/vendor/w/foo</code>文件夹中的包。
+	当在<code>x.go</code>或者<code>z.go</code>文件中引入一个引入路径为<code>w/foo</code>的包的时候，被引入的包为<code>GOPATH/src/x/vendor/w/foo</code>目录中的包。
 </li>
 </ul>
 
@@ -290,29 +294,31 @@ Go SDK 1.11引入了一个环境变量<code>GO111MODULE</code>。这个环境变
 </p>
 
 <p>
-对于一个支持模块模式的代码包，其对应的<code>go.mod</code>文件中必须指定此<code>go.mod</code>文件所处的最内层文件夹对应的代码包的引入路径。
-指定引入路径的格式为<code>module ImportPath</code>。
-在这种模式下，只有和与此<code>go.mod</code>文件处于同一文件夹下的<code>vendor</code>文件夹才被视为特殊的文件夹。
-并且请注意，如果<code>go</code>命令的选项<code>-mod=vendor</code>未提供，则此<code>vendor</code>文件夹的包将被忽略，而下载缓存（处于项目代码包之外）中相应的代码包将被使用。
+当模块特性为打开状态时，一个模块的根引入路径经常（但不是必须地）被指定在此模块的根目录下的一个<code>go.mod</code>文件中。
+我们常用一个模块的根引入路径来标识此模块。
+一个模块的根引入路径是此模块中的所有代码包的引入路径的前缀。
 </p>
 
-在支持模块模式的情形下，假设有一个如下的包层级结构，则：
+<p>
+只有直接位于一个模块的根目录下的的<code>vendor</code>目录才会被视为特殊的目录。
+</p>
 
+当模块特性为打开状态时，假设有一个如下的被标识为<code>example.com/mypkg</code>的模块，则：
 <ul>
 <li>
 	第一个<code>foo</code>包的引入路径均为<code>w/foo</code>。
-	此包的父目录<code>vendor</code>文件夹被视为一个特殊的文件夹。
+	此包的父目录<code>vendor</code>目录被视为一个特殊的目录。
 </li>
 <li>
 	另外一个<code>foo</code>包的引入路径均为<code>example.com/mypkg/x/y/vendor/w/foo</code>。
-	注意这里的<code>vendor</code>文件夹被视为一个普通的包文件夹。
+	注意这里的<code>vendor</code>目录被视为一个普通的包目录。
 </li>
 <li>
 	<code>x</code>包、<code>y</code>包和<code>z</code>包的引入路径均分别为<code>example.com/mypkg/x</code>、<code>example.com/mypkg/x/y</code>和<code>example.com/mypkg/x/z</code>。
 </li>
 </ul>
 
-注意：当在<code>x.go</code>、<code>y.go</code>或者<code>z.go</code>文件中引入一个引入路径均为<code>w/foo</code>的包的时候，被引入的包均为<code>MyProject/vendor/w/foo</code>文件夹中的包。
+注意：当在<code>x.go</code>、<code>y.go</code>或者<code>z.go</code>文件中引入一个引入路径均为<code>w/foo</code>的包的时候，被引入的包均为<code>MyProject/vendor/w/foo</code>目录中的包。
 
 <pre class="disable-line-numbers111"><code class="language-go">_ MyProject
      |_ go.mod                // module example.com/mypkg
@@ -333,7 +339,6 @@ Go SDK 1.11引入了一个环境变量<code>GO111MODULE</code>。这个环境变
 </code></pre>
 
 <p>
-如果一个包文件夹含有一个<code>go.mod</code>文件，则请不要在它的任何（直接或间接）子包文件夹中也放置一个<code>go.mod</code>文件。
 </p>
 
 <p>
@@ -350,14 +355,20 @@ Go不支持循环引用（依赖）。
 </p>
 
 <p>
+和包依赖类似，一个模块也可能依赖于一些其它模块。
+此模块的直接依赖模块和这些依赖模块的版本在此模块中的<code>go.mod</code>文件中指定。
+模块循环依赖是允许的，但模块循环依赖这种情况在实践中很少见。
+</p>
+
+<p>
 今后，我们称一个程序中含有<code>main</code>入口函数的名称为<code>main</code>的代码包为程序代码包，称其它代码包为库代码包。
 一个程序只能有一个程序代码包。程序代码包不能被其它代码包引入。
 </p>
 
 <p>
-代码包文件夹的名称并不要求一定要和其对应的代码包的名称相同。
-但是，库代码包文件夹的名称最好设为和其对应的代码包的名称相同。
-因为一个代码包的引入路径中包含的是此包的文件夹名，但是此包的默认引入名为此包的名称。
+代码包目录的名称并不要求一定要和其对应的代码包的名称相同。
+但是，库代码包目录的名称最好设为和其对应的代码包的名称相同。
+因为一个代码包的引入路径中包含的是此包的目录名，但是此包的默认引入名为此包的名称。
 如果两者不一致，会使人感到困惑。
 </p>
 
@@ -478,7 +489,7 @@ var (
 </code></pre>
 
 <p>
-其中引入名<code>importname</code>是可选的，它的默认值为被引入的包的包名（不是文件夹名）。
+其中引入名<code>importname</code>是可选的，它的默认值为被引入的包的包名（不是目录名）。
 </p>
 
 事实上，在本文上面的例子中的包引入声明中，<code>importname</code>部分都被省略掉了，因为它们都分别和引入的代码包的包名相同。
@@ -559,7 +570,7 @@ func main() {
 </p>
 
 <p>
-一般来说，句点引入不推荐使用，因为它们的可读性较低。
+一般来说，句点引入不推荐使用，因为它们会导致较低的代码可读性。
 </p>
 
 <p>
