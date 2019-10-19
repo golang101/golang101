@@ -592,6 +592,24 @@ for range chan struct{}(nil) {}
 详见<a href="string.html#string-concatenation">字符串</a>一文。
 </p>
 
+<a class="anchor" id="compiler-optimizations"></a>
+<h3>
+	官方标准编译器中实现的一些优化
+</h3>
+
+<p>
+详见<a href="https://github.com/go101/go101/wiki/The-perceivable-optimizations-made-by-the-standard-Go-compiler-%28gc%29">Go语言101维基中的一文</a>。
+</p>
+
+<a class="anchor" id="compiler-optimizations"></a>
+<h3>
+	在Go程序运行中将会产生恐慌或者崩溃的情形
+</h3>
+
+<p>
+详见<a href="https://github.com/go101/go101/wiki/Panic-and-crash-cases">Go语言101维基中的一文</a>。
+</p>
+
 
 
 
@@ -601,8 +619,20 @@ for range chan struct{}(nil) {}
 
 Fatal errors which can be recovered:
 * https://play.golang.org/p/bYrfLTzXpc_o bad Mutex.Unlock call
-* create goroutine with nil function
-* memory allcaotion fails
+1. out of memory (memory allcaotion fails)
+2. stack overflow
+3. start a goroutine with a nil entry fucntion
+4. map entry access data race detected
+https://go101.org/article/details.html#stack-overflow-is-not-panic
+
+run-time panics
+* compare interfaces with identical incomparable dynamic types
+* use interface values with incomparable dynamic types as map keys
+* one-return-result type assertions fail
+5. index out of range
+6. nil pointer dereference
+7. send to closed channels
+8. divide 0
 
 The optimizations made by gc
 * len([]rune(str)) // since Go 1.11
@@ -611,7 +641,7 @@ The optimizations made by gc
   len([]rune(string))
   string + string
 * since Go 1.11, https://github.com/golang/go/issues/21266#issuecomment-384706868
-  possible future append(s, make([]T)) optimiation
+  possible future append(s, make([]T)) optimization
   https://docs.google.com/presentation/d/1tpeJZFObkeick4CF-mx0L3CeCgvT15B96aJeRpxEPcE/preview#slide=id.g3bc6fcf60c_0_62
 * memclr
 * interface copy

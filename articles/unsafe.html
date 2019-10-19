@@ -531,6 +531,9 @@ func main() {
 
 <p>
 然而，我并不推荐在此使用模式中使用此<code>runtime.KeepAlive</code>技巧。具体原因见上面的注释中提到的潜在的危险。
+因为存在着这样一种可能：当Go运行时为变量<code>ty2</code>开辟内存的时候，当前协程的栈的大小需要进行增大调整。调整之后<code>t</code>的地址将改变，但是存储在变量<code>addr</code>中的地址值却未得到更新（因为只有开辟在栈上的指针类型的值才会被更新，而变量<code>addr</code>的类型为整数类型<code>uintptr</code>）。这直接导致存储在变量<code>ty2</code>的地址值时无效的（野指针）。
+但是，实事求是地讲，如果上例中的代码使用官方标准编译器编译，则此潜在的危险并不存在。
+原因是在官方标准编译器的实现中，一个<code>runtime.KeepAlive</code>调用将使它的实参和被此实参引用的值开辟到堆上，并且开辟在堆上的内存块从不会被移动。
 </p>
 
 <p>
@@ -624,6 +627,10 @@ p := (*int)(unsafe.Pointer(u))
 </code></pre>
 
 <p>
+</p>
+
+<p>
+注意：此使用模式也适用于Windows系统中的<a href="https://golang.org/pkg/syscall/?GOOS=windows#Proc.Call">syscall.Proc.Call</a>和<a href="https://golang.org/pkg/syscall/?GOOS=windows#LazyProc.Call">syscall.LazyProc.Call</a>系统调用。
 </p>
 
 </div>
@@ -761,6 +768,35 @@ func main() {
 <p>
 此实现借鉴于<code>strings</code>标准库包中的<code>Builder</code>类型的<code>String</code>方法的实现。
 此实现利用了上述第一个使用模式。
+</p>
+
+事实上，为了避免因为忘记调用<code>runtime.KeepAlive</code>函数而造成的危险，在日常编程中更推荐使用我们自定义<code>Data</code>字段的类型为<code>unsafe.Pointer</code><code>SliceHeader</code>和<code>StringHeader</code>结构体。比如：
+
+<pre class="line-numbers"><code class="language-go">type SliceHeader struct {
+	Data unsafe.Pointer
+	Len  int
+	Cap  int
+}
+
+type StringHeader struct {
+	Data unsafe.Pointer
+	Len  int
+}
+
+func String2ByteSlice(str string) (bs []byte) {
+	strHdr := (*StringHeader)(unsafe.Pointer(&str))
+	sliceHdr := (*SliceHeader)(unsafe.Pointer(&bs))
+	sliceHdr.Data = strHdr.Data
+	sliceHdr.Len = strHdr.Len
+	sliceHdr.Cap = strHdr.Len
+	
+	// 此KeepAlive调用变得不再必需。
+	//runtime.KeepAlive(&str)
+	return
+}
+</code></pre>
+
+<p>
 </p>
 
 </div>

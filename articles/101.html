@@ -24,20 +24,24 @@
 
 
 <div class="text-center">
-	<img src="res/101-reward-qrcode-2.png" alt="赞赏" style="max-width: 100%; height: auto; width: auto\9;"></img>
+	<img src="res/101-reward-qrcode-5.png" alt="赞赏" style="max-width: 100%; height: auto; width: auto\9;"></img>
 </div>
 
 <p>
 </p>
 
 <div class="alert alert-warning"><small>
-	<strike><i>2019/09/30</i>: 在“非类型安全指针”一文中添加了<a href="unsafe.html#fact-value-address-might-change">一个事实</a>并指出本书在<a href="unsafe.html#pattern-convert-to-uintptr-and-back">使用模式三：将一个非类型安全指针转换为一个uintptr值，然后此uintptr值参与各种算术运算，再将算术运算的结果uintptr值转回非类型安全指针</a>一节中犯了一个严重的错误。</strike>
+	<i>2019/10/18</i>: “表达式估值顺序规则”一文中对<a href="evaluation-orders.html#value-assignment">赋值语句中的表达式估值和赋值执行顺序</a>的解释有<a href="https://github.com/golang/go/issues/27821#issuecomment-543611217">不恰当之处</a>。目前采用了一个新的更简单的描述来解释。
+</small></div>
+
+<div class="alert alert-warning"><small>
+	<i>2019/09/30</i>: 在“非类型安全指针”一文中添加了<a href="unsafe.html#fact-value-address-might-change">一个事实</a><strike>并指出本书在<a href="unsafe.html#pattern-convert-to-uintptr-and-back">使用模式三：将一个非类型安全指针转换为一个uintptr值，然后此uintptr值参与各种算术运算，再将算术运算的结果uintptr值转回非类型安全指针</a>一节中犯了一个严重的错误</strike>。
 	<i>（我决定撤回此勘误。）</i>
 </small></div>
 
 <div class="alert alert-warning"><small>
 	<i>2019/09/25</i>: 本书《在正确的位置调用内置recover函数》一文犯了<a href="panic-and-recover-more.html#recover-order">一个低级错误</a>。
-	犯此错误的一节过段时间后将被删除。
+	犯此错误的一节过段时间后将被修订。
 </small></div>
 
 <div class="alert alert-warning"><small>

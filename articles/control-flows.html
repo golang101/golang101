@@ -514,7 +514,7 @@ default:
 switch 5 {
 }
 
-switch n := 5; {
+switch _ = 5; {
 }
 
 switch {
@@ -650,7 +650,7 @@ Next:
 	i++
 	goto Next
 Exit: // 此标签声明在k的作用域内，但
-      // 它的使用再在k的作用域之外。
+      // 它的使用在k的作用域之外。
 }
 </code></pre>
 
@@ -660,7 +660,7 @@ Exit: // 此标签声明在k的作用域内，但
 </p>
 
 第一种途径是缩小变量<code>k</code>的作用域：
-<pre class="line-numbers"><code class="language-go">func main() func main() {
+<pre class="line-numbers"><code class="language-go">func main() {
 	i := 0
 Next:
 	if i >= 5 {

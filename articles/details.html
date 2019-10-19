@@ -1840,6 +1840,26 @@ func main() {
 
 <p>
 </p>
+
+如果你的项目只支持Go 1.13+，则更推荐使用<code>errors.Is(err, os.ErrNotExist)</code>来检查文件是否存在。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import (
+	"errors"
+	"fmt"
+	"os"
+)
+
+func main() {
+	_, err := os.Stat("a-nonexistent-file.abcxyz")
+	fmt.Println(errors.Is(err, os.ErrNotExist)) // true
+}
+</code></pre>
+
+<p>
+</p>
+
 </div>
 
 
@@ -1921,14 +1941,15 @@ arguments: [arg0 arg1]
 <h3><code>[Sp|Fp|P]rintf</code>函数支持位置参数。</h3>
 
 <div>
-下面的程序会打印<code>3, 2, 1</code>。
+下面的程序会打印<code>coco</code>。
 
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
 func main() {
-	fmt.Printf("%[3]v, %[2]v, %[1]v", 1, 2, 3) // 3, 2, 1
+	// The next line prints: coco
+	fmt.Printf("%[2]v%[1]v%[2]v%[1]v", "o", "c")
 }
 </code></pre>
 

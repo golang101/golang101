@@ -22,15 +22,14 @@
 	<li><a class="index" href="#atomical-assignment">赋值是原子操作吗？</a></li>
 	<li><a class="index" href="#zero-values-zero-bytes">是否每一个零值在内存中占据的字节都是零？</a></li>
 	<li><a class="index" href="#function-inline">标准的Go编译器是否支持函数内联？</a></li>
+	<li><a class="index" href="#finalizers">终结器（finalizer）可以用做对象的析构函数吗？</a></li>
 	</ul>
 </li>
 
 <li>标准库
 	<ul class="index">
-	<li><a class="index" href="#pointer-atomic">如何原子地操作指针值？</a></li>
 	<li><a class="index" href="#get-days-of-month">如何使用尽可能短的代码行数来获取任意月份的天数？</a></li>
 	<li><a class="index" href="#time-sleep-after">函数调用<code>time.Sleep(d)</code>和通道接收<code>&lt;-time.After(d)</code>操作之间有何区别？</a></li>
-	<li><a class="index" href="#finalizers">终结器（finalizer）可以用做对象的析构函数吗？</a></li>
 	<li><a class="index" href="#trim">调用<code>strings</code>和<code>bytes</code>标准库包里<code>TrimLeft</code>和<code>TrimRight</code>函数经常会返回不符预期的结果，这些函数的实现存在bugs吗？</a></li>
 	<li><a class="index" href="#fmt-print-println">函数<code>fmt.Print</code>和<code>fmt.Println</code>的区别是什么？</a></li>
 	<li><a class="index" href="#log-print-println">函数<code>log.Print</code>和函数<code>log.Println</code>有什么区别吗?</a></li>
@@ -54,6 +53,7 @@
 	<li><a class="index" href="#declare-immutables">在Go里如何声明不可变量？</a></li>
 	<li><a class="index" href="#set-container-type">为什么没有内置的<code>set</code>容器类型？</a></li>
 	<li><a class="index" href="#byte-rune-slice-string">什么是byte？什么是rune？如何将<code>[]byte</code>和<code>[]rune</code>的值转换为字符串？</a></li>
+	<li><a class="index" href="#pointer-atomic">如何原子地操作指针值？</a></li>
 	</ul>
 </li>
 <li>其它
@@ -420,55 +420,35 @@ func main() {
 </ul>
 </div>
 
-<!-- 标准库  -->
-
-<a class="anchor" id="pointer-atomic"></a>
+<a class="anchor" id="finalizers"></a>
 <h3>
-	如何原子地操作指针值？
+	终结器（finalizer）可以用做对象的析构函数吗？
 </h3>
 
-<div>
-例如:
-<pre class="line-numbers"><code class="language-go">import (
-	"unsafe"
-	"sync/atomic"
-)
+<p>
+在Go程序里，我们可以通过调用<code>runtime.SetFinalizer</code>函数来给一个对象设置一个终结器函数。
+一般说来，此终结器函数将在此对象被垃圾回收之前调用。
+但是终结器并非被设计为对象的析构函数。
+通过<code>runtime.SetFinalizer</code>函数设置的终结器函数并不保证总会被运行。
+因此我们不应该依赖于终结器来保证程序的正确性。
+</p>
 
-type T int // just a demo
+<p>
+终结器的主要用途是为了库包的维护者能够尽可能地避免因为库包使用者不正确地使用库包而带来的危害。
+例如，我们知道，当在程序中使用完某个文件后，我们应该将其关闭。
+但是有时候因为种种原因，比如经验不足或者粗心大意，导致一些文件在使用完成后并未被关闭，那么和这些文件相关的很多资源只有在此程序退出之后才能得到释放。这属于资源泄漏。
+为了尽可能地避免防止资源泄露，<code>os</code>库包的维护者将会在一个<code>os.File</code>对象被被创建的时候为之设置一个终结器。
+此终结器函数将关闭此<code>os.File</code>对象。当此<code>os.File</code>对象因为不再被使用而被垃圾回收的时候，此终结器函数将被调用。
+</p>
 
-var p *T
+<!-- to add best practices and more cases where finalizer doesn't work. -->
 
-func demo(newP *T) {
-	// 加载（读取）
-	var _ = (*T)(atomic.LoadPointer(
-		(*unsafe.Pointer)(unsafe.Pointer(&p)),
-		))
+<p>
+请记住，有一些终结器函数永远不会被调用，并且有时候不当的设置终结器函数将会阻止对象被垃圾回收。
+关于更多细节请阅读<a href="https://golang.google.cn/pkg/runtime/#SetFinalizer">runtime.SetFinalizer函数的文档</a>。
+</p>
 
-	// 存储（修改）
-	atomic.StorePointer(
-		(*unsafe.Pointer)(unsafe.Pointer(&p)),
-		unsafe.Pointer(newP),
-		)
-
-
-	// 交换
-	var oldP = (*T)(atomic.SwapPointer(
-		(*unsafe.Pointer)(unsafe.Pointer(&p)),
-		unsafe.Pointer(newP),
-		))
-
-	// 比较并交换
-	var swapped = atomic.CompareAndSwapPointer(
-		(*unsafe.Pointer)(unsafe.Pointer(&p)),
-		unsafe.Pointer(oldP),
-		unsafe.Pointer(newP),
-		)
-
-	_ = swapped
-}
-</code></pre>
-是的，目前指针的原子操作使用起来非常得繁琐。
-</div>
+<!-- 标准库  -->
 
 <a class="anchor" id="get-days-of-month"></a>
 <h3>
@@ -522,34 +502,6 @@ func main() {
 两者都会将当前的goroutine执行暂停一段时间。
 区别在于<code>time.Sleep(d)</code>函数调用将使当前的协程进入睡眠字状态，但是当前协程的<a href="control-flows-more.html#states-of-goroutine">（主）状态</a>依然为运行状态；
 而通道接收<code>&lt;-time.After(d)</code>操作将使当前协程进入阻塞状态。
-</p>
-
-<a class="anchor" id="finalizers"></a>
-<h3>
-	终结器（finalizer）可以用做对象的析构函数吗？
-</h3>
-
-<p>
-在Go程序里，我们可以通过调用<code>runtime.SetFinalizer</code>函数来给一个对象设置一个终结器函数。
-一般说来，此终结器函数将在此对象被垃圾回收之前调用。
-但是终结器并非被设计为对象的析构函数。
-通过<code>runtime.SetFinalizer</code>函数设置的终结器函数并不保证总会被运行。
-因此我们不应该依赖于终结器来保证程序的正确性。
-</p>
-
-<p>
-终结器的主要用途是为了库包的维护者能够尽可能地避免因为库包使用者不正确地使用库包而带来的危害。
-例如，我们知道，当在程序中使用完某个文件后，我们应该将其关闭。
-但是有时候因为种种原因，比如经验不足或者粗心大意，导致一些文件在使用完成后并未被关闭，那么和这些文件相关的很多资源只有在此程序退出之后才能得到释放。这属于资源泄漏。
-为了尽可能地避免防止资源泄露，<code>os</code>库包的维护者将会在一个<code>os.File</code>对象被被创建的时候为之设置一个终结器。
-此终结器函数将关闭此<code>os.File</code>对象。当此<code>os.File</code>对象因为不再被使用而被垃圾回收的时候，此终结器函数将被调用。
-</p>
-
-<!-- to add best practices and more cases where finalizer doesn't work. -->
-
-<p>
-请记住，有一些终结器函数永远不会被调用，并且有时候不当的设置终结器函数将会阻止对象被垃圾回收。
-关于更多细节请阅读<a href="https://golang.google.cn/pkg/runtime/#SetFinalizer">runtime.SetFinalizer函数的文档</a>。
 </p>
 
 <a class="anchor" id="trim"></a>
@@ -1060,11 +1012,62 @@ func main() {
 	fmt.Println(s0 == s2) // true
 }
 </code></pre>
-</div>
 
 <p>
 更多关于字符串的信息，请阅读<a href="string.html">Go中的字符串</a>一文。
 </p>
+</div>
+
+<a class="anchor" id="pointer-atomic"></a>
+<h3>
+	如何原子地操作指针值？
+</h3>
+
+<div>
+例如:
+<pre class="line-numbers"><code class="language-go">import (
+	"unsafe"
+	"sync/atomic"
+)
+
+type T int // just a demo
+
+var p *T
+
+func demo(newP *T) {
+	// 加载（读取）
+	var _ = (*T)(atomic.LoadPointer(
+		(*unsafe.Pointer)(unsafe.Pointer(&p)),
+		))
+
+	// 存储（修改）
+	atomic.StorePointer(
+		(*unsafe.Pointer)(unsafe.Pointer(&p)),
+		unsafe.Pointer(newP),
+		)
+
+
+	// 交换
+	var oldP = (*T)(atomic.SwapPointer(
+		(*unsafe.Pointer)(unsafe.Pointer(&p)),
+		unsafe.Pointer(newP),
+		))
+
+	// 比较并交换
+	var swapped = atomic.CompareAndSwapPointer(
+		(*unsafe.Pointer)(unsafe.Pointer(&p)),
+		unsafe.Pointer(oldP),
+		unsafe.Pointer(newP),
+		)
+
+	_ = swapped
+}
+</code></pre>
+
+<p>
+是的，目前指针的原子操作使用起来非常得繁琐。
+</p>
+</div>
 
 <!-- 其它 -->
 
