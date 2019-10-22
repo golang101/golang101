@@ -271,7 +271,8 @@ func main() {
 	// const C int = C // error: C未定义
 	/*
 	type T = struct {
-		*T // error: 不可循环引用
+		*T    // error: 不可循环引用
+		x []T // error: 不可循环引用
 	}
 	*/
 
@@ -299,6 +300,7 @@ func main() {
 	var p P
 	p = &p
 	p = ***********************p
+	***********************p = p
 }
 </code></pre>
 
@@ -383,6 +385,50 @@ func main() {
 <p>
 </p>
 
+下面是另一个关于标识符遮挡和作用域的例子。此例子程序运行将输出<code>Sheep Goat</code>而不是<code>Sheep Sheep</code>。
+请阅读其中的注释获取原因。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import "fmt"
+
+var f = func(b bool) {
+	fmt.Print("Goat")
+}
+
+func main() {
+	var f = func(b bool) {
+		fmt.Print("Sheep")
+		if b {
+			fmt.Print(" ")
+			f(!b) // 此f乃包级变量f也。
+		}
+	}
+	f(true) // 此f为刚声明的局部变量f。
+}
+</code></pre>
+
+<p>
+</p>
+
+如果我们将上例中局部变量声明中的<code>var</code>关键字删除（从而将其变为一个纯赋值语句），或者将上例更改为如下所示，则此程序将运行输出<code>Sheep Sheep</code>。
+
+<pre class="line-numbers"><code class="language-go">func main() {
+	var f func(b bool)
+	f = func(b bool) {
+		fmt.Print("Sheep")
+		if b {
+			fmt.Print(" ")
+			f(!b) // 现在，此f变为局部变量f了。
+		}
+	}
+	f(true)
+}
+</code></pre>
+
+<p>
+</p>
+
 在某些情况下，当一些标识符被内层的一个变量短声明中声明的变量所遮挡时，一些新手Go程序员会搞不清楚此变量短声明中声明的哪些变量是新声明的变量。
 下面这个例子（含有bug）展示了Go编程中一个比较有名的陷阱。
 几乎每个Go程序员在刚开始使用Go的时候都曾经掉入过此陷阱。
@@ -407,7 +453,7 @@ func parseInt(s string) (int, error) {
 		// 如果代码运行到这里，一些新手Go程序员
 		// 期望着内层的nil err将被返回。但是其实
 		// 返回是外层的非nil err。因为内层的err
-		// 的作用域到第一个if代码块结尾就结束了。
+		// 的作用域到外层if代码块结尾就结束了。
 		if b {
 			n = 1
 		}

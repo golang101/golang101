@@ -1,6 +1,7 @@
 ### 1.13.f (2019/十月/18)
 
 * 修正了“表达式估值顺序规则”一文中对[赋值语句中的表达式估值和赋值执行顺序](https://gfw.go101.org/article/evaluation-orders.html#value-assignment)的欠妥解释。
+* 添加了[两条总结](https://gfw.go101.org/article/101.html#compiler-optimizations)。
 
 ### 1.13.e (2019/十月/07)
 
