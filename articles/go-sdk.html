@@ -124,7 +124,7 @@ Go SDK工具要求所有的Go源代码文件必须以<code>.go</code>后缀结�
 如果一个程序的<code>main</code>包中有若干Go源代码，
 我们也可以使用下面的命令运行此程序。
 
-<pre class="output"><code>$ go run *.go
+<pre class="output"><code>$ go run .
 </code></pre>
 
 <p>
@@ -213,7 +213,7 @@ Go SDK工具要求所有的Go源代码文件必须以<code>.go</code>后缀结�
 <p>
 <code>godoc</code>程序启动时默认将会为所有本地已经下载的Go第三方库包生成文档。
 有时这可能需要很长的时间。如果你只想查看标准库的文档，你可以在<code>godoc</code>命令运行之前在终端中将<code>GOPATH</code>环境变量暂时设为一个不存在的路径，
-比如：<code>GOPATH=nonexist godoc -http=:9999</code>。
+比如，在Linux系统中，可以运行<code>GOPATH=nonexist godoc -http=:9999</code>。
 </p>
 
 <!--
