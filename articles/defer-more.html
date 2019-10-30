@@ -34,11 +34,32 @@ func main() {
 </code></pre>
 </div>
 
+<a class="anchor" id="function-evaluation-time"></a>
 <h3>延迟调用的函数值的估值时刻</h3>
 
 <div>
+一个被延迟调用的函数值是在其调用被推入延迟调用堆栈之前被估值的。
+例如，下面这个例子将输出<code>false</code>。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import "fmt"
+
+func main() {
+	var f = func () {
+		fmt.Println(false)
+	}
+	defer f()
+	f = func () {
+		fmt.Println(true)
+	}
+}
+</code></pre>
+
+<p></p>
+
 一个被延迟调用的函数值可能是一个nil函数值。这种情形将导致一个恐慌。
-对于这种情形，恐慌产生在此延迟调用被推入延迟调用堆栈之前。
+对于这种情形，恐慌产生在此延迟调用被执行而不是被推入延迟调用堆栈的时候。
 一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -49,8 +70,8 @@ func main() {
 	var f func() // f == nil
 	defer f()    // 将产生一个恐慌
 	// 下面的代码不会被执行。
-	fmt.Println("not reachable")
-	f = func() {}
+	fmt.Println("also reachable")
+	f = func() {} // 此行不会阻止恐慌产生
 }
 </code></pre>
 
