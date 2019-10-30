@@ -129,7 +129,7 @@ https://github.com/golang/go/issues/18640
 
 <p>
 对于类型<code>S</code>的一个值<code>v</code>，我们可以用<code>v.x</code>和<code>v.y</code>来表示它的字段。
-<code>v.x</code>这种形式称为一个选择器（selector）。
+<code>v.x</code>（或<code>v.y</code>）这种形式称为一个选择器（selector）。其中的<code>v</code>称为此选择器的属主。
 今后，我们称一个选择器中的句点<code>.</code>为属性选择操作符。
 </p>
 
@@ -284,7 +284,8 @@ func main() {
 	book2 := new(Book)  // book2是另外一个指针
 	// 像使用结构值一样来使用结构体值的指针。
 	book2.pages = book1.pages
-	// 上一行等价于下一行。
+	// 上一行等价于下一行。换句话说，上一行
+	// 两个选择器中的指针属主将被自动解引用。
 	(*book2).pages = (*book1).pages
 }
 </code></pre>

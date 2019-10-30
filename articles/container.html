@@ -1850,8 +1850,12 @@ s = append(s[:from], s[to:]...)
 s = s[:from + copy(s[from:], s[to:])]
 
 // 第三种方法（不保持剩余元素的次序）：
-copy(s[from:to], s[len(s)+from-to:])
-s = s[:len(s)+from-to]
+if n := to-from; len(s)-to < n {
+	copy(s[from:to], s[to:])
+} else {
+	copy(s[from:to], s[len(s)-n:])
+}
+s = s[:len(s)-(to-from)]
 </code></pre>
 
 如果切片的元素可能引用着其它值，则我们应该重置因为删除元素而多出来的元素槽位上的元素值，以避免暂时性的内存泄露：
@@ -1959,6 +1963,13 @@ s = append(s, elements...)
 s = append(elements, s...)
 </code></pre>
 
+<p>
+上面这个代码片段中的<code>make</code>函数调用将开辟给切片<code>x</code>的内存清零。事实上，对于这个特例来说，此清零操作是完全没有必要的。
+此清零操作可能会在以后的官方标准编译器版本中<a href="https://github.com/golang/go/issues/31592">被优化掉</a>。
+</p>
+
+</div>
+
 <h4>插入若干独立的元素</h4>
 
 <p>
@@ -1991,8 +2002,6 @@ s = append(s, e)
 在实践中，需求是各种各样的。对于某些特定的情形，上面的例子中的代码实现可能并非是最优化的，甚至是不满足要求的。
 所以，请在实践中根据具体情况来实现代码。或许，这是为什么Go没有支持更多的内置切片操作的原因。
 </p>
-
-</div>
 
 <h3>用映射来模拟集合（set）</h3>
 

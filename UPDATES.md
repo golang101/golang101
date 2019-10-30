@@ -1,3 +1,7 @@
+### 1.13.g (2019/十月/30)
+
+* 改正了“数组、切片和映射”一文中对[删除一段切片元素](https://gfw.go101.org/article/container.html#delete-slice-elements)一节中的错误代码。
+
 ### 1.13.f (2019/十月/18)
 
 * 修正了“表达式估值顺序规则”一文中对[赋值语句中的表达式估值和赋值执行顺序](https://gfw.go101.org/article/evaluation-orders.html#value-assignment)的欠妥解释。
