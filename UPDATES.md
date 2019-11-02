@@ -1,8 +1,10 @@
-### 1.13.g (2019/十月/30)
+### 1.13.i (2019/十月/31)
 
 * 改正了“数组、切片和映射”一文中对[删除一段切片元素](https://gfw.go101.org/article/container.html#delete-slice-elements)一节中的错误代码。
+* 更正了[延迟调用的函数值的估值时刻](https://gfw.go101.org/article/function.html#function-evaluation-time)一节中的解释。
+* "在正确的位置调用内置<code>recover</code>函数"一文[改名](https://gfw.go101.org/article/panic-and-recover-more.html)为“详解panic/recover原理”。这篇文章几乎被整个重写了。
 
-### 1.13.f (2019/十月/18)
+### 1.13.h (2019/十月/18)
 
 * 修正了“表达式估值顺序规则”一文中对[赋值语句中的表达式估值和赋值执行顺序](https://gfw.go101.org/article/evaluation-orders.html#value-assignment)的欠妥解释。
 * 添加了[两条总结](https://gfw.go101.org/article/101.html#compiler-optimizations)。
@@ -17,7 +19,7 @@
   
 ### 1.13.c (2019/九月/25)
 
-* 删除了《在正确的位置调用内置recover函数》一文中<a href="https://gfw.go101.org/article/panic-and-recover-more.html#recover-order">犯了低级错误的一节</a>。
+* 删除了《在正确的位置调用内置recover函数》一文中犯了低级错误的一节。
 
 ### 1.13.b (2019/九月/19)
 

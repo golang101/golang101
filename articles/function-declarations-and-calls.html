@@ -203,13 +203,17 @@ func doNothing(string, int32) {
 <a href="control-flows-more.html">后面的一文</a>将对这两个特性进行详解。
 </p>
 
-<a class="anchor" id="existing-phase"></a>
+<a class="anchor" id="exiting-phase"></a>
 <h3>函数调用的退出阶段</h3>
 
 <p>
 在Go中，当一个函数调用返回后（比如执行了一个<code>return</code>语句或者函数中的最后一条语句执行完毕），
 此调用可能并未立即退出。一个函数调从返回开始到最终退出的阶段称为此函数调用的退出阶段（exiting phase）。
-函数调用的退出阶段的意义将在讲解延迟函数的时候一并讲解。
+函数调用的退出阶段的意义将在讲解<a href="control-flows-more.html#defer">延迟函数</a>的时候体现出来。
+</p>
+
+<p>
+函数调用的退出阶段将在<a href="panic-and-recover-more.html#exiting-phase">后面的一篇文章</a>中详细解释。
 </p>
 
 <h3>匿名函数</h3>

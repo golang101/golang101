@@ -24,13 +24,13 @@
 运行
 
 ```
-$ git clone gitlab.com/go101/go101
+$ git clone https://gitlab.com/golang101/golang101.git
 ```
 
 或者
 
 ```
-$ git clone github.com/go101/go101
+$ git clone https://github.com/golang101/golang101.git
 ```
 
 

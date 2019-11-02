@@ -5,6 +5,7 @@
 下面将展示一些恐慌/恢复用例。
 </p>
 
+<a class="anchor" id="avoid-crashing"></a>
 <h3>用例1：避免恐慌导致程序崩溃</h3>
 
 <div>
@@ -57,6 +58,7 @@ func ClientHandler(c net.Conn) {
 
 </div>
 
+<a class="anchor" id="auto-restart"></a>
 <h3>用例2：自动重启因为恐慌而退出的协程</h3>
 
 <div>
@@ -96,6 +98,7 @@ func main() {
 </code></pre>
 </div>
 
+<a class="anchor" id="long-jump"></a>
 <h3>用例3：使用<code>panic</code>/<code>recover</code>函数调用模拟长程跳转</h3>
 
 <div>
@@ -136,6 +139,7 @@ func main() {
 </code></pre>
 </div>
 
+<a class="anchor" id="avoid-verbose"></a>
 <h3>用例4：使用<code>panic</code>/<code>recover</code>函数调用来减少错误检查代码</h3>
 
 <div>
@@ -163,7 +167,16 @@ func main() {
 // * 如果本步失败，则调用panic(err)来制造一个恐慌
 //   以示不需继续；
 // * 不制造任何恐慌表示继续下一步。
-func doStepN() {...}
+func doStepN() {
+	...
+	if err != nil {
+		panic(err)
+	}
+	...
+	if done {
+		panic(nil)
+	}
+}
 </code></pre>
 
 <p>
@@ -197,7 +210,17 @@ func doStepN() {...}
 
 // 如果返回值err不为nil，则shouldContinue一定为true。
 // 如果shouldContinue为true，返回值err可能为nil或者非nil。
-func doStepN() (shouldContinue bool, err error) {...}
+func doStepN() (shouldContinue bool, err error) {
+	...
+	if err != nil {
+		return false, err
+	}
+	...
+	if done {
+		return false, nil
+	}
+	return true, nil
+}
 </code></pre>
 
 <!--

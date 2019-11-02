@@ -1910,14 +1910,15 @@ s[:len(s)+1][len(s)] = t0
 </p>
 </div>
 
-<h4>条件性的删除切片元素</h4>
+<h4>条件性地删除切片元素</h4>
 
 <div>
 有时，我们需要删除满足某些条件的切片元素。
 
 <pre class="line-numbers"><code class="language-go">// 假设T是一个小尺寸类型。
 func DeleteElements(s []T, keep func(T) bool, clear bool) []T {
-	result := make([]T, 0, len(s))
+	// result := make([]T, 0, len(s))
+	result := s[:0] // 无须开辟内存
 	for _, v := range s {
 		if keep(v) {
 			result = append(result, v)
@@ -1926,12 +1927,16 @@ func DeleteElements(s []T, keep func(T) bool, clear bool) []T {
 	if clear { // 避免暂时性的内存泄露。
 		temp := s[len(result):]
 		for i := range temp {
-			temp[i] = t0 // t0是类型T的零值的字面表示形式
+			temp[i] = t0 // t0是类型T的零值
 		}
 	}
 	return result
 }
 </code></pre>
+
+<p>
+注意：如果<code>T</code>是一个大尺寸类型，请<a href="value-copy-cost.html#copy-costs">慎用</a><code>T</code>做为参数类型和使用双循环变量<code>for-range</code>代码块遍历元素类型为<code>T</code>的切片。
+</p>
 
 </div>
 

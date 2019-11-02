@@ -31,6 +31,22 @@
 </p>
 
 <div class="alert alert-warning"><small>
+	<i>2019/10/31</i>:
+	<ul>
+	<li>
+	改正了“删除子切片”例子代码中的<a href="https://github.com/golang101/golang101/commit/b77b9fc3eab480f96abb3bf3d4bc3063f22a4b63#diff-8eb02937949dd308587a57ed66732712">一个错误</a>。
+	</li>
+	<li>
+	更正了“延迟调用的函数值的估值时刻”的<a href="https://github.com/golang101/golang101/commit/facaf82943a5c0d21bec96ce76ad70d60fccdda7">解释</a>。
+	</li>
+	<li>
+	"在正确的位置调用内置<code>recover</code>函数"一文改名为“<a href="panic-and-recover-more.html">详解panic/recover原理</a>”。
+	</li>
+	</ul>
+	
+</small></div>
+
+<div class="alert alert-warning"><small>
 	<i>2019/10/18</i>: “表达式估值顺序规则”一文中对<a href="evaluation-orders.html#value-assignment">赋值语句中的表达式估值和赋值执行顺序</a>的解释有<a href="https://github.com/golang/go/issues/27821#issuecomment-543611217">不恰当之处</a>。目前采用了一个新的更简单的描述来解释。
 </small></div>
 
@@ -39,6 +55,7 @@
 	<i>（我决定撤回此勘误。）</i>
 </small></div>
 
+<!--
 <div class="alert alert-warning"><small>
 	<i>2019/09/25</i>: 本书《在正确的位置调用内置recover函数》一文犯了<a href="panic-and-recover-more.html#recover-order">一个低级错误</a>。
 	犯此错误的一节过段时间后将被修订。
@@ -48,7 +65,6 @@
 	<i>2019/09/19</i>: 本书加回了“有名类型”和“无名类型”这两个术语，但是它们的含义改变了。现在它们完全等价于“定义类型”和“非定义类型”。
 </small></div>
 
-<!--
 <div class="alert alert-warning"><small>
 	<i>2019/04/09</i>: 本书不再使用“别名类型”、“有名类型”和“无名类型”这几个术语。
 	“类型别名”仍被使用。
@@ -135,7 +151,7 @@ Go类型系统
 	<li><a class="index" href="line-break-rules.html">代码断行规则</a></li>
 	<li><a class="index" href="defer-more.html">更多关于延迟函数调用的知识点</a></li>
 	<li><a class="index" href="panic-and-recover-use-cases.html">一些恐慌/恢复用例</a></li>
-	<li><a class="index" href="panic-and-recover-more.html">在正确的位置调用内置<code>recover</code>函数</a></li>
+	<li><a class="index" href="panic-and-recover-more.html">详解panic/recover原理</a> - 也解释了什么是“函数退出阶段”</li>
 	<li><a class="index" href="blocks-and-scopes.html">代码块和标识符作用域</a></li>
 	<li><a class="index" href="evaluation-orders.html">表达式估值顺序规则</a></li>
 	<li><a class="index" href="value-copy-cost.html">值复制成本</a></li>

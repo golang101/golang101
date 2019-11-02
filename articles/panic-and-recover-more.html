@@ -1,67 +1,327 @@
-<h1>在正确的位置调用内置<code>recover</code>函数</h1>
+<h1>详解恐慌和恢复原理</h1>
 
 <p>
-恐慌/恢复机制已经<a href="control-flows-more.html#panic-recover">在前面的文章中介绍了</a>，
-另外<a href="panic-and-recover-use-cases.html">上一篇文章</a>也介绍了一些恐慌/恢复用例。
-通过这些介绍，我们得知一个<code>recover</code>调用只能在一个延迟函数调用中起作用。
-但是，并非所有的处于延迟函数调用中的<code>recover</code>调用都能起作用。
-本文下面将展示一些不起作用的<code>recover</code>调用，并解释它们为什么不起作用。
+恐慌和恢复原理已经在前面的文章中<a href="control-flows-more.html#panic-recover">介绍过了</a>。
+一些恐慌和恢复用例也在<a href="panic-and-recover-use-cases.html">上一篇文章中</a>得到了展示。
+本文将详细解释一下恐慌和恢复原理。函数调用的退出阶段也将被一并详细解释。
 </p>
 
+<a class="anchor" id="exiting-phase"></a>
+<h3>函数调用的退出阶段</h3>
+
 <div>
-我们先看一个例子：
+<p>
+在Go中，一个函数调用在其退出完毕之前可能将经历一个退出阶段。
+在此退出阶段，所有在执行此函数调用期间被推入延迟调用堆栈的延迟函数调用将按照它们的推入顺序的逆序被执行。
+当这些延迟函数调用都退出完毕之后，此函数调用的退出阶段也就结束了，或者说此函数调用也退出完毕了，
+</p>
+
+一个调用函数可能通过三种途径进入它的退出阶段：
+<ol>
+<li>
+	此调用正常返回；
+</li>
+<li>
+	当此调用中产生了一个恐慌；
+</li>
+<li>
+	当<code>runtime.Goexit</code>函数在此调用中被调用并且退出完毕。
+</li>
+</ol>
+
+比如，在下面这段代码中，
+<ul>
+<li>
+	函数<code>f0</code>或者<code>f1</code>的一个调用将在它正常返回后进入它的退出阶段；
+</li>
+<li>
+	函数<code>f2</code>的一个调用将在“被零除”恐慌产生之后进入它的退出阶段；
+</li>
+<li>
+	函数<code>f3</code>的一个调用将在其中的<code>runtime.Goexit</code>函数调用退出完毕之后进入它的退出阶段。
+</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-go">import (
+	"fmt"
+	"runtime"
+)
+
+func f0() int {
+	var x = 1
+	defer fmt.Println("正常退出：", x)
+	x++
+	return x
+}
+
+func f1() {
+	var x = 1
+	defer fmt.Println("正常退出：", x)
+	x++
+}
+
+func f2() {
+	var x, y = 1, 0
+	defer fmt.Println("因恐慌而退出：", x)
+	x = x / y // 将产生一个恐慌
+	x++       // 执行不到
+}
+
+func f3() int {
+	x := 1
+	defer fmt.Println("因Goexit调用而退出：", x)
+	x++
+	runtime.Goexit()
+	return x+x // 执行不到
+}
+</code></pre>
+
+<p>
+</p>
+</div>
+
+<a class="anchor" id="function-call-assosiations"></a>
+<h3>函数调用关联恐慌和Goexit信号</h3>
+<div>
+
+<p>
+当一个函数调用中直接产生了一个恐慌的时候，我们可以认为此（尚未被恢复的）恐慌将和此函数调用相关联起来。
+类似地，当一个函数调用直接调用了<code>runtime.Goexit</code>函数，则<code>runtime.Goexit</code>函数返回完毕之后，我们可以认为一个Goexit信号将和此函数调用相关联起来。
+恐慌和Goexit信号互相独立于对方，两者互不干扰。
+按照上一节中的解释，当一个恐慌或者一个Goexit信号和一个函数调用相关联之后，此函数调用将立即进入它的退出阶段。
+</p>
+
+<p>
+我们已经了解到<a href="control-flows-more.html#panic-recover">恐慌是可以被恢复的</a>。
+但是，Goexit信号是不能被取消的。
+</p>
+
+在任何一个给定时刻，一个函数调用最多只能和一个未恢复的恐慌相关联。
+如果一个调用正和一个未恢复的恐慌相关联，则
+<ul>
+<li>
+	在此恐慌被恢复之后，此调用将不再和任何恐慌相关联。
+</li>
+<li>
+	当在此函数调用中产生了一个新的恐慌，此新恐慌将替换原来的未被恢复的恐慌做为和此函数调用相关联的恐慌。
+</li>
+</ul>
+
+比如，在下面这个例子中，最总被恢复的恐慌是恐慌3。它是最后一个和<code>main</code>函数调用相关联的恐慌。
+
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
 func main() {
 	defer func() {
+		fmt.Println(recover()) // 3
+	}()
+	
+	defer panic(3) // 将替换恐慌2
+	defer panic(2) // 将替换恐慌1
+	defer panic(1) // 将替换恐慌0
+	panic(0)
+}
+</code></pre>
+
+<p>
+</p>
+
+<p>
+因为Goexit信号不可被取消，争论一个函数调用是否最多只能和一个Goexit信号相关联是没有意义和没有必要的。
+</p>
+
+在某个时刻，一个协程中可能共存多个未被恢复的恐慌，尽管这在实际编程中并不常见。
+每个未被恢复的恐慌和此协程的调用堆栈中的一个尚未退出的函数调用相关联。
+当仍和一个未被恢复的恐慌相关联的一个内层函数调用退出完毕之后，此未被恢复的恐慌将传播到调用此内层函数调用的外层函数调用中。
+这和在此外层函数调用中直接产生一个新的恐慌的效果是一样的。也就是说，
+<ul>
+<li>
+	如果此外层函数已经和一个未被恢复的旧恐慌相关联，则传播出来的新恐慌将替换此旧恐慌并和此外层函数调用相关联起来。
+	对于这种情形，此外层函数调用肯定已经进入了它的退出阶段（刚提及的内层函数肯定是被延迟调用的），这时延迟调用堆栈中的下一个延迟调用将被执行。
+</li>
+<li>
+	如果此外层函数尚未和一个未被恢复的旧恐慌相关联，则传播出来的恐慌将和此外层函数调用相关联起来。
+	对于这种情形，如果此外层函数调用尚未进入它的退出阶段，则它将立即进入。
+</li>
+</ul>
+
+<p>
+所以，当一个协程完成完毕后，此协程中最多只有一个尚未被恢复的恐慌。
+如果一个协程带着一个尚未被恢复的恐慌退出完毕，则这将是整个程序崩溃，此恐慌信息将在程序崩溃的时候被打印出来。
+</p>
+
+<p>
+在一个函数调用被执行的起始时刻，此调用将没有任何恐慌和Goexit信号和它相关联，这个事实和此函数调用的外层调用是否已经进入退出阶段无关。
+当然，在此函数调用的执行过程中，恐慌可能产生，<code>runtime.Goexit</code>函数也可能被调用，因此恐慌和Goexit信号以后可能和此调用相关联起来。
+</p>
+
+下面这个例子程序在运行时将崩溃，因为新开辟的协程在退出完毕时仍带有一个未被恢复的恐慌。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+func main() {
+	// 新开辟一个协程。
+	go func() {
+		// 一个匿名函数调用。
+		// 当它退出完毕时，恐慌2将传播到此新协程的入口
+		// 调用中，并且替换掉恐慌0。恐慌2永不会被恢复。
 		defer func() {
-			fmt.Println("7:", recover())
+			// 上一个例子中已经解释过了：恐慌2将替换恐慌1.
+			defer panic(2)
+			
+			// 当此匿名函数调用退出完毕后，恐慌1将传播到刚
+			// 提到的外层匿名函数调用中并与之关联起来。
+			func () {
+				panic(1)
+				// 在恐慌1产生后，此新开辟的协程中将共存
+				// 两个未被恢复的恐慌。其中一个（恐慌0）
+				// 和此协程的入口函数调用相关联；另一个
+				// （恐慌1）和当前这个匿名调用相关联。
+			}()
+		}()
+		panic(0)
+	}()
+	
+	select{}
+}
+</code></pre>
+
+此程序的输出（当使用标准编译器1.13版本编译）：
+<pre class="output"><code>panic: 0
+	panic: 1
+	panic: 2
+
+goroutine 5 [running]:
+...
+</code></pre>
+
+<p>
+此输出的格式并使很完美，它容易让一些程序员误认为恐慌0时最终未被恢复的恐慌。事实上，恐慌2才是最终未被恢复的恐慌。
+</p>
+
+<p>
+类似地，当一个和Goexit信号相关联的内层函数调用退出完毕后，此Goexit信号也将传播到外层函数调用中，并和外层函数调用相关联起来。
+如果外层函数调用尚未进入退出阶段，则其将立即进入。
+</p>
+
+上面提到了恐慌和Goexit信号时互不干扰的。
+换句话说，一个尚未被恢复的恐慌不会导致一个Goexit信号被取消；一个Goexit信号也不会压制遮挡一个尚未被恢复的恐慌。
+不过目前最新版本的官方两个编译器（标准编译器v1.13和gccgo v8.0）都并未正确实现此规则。
+比如，下面这个程序本应崩溃退出，但是并没有（使用最新版本的标准编译器和gccgo编译器编译）。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import "runtime"
+
+func main() {
+	c := make(chan struct{})
+	go func() {
+		defer close(c)
+		// 此调用产生的Goexit信号将压制先前
+		// 产生的恐慌"bye"，但是不应该如此。
+		defer runtime.Goexit()
+		panic("bye")
+	}()
+	<-c
+}
+</code></pre>
+
+<p>
+</p>
+
+下面是另一个两个编译器都未正确实现互不干扰规则的例子（偷自<a href="https://github.com/golang/go/issues/29226">此issue</a>）。
+此例子程序运行时不应该打印出<code>本应执行不到这里</code>字样，但是此字样却被打印出来了（使用最新版本的标准编译器和gccgo编译器编译）。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import "fmt"
+import "runtime"
+
+func f() {
+	defer func() {
+		recover()
+	}()
+	panic("将取消Goexit信号但是不应该这样")
+	runtime.Goexit()
+}
+
+func main() {
+	c := make(chan struct{})
+	go func() {
+		defer close(c)
+		f()
+		fmt.Println("本应执行不到这里")
+	}()
+	<-c
+}
+</code></pre>
+
+<p>
+标准编译器和gccgo编译器将在以后的版本中<a href="https://github.com/golang/go/issues/29226">修复此问题</a>。
+</p>
+
+</div>
+
+<a class="anchor" id="some-recovers-are-no-ops"></a>
+<h3>一些<code>recover</code>调用相当于空操作（No-Op）</h3>
+<div>
+
+内置<code>recover</code>函数必须在合适的位置调用才能发挥作用；否则，它的调用相当于空操作。
+比如，在下面这个程序中，没有一个<code>recover</code>函数调用恢复了恐慌<code>bye</code>。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+func main() {
+	defer func() {
+		defer func() {
+			recover() // 空操作
 		}()
 	}()
 	defer func() {
 		func() {
-			fmt.Println("6:", recover())
+			recover() // 空操作
 		}()
 	}()
 	func() {
 		defer func() {
-			fmt.Println("1:", recover())
+			recover() // 空操作
 		}()
 	}()
 	func() {
-		defer fmt.Println("2:", recover())
+		defer recover() // 空操作
 	}()
 	func() {
-		fmt.Println("3:", recover())
+		recover() // 空操作
 	}()
-	fmt.Println("4:", recover())
-	defer fmt.Println("5:", recover())
-	panic(789)
-	defer func() {
-		fmt.Println("0:", recover())
-	}()
+	recover()       // 空操作
+	defer recover() // 空操作
+	panic("bye")
 }
 </code></pre>
 
-运行之，我们将发现上例中的7个<code>recover</code>函数调用都没有恢复程序中产生的恐慌。
-此程序的输出结果如下：
-<pre class="output"><code>1: &lt;nil&gt;
-2: &lt;nil&gt;
-3: &lt;nil&gt;
-4: &lt;nil&gt;
-5: &lt;nil&gt;
-6: &lt;nil&gt;
-7: &lt;nil&gt;
-panic: 789
+<p>
+</p>
 
-goroutine 1 [running]:
-...
+我们已经知道下面这个<code>recover</code>调用是有作用的。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+func main() {
+	defer func() {
+		recover() // 将恢复恐慌"byte"
+	}()
+
+	panic("bye")
+}
 </code></pre>
 
-显然地，标号为0的<code>recover</code>调用（代码中最后一个）是执行不到的。
-其它7个均执行到了，但是它们的返回值都是<code>nil</code>。为什么呢？让我们先阅读一下<a href="https://golang.google.cn/ref/spec#Handling_panics">Go白皮书中列出的规则</a>：
+<p>
+</p>
+
+那么为什么本节中的第一个例子中的所有<code>recover</code>调用都不起作用呢？
+让我们先看看当前版本的<a href="https://golang.org/ref/spec#Handling_panics">Go白皮书</a>是怎么说的：
 
 <div class="alert alert-success">
 在下面的情况下，<code>recover</code>函数调用的返回值为<code>nil</code>：
@@ -73,287 +333,52 @@ goroutine 1 [running]:
 </div>
 
 <p>
-这里我们忽略第一种情况。上例中标号为1/2/3/4的<code>recover</code>调用都属于第二种情况，标号为5和6的<code>recover</code>调用都属于第三种情况。
-但是，白皮书中列出的三种情况都没有解释为什么标号为7的<code>recover</code>调用也没有恢复程序中的恐慌。
+上一篇文章中提供了<a href="panic-and-recover-use-cases.html#avoid-verbose">一个第一种情况的例子</a>。
 </p>
 
-我们知道下面的程序中的<code>recover</code>调用将捕获到<code>panic</code>调用抛出的恐慌。
-<pre class="line-numbers"><code class="language-go">// example2.go
+<p>
+本节中的第一个例子中的大多<code>recover</code>调用要么符合Go白皮书中描述的第二种情况，要么符合第三种情况，除了第一个<code>recover</code>调用。
+是的，当前版本的白皮书中的描述并不准确。此描述正<a href="https://go-review.googlesource.com/c/go/+/189377">在被改进中</a>。
+</p>
+
+事实上，当前版本的白皮书也没有解释清楚为什么下面这个例子中的第二个<code>recover</code>调用没有起作用。此调用本用来恢复恐慌1。
+
+<pre class="line-numbers"><code class="language-go">// 此程序将带着未被恢复的恐慌1而退出。
 package main
 
-import (
-	"fmt"
-)
-
-func main() {
+func demo() {
 	defer func() {
-		fmt.Println( recover() ) // 1
-	}()
-
-	panic(1)
-}
-</code></pre>
-
-<p>
-但是，这个简短的程序中的<code>recover</code>调用和前面的例子中的标号为7的<code>recover</code>调用有何本质区别呢？
-</p>
-
-<p>
-首先，让我们了解一些概念和事实。
-</p>
-</div>
-
-<h3>概念：函数调用深度、协程执行深度和恐慌深度</h3>
-
-<div>
-<p>
-每个函数调用都对应着一个相对于当前协程的入口调用的调用深度。
-对于主协程中的一个函数调用，它的调用深度是相对于<b><i>main</i></b>入口函数。
-</p>
-
-用一个例子说明：
-<pre class="line-numbers"><code class="language-go">package main
-
-func main() { // 深度为0
-	go func() { // 深度为0
-		func() { // 深度为1
-		}()
-
-		defer func() { // 深度为1
-			defer func() { // 深度为2
-			}()
-		}()
-	}()
-
-	func () { // 深度为1
-		func() { // 深度为2
-			go func() { // 深度为0
-			}()
-		}()
-
-		go func() { // 深度为0
-		}()
-	}()
-}
-</code></pre>
-</div>
-
-<p>
-如果一个协程中的当前执行位置处于某个调用中，则我们说此协程的当前执行深度为此调用的深度。
-</p>
-
-<p>
-一个协程的某个恐慌的深度为此恐慌已经传播到的函数调用深度。
-请阅读下一节以对恐慌传播有一个清晰的认识。
-</p>
-
-<h3>事实：恐慌只能向更浅的函数深度传播</h3>
-
-<div>
-是的，恐慌只会从一个函数传播到此函数的调用函数，而从不会传播到深度更深的被此函数调用的函数中。
-
-<pre class="line-numbers"><code class="language-go">package main
-
-import "fmt"
-
-func main() { // 调用深度为0
-	defer func() { // 调用深度为1
-		fmt.Println("当前恐慌深度为0（执行深度为1）")
-		func() { // 调用深度为2
-			fmt.Println("当前恐慌深度为0（执行深度为2）")
-			func() { // 调用深度为3
-				fmt.Println("当前恐慌深度为0")
-			}()
-		}()
-	}()
-
-	defer fmt.Println("当前恐慌深度为0（执行深度为0）")
-
-	func() { // 调用深度为1
-		defer fmt.Println("当前恐慌深度为1（执行深度为1）")
-		func() { // 调用深度为2
-			defer fmt.Println("当前恐慌深度为2")
-			func() { // 调用深度为3
-				defer fmt.Println("当前恐慌深度为3")
-				panic(1)
-			}()
-		}()
-	}()
-}
-</code></pre>
-
-<p>
-</p>
-</div>
-
-<p>
-所以，一个恐慌的深度总是单调递减的，它从不增加。另外，一个协程的恐慌深度从不会小于它的执行深度。
-</p>
-
-<h3>事实：新生成的恐慌将压制同一深度的老的恐慌</h3>
-
-<div>
-一个例子：
-<pre class="line-numbers"><code class="language-go">package main
-
-import "fmt"
-
-func main() {
-	defer fmt.Println("程序退出时未崩溃")
-
-	defer func() {
-		fmt.Println( recover() ) // 3
-	}()
-
-	defer fmt.Println("恐慌3将压制恐慌2")
-	defer panic(3)
-	defer fmt.Println("恐慌2将压制恐慌1")
-	defer panic(2)
-	panic(1)
-}
-</code></pre>
-
-输出：
-<pre class="output"><code>恐慌2将压制恐慌1
-恐慌3将压制恐慌2
-3
-程序退出时未崩溃
-</code></pre>
-</div>
-
-<p>
-在此例中，恐慌1被恐慌2压制了，恐慌2又被恐慌3压制了。所以，最后被捕获的恐慌值为3。
-</p>
-
-<p>
-在一个协程中，任何调用深度上最多只能有一个活动的恐慌共存。
-特别地，当一个协程的当前执行深度为0时，此协程中只能存在一个活动的恐慌。
-</p>
-
-<h3>事实：一个协程中可以有多个活动的恐慌共存</h3>
-
-<div>
-一个例子：
-<pre class="line-numbers"><code class="language-go">package main
-
-import "fmt"
-
-func main() { // 调用深度为0
-	defer fmt.Println("程序崩溃了，因为退出时恐慌3依然未恢复")
-
-	defer func() { // 调用深度为1
-		defer func() { // 调用深度为2
-			// 恐慌6被消除了。
-			fmt.Println( recover() ) // 6
-		}()
-
-		// 恐慌3的深度为0，恐慌6的深度为1。
-		defer fmt.Println("现在，恐慌3和恐慌6共存")
-		defer panic(6) // 将压制恐慌5
-		defer panic(5) // 将压制恐慌4
-		panic(4) // 不会压制恐慌3，因为恐慌4和恐慌3的深度
-		         // 不同。恐慌3为0，而恐慌4的深度为1。
-	}()
-
-	defer fmt.Println("现在，只存在恐慌3")
-	defer panic(3) // 将压制恐慌2
-	defer panic(2) // 将压制恐慌1
-	panic(1)
-}
-</code></pre>
-
-<p>
-在这个例子中，两个曾经共存过的恐慌之一（恐慌6）被恢复了。
-但是恐慌3在程序退出时仍然没有被恢复，所以此程序在退出时崩溃了。
-</p>
-
-输出：
-<pre class="output"><code>现在，只存在恐慌3
-现在，恐慌3和恐慌6共存
-6
-程序崩溃了，因为退出时恐慌3依然未恢复
-panic: 1
-	panic: 2
-	panic: 3
-
-goroutine 1 [running]:
-...
-</code></pre>
-</div>
-
-
-<a class="anchor" id="recover-order"></a>
-<h3>事实：更深的恐慌可能被先恢复也可能被后恢复</h3>
-
-<div>
-
-<p>
-<b><i>（注意：很抱歉：本节中的代码犯了个低级错误。它证明不了本节标题中的结论。在此段代码中从未有两个恐慌共存的时刻。
-本节标题中的结论以及文末最终规则总结的正确性<a href="https://github.com/golang/go/issues/34530">尚有待Go核心设计团队的确认</a>。
-根据情况，本节或将在一段时间后被删除。）</i></b>
-</p>
-
-一个例子：
-<pre class="line-numbers"><code class="language-go">package main
-
-import "fmt"
-
-func demo(recoverShallowerPanicAtFirst bool) {
-	fmt.Println("====================")
-	defer func() {
-		if !recoverShallowerPanicAtFirst{
-			// 恢复恐慌1
-			defer fmt.Println("恐慌", recover(), "被恢复了")
-		}
 		defer func() {
-			//  恢复恐慌2
-			fmt.Println("恐慌", recover(), "被恢复了")
+			recover() // 此调用将恢复恐慌2
 		}()
-		if recoverShallowerPanicAtFirst {
-			//  恢复恐慌1
-			defer fmt.Println("恐慌", recover(), "被恢复了")
-		}
-		defer fmt.Println("现在有两个恐慌共存")
+
+		defer recover() // 空操作
+
 		panic(2)
 	}()
 	panic(1)
 }
 
 func main() {
-	demo(true)
-	demo(false)
+	demo()
 }
 </code></pre>
 
-The output:
-<pre class="output"><code>====================
-现在有两个恐慌共存
-恐慌 1 被恢复了
-恐慌 2 被恢复了
-====================
-现在有两个恐慌共存
-恐慌 2 被恢复了
-恐慌 1 被恢复了
-</code></pre>
-</div>
-
-<h3>那么，一个<code>recover</code>调用发挥作用的基本规则是什么呢？</h3>
-
-<div>
-
 <p>
-<b><i>（注意：下述规则总结的正确性<a href="https://github.com/golang/go/issues/34530">尚有待Go核心设计团队的确认</a>。）</i></b>
+当前版本的白皮书没提到的一点是：在任何时刻，一个协程中只有最新产生的恐慌才能够被恢复。
+换句话说，每个<code>recover</code>调用都被视为一个恢复当前协程中最新产生并且尚未恢复的恐慌的试图。
+这就是为什么上例中的第二个<code>recover</code>调用不起作用的原因。
 </p>
 
-基本规则很简单：
-
+好了，到此我们可以对哪些<code>recover</code>调用会起作用做一个简单地解释：
 <div class="alert alert-info">
-在一个协程中，假设一个<code>recover</code>调用的调用者函数是<code>f</code>并且此<code>f</code>调用的深度为<code>d</code>，
-则此<code>recover</code>调用只有在此<code>f</code>调用是一个延迟调用并且有一个深度为<code>d-1</code>的恐慌存在的情况下才会发挥作用。
-此<code>recover</code>调用本身是否是延迟的无关紧要。
+一个<code>recover</code>调用只有在它的直接外层调用是一个延迟调用，并且此延迟调用的直接外层调用和当前协程中最新产生并且尚未恢复的恐慌相关联时才起作用。
+一个有效的<code>recover</code>调用将最新产生并且尚未恢复的恐慌和与此恐慌相关联的函数调用剥离开来，并且返回当初传递给产生此恐慌的<code>panic</code>函数调用的参数。
 </div>
 
-<p>
-我认为此规则描述比Go白皮书中的描述更准确。现在，你可以回过头重新看看为什么第一个例子中的标号为7的<code>recover</code>调用没有发挥作用。
-</p>
 </div>
+
+
+
+
+

@@ -66,11 +66,10 @@ func main() {
 import "fmt"
 
 func main() {
-	defer fmt.Println("reachable")
+	defer fmt.Println("此行可以被执行到")
 	var f func() // f == nil
 	defer f()    // 将产生一个恐慌
-	// 下面的代码不会被执行。
-	fmt.Println("also reachable")
+	fmt.Println("此行也可以被执行到")
 	f = func() {} // 此行不会阻止恐慌产生
 }
 </code></pre>
