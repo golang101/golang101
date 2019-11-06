@@ -74,10 +74,21 @@ func main() {
 </blockquote>
 
 <p>
-此规则描述在Go 1.09之前是精确的。但是随着从Go 1.09引入的自定义类型别名概念，此描述<a href="https://github.com/golang/go/issues/22005">有些过时和不太准确了</a>。
+此规则描述在Go 1.9之前是精确的。但是随着从Go 1.9引入的自定义类型别名概念，此描述<a href="https://github.com/golang/go/issues/22005">有些过时和不太准确了</a>。
 比如，此描述没有包括上一节的例子中的<code>P</code>内嵌字段的情形。
 </p>
 
+这里，本文试图使用一个更精确的描述：
+<ul>
+<li>
+	一个类型名<code>T</code>只有在它既不表示一个定义的指针类型也不表示一个基类型为指针类型或者接口类型的指针类型的情况下在可以被用作内嵌字段。
+</li>
+<li>
+	一个指针类型<code>*T</code>只有在<code>T</code>为一个类型名并且<code>T</code>既不表示一个指针类型也不表示一个接口类型的时候才能被用作内嵌字段。
+</li>
+</ul>
+
+<!--
 这里，本文试图使用一个更精确的描述：
 <ul>
 <li>
@@ -93,6 +104,7 @@ func main() {
 <div class="alert alert-info">
 一个内嵌字段必须被声明为形式<code>T</code>或者<code>*T</code>，其中<code>T</code>为一个类型名并且<code>T</code>和<code>*T</code>不能表示基类型为指针类型或者接口类型的指针类型。
 </div>
+-->
 
 <!--
 <p>
