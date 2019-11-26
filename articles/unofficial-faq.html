@@ -610,7 +610,7 @@ func main() {
 	内置<code>print</code>/<code>println</code>函数的调用不能接受数组和结构体参数。
 </li>
 <li>
-	对于组合类型的参数，内置的<code>print</code>/<code>println</code>函数将输出参数的底层值部的地址，而<code>fmt</code>和<code>log</code>标准库包中的打印函数将输出参数的字面值。
+	对于组合类型的参数，内置的<code>print</code>/<code>println</code>函数将输出参数的底层值部的地址，而<code>fmt</code>和<code>log</code>标准库包中的打印函数将输出接口参数的动态值的字面形式。
 </li>
 <li>
 	目前（Go 1.13），对于标准编译器，调用内置的<code>print</code>/<code>println</code>函数不会使调用参数引用的值逃逸到堆上，而<code>fmt</code>和<code>log</code>标准库包中的的打印函数将使调用参数引用的值逃逸到堆上。

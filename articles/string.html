@@ -186,6 +186,11 @@ Unicode标准为全球各种人类语言中的每个字符制定了一个独一�
 </ol>
 
 <p>
+<i>（注意：今后的官方文档<a href="https://github.com/golang/go/issues/23536">可能会对字节切片或者码点切片的定义做一点改变</a>。
+字节切片或者码点切片有可能会被定义为元素类型的底层类型为<code>byte</code>或者<code>rune</code>的切片。）</i>
+</p>
+
+<p>
 在一个从码点切片到字符串的转换中，码点切片中的每个码点值将被UTF-8编码为一到四个字节至结果字符串中。
 如果一个码点值是一个不合法的Unicode码点值，则它将被视为Unicode替换字符（码点）值<code>0xFFFD</code>（Unicode replacement character）。
 替换字符值<code>0xFFFD</code>将被UTF-8编码为三个字节<code>0xef 0xbf 0xbd</code>。

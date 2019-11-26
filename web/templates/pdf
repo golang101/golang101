@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 	<head>
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -339,7 +339,7 @@
 
 	{{ if ge $id 7 }}
 	<div style="margin: 16px 0px; text-align: center;">
-		<img src="res/101-reward-qrcode-2.png" alt="赞赏"></img>
+		<img src="res/101-reward-qrcode-5.png" alt="赞赏"></img>
 		<div class="visible-on-print">（请访问<u>https://gfw.go101.org</u>获取本书最新版）</div>
 	</div>
 	{{ end }}

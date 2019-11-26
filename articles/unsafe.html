@@ -700,7 +700,7 @@ func main() {
 
 <p>
 注意：上例中的<code>runtime.KeepAlive</code>调用必不可少。
-否则，在转换<code>uintptr(unsafe.Pointer(&amp;a))</code>被执行之前，分配给数组<code>a</code>的内存可能已经被回收。
+否则，在转换<code>uintptr(unsafe.Pointer(&amp;a))</code>被执行之前，分配给数组<code>a</code>的内存可能已经被回收或者移动。
 </p>
 
 一般说来，我们只应该从一个已经存在的字符串值得到一个<code>*reflect.StringHeader</code>指针，
@@ -798,6 +798,7 @@ func String2ByteSlice(str string) (bs []byte) {
 </code></pre>
 
 <p>
+Matthew Dempsky提议将上述两个自定义类型<code>SliceHeader</code>和<code>StringHeader</code><a href="https://github.com/golang/go/issues/19367">置入</a><code>unsafe</code>标准库。
 </p>
 
 </div>

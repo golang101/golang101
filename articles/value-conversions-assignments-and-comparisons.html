@@ -170,7 +170,7 @@ func main() {
 	cb = ca // ok，因为底层类型相同
 	ca = cb // ok，因为底层类型相同
 
-	// 这4行都满足此第2条转换规则的条件。
+	// 这4行都满足此第3条转换规则的条件。
 	var _, _ chan<- string = ca, cb // ok
 	var _, _ <-chan string = ca, cb // ok
 	var _ C1 = cb                   // ok

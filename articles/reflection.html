@@ -84,7 +84,7 @@ func main() {
 </code></pre>
 
 <p>
-目前，Go支持<a href="https://golang.google.cn/pkg/reflect/#Kind">26种类型</a>。
+目前，Go支持<a href="https://golang.google.cn/pkg/reflect/#Kind">26种种类的类型</a>。
 </p>
 
 在上面这个例子中，我们使用方法<code>Elem</code>来得到某些类型的元素类型。
@@ -156,6 +156,37 @@ func main() {
 
 <p>
 注意：<code>reflect.Type.NumMethod</code>方法只返回一个类型的所有导出的方法的个数。
+</p>
+
+<a class="anchor" id="struct-field-tag"></a>
+我们可以<a href="https://golang.org/pkg/reflect/#StructTag">通过反射来检视结构体字段的标签信息</a>。
+结构体字段标签的类型为<code>reflect.StructTag</code>，它有两个方法：<code>Get</code>和<code>Lookup</code>。
+一个例子：
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import "fmt"
+import "reflect"
+
+type T struct {
+	X int  `max:"99" min:"0"`
+	Y bool `optional:"yes"`
+}
+
+func main() {
+	t := reflect.TypeOf(T{})
+	x, y := t.Field(0).Tag, t.Field(1).Tag
+	fmt.Println(reflect.TypeOf(x)) // reflect.StructTag
+
+	tag, present := y.Lookup("default")
+	fmt.Println(len(tag), present)    // 0 false
+	fmt.Println(y.Lookup("optional")) // yes true
+
+	fmt.Println(x.Get("max"), x.Get("min")) // 99 0
+}
+</code></pre>
+
+<p>
 </p>
 
 <code>reflect</code>代码包也提供了一些其它函数来动态地创建出来一些非定义组合类型。
@@ -476,15 +507,15 @@ func main() {
 		{Dir: reflect.SelectRecv, Chan: vc, Send: vZero},
 		{Dir: reflect.SelectSend, Chan: vc, Send: vSend},
 	}
-	selIndex, vRecv, closed := reflect.Select(branches)
-	fmt.Println(selIndex)    // 1
-	fmt.Println(closed)      // true
-	fmt.Println(vRecv.Int()) // 123
+	selIndex, vRecv, sentBeforeClosed := reflect.Select(branches)
+	fmt.Println(selIndex)         // 1
+	fmt.Println(sentBeforeClosed) // true
+	fmt.Println(vRecv.Int())      // 123
 	vc.Close()
-	// 再模拟select流程控制代码块。因为vc已经关闭了，
+	// 再模拟一次select流程控制代码块。因为vc已经关闭了，
 	// 所以需将最后一个case分支去除，否则它可能会造成一个恐慌。
-	selIndex, _, closed = reflect.Select(branches[:2])
-	fmt.Println(selIndex, closed) // 1 false
+	selIndex, _, sentBeforeClosed = reflect.Select(branches[:2])
+	fmt.Println(selIndex, sentBeforeClosed) // 1 false
 }
 </code></pre>
 

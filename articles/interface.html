@@ -785,7 +785,7 @@ type Ie interface {
 </code></pre>
 
 <p>
-上例中展示的限制<a href="https://github.com/golang/proposal/blob/master/design/6977-overlapping-interfaces.md">可能会从以后的Go版本中移除s</a>。
+上例中展示的限制将<a href="https://github.com/golang/go/issues/6977">从Go 1.14版本开始</a><a href="https://github.com/golang/proposal/blob/master/design/6977-overlapping-interfaces.md">被移除</a>。
 </p>
 
 截止到目前（Go 1.13），如果两个接口类型都指定了一个同名方法，则这两个接口类型不可被同时被内嵌在同一个接口类型中，即使它们指定的同名方法的原型也一致。

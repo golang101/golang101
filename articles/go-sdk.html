@@ -193,7 +193,7 @@ Go SDK工具要求所有的Go源代码文件必须以<code>.go</code>后缀结�
 请注意：
 <ul>
 <li>
-	从Go SDK 1.13开始，此<code>godoc</code>命令<a href="https://golang.google.cn/doc/go1.12">已经从不再集成在Go SDK中</a>，而需要另外下载（<code>go get golang.org/x/tools/cmd/godoc</code>）。
+	从Go SDK 1.13开始，此<code>godoc</code>命令<a href="https://golang.google.cn/doc/go1.12">已经从不再集成在Go SDK中</a>，而需要另外下载（<code>go get golang.org/x/tools/cmd/godoc</code>）。目前，最新版的<code>godoc</code>程序已经支持模块模式了。
 </li>
 <li>
 	对于1.10版本的Go SDK，如果<code>GOROOT</code>环境变量没有设置，
@@ -205,10 +205,6 @@ Go SDK工具要求所有的Go源代码文件必须以<code>.go</code>后缀结�
 	从Go SDK 1.12开始，教程《A Tour of Go》不再打包在Go SDK中，而必须通过运行<code>go get golang.org/x/tour</code>来单独安装，并运行<code>tour</code>来开启一个本地服务进行阅读。
 </li>
 </ul>
-
-<p>
-另注意：当前（Go SDK 1.13），<code>godoc</code>命令不支持不处于<code>GOPATH</code>下的代码包。
-</p>
 
 <p>
 <code>godoc</code>程序启动时默认将会为所有本地已经下载的Go第三方库包生成文档。
