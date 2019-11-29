@@ -662,7 +662,7 @@ func main() {
 	}
 	var x interface{} = []int{}
 	var y = T{a: x}
-	var z = [3]T{}
+	var z = [3]T{{a: y}}
 
 	// 这三个比较均会产生一个恐慌。
 	_ = x == x
@@ -672,8 +672,6 @@ func main() {
 </code></pre>
 
 <p>
-请注意，上例中含有<code>z</code>的两行使用官方Go SDK各个版本中的<code>go build</code>和<code>go install</code>子命令均编译没问题，但是当使用Go SDK 1.9和1.10中的 <code>go run</code>子命令运行上例时，编译将报错。
-这是Go SDK 1.9和1.10中<a href="https://github.com/golang/go/issues/24747">一个已知的bug</a>。
 </p>
 </div>
 
