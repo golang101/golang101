@@ -319,7 +319,7 @@ func main() {
 	关于结构体，请参阅<a href="struct.html">下一篇文章</a>。
 </li>
 <li>
-	类型<code>T1</code>和<code>T2</code>都为非定义类型并且它们的底层类型的基类型一致（忽略结构体字段的标签）。
+	类型<code>T1</code>和<code>T2</code>都为非定义类型并且它们的基类型的底层类型一致（忽略结构体字段的标签）。
 </li>
 </ol>
 
@@ -340,7 +340,7 @@ type Tb    *MyInt
 	类型 <code>*MyInt</code>的值可以被隐式转换到类型<code>Tb</code>，反之亦然（因为它们的底层类型均为<code>*MyInt</code>）。
 </li>
 <li>
-	类型<code>*MyInt</code>的值可以被显式转换为类型<code>*int64</code>，反之亦然（因为它们都是非定义的并且它们的底层类型的基类型均为<code>int64</code>）。
+	类型<code>*MyInt</code>的值可以被显式转换为类型<code>*int64</code>，反之亦然（因为它们都是非定义的并且它们的基类型的底层类型均为<code>int64</code>）。
 </li>
 <li>
 	类型<code>Ta</code>的值不能直接被转换为类型<code>Tb</code>，即使是显式转换也是不行的。
