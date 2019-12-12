@@ -79,7 +79,7 @@
 	容器相关的细节：
 	<ul class="index">
 	<li>
-		<a class="index" href="#composite-literal-simplification">有时候，嵌套组合字面值可以被简化。</a>
+		<a class="index" href="#composite-literal-simplification">有时候，嵌套组合字面量可以被简化。</a>
 	</li>
 	<li>
 		<a class="index" href="#use-pointer-as-array">在某些情形下，我们可以将数组指针当作数组来用。</a>
@@ -109,10 +109,10 @@
 		<a class="index" href="#modify-slice-length-and-capacity-separately">切片的长度和容量可以被单独修改。</a>
 	</li>
 	<li>
-		<a class="index" href="#indexes-in-composite-literals">切片和数组组合字面值中的索引必须是非负常量。</a>
+		<a class="index" href="#indexes-in-composite-literals">切片和数组组合字面量中的索引必须是非负常量。</a>
 	</li>
 	<li>
-		<a class="index" href="#constant-keys-in-composite-literals">切片/数组/映射组合字面值的常量索引和键值不能重复。</a>
+		<a class="index" href="#constant-keys-in-composite-literals">切片/数组/映射组合字面量的常量索引和键值不能重复。</a>
 	</li>
 	<li>
 		<a class="index" href="#array-slice-element-addressability">不可寻址的数组的元素依旧是不可寻址的，但是不可寻址的切片的元素总是可寻址的。</a>
@@ -873,10 +873,10 @@ func main() {
 </div>
 
 <a class="anchor" id="composite-literal-simplification"></a>
-<h3>有时候，嵌套组合字面值可以被简化。</h3>
+<h3>有时候，嵌套组合字面量可以被简化。</h3>
 
 <p>
-关于细节，请阅读<a href="container.html#composite-literal-simplification">内嵌组合字面值可以被简化</a>这一章节。
+关于细节，请阅读<a href="container.html#composite-literal-simplification">内嵌组合字面量可以被简化</a>这一章节。
 </p>
 
 <a class="anchor" id="use-pointer-as-array"></a>
@@ -1041,7 +1041,7 @@ func main() {
 </p>
 
 <a class="anchor" id="indexes-in-composite-literals"></a>
-<h3>切片和数组组合字面值中的索引必须是非负常量。</h3>
+<h3>切片和数组组合字面量中的索引必须是非负常量。</h3>
 
 <div>
 例如，下面的程序将编译失败。
@@ -1052,12 +1052,12 @@ var y = []int{k: 1}  // error: 索引必须为一个常量
 </code></pre>
 
 <p>
-注意，映射组合字面值中的键值不必为常量。
+注意，映射组合字面量中的键值不必为常量。
 </p>
 </div>
 
 <a class="anchor" id="constant-keys-in-composite-literals"></a>
-<h3>切片/数组/映射组合字面值的常量索引和键值不能重复。</h3>
+<h3>切片/数组/映射组合字面量的常量索引和键值不能重复。</h3>
 
 <div>
 例如，下面的程序将编译失败。
@@ -1089,7 +1089,7 @@ var c = map[string]int{"foo": 1, "foo": 2}
 <pre class="line-numbers"><code class="language-go">package main
 
 func main() {
-	// 组合字面值是不可寻址的。
+	// 组合字面量是不可寻址的。
 
 	/* 取容器元素的地址。 */
 

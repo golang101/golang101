@@ -7,7 +7,7 @@
 <h3>概念：基本类型（basic type）</h3>
 
 <div>
-内置基本类型已经在前面的文章<a href="basic-types-and-value-literals.html">基本类型和它们的值的字面表示形式</a>一文中介绍了。
+内置基本类型已经在前面的文章<a href="basic-types-and-value-literals.html">基本类型和它们的字面量表示</a>一文中介绍过了。
 为了本文的完整性，这些内置类型重新被列在这里：
 <ul>
 <li>内置字符串类型：<code>string</code>.</li>
@@ -52,8 +52,8 @@ Go支持下列组合类型：
 </div>
 
 <div>
-组合类型可以用它们各自的字面表示形式来表示。
-下面是一些各种不同类型的组合类型字面表示形式的例子：
+非定义组合类型可以用它们各自的字面表示形式来表示。
+下面是一些各种不同种类的非定义组合类型字面表示形式的例子（非定义类型将在下面解释）：
 <pre class="line-numbers"><code class="language-go">// 假设T为任意一个类型，Tkey为一个支持比较的类型。
 
 *T         // 一个指针类型
@@ -123,7 +123,7 @@ type (
 </code></pre>
 
 <p>
-新的类型名必须为标识符。
+新的类型名必须为标识符。但是请注意：包级类型（以及下一节将要介绍的类型别名）的名称不能为<a href="packages-and-imports.html#init"><code>init</code></a>。
 </p>
 
 <p>
@@ -409,12 +409,12 @@ Ages → AgeSlice → []Age <span style="color:#aaa">→ <span style="text-decor
 
 <p>
 每个类型有一个零值。一个类型的零值可以看作是此类型的默认值。
-预声明的标识符<code>nil</code>可以看作是切片、映射、函数、通道、指针（包括非类型安全指针）和接口类型的零值的字面表示形式。
+预声明的标识符<code>nil</code>可以看作是切片、映射、函数、通道、指针（包括非类型安全指针）和接口类型的零值的字面量表示。
 我们以后可以在<a href="nil.html">Go中的nil</a>一文中了解到关于<code>nil</code>的各种事实。
 </p>
 
 <p>
-在源代码中，值可以呈现为若干种形式，包括<a href="basic-types-and-value-literals.html">字面形式</a>、<a href="constants-and-variables.html#constant">有名常量</a>、<a href="constants-and-variables.html#variable">变量</a>和<a href="expressions-and-statements.html">表达式</a>。前三中形式可以看作是最后一种形式的特例。
+在源代码中，值可以呈现为若干种形式，包括<a href="basic-types-and-value-literals.html">字面量</a>、<a href="constants-and-variables.html#constant">有名常量</a>、<a href="constants-and-variables.html#variable">变量</a>和<a href="expressions-and-statements.html">表达式</a>。前三中形式可以看作是最后一种形式的特例。
 </p>
 
 <p>
@@ -422,21 +422,21 @@ Ages → AgeSlice → []Age <span style="color:#aaa">→ <span style="text-decor
 </p>
 
 <p>
-各种基本类型的值的字面表示形式已经在<a href="basic-types-and-value-literals.html">基本类型和它们的值的字面表示形式</a>一文中介绍过了。
-另外，Go中还有另外两种值的字面表示形式：组合字面表示形式（composite literal）和函数字面表示形式。
+基本类型和它们的字面量表示已经在<a href="basic-types-and-value-literals.html">前面一文</a>中介绍过了。
+另外，Go中还有另外两种的字面量表示形式：函数字面量表示形式和组合字面量表示形式（composite literal）。
 </p>
 
 <p>
-函数字面表示形式用来表示函数值。事实上，一个<a href="function-declarations-and-calls.html#declaration">函数声明</a>是由一个标识符（函数名）和一个函数字面表示形式组成。
+函数字面量表示形式用来表示函数值。事实上，一个<a href="function-declarations-and-calls.html#declaration">函数声明</a>是由一个标识符（函数名）和一个函数字面量表示形式组成。
 </p>
 
 <p>
-组合字面表示形式用来表示结构体类型值和容器类型（数组、切片和映射）值。
+组合字面量表示形式用来表示结构体类型值和容器类型（数组、切片和映射）值。
 详见<a href="struct.html">结构体</a>和<a href="container.html">容器类型</a>两文。
 </p>
 
 <p>
-指针类型、通道类型和接口类型的值没有字面表示形式。
+指针类型、通道类型和接口类型的值没有字面量表示形式。
 </p>
 
 <a class="anchor" id="value-part"></a>
@@ -465,7 +465,7 @@ Ages → AgeSlice → []Age <span style="color:#aaa">→ <span style="text-decor
 </p>
 
 <p>
-Go白皮书没有规定非数值类型值的尺寸。对数值类型值的尺寸的要求已经在<a href="basic-types-and-value-literals.html">基本类型和它们的值的字面表示形式</a>一文中提及了。
+Go白皮书没有规定非数值类型值的尺寸。对数值类型值的尺寸的要求已经在<a href="basic-types-and-value-literals.html">基本类型和它们的字面量表示</a>一文中提及了。
 </p>
 
 <a class="anchor" id="pointer-base-type"></a>

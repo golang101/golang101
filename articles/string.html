@@ -34,7 +34,7 @@
 	字符串值（和布尔以及各种数值类型的值）可以被用做常量。
 </li>
 <li>
-	Go支持<a href="basic-types-and-value-literals.html#string-literals">两种风格的字符串字面表示形式</a>：双引号风格（解释型字面表示）和反引号风格（直白字面表示）。
+	Go支持<a href="basic-types-and-value-literals.html#string-literals">两种风格的字符串字面量表示形式</a>：双引号风格（解释型字面表示）和反引号风格（直白字面表示）。
 </li>
 <li>
 	字符串类型的零值为空字符串。一个空字符串在字面上可以用<code>""</code>或者<code>``</code>来表示。
@@ -342,6 +342,9 @@ func main() {
 }
 </code></pre>
 
+<p>
+</p>
+
 另一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -349,8 +352,8 @@ import "fmt"
 import "testing"
 
 var s string
-var x = []byte{1024: 'x'}
-var y = []byte{1024: 'y'}
+var x = []byte{1023: 'x'}
+var y = []byte{1023: 'y'}
 
 func fc() {
 	// 下面的四个转换都不需要深复制。

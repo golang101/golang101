@@ -126,12 +126,12 @@ map[struct{x int}]*int8 // 元素类型为一个指针类型：*int8；
 </div>
 
 <a class="anchor" id="value-literals"></a>
-<h3>容器类型值的字面表示形式</h3>
+<h3>容器字面量的表示形式</h3>
 
 <div>
-和结构体值类似，容器值的文字表示也可以用组合字面值（composite literal）来表示。
+和结构体值类似，容器值的文字表示也可以用组合字面量形式（composite literal）来表示。
 比如对于一个容器类型<code>T</code>，它的值可以用形式<code>T{...}</code>来表示（除了切片和映射的零值外）。
-下面是一些结构体值的字面表示形式：
+下面是一些容器字面量：
 
 <pre class="line-numbers"><code class="language-go">// 一个含有4个布尔元素的数组值。
 [4]bool{false, true, true, false}
@@ -144,18 +144,18 @@ map[string]int{"C": 1972, "Python": 1991, "Go": 2009}
 </code></pre>
 
 <p>
-映射组合字面值中大括号中的每一项称为一个键值对（key-value pair），或者称为一个条目（entry）。
+映射组合字面量中大括号中的每一项称为一个键值对（key-value pair），或者称为一个条目（entry）。
 </p>
 
-数组和切片组合字面值有一些微小的变种：
+数组和切片组合字面量有一些微小的变种：
 
-<pre class="line-numbers"><code class="language-go">// 下面这些切片的字面表示形式都是等价的。
+<pre class="line-numbers"><code class="language-go">// 下面这些切片字面量都是等价的。
 []string{"break", "continue", "fallthrough"}
 []string{0: "break", 1: "continue", 2: "fallthrough"}
 []string{2: "fallthrough", 1: "continue", 0: "break"}
 []string{2: "fallthrough", 0: "break", "continue"}
 
-// 下面这些数组的字面表示形式都是等价的。
+// 下面这些数组字面量都是等价的。
 [4]bool{false, true, true, false}
 [4]bool{0: false, 1: true, 2: true, 3: false}
 [4]bool{1: true, true}
@@ -177,15 +177,15 @@ be assignable to the corresponding map key type.
 </p>
 -->
 
-从上面的例子中，我们可以看出数组和切片组合字面值中的索引下标（即数组和切片的键值）是可选的。
-在一个数组或者切片组合字面值中：
+从上面的例子中，我们可以看出数组和切片组合字面量中的索引下标（即数组和切片的键值）是可选的。
+在一个数组或者切片组合字面量中：
 <ul>
 <li>
 	如果一个索引下标出现，它的类型不必是数组和切片类型的键值类型<code>int</code>，但它必须是一个可以表示为int值的非负常量；
 	如果它是一个类型确定值，则它的类型必须为一个基本整数类型。
 </li>
 <li>
-	<b>在一个数组或切片组合字面值中，如果一个元素的索引下标缺失，则编译器认为它的索引下标为出现在它之前的元素的索引下标加一。</b>
+	<b>在一个数组或切片组合字面量中，如果一个元素的索引下标缺失，则编译器认为它的索引下标为出现在它之前的元素的索引下标加一。</b>
 </li>
 <li>
 	如果出现的第一个元素的索引下标缺失，则它的索引下标被认为是0。
@@ -193,7 +193,7 @@ be assignable to the corresponding map key type.
 </ul>
 
 <p>
-映射组合字面值中元素对应的键值不可缺失，并且它们可以为非常量。
+映射组合字面量中元素对应的键值不可缺失，并且它们可以为非常量。
 </p>
 
 <pre class="line-numbers"><code class="language-go">var a uint = 1
@@ -206,12 +206,12 @@ var _ = [5]int{a: 100}         // error: 下标必须为常量
 </p>
 
 <p>
-一个容器组合字面值中的<a href="details.html#constant-keys-in-composite-literals">常量键值（包括索引下标）不可重复</a>。
+一个容器组合字面量中的<a href="details.html#constant-keys-in-composite-literals">常量键值（包括索引下标）不可重复</a>。
 </p>
 
 </div>
 
-<h3>容器类型零值的字面表示形式</h3>
+<h3>容器类型零值的字面量表示形式</h3>
 
 <p>
 和结构体类似，一个数组类型<code>A</code>的零值可以表示为<code>A{}</code>。
@@ -238,12 +238,12 @@ var _ = [5]int{a: 100}         // error: 下标必须为常量
 </p>
 
 <a class="anchor" id="take-composite-literal-address"></a>
-<h3>容器字面值是不可寻址的但可以被取地址</h3>
+<h3>容器字面量是不可寻址的但可以被取地址</h3>
 
 <div>
 <p>
-我们已经了解到<a href="struct.html#take-composite-literal-address">结构体（组合）字面值是不可寻址的但却是可以被取地址的</a>。
-容器字面值也不例外。
+我们已经了解到<a href="struct.html#take-composite-literal-address">结构体（组合）字面量是不可寻址的但却是可以被取地址的</a>。
+容器字面量也不例外。
 </p>
 
 一个例子：
@@ -265,15 +265,15 @@ func main() {
 </div>
 
 <a class="anchor" id="composite-literal-simplification"></a>
-<h3>内嵌组合字面值可以被简化</h3>
+<h3>内嵌组合字面量可以被简化</h3>
 
 <div>
 <p>
-在某些情形下，内嵌在其它组合字面值中的组合字面值可以简化为<code>{...}</code>（即类型部分被省略掉了）。
-内嵌组合字面值前的取地址操作符<code>&amp;</code>有时也可以被省略。
+在某些情形下，内嵌在其它组合字面量中的组合字面量可以简化为<code>{...}</code>（即类型部分被省略掉了）。
+内嵌组合字面量前的取地址操作符<code>&amp;</code>有时也可以被省略。
 </p>
 
-比如，下面的组合字面值
+比如，下面的组合字面量
 
 <pre class="line-numbers"><code class="language-go">// heads为一个切片值。它的类型的元素类型为*[4]byte。
 // 此元素类型为一个基类型为[4]byte的指针类型。
@@ -297,7 +297,7 @@ var heads = []*[4]byte{
 <p>
 </p>
 
-下面这个数组组合字面值
+下面这个数组组合字面量
 
 <pre class="line-numbers"><code class="language-go">type language struct {
 	name string
@@ -323,7 +323,7 @@ var _ = [...]language{
 <p>
 </p>
 
-下面这个映射组合字面值
+下面这个映射组合字面量
 
 <pre class="line-numbers"><code class="language-go">type LangCategory struct {
 	dynamic bool
@@ -489,7 +489,7 @@ func main() {
 假设<code>v</code>是一个数组或者切片，在<code>v[k]</code>中，
 <ul>
 <li>
-	如果<code>k</code>是一个常量，则它必须满足上面列出的<a href="#value-literals">对出现在组合字面值中的索引的要求</a>。
+	如果<code>k</code>是一个常量，则它必须满足上面列出的<a href="#value-literals">对出现在组合字面量中的索引的要求</a>。
 	另外，如果<code>v</code>是一个数组，则<code>k</code>必须小于此数组的长度。
 </li>
 <li>
@@ -862,7 +862,7 @@ func main() {
 
 <div>
 <p>
-除了使用组合字面值来创建映射和切片，我们还可以使用内置<code>make</code>函数来创建映射和切片。
+除了使用组合字面量来创建映射和切片，我们还可以使用内置<code>make</code>函数来创建映射和切片。
 数组不能使用内置<code>make</code>函数来创建。
 </p>
 
@@ -934,7 +934,7 @@ func main() {
 </p>
 
 <p>
-使用<code>new</code>函数来用来创建数组值并非是完全没有意义的，但是在实践中很少这么做，因为使用组合字面值来创建数组值更为方便。
+使用<code>new</code>函数来用来创建数组值并非是完全没有意义的，但是在实践中很少这么做，因为使用组合字面量来创建数组值更为方便。
 </p>
 
 一个使用<code>new</code>函数创建容器值的例子：
@@ -1697,7 +1697,7 @@ fmt.Println(len(pa), cap(pa)) // 5 5
 <h3><code>memclr</code>优化</h3>
 
 <div>
-假设<code>t0</code>是一个类型<code>T</code>的零值的字面表示形式，并且<code>a</code>是一个元素类型为<code>T</code>的数组，则官方标准编译器将把下面的单循环变量<code>for-range</code>代码块优化为一个<a href="https://github.com/golang/go/issues/5373">内部的<code>memclr</code>调用</a>。
+假设<code>t0</code>是一个类型<code>T</code>的零值字面量，并且<code>a</code>是一个元素类型为<code>T</code>的数组，则官方标准编译器将把下面的单循环变量<code>for-range</code>代码块优化为一个<a href="https://github.com/golang/go/issues/5373">内部的<code>memclr</code>调用</a>。
 大多数情况下，此<code>memclr</code>调用比一个一个地重置元素要快。
 
 <pre class="line-numbers"><code class="language-go">for i := range a {
@@ -1806,7 +1806,7 @@ Go不支持更多的内置切片操作，比如切片克隆、元素删除和插
 </p>
 
 <p>
-在下面当前大节中的例子中，假设<code>s</code>是被谈到的切片、<code>T</code>是它的元素类型、<code>t0</code>是类型<code>T</code>的零值的字面表示形式。
+在下面当前大节中的例子中，假设<code>s</code>是被谈到的切片、<code>T</code>是它的元素类型、<code>t0</code>是类型<code>T</code>的零值字面量。
 </p>
 
 <h4>切片克隆</h4>
@@ -1979,7 +1979,7 @@ s = append(elements, s...)
 
 <p>
 插入若干独立的元素和插入一个切片中的所有元素类似。
-我们可以使用切片组合字面值构建一个临时切片，然后使用上面的方法插入这些元素。
+我们可以使用切片组合字面量构建一个临时切片，然后使用上面的方法插入这些元素。
 </p>
 
 <h4>特殊的插入和删除：前推/后推，前弹出/后弹出</h4>

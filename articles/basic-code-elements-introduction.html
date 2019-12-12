@@ -35,8 +35,8 @@
 
 <p>
 编程中常常会使用大量的值。
-一些值可以用它们的<b>字面形式</b>（literal）直接表示，但其它大多数值不可以或不推荐使用它们的字面形式来表示。
-为了编程灵活和不易出错，这些其它值一般使用<b>变量</b>（variable）和<b>（有名）常量</b>（named constant）来表示。
+一些在编码阶段可确定的值可以用它们的<b>字面形式</b>（literal，即字面量）来表示。
+为了编程灵活和不易出错，其它的值一般使用<b>变量</b>（variable）和<b>（有名）常量</b>（named constant）来表示。
 </p>
 
 <p>
@@ -129,9 +129,9 @@ Result: 46 + 54 = 100? true
 四个<code>int</code>（一个在第<i>15</i>行，另三个在第<i>13</i>行）
 表示内置基本类型<code>int</code>。int类型是Go中的基本整数类型之一。
 第<i>5</i>行中的<code>16</code>、第<i>17</i>行中的<code>0</code>、
-第<i>20</i>行中的<code>1</code>以及第<i>30</i>行的<code>100</code>均为整型字面值。
-第<i>35</i>行的<code>"Result: "</code>是一个字符串字面值。
-请阅读<a href="basic-types-and-value-literals.html">基本类型和它们的字面值表示</a>以获取更多关于基本类型和它们的字面值的信息。
+第<i>20</i>行中的<code>1</code>以及第<i>30</i>行的<code>100</code>均为整型字面量。
+第<i>35</i>行的<code>"Result: "</code>是一个字符串字面量。
+请阅读<a href="basic-types-and-value-literals.html">基本类型和它们的字面量表示</a>以获取更多关于基本类型和它们的字面量的信息。
 Go中的非基本类型（均为组合类型）将在以后的其它文章中介绍和解释。
 </p>
 
@@ -141,13 +141,13 @@ Go中的非基本类型（均为组合类型）将在以后的其它文章中介
 第<i>15</i>行和第<i>30</i>行使用标准变量声明语句声明了三个变量。
 第<i>17</i>行的变量<code>i</code>以及第<i>33</i>行的变量<code>x</code>和<code>y</code>是使用变量短声明语句声明的。
 变量<code>a</code>和<code>b</code>在声明的时候被指定为<code>int</code>类型。
-编译器会自动推导出变量<code>i</code>、<code>num</code>、<code>x</code>和<code>y</code>的类型均为<code>int</code>类型，因为它们的初始值都是整型字面值表示的。
+编译器会自动推导出变量<code>i</code>、<code>num</code>、<code>x</code>和<code>y</code>的类型均为<code>int</code>类型，因为它们的初始值都是整型字面量表示的。
 请阅读<a href="constants-and-variables.html">常量和变量</a>以获取什么是类型不确定值、类型推导、赋值、以及如何声明变量和有名常量。
 </p>
 
 <p>
 上面的示例程序中使用了很多操作符，比如第<i>17</i>和<i>19</i>行的小于比较符<code>&lt;</code>，第<i>36</i>行的等于比较符<code>==</code>，还有第<i>20</i>和<i>36</i>行的加法运算符<code>+</code>。
-第<i>35</i>行中的<code>+</code>不是一个运算符，它是一个字符串字面值中的一个字符。
+第<i>35</i>行中的<code>+</code>不是一个运算符，它是一个字符串字面量中的一个字符。
 一个使用操作符的操作中涉及到的值称为操作值（有时也可称为运算数）。
 请阅读<a href="operators.html">常用操作符</a>以获取更多关于操作符的信息。
 更多操作符将在后续其它文章中介绍。

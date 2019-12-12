@@ -373,10 +373,10 @@ func main() {
 </code></pre>
 
 <p>
-在上面这行调用中，<code>fa</code>和<code>fb</code>两个函数实际上是串行调用的，future/promise的价值没有体现出来。
+在上面这行调用中，两个实参值（promise回应结果）的生成实际上是串行进行的，future/promise的价值没有体现出来。
 </p>
 
-我们应该像下面这样调用这两个函数来并发获取两个回应结果：
+我们应该像下面这样调用这两个函数来并发生成两个回应结果：
 
 <pre class="line-numbers"><code class="language-go">ca, cb := fa(), fb()
 doSomethingWithFutureArguments(<-ca, <-cb)

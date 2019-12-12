@@ -2,7 +2,7 @@
 
 <p>
 如果你已经写了一些Go代码，你应该知道，Go代码风格不能太随意。
-具体说来，我们不能在任意一个空格或者符号字符处断行。
+具体说来，我们不能随意在某个空格或者符号字符处断行。
 本文余下的部分将列出Go代码中的详细断行规则。
 </p>
 
@@ -82,7 +82,7 @@ func main() {
 		一个<a href="keywords-and-identifiers.html#identifier">标识符</a>；
 	</li>
 	<li>
-		一个整数、浮点数、虚部、码点或者字符串<a href="basic-types-and-value-literals.html#basic-value-literals">字面表示形式</a>；
+		一个整数、浮点数、虚部、码点或者字符串<a href="basic-types-and-value-literals.html#basic-value-literals">字面量</a>；
 	</li>
 	<li>
 		这几个跳转关键字之一：<code>break</code>、<code>continue</code>、<code>fallthrough</code>和<code>return</code>；
@@ -338,7 +338,7 @@ func main() {
 
 <div>
 <p>
-一些包含多个类似项目的语法形式多用逗号<code>,</code>来做为这些项目之间的分割符，比如组合字面值和函数参数列表等。
+一些包含多个类似项目的语法形式多用逗号<code>,</code>来做为这些项目之间的分割符，比如组合字面量和函数参数列表等。
 在这样的一个语法形式中，最后一个项目后总可以跟一个可选的逗号。
 如果此逗号为它所在代码行的最后一个有效字符，则此逗号是必需的；否则，此逗号可以省略。
 编译器在任何情况下都不会自动插入逗号。
@@ -384,10 +384,34 @@ var _, _ = f1(123, "Go" // error: unexpected newline
 <h3>结束语</h3>
 
 <p>
+最后，根据上面的解释，在这里描述一下Go代码中的断行规则。
+</p>
+
+<div class="alert alert-success">
+
+在Go代码中，以下断行是没问题的：
+<ul>
+<li>
+	在除了<code>break</code>、<code>continue</code>、<code>fallthrough</code>和<code>return</code>这几个跳转关键字之外的任何关键字之后断行；
+</li>
+<li>
+	在（显式输入的或者隐式被编译器插入的）分号<code>;</code>之后断行；
+</li>
+<li>
+	在不会导致新的隐式分号被编译器插入的情况下断行。
+</li>
+</ul>
+</div>
+
+<p>
 和很多Go中的其它设计细节一样，Go代码断行规则设计的评价也是褒贬不一。
 有些程序员不太喜欢这样的断行规则，因为这样的规则限制了代码风格的自由度。
 但是这些规则不但使得代码编译速度大大提高，另一方面也使得不同Go程序员写出的代码风格大体一致，从而相互可以比较轻松地读懂对方的代码。
 </p>
+
+
+
+
 
 
 

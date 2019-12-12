@@ -107,7 +107,7 @@ func main() {
 	一个<code>Printf</code>函数调用必须带有至少一个实参，并且第一个实参的类型必须为<code>string</code>。
 	此第一个实参指定了此调用的打印格式。此格式中的<code>%v</code>在打印结果将被对应的后续实参的字符串表示形式所取代。
 	比如上列中的<code>%v</code>在打印结果中将被<code>rand.Uint32()</code>函数调用所返回的随机数所取代。
-	打印格式中的<code>\n</code>表示一个换行符，这在<a href="basic-types-and-value-literals.html">基本类型和它们的字面表示形式</a>一文中已经解释过。
+	打印格式中的<code>\n</code>表示一个换行符，这在<a href="basic-types-and-value-literals.html">基本类型和它们的字面量表示</a>一文中已经解释过。
 </li>
 </ul>
 
@@ -386,7 +386,7 @@ Go不支持循环引用（依赖）。
 </p>
 
 <p>
-注意，我们不能声明名为<code>init</code>的包级变量、常量或者类型。
+注意：我们不能声明名为<code>init</code>的包级变量、常量或者类型。
 </p>
 
 <p>

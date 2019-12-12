@@ -5,7 +5,7 @@
 
 <ul class="index summaries" id="tips.html">
 <li>
-	<a class="index" href="#force-to-use-keyed-struct-literals">如何强制一个代码包的使用者总是使用带字段名称的组合字面值来表示此代码包中的结构体类型的值？</a>
+	<a class="index" href="#force-to-use-keyed-struct-literals">如何强制一个代码包的使用者总是使用带字段名称的组合字面量来表示此代码包中的结构体类型的值？</a>
 </li>
 <li>
 	<a class="index" href="#make-struct-type-uncomparable">如何使一个结构体类型不可比较？</a>
@@ -71,12 +71,12 @@
 <div class="summaries-items">
 
 <a class="anchor" id="force-to-use-keyed-struct-literals"></a>
-<h3>如何强制一个代码包的使用者总是使用带字段名称的组合字面值来表示此代码包中的结构体类型的值？</h3>
+<h3>如何强制一个代码包的使用者总是使用带字段名称的组合字面量来表示此代码包中的结构体类型的值？</h3>
 
 <div>
 
 <p>
-代码包的开发者可以在一个结构体类型定义里放置一个非导出的零尺寸的字段，这样编译器将会禁止代码包的使用者使用含有一些字段但却不含有字段名字的组合字面值来创建此结构体类型的值。
+代码包的开发者可以在一个结构体类型定义里放置一个非导出的零尺寸的字段，这样编译器将会禁止代码包的使用者使用含有一些字段但却不含有字段名字的组合字面量来创建此结构体类型的值。
 </p>
 
 例如：
@@ -482,7 +482,7 @@ var _ uint = N/M - 1
 </code></pre>
 
 另一个方法是借鉴<a href="https://twitter.com/lukechampine/status/1026695476811390976">@lukechampine</a>的一个点子。
-此点子利用了<a href="container.html#value-literals">容器组合字面值中不能出现重复的常量键值</a>这一规则。
+此点子利用了<a href="container.html#value-literals">容器组合字面量中不能出现重复的常量键值</a>这一规则。
 
 <pre class="line-numbers"><code class="language-go">var _ = map[bool]struct{}{false: struct{}{}, N>=M: struct{}{}}
 </code></pre>
@@ -494,7 +494,7 @@ var _ uint = N/M - 1
 </code></pre>
 
 <!--p>
-注意：目前，<a href="https://github.com/golang/go/issues/28104">gccgo 8.2.0 有一个bug</a>，就是允许重复的常量键出现在复合字面值中。
+注意：目前，<a href="https://github.com/golang/go/issues/28104">gccgo 8.2.0 有一个bug</a>，就是允许重复的常量键出现在组合字面量中。
 因此目前这个技巧不适用于gccgo。这个bug将会在之后的gccgo版本中被修复。
 </p-->
 
