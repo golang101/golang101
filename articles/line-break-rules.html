@@ -40,7 +40,7 @@
 
 <p>
 那么，Go代码中的根本性换行规则究竟是如何定义的呢？
-在回答这个问题之前，我们应该知道一个事实：正式的Go语法是使用分号<code>;</code>做为结尾标识符的。
+在回答这个问题之前，我们应该知道一个事实：正式的Go语法是使用（英文）分号<code>;</code>做为结尾标识符的。
 但是，我们很少在Go代码中使用和看到分号。为什么呢？原因是大多数分号都是可选的，因此它们常常被省略。
 在编译时刻，Go编译器会自动插入这些省略的分号。
 </p>
@@ -389,10 +389,10 @@ var _, _ = f1(123, "Go" // error: unexpected newline
 
 <div class="alert alert-success">
 
-在Go代码中，以下断行是没问题的：
+在Go代码中，以下断行是没问题的（不影响程序行为的）：
 <ul>
 <li>
-	在除了<code>break</code>、<code>continue</code>、<code>fallthrough</code>和<code>return</code>这几个跳转关键字之外的任何关键字之后断行；
+	在除了<code>break</code>、<code>continue</code>和<code>return</code>这几个跳转关键字之外的任何关键字之后断行，或者在不跟随标签的<code>break</code>和<code>continue</code>关键字以及不跟随返回值的<code>return</code>关键字之后断行；
 </li>
 <li>
 	在（显式输入的或者隐式被编译器插入的）分号<code>;</code>之后断行；

@@ -123,7 +123,7 @@ func main() {
 上面这个例子同时也展示了如何通过间接的途径得到一个表示一个接口类型的<code>reflect.Type</code>值。
 </p>
 
-我们可以通过反射列出一个类型的所有（导出）方法和一个结构体类型的所有字段。
+我们可以通过反射列出一个类型的所有方法和一个结构体类型的所有（导出和非导出）字段的类型。
 我们也可以通过反射列出一个函数类型的各个输入参数和返回结果类型。
 
 <pre class="line-numbers"><code class="language-go">package main
@@ -138,25 +138,38 @@ func (f F) Validate(s string) bool {
 
 func main() {
 	var x struct {
-		n int
+		N int
 		f F
 	}
 	tx := reflect.TypeOf(x)
-	fmt.Println(tx.Kind())     // struct
-	fmt.Println(tx.NumField()) // 2
+	fmt.Println(tx.Kind())        // struct
+	fmt.Println(tx.NumField())    // 2
+	fmt.Println(tx.Field(1).Name) // f
 	tf := tx.Field(1).Type
 	fmt.Println(tf.Kind())               // func
 	fmt.Println(tf.IsVariadic())         // false
 	fmt.Println(tf.NumIn(), tf.NumOut()) // 2 1
 	fmt.Println(tf.NumMethod())          // 1
+	fmt.Println(tf.Method(0).Name)       // Validate
 	ts, ti, tb := tf.In(0), tf.In(1), tf.Out(0)
-	fmt.Println(ts.Kind(), ti.Kind(), tb.Kind()) // string int bool
+	// 下一行打印出：string int bool
+	fmt.Println(ts.Kind(), ti.Kind(), tb.Kind())
 }
 </code></pre>
 
 <p>
-注意：<code>reflect.Type.NumMethod</code>方法只返回一个类型的所有导出的方法的个数。
 </p>
+
+注意：
+<ol>
+<li>
+	<code>reflect.Type.NumMethod</code>方法只返回一个类型的所有导出的方法的个数。
+	方法<code>reflect.Type.MethodByName</code>不能用来获取一个类型的非导出方法。
+</li>
+<li>
+	虽然<code>reflect.Type.NumField</code>方法返回一个结构体类型的所有字段（包括非导出字段）的数目，但是<a href="https://golang.org/pkg/reflect/#pkg-note-BUG">不推荐</a>使用方法<code>reflect.Type.FieldByName</code>来获取非导出字段。
+</li>
+</ol>
 
 <a class="anchor" id="struct-field-tag"></a>
 我们可以<a href="https://golang.org/pkg/reflect/#StructTag">通过反射来检视结构体字段的标签信息</a>。
