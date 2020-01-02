@@ -413,7 +413,7 @@ func main() {
 	<ol>
 	<li>你可以在函数声明前增加一行<code>//go:noinline</code> 指令来避免这个函数被内联。</li>
 	<li><span style="text-decoration:line-through;">由于包含循环块的函数不会内联，所以你可以再函数里增加一个空循环 <code>for false {}</code>来避免该函数被内联</span>。
-		（但是这个方法<a href="https://github.com/golang/go/issues/14768">从Go 1.14开始将不再有效</a>。）
+		（但是这个方法<a href="https://github.com/golang/go/issues/14768">从以后的某个Go SDK版本开始将不再有效</a>。）
 	</li>
 	</ol>
 </li>

@@ -286,6 +286,7 @@ main.Singer has 1 methods:
 </p>
 </div>
 
+<a class="anchor" id="shorten-form"></a>
 <h3>选择器的缩写形式</h3>
 
 <p>
@@ -424,7 +425,7 @@ type C struct {
 }
 </code></pre>
 
-下面这段代码编译不通过，原因是选择器<code>v1.A.x</code>和<code>v1.B.x</code>发生了碰撞，结果导致它们都不能被缩写为<code>v1.x</code>。
+下面这段代码编译不通过，原因是选择器<code>v1.A.x</code>和<code>v1.B.x</code>的深度一样，所以它们发生了碰撞，结果导致它们都不能被缩写为<code>v1.x</code>。
 同样的情况发生在选择器<code>v1.A.y</code>和<code>v1.B.y</code>身上。
 
 <pre class="line-numbers"><code class="language-go">var v1 struct {
@@ -650,17 +651,18 @@ func main() {
 </p>
 
 请注意：一个类型将只会获取它（直接或者间接）内嵌了的类型的方法。
+换句话说，一个类型的方法集由为类型直接（显式或者隐式）声明的方法和此类型的底层类型的方法集组成。
 比如，在下面的例子中，
 <ul>
 <li>
-	类型<code>Age</code>没有方法，因为它没有内嵌任何类型。
+	类型<code>Age</code>没有方法，因为代码中既没有为它声明任何方法，它也没有内嵌任何类型，。
 </li>
 <li>
 	类型<code>X</code>有两个方法：<code>IsOdd</code>和<code>Double</code>。
 	其中<code>IsOdd</code>方法是通过内嵌类型<code>MyInt</code>而得来的。
 </li>
 <li>
-	类型<code>Y</code>没有方法，因为它所内嵌的类型<code>Age</code>没有方法。
+	类型<code>Y</code>没有方法，因为它所内嵌的类型<code>Age</code>没有方法，另外代码中也没有为它声明任何方法。
 </li>
 <li>
 	类型<code>Z</code>只有一个方法：<code>IsOdd</code>。

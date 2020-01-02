@@ -483,8 +483,8 @@ func main() {
 
 		<p>
 		</p>
-		一旦当前协程重新进入运行状态，<code>c.L.Lock()</code>将被调用来试图重新<code>c.L</code>字段值的锁。
-		此<code>c.Wait()</code>调用将在此<code>c.L.Lock()</code>调用成功之后退出。
+		一旦当前协程重新进入运行状态，<code>c.L.Lock()</code>将被调用以试图重新获取<code>c.L</code>字段值的锁。
+		此<code>c.Wait()</code>调用将在此试图成功之后退出。
 	</li>
 	</ol>
 </li>

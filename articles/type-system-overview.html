@@ -343,7 +343,8 @@ type C = []string
 <div>
 在Go中，每个类型都有一个底层类型。规则：
 <ul>
-<li>一个内置类型（包括<code>unsafe</code>标准库包中定义的<code>Pointer</code>类型）的底层类型为它自己。</li>
+<li>一个内置类型的底层类型为它自己。</li>
+<li><code>unsafe</code>标准库包中定义的<code>Pointer</code>类型的底层类型是它自己。（至少我们可以认为是这样。事实上，关于<code>unsafe.Pointer</code>类型的底层类型，官方文档中并没有清晰的说明。我们也可以认为<code>unsafe.Pointer</code>类型的的底层类型为<code>*T</code>，其中<code>T</code>表示一个任意类型。）</li>
 <li>一个非定义类型（必为一个组合类型）的底层类型为它自己。</li>
 <li>在一个类型声明中，新声明的类型和源类型共享底层类型。</li>
 </ul>

@@ -24,7 +24,9 @@
 对于官方标准编译器，上述基本规则不适用于内置函数<code>print</code>和<code>println</code>。这两个函数的调用不能内嵌多返回值函数调用。
 </div>
 
+<p>
 <i>（刚提到的例外<a href="https://github.com/golang/go/issues/35576">将在Go SDK 1.15中被移除</a>。）</i>
+</p>
 
 例子：
 <pre class="line-numbers"><code class="language-go">package main
@@ -379,7 +381,7 @@ func main() {
 
 例外：
 <div class="alert alert-success">
-同一个代码包中可以声明若干个名为<code>init</code>原型为<code>func()</code>的函数。
+同一个代码包中可以声明若干个名为<code>init</code>类型为<code>func()</code>的函数。
 </div>
 
 </div>

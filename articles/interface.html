@@ -785,11 +785,10 @@ type Ie interface {
 </code></pre>
 
 <p>
-上例中展示的限制将<a href="https://github.com/golang/go/issues/6977">从Go 1.14版本开始</a><a href="https://github.com/golang/proposal/blob/master/design/6977-overlapping-interfaces.md">被移除</a>。
 </p>
 
-截止到目前（Go 1.13），如果两个接口类型都指定了一个同名方法，则这两个接口类型不可被同时被内嵌在同一个接口类型中，即使它们指定的同名方法的原型也一致。
-比如，下面的代码中假设的接口类型都是非法的。
+在Go 1.14版本之前，如果两个接口类型都指定了一个同名方法，则这两个接口类型不可被同时被内嵌在同一个接口类型中，即使它们指定的同名方法的原型也一致。
+比如，下面的代码中的几个接口类型声明在Go 1.14版本之前都是均是非法的。
 
 <pre class="line-numbers"><code class="language-go">type Ix interface {
 	Ia
@@ -808,6 +807,7 @@ type Iz interface {
 </code></pre>
 
 <p>
+从<a href="https://github.com/golang/go/issues/6977">Go 1.14版本开始</a>，上面这段代码中的几个接口类型声明均被认为是<a href="https://github.com/golang/proposal/blob/master/design/6977-overlapping-interfaces.md">合法的</a>，它们指定的方法集其实和<code>Ic</code>是一样的。
 </p>
 
 <p>

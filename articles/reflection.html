@@ -46,7 +46,7 @@ Go反射机制设计的目标之一是任何非反射操作都可以通过反射
 <p>
 类型<code>reflect.Type</code>为一个接口类型，它指定了<a href="https://golang.google.cn/pkg/reflect/#Type">若干方法</a>。
 通过这些方法，我们能够观察到一个<code>reflect.Type</code>值所表示的Go类型的各种信息。
-这些方法中的有的适用于<a href="https://golang.google.cn/pkg/reflect/#Kind">所有种类</a>的类型，有的只适用于一种或几种类型。
+这些方法中的有些适用于<a href="https://golang.google.cn/pkg/reflect/#Kind">所有种类</a>的类型，有些只适用于一种或几种类型。
 通过不合适的<code>reflect.Type</code>属主值调用某个方法将在运行时产生一个恐慌。
 请阅读<code>reflect</code>代码库中各个方法的文档来获取如何正确地使用这些方法。
 </p>

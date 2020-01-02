@@ -72,19 +72,23 @@
 </li>
 </ul>
 
-<p>
-注意，这三个函数的返回值的类型均为内置类型<code>uintptr</code>。
-下面我们将了解到<code>uintptr</code>类型的值可以转换为非类型安全指针（反之亦然）。
-</p>
 
-<p>
-尽管这三个函数之一的任何调用的返回结果在同一个编译好的程序中总是一致的，
-但是这样的一个调用在不同架构的操作系统中（或者使用不同的编译器编译时）的返回值可能是不一样的。
-</p>
-
-<p>
-这三个函数的调用总是在编译时刻被估值，并且估值结果为常量。
-</p>
+注意：
+<ul>
+<li>
+	这三个函数的返回值的类型均为内置类型<code>uintptr</code>。下面我们将了解到<code>uintptr</code>类型的值可以转换为非类型安全指针（反之亦然）。
+</li>
+<li>
+	尽管这三个函数之一的任何调用的返回结果在同一个编译好的程序中总是一致的，但是这样的一个调用在不同架构的操作系统中（或者使用不同的编译器编译时）的返回值可能是不一样的。
+</li>
+<li>
+	这三个函数的调用总是在编译时刻被估值，估值结果为类型为<code>uintptr</code>的常量。
+</li>
+<li>
+	传递给<code>Offsetof</code>函数的实参必须为一个字段选择器形式<code>value.field</code>。
+	此选择器可以表示一个内嵌字段，但此选择器的路径中不能包含指针类型的<a href="type-embedding.html#shorten-form">隐式字段</a>。
+</li>
+</ul>
 
 一个使用了这三个函数的例子：
 <pre class="line-numbers"><code class="language-go">package main
@@ -112,7 +116,53 @@ func main() {
 </code></pre>
 
 <p>
+</p>
+
+下面是一个展示了上面提到的最后一个注意点的例子：
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import "fmt"
+import "unsafe"
+
+func main() {
+	type T struct {
+		c string
+	}
+	type S struct {
+		b bool
+	}
+	var x struct {
+		a int64
+		*S
+		T
+	}
+
+	fmt.Println(unsafe.Offsetof(x.a)) // 0
+	
+	fmt.Println(unsafe.Offsetof(x.S)) // 8
+	fmt.Println(unsafe.Offsetof(x.T)) // 16
+	
+	// 此行可以编译过，因为选择器x.c中的隐含字段T为非指针。
+	fmt.Println(unsafe.Offsetof(x.c)) // 16
+	
+	// 此行编译不过，因为选择器x.b中的隐含字段S为指针。
+	//fmt.Println(unsafe.Offsetof(x.b)) // error
+	
+	// 此行可以编译过，但是它将打印出字段b在x.S中的偏移量.
+	fmt.Println(unsafe.Offsetof(x.S.b)) // 0
+}
+</code></pre>
+
+<p>
 注意，上面程序中的注释所暗示的输出结果是此程序在AMD64架构上使用标准编译器1.13版本编译时的结果。
+</p>
+
+<p>
+<code>unsafe</code>包提供的这三个函数看上去并不怎么危险。
+它们的原型在以后的Go 1版本中<a href="https://groups.google.com/forum/?_escaped_fragment_=topic/golang-nuts/Pi7VveWDUPc">几乎不可能会发生改变</a>。
+Rob Pike甚至曾经<a href="https://github.com/golang/go/issues/5602">将这几个函数挪到其它包中</a>。
+<code>unsafe</code>包的危险性基本上来自于非类型安全指针。它们和C指针一样危险，这是Go安全指针千方百计设法去避免的。
 </p>
 
 </div>
@@ -513,7 +563,6 @@ func main() {
 <p>
 这样的bug是非常微妙和很难被觉察到的，并且爆发出来的几率是相当得低。
 一旦这样的bug爆发出来，将很让人摸不到头脑。这是为什么使用非类型安全指针是危险的原因之一。
-官方Go编译器1.14版本<a href="https://go-review.googlesource.com/c/go/+/162237">可能会添加</a>一个<code>-d=checkptr</code>选项，用来检查这样的危险。
 </p>
 
 如果我们确实希望将上面提到的转换拆成两行，我们应该在拆分后的两行后添加一条<code>runtime.KeepAlive</code>函数调用并将（直接或间接）引用着<code>t.y[2]</code>值的一个值传递给此调用做为实参。
@@ -825,3 +874,6 @@ Matthew Dempsky提议将上述两个自定义类型<code>SliceHeader</code>和<c
 </p>
 
 
+<!--
+官方Go编译器1.15版本<a href="https://go-review.googlesource.com/c/go/+/162237">可能会添加</a>一个<code>-d=checkptr</code>选项，用来检查这样的危险。
+-->

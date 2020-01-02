@@ -773,10 +773,10 @@ If the step ids change, please also update the above reference ones.
 	所有<code>case</code>操作中相关的通道可能会有重复的。
 </li>
 <li>
-	为了防止在下一步中造成死锁，对所有<code>case</code>操作中相关的通道进行排序。
-	排序依据并不重要，可以按照它们的地址顺序进行排序。
+	为了防止在下一步中造成（和其它协程互相）死锁，对所有<code>case</code>操作中相关的通道进行排序。
+	排序依据并不重要，官方Go标准编译器使用通道的地址顺序进行排序。
 	排序结果中前<code>N</code>个通道不存在重复的情况。
-	<code>N</code>为所有<code>case</code>操作中不重复的通道的数量。
+	<code>N</code>为所有<code>case</code>操作中涉及到的不重复的通道的数量。
 	下面，<b><i>通道锁顺序</i></b>是针对此排序结果中的前<code>N</code>个通道来说的，<b><i>通道锁逆序</i></b>是指此顺序的逆序。
 </li>
 <li>

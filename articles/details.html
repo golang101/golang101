@@ -210,7 +210,7 @@
 	</li>
 	-->
 	<li>
-		<a class="index" href="#stack-overflow-is-not-panic">栈溢出不会造成恐慌，它将使程序崩溃。</a>
+		<a class="index" href="#stack-overflow-is-unrecoverable">栈溢出不可被挽救，它将使程序崩溃。</a>
 	</li>
 	<li>
 		<a class="index" href="#some-evaluation-order-are-compiler-dependent">某些表达式的估值顺序取决于具体编译器实现。</a>
@@ -1666,12 +1666,12 @@ var main int
 </div>
 -->
 
-<a class="anchor" id="stack-overflow-is-not-panic"></a>
-<h3>栈溢出不会造成恐慌，它将使程序崩溃。</h3>
+<a class="anchor" id="stack-overflow-is-unrecoverable"></a>
+<h3>栈溢出不可被挽救，它将使程序崩溃。</h3>
 
 <div>
 
-栈溢出在Go里是致命错误，不会造成恐慌。一旦栈溢出发生，程序将不可恢复地崩溃。
+在目前的主流Go编译器实现中，栈溢出是致命错误。一旦栈溢出发生，程序将不可恢复地崩溃。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1697,6 +1697,10 @@ runtime stack:
 </code></pre>
 
 <p>
+</p>
+
+<p>
+关于更多不可恢复的致命错误，请参考<a href="https://github.com/go101/go101/wiki/Panic-and-crash-cases">此篇维基文章</a>。
 </p>
 </div>
 
