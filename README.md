@@ -15,6 +15,8 @@
 
 ![](articles/res/101-group-qrcode-2.jpg?raw=true)
 
+_(若上面二维码未显示出来，请点击此[墙内版链接](https://tool.oschina.net/action/qrcode/generate?data=http%3A%2F%2Fweixin.qq.com%2Fr%2FRy6ju1TE0AmvrRDY93tV&output=image%2Fgif&error=L&type=0&margin=12&size=4)。)_
+
 ### 致谢
 
 见[本书致谢一章](https://gfw.go101.org/article/acknowledgements.html)。
