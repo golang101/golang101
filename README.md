@@ -7,9 +7,7 @@
 这本书旨在尽可能地帮助Go程序员更深更全面地理解Go语言。
 此书同时适合Go初学者和有一定经验的Go程序员阅读。
 
-此书的英文项目地址为：
-* [gitlab.com/go101/go101](https://gitlab.com/go101/go101)
-* [github.com/go101/go101](https://github.com/go101/go101)
+此书的英文项目地址为：[github.com/go101/go101](https://github.com/go101/go101)
 
 微信公众号（用于发布一些Go细节、常识和技巧）：
 
@@ -24,12 +22,6 @@ _(若上面二维码未显示出来，请点击此[墙内版链接](https://tool
 ### 安装
 
 运行
-
-```
-$ git clone https://gitlab.com/golang101/golang101.git
-```
-
-或者
 
 ```
 $ git clone https://github.com/golang101/golang101.git

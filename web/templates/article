@@ -8,8 +8,7 @@
 <div class="alert alert-success text-center" style="margin-bottom: 0px;">
 
 <p>
-Go语言101项目目前同时托管在<a href="https://github.com/golang101/golang101">Github</a>和<a href="https://gitlab.com/golang101/golang101">Gitlab</a>上。
-欢迎各位在这两个项目中通过提交bug和PR的方式来改进完善Go语言101中的各篇文章。
+Go语言101项目目前托管在<a href="https://github.com/golang101/golang101">Github</a>上。欢迎各位在此项目中通过提交bug和PR的方式来改进完善Go语言101中的各篇文章。
 </p>
 
 <p>
