@@ -43,33 +43,35 @@
 一个零字段结构体的尺寸为零。
 </p>
 
-每个结构体字段在它的声明中可以被指定一个标签（tag）。字段标签可以是任意字符串，它们是可选的，默认为空字符串。
-下面这个结构体类型中的字段均被指定了标签。
+每个结构体字段在它的声明中可以被指定一个标签（tag）。从语法上讲，字段标签可以是任意字符串，它们是可选的，默认为空字符串。
+但在实践中，它们应该被表示成用空格分隔的键值对形式，并且每个标签尽量使用直白字面形式（<code>`...`</code>）表示，而键值对中值使用解释型字面形式（<code>"..."</code>）表示。
+比如下例：
 
 <pre class="line-numbers"><code class="language-go">struct {
-	Title  string `json:"title"`
-	Author string `json:"author,omitempty"`
-	Pages  int    `json:"pages,omitempty"`
+	Title  string `json:"title" myfmt:"s1"`
+	Author string `json:"author,omitempty myfmt:"s2"`
+	Pages  int    `json:"pages,omitempty" myfmt:"n1"`
+	X, Y   bool   `myfmt:"b1"`
 }
 </code></pre>
 
 <p>
-结构体字段的标签通常为一个键值对集合。
+注意：上例中的<code>X</code>和<code>Y</code>字段的标签是一样的。
+</p>
+
+<p>
 我们可以使用<a href="reflection.html#struct-field-tag">反射</a>来检视字段的标签信息。
 </p>
 
 <p>
-每个字段标签的目的取决于具体应用。上面这个例子中的字段标签用来帮助<code>encoding/json</code>标准库包来将上面这个结构体类型的某个值编码成JSON数据或者从一份JSON数据解码到上面这个结构体类型的某个值中。
-在编码和解码过程中，<code>encoding/json</code>标准库包中的函数将只考虑导出的结构体字段。这是为什么上面这个结构体的字段均为导出的。
+每个字段标签的目的取决于具体应用。上面这个例子中的字段标签用来帮助<code>encoding/json</code>标准库包来将上面这个结构体类型的某个值编码成JSON数据或者从一份JSON数据解码到上面这个结构体类型的某个值中。在编码和解码过程中，<code>encoding/json</code>标准库包中的函数将只考虑导出的结构体字段。这是为什么上面这个结构体的字段均为导出的。
 </p>
 
 <p>
 把字段标签当成字段注释来使用不是一个好主意。
 </p>
 
-<p>
-在实践中，在指定字段标签时，字符串直白字面表示（<code>`...`</code>）比解释型字面表示（<code>"..."</code>）用得更流行一些。
-</p>
+
 
 <p>
 和C语言不一样，Go结构体不支持字段联合（union）。

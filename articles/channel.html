@@ -677,7 +677,7 @@ Go中有一个专门为通道设计的<code>select-case</code>分支流程控制
 按照上述规则，一个不含任何分支的<code>select-case</code>代码块<code>select{}</code>将使当前协程处于永久阻塞状态。
 </p>
 
-在下面这个例子中，<code>default</code>分支将铁定得到执行，因为另两个<code>case</code>分支后的操作均为阻塞的。
+在下面这个例子中，<code>default</code>分支将铁定得到执行，因为两个<code>case</code>分支后的操作均为阻塞的。
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"

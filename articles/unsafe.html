@@ -775,10 +775,10 @@ s := *(*string)(unsafe.Pointer(&hdr)) // 危险！
 
 import (
 	"fmt"
-	"unsafe"
 	"reflect"
 	"runtime"
 	"strings"
+	"unsafe"
 )
 
 func String2ByteSlice(str string) (bs []byte) {
@@ -793,6 +793,9 @@ func String2ByteSlice(str string) (bs []byte) {
 }
 
 func main() {
+	// str := "Golang"
+	// 对于官方标准编译器来说，上面这行将使str中的字节
+	// 开辟在不可修改内存区。所以这里我们使用下面这行。
 	str := strings.Join([]string{"Go", "land"}, "")
 	s := String2ByteSlice(str)
 	fmt.Printf("%s\n", s) // Goland

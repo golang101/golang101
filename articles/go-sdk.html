@@ -127,10 +127,19 @@ Go SDK工具要求所有的Go源代码文件必须以<code>.go</code>后缀结�
 </code></pre>
 
 <p>
-注意：<code>go run</code>子命令并不推荐在正式的大项目中使用。
-<code>go run</code>子命令只是一种方便的方式来运行简单的Go程序。
-对于正式的项目，最好使用<code>go build</code>或者<code>go install</code>子命令来编译生成可执行程序文件。
 </p>
+
+注意：
+<ol>
+<li>
+	<code>go run</code>子命令并不推荐在正式的大项目中使用。
+	<code>go run</code>子命令只是一种方便的方式来运行简单的Go程序。
+	对于正式的项目，最好使用<code>go build</code>或者<code>go install</code>子命令来编译生成可执行程序文件。
+</li>
+<li>
+	从Go SDK 1.11开始，如果环境变量<code>GO111MODULE</code>被设置成了<code>on</code>（可以使用<code>go env</code>命令查看Go相关环境变量设置），请在Go源码文件同目录下创建一个<code>go.mod</code>文件，其中包含一行类似于<code>module my.module</code>的指令。此文件可以使用命令<code>go mod init my.module</code>来生成。
+</li>
+</ol>
 </div>
 
 <h3>更多<code>go</code>子命令</h3>
