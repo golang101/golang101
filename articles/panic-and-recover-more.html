@@ -375,7 +375,7 @@ func main() {
 这就是为什么上例中的第二个<code>recover</code>调用不起作用的原因。
 </p>
 
-好了，到此我们可以对哪些<code>recover</code>调用会起作用做一个简单地解释：
+好了，到此我们可以对哪些<code>recover</code>调用会起作用做一个简短的描述：
 <div class="alert alert-info">
 一个<code>recover</code>调用只有在它的直接外层调用（即<code>recover</code>调用的父调用）是一个延迟调用，并且此延迟调用（即父调用）的直接外层调用（即<code>recover</code>调用的爷调用）和当前协程中最新产生并且尚未恢复的恐慌相关联时才起作用。一个有效的<code>recover</code>调用将最新产生并且尚未恢复的恐慌和与此恐慌相关联的函数调用（即爷调用）剥离开来，并且返回当初传递给产生此恐慌的<code>panic</code>函数调用的参数。
 </div>

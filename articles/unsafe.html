@@ -679,6 +679,9 @@ p := (*int)(unsafe.Pointer(u))
 <p>
 </p>
 
+<!--
+https://github.com/golang/go/issues/34684#issuecomment-540103545
+-->
 <p>
 注意：此使用模式也适用于Windows系统中的<a href="https://golang.org/pkg/syscall/?GOOS=windows#Proc.Call">syscall.Proc.Call</a>和<a href="https://golang.org/pkg/syscall/?GOOS=windows#LazyProc.Call">syscall.LazyProc.Call</a>系统调用。
 </p>
@@ -876,7 +879,11 @@ Matthew Dempsky提议将上述两个自定义类型<code>SliceHeader</code>和<c
 所以，在实践中，请尽量保证能够将使用了非类型安全机制的代码轻松改为使用安全途径实现。
 </p>
 
+<p>
+最后值得提一下的是，Go SDK 1.14中将加入一个<code>-gcflags=all=-d=checkptr</code>编译器动态分析选项。
+当此选项被使用的时候，编译出的程序在运行时会监测到很多非类型安全指针的错误使用。一旦错误的使用被监测到，恐慌将产生。
+比如，我们可以使用命令<code>go run -gcflags=all=-d=checkptr bad-unsafe-use.go</code>来验证此选项的有效性。
+感谢<a href="https://github.com/golang/go/issues/22218">Matthew Dempsky实现了此特性</a>。
+</p>
 
-<!--
-官方Go编译器1.15版本<a href="https://go-review.googlesource.com/c/go/+/162237">可能会添加</a>一个<code>-d=checkptr</code>选项，用来检查这样的危险。
--->
+

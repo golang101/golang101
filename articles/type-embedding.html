@@ -434,8 +434,8 @@ type C struct {
 }
 
 func f1() {
-	_ = v1.x
-	_ = v1.y
+	_ = v1.x // error: 模棱两可的v1.x
+	_ = v1.y // error: 模棱两可的v1.y
 }
 </code></pre>
 
@@ -459,11 +459,46 @@ func f2() {
 <p>
 </p>
 
+一个被遮挡或者碰撞的选择器并不妨碍更深层的选择器被提升，如下例所示中的<code>.M</code>和<code>.z</code>：
+
+<pre class="line-numbers"><code class="language-go">package main
+
+type x string
+func (x) M() {}
+
+type y struct {
+	z byte
+}
+
+type A struct {
+	x
+}
+func (A) y(int) bool {
+	return false
+}
+
+type B struct {
+	y
+}
+func (B) x(string) {}
+
+func main() {
+	var v struct {
+		A
+		B
+	}
+	//_ = v.x // error: 模棱两可的v.x
+	//_ = v.y // error: 模棱两可的v.y
+	_ = v.M // ok. <=> v.A.x.M
+	_ = v.z // ok. <=> v.B.y.z
+}
+</code></pre>
+
 <p>
-一个不寻常的但需要注意的细节是：来自不同库包的两个非导出字段（或者方法）将总是被认为是两个不同的标识符，即使它们的名字完全一致。
-因此，当它们的属主类型被同时内嵌在同一个结构体类型中的时候，它们绝对不会相互碰撞或者遮挡。
 </p>
 
+一个不寻常的但需要注意的细节是：来自不同库包的两个非导出字段（或者方法）将总是被认为是两个不同的标识符，即使它们的名字完全一致。
+因此，当它们的属主类型被同时内嵌在同一个结构体类型中的时候，它们绝对不会相互碰撞或者遮挡。
 举个例子，下面这个含有两个库包的Go程序编译和运行都没问题。
 但是，如果将其中所有出现的<code>m()</code>改为<code>M()</code>，则此程序将编译不过。
 原因是<code>A.M</code>和<code>B.M</code>碰撞了，导致<code>c.M</code>为一个非法的选择器。
