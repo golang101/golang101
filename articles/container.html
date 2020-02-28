@@ -852,7 +852,7 @@ func main() {
 </p>
 
 <p>
-截至目前（Go 1.13），<code>append</code>函数调用的第一个实参不能为类型不确定的<code>nil</code>。
+截至目前（Go 1.14），<code>append</code>函数调用的第一个实参不能为类型不确定的<code>nil</code>。
 </p>
 
 </div>
@@ -881,7 +881,7 @@ make(M)
 第二个函数调用形式创建了一个可以容纳一个小数目的条目而无需再次开辟内存的空映射值。此小数目的值取决于具体编译器实现。
 </p>
 
-假设<code>S</code>是一个切片类型，<code>length</code>和<code>capacity</code>是两个非负整数，并且<code>length</code>小于等于<code>capacity</code>，我们可以用下面的两种函数调用来各自生成一个类型为<code>S</code>的切片值。
+假设<code>S</code>是一个切片类型，<code>length</code>和<code>capacity</code>是两个非负整数，并且<code>length</code>小于等于<code>capacity</code>，我们可以用下面的两种函数调用来各自生成一个类型为<code>S</code>的切片值。<code>length</code>和<code>capacity</code>的类型必须均为整数类型（两者可以不一致）。
 
 <pre class="line-numbers"><code class="language-go">make(S, length, capacity)
 make(S, length) // <=> make(S, length, length)
@@ -889,7 +889,7 @@ make(S, length) // <=> make(S, length, length)
 
 <p>
 第一个函数调用创建了一个长度为<code>length</code>并且容量为<code>capacity</code>的切片。
-第一个函数调用创建了一个长度为<code>length</code>并且容量也为<code>length</code>的切片。
+第二个函数调用创建了一个长度为<code>length</code>并且容量也为<code>length</code>的切片。
 </p>
 
 <p>
@@ -1284,7 +1284,7 @@ func Copy(dest, src []T) int {
 </p>
 
 <p>
-截至目前（Go 1.13），<code>copy</code>函数调用的两个实参均不能为类型不确定的<code>nil</code>。
+截至目前（Go 1.14），<code>copy</code>函数调用的两个实参均不能为类型不确定的<code>nil</code>。
 </p>
 
 </div>
@@ -1708,7 +1708,7 @@ fmt.Println(len(pa), cap(pa)) // 5 5
 此优化在官方Go编译器1.5版本中被引入。
 </p>
 
-此优化也适用于<code>a</code>为一个切片的情形。但是，有点遗憾，此优化不适用于<code>a</code>为一个数组指针的情形，至少到目前（Go 1.13）为止。
+此优化也适用于<code>a</code>为一个切片的情形。但是，有点遗憾，此优化不适用于<code>a</code>为一个数组指针的情形，至少到目前（Go 1.14）为止。
 所以，如果你打算重置一个数组，最好不要在<code>range</code>关键字后跟随此数组的指针。
 特别地，推荐在<code>range</code>关键字后跟随一个从此数组派生出来的切片，如下：
 
@@ -1811,7 +1811,7 @@ Go不支持更多的内置切片操作，比如切片克隆、元素删除和插
 <h4>切片克隆</h4>
 
 <div>
-对于目前的标准编译器（1.13版本），最有效的克隆一个切片的方法为：
+对于目前的标准编译器（1.14版本），最有效的克隆一个切片的方法为：
 <pre class="disable-line-numbers111"><code class="language-go">sClone := append(s[:0:0], s...)
 </code></pre>
 

@@ -351,7 +351,7 @@ the receiver arguments of the <code>Pages</code> and <code>SetPages</code> metho
 <p>
 等一下，上例中的<code>(&amp;book).SetPages(123)</code>一行为什么可以被简化为<code>book.SetPages(123)</code>呢？
 毕竟，类型<code>Book</code>并不拥有一个<code>SetPages</code>方法。
-啊哈，这可以看作是Go中为了让代码看上去更简洁而特别设计的的语法糖。此语法糖只对可寻址的值类型的属主有效。
+啊哈，这可以看作是Go中为了让代码看上去更简洁而特别设计的语法糖。此语法糖只对可寻址的值类型的属主有效。
 编译器会自动将<code>book.SetPages(123)</code>改写为<code>(&amp;book).SetPages(123)</code>。
 但另一方面，我们应该总是认为<code>aBookExpression.SetPages</code>是一个合法的选择器（从语法层面讲），即使表达式<code>aBookExpression</code>被估值为一个不可寻址的<code>Book</code>值（在这种情况下，<code>aBookExpression.SetPages</code>是一个无效但合法的选择器）。
 </p>

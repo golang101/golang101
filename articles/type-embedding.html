@@ -55,7 +55,7 @@ func main() {
 <h3>哪些类型可以被内嵌？</h3>
 
 <div>
-当前的Go白皮书（1.13）<a href="https://golang.google.cn/ref/spec#Struct_types">规定</a>：
+当前的Go白皮书（1.14）<a href="https://golang.google.cn/ref/spec#Struct_types">规定</a>：
 
 <blockquote style="margin-top:0px;margin-bottom:0px;">
 <small>
@@ -593,6 +593,9 @@ func main() {
 
 <pre class="line-numbers"><code class="language-go">func (s Singer) PrintName() {
 	s.Person.PrintName()
+	// 编译器在这里会做一个优化。对于一个
+	// 传递给形参s的实参来说，只有它的
+	// Person部分将在传参过程中被复制。
 }
 
 func (s *Singer) PrintName() {
@@ -600,7 +603,8 @@ func (s *Singer) PrintName() {
 }
 
 func (s *Singer) SetAge(age int) {
-	(&s.Person).SetAge(age) // <=> (&((*s).Person)).SetAge(age)
+	(&s.Person).SetAge(age)
+	// <=> (&((*s).Person)).SetAge(age)
 }
 </code></pre>
 

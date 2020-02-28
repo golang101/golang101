@@ -42,7 +42,7 @@ Go是一门支持自动内存管理的语言，比如自动内存开辟和自动
 <h3>一个值引用着承载着它的值部的内存块</h3>
 
 <p>
-我们已经知道，一个值部可能引用着另一个值部。这里，我们将引用的定义扩展到一下。
+我们已经知道，一个值部可能引用着另一个值部。这里，我们将引用的定义扩展一下。
 我们可以说一个内存块被它承载着各个值部所引用着。
 所以，当一个值部<code>v</code>被另一个值部引用着时，此另一个值部也（间接地）引用着承载着值部<code>v</code>的内存块。
 </p>
@@ -152,7 +152,7 @@ The values referenced by values allocated on heap will never be allocated in sta
 
 <p>
 如果一个局部声明的变量的某些值部被开辟在堆上，则我们说这些值部以及此局部变量逃逸到了堆上。
-我们可以运行官方Go SDK中提供的的<code>go build -gcflags -m</code>命令来查看代码中哪些局部值的值部在运行时刻会逃逸到堆上。
+我们可以运行官方Go SDK中提供的<code>go build -gcflags -m</code>命令来查看代码中哪些局部值的值部在运行时刻会逃逸到堆上。
 如上所述，目前官方Go编译器中的逃逸分析器并不十分完美，因此某些可以安全地开辟在栈上的值也可能会逃逸到了堆上。
 </p>
 
@@ -318,7 +318,7 @@ func main() {
 
 <div>
 <p>
-目前的官方Go标准运行时（1.13版本）使用<a href="https://blog.golang.org/go15gc">一个并发三色（tri-color）标记清扫（mark-sweep）算法</a>来实现垃圾回收。
+目前的官方Go标准运行时（1.14版本）使用<a href="https://blog.golang.org/go15gc">一个并发三色（tri-color）标记清扫（mark-sweep）算法</a>来实现垃圾回收。
 这里仅会对此算法的原理做一个大致的描述。一个具体实现可能和此大致描述会有很多细节上的差别。
 </p>
 
@@ -374,7 +374,7 @@ func main() {
 </p>
 
 <p>
-目前（Go 1.13），对于使用标准编译器编译的Go程序，一轮新的垃圾回收过程开启的默认条件是通过<a href="https://golang.google.cn/pkg/runtime/#hdr-Environment_Variables"><code>GOGC</code>环境变量</a>来控制的。
+目前（Go SDK 1.14），对于使用标准编译器编译的Go程序，一轮新的垃圾回收过程开启的默认条件是通过<a href="https://golang.google.cn/pkg/runtime/#hdr-Environment_Variables"><code>GOGC</code>环境变量</a>来控制的。
 当从上一轮垃圾回收结束后新申请的内存块的内存总和占上一轮垃圾回收结束时仍在被使用的所有内存块的内存总和的百分比超过此值时，新的一轮垃圾回收过程将开始。
 所以此值决定了垃圾回收过程的频率。
 此环境变量的默认值为100。
@@ -384,6 +384,14 @@ func main() {
 
 <p>
 一轮新的垃圾回收过程也可以通过调用<a href="https://golang.google.cn/pkg/runtime/#GC"><code>runtime.GC</code>函数</a>来手动开启。
+</p>
+
+<p>
+另一点需要注意的是，当前的官方Go运行时（v1.14）采取了另一个策略：<a href="https://github.com/golang/go/blob/895b7c85addfffe19b66d8ca71c31799d6e55990/src/runtime/proc.go#L4481-L4486">一个Go程序的最大垃圾回收时间间隔为两分钟</a>。
+</p>
+
+<p>
+以后的Go运行时版本可能会采取不同的垃圾回收策略。
 </p>
 
 <p>

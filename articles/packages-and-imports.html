@@ -243,7 +243,7 @@ Go SDK 1.11版本引入了模块（modules）特性的概念。
 
 <p>
 Go SDK 1.11也引入了一个<code>GO111MODULE</code>环境变量，它的值可以为<code>auto</code>、<code>on</code>或<code>off</code>。
-截至到目前（Go SDK v1.13），它的默认值为<code>auto</code>。
+截至到目前（Go SDK v1.14），它的默认（和推荐）值为<code>auto</code>。
 根据具体情景，不同的SDK版本将根据不同的规则把<code>auto</code>解读为<code>on</code>或者<code>off</code>。
 请阅读<a href="https://github.com/golang/go/wiki/Modules">官方维基</a>以获取详情。
 </p>
@@ -300,7 +300,7 @@ Go SDK 1.11也引入了一个<code>GO111MODULE</code>环境变量，它的值可
 </p>
 
 <p>
-只有直接位于一个模块的根目录下的的<code>vendor</code>目录才会被视为特殊的目录。
+只有直接位于一个模块的根目录下的<code>vendor</code>目录才会被视为特殊的目录。
 </p>
 
 当模块特性为打开状态时，假设有一个如下的被标识为<code>example.com/mypkg</code>的模块，则：
@@ -543,7 +543,7 @@ func main() {
 <li>
 	<code>Print</code>是<code>fmt</code>标准库包中的另外一个函数。
 	和<code>Println</code>函数调用一样，一个<code>Print</code>函数调用也接受任意数量实参。
-	它将逐个打印出每个实参的字符串表示形式。如果相邻的的两个实参都不是字符串类型，则在它们中间会打印一个空格字符。
+	它将逐个打印出每个实参的字符串表示形式。如果相邻的两个实参都不是字符串类型，则在它们中间会打印一个空格字符。
 </li>
 </ul>
 

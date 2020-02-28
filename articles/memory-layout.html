@@ -30,7 +30,7 @@ Go是一门属于C语言家族的编程语言，所以本文谈及的很多概�
 </p>
 
 <p>
-对于一个类型<code>T</code>，我们可以调用<code>unsafe.Alignof(t)</code>来获得它的一般对齐保证，其中<code>t</code>为一个<code>T</code>类型的的非字段值，
+对于一个类型<code>T</code>，我们可以调用<code>unsafe.Alignof(t)</code>来获得它的一般对齐保证，其中<code>t</code>为一个<code>T</code>类型的非字段值，
 也可以调用<code>unsafe.Alignof(x.t)</code>来获得<code>T</code>的字段对齐保证，其中<code>x</code>为一个结构体值并且<code>t</code>为一个类型为<code>T</code>的结构体字段值。
 </p>
 
@@ -44,7 +44,7 @@ Go是一门属于C语言家族的编程语言，所以本文谈及的很多概�
 </p>
 
 <p>
-对于当前的官方Go编译器（1.13版本），一个类型的一般对齐保证和字段对齐保证总是相等的。对于gccgo编译器，这两者可能不相等。
+对于当前的官方Go编译器（1.14版本），一个类型的一般对齐保证和字段对齐保证总是相等的。对于gccgo编译器，这两者可能不相等。
 </p>
 
 Go白皮书仅列出了<a href="https://golang.google.cn/ref/spec#Size_and_alignment_guarantees">些许类型对齐保证要求</a>。
@@ -63,7 +63,7 @@ Go白皮书仅列出了<a href="https://golang.google.cn/ref/spec#Size_and_align
 
 即使对于同一个编译器，具体类型的对齐保证在不同的架构上也是不相同的。
 同一个编译器的不同版本做出的具体类型的对齐保证也有可能是不相同的。
-当前版本（1.13）的标准编译器做出的对齐保证列在了下面：
+当前版本（1.14）的标准编译器做出的对齐保证列在了下面：
 
 <pre class="fixed-width"><code class="language-go">类型种类                   对齐保证（字节数）
 ------                    ------
@@ -363,7 +363,7 @@ func (c *Counter) Value() uint64 {
 
 <p>
 为了原子操作的跨架构兼容编程变得更简单，Russ Cox<a href="https://github.com/golang/go/issues/599">提议64位字的地址应该总是8字节对齐的</a>，无论在64位架构上还是32位架构上。
-但截至目前（Go 1.13），此提议尚未得到通过。
+但截至目前（Go 1.14），此提议尚未得到通过。
 </p>
 
 </div>

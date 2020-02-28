@@ -100,7 +100,7 @@ Go所支持的六种流程控制代码快中，除了<code>if-else</code>条件�
 
 <p>
 在执行一个<code>if-else</code>条件分支控制代码块中，如果<code>InitSimpleStatement</code>这条语句没有被省略，则此条语句将被率先执行。
-如果<code>InitSimpleStatement</code>被省略掉，则其后跟随的的分号<code>;</code>也可一块儿被省略。
+如果<code>InitSimpleStatement</code>被省略掉，则其后跟随的分号<code>;</code>也可一块儿被省略。
 </p>
 
 <p>
@@ -379,7 +379,7 @@ default:
 </p>
 
 <p>
-除了刚提到的的分支代码块，每个<code>switch-case</code>流程控制至少包括其它两个代码块。
+除了刚提到的分支代码块，每个<code>switch-case</code>流程控制至少包括其它两个代码块。
 其中一个是隐式的，另一个显式地。此显式的代码块内嵌在隐式的代码块之中。
 所有的分支代码块都内嵌在此显式代码块之中（因此也间接内嵌在刚提及的隐式代码块中）。
 </p>
@@ -440,7 +440,7 @@ https://github.com/golang/go/blob/5a7cfbc0117bce314c3f079ece459173b9efc854/src/c
 -->
 <p>
 注意，编译器可能会不允许一个<code>switch-case</code>流程控制中有任何两个case表达式可以在编译时刻确定相等的表达式。
-比如，当前的官方标准编译器（1.13版本）认为上例中的<code>case 6, 7, 8</code>一行是不合法（如果此行未被注释掉）。但是其它编译器未必这么认为。
+比如，当前的官方标准编译器（1.14版本）认为上例中的<code>case 6, 7, 8</code>一行是不合法（如果此行未被注释掉）。但是其它编译器未必这么认为。
 事实上，当前的官方标准编译器<a href="https://github.com/golang/go/issues/28357">允许重复的布尔case表达式在同一个<code>switch-case</code>流程控制中出现</a>，
 而gccgo（v8.2）允许重复的布尔和字符串类型的case表达式在同一个<code>switch-case</code>流程控制中出现。
 </p>
@@ -507,7 +507,7 @@ default:
 如果<code>InitSimpleStatement</code>语句被省略，其后的分号也可一并被省略。
 </p>
 
-上面已经提到了一个<code>switch-case</code>流程控制中的的所有分支都可以被省略，所以下面的所有流程控制代码块都是合法的，它们都可以被视为空操作。
+上面已经提到了一个<code>switch-case</code>流程控制中的所有分支都可以被省略，所以下面的所有流程控制代码块都是合法的，它们都可以被视为空操作。
 
 <pre class="line-numbers"><code class="language-go">switch n := 5; n {
 }

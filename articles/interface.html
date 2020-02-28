@@ -134,7 +134,7 @@ func (MyInt) About() string {
 </p>
 
 隐式实现关系的设计使得一个声明在另一个代码包（包括标准库包）中的类型可以被动地实现一个用户代码包中的接口类型。
-比如，如果我们声明一个像下面这样的接口类型，则<a href="https://golang.google.cn/pkg/database/sql/"><code>database/sql</code></a>标准库包中声明的<code>DB</code>和<code>Tx</code>类型都实现了这个接口类型，因为它们都拥有此接口类型指定的的三个方法。
+比如，如果我们声明一个像下面这样的接口类型，则<a href="https://golang.google.cn/pkg/database/sql/"><code>database/sql</code></a>标准库包中声明的<code>DB</code>和<code>Tx</code>类型都实现了这个接口类型，因为它们都拥有此接口类型指定的三个方法。
 
 <pre class="line-numbers"><code class="language-go">import "database/sql"
 
@@ -186,7 +186,7 @@ type DatabaseStorer interface {
 </p>
 
 <p>
-接口值的动态值的直接部分是不可修改的的，除非它的动态值被整体替换为另一个动态值。
+接口值的动态值的直接部分是不可修改的，除非它的动态值被整体替换为另一个动态值。
 </p>
 
 <!--
@@ -451,7 +451,7 @@ func main() {
 </p>
 
 <p>
-到目前为止（Go 1.13），Go尚未支持自定义函数和类型的范型。
+到目前为止（Go 1.14），Go尚未支持自定义函数和类型的范型。
 反射部分地弥补了一些因为缺少范型而导致的编程不便。
 </p>
 
