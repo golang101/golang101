@@ -569,7 +569,7 @@ func main() {
 比如：
 <pre class="line-numbers"><code class="language-go">func main() {
 	t := T{y: [3]int16{123, 456, 789}}
-	p := unsafe.Pointer(t)
+	p := unsafe.Pointer(&t)
 	addr := uintptr(p) + N + M + M
 	ty2 := (*int16)(unsafe.Pointer(addr))
 	// 下面这条调用将确保整个t值的内存
