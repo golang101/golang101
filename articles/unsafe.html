@@ -572,8 +572,8 @@ func main() {
 	p := unsafe.Pointer(&t)
 	addr := uintptr(p) + N + M + M
 	ty2 := (*int16)(unsafe.Pointer(addr))
-	// 下面这条调用将确保整个t值的内存
-	// 在此时刻不会被回收。
+	// 下面这条调用将确保整个t值的内存在此时刻
+	// 不会被回收（使用官方编译器编译）。
 	runtime.KeepAlive(p)
 	fmt.Println(*ty2)
 }
