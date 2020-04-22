@@ -310,22 +310,22 @@ func foo() {
 
 <p>
 在上面这个例子中，值<code>p2</code>仍旧在使用这个事实并不能保证曾经被<code>z</code>指针值所引用的<code>int</code>值所占的内存块一定还没有被回收。
-换句话说，当<code>*(*T)(unsafe.Pointer(p2))) = 3</code>被执行的时候，此内存块有可能已经被回收了。
+换句话说，当<code>*(*int)(unsafe.Pointer(p2)) = 3</code>被执行的时候，此内存块有可能已经被回收了。
 所以，继续通过解引用值<code>p2</code>中存储的地址是非常危险的，因为此内存块可能已经被重新分配给其它值使用了。
 </p>
 
 </div>
 
-<a class="anchor" id="fact-value-address-might-change"></a>
-<h4>事实三：一个值的地址在程序运行中可能改变</h4>
+<!--
+https://github.com/golang/go/issues/32115
+-->
+<strike>
+<h4>事实三：我们可以将一个值的指针传递给<code>runtime.KeepAlive</code>函数调用来确保此值在此调用之前仍然处于被使用中</h4>
+</strike>
 
-<p>
-详情请阅读<a href="memory-block.html#where-to-allocate">内存块</a>一文（见链接所指一节的尾部）。
-这里我们只需要知道当一个协程的栈的大小改变时，开辟在此栈上的内存块需要移动，从而相应的值的地址将改变。
-</p>
+<i>（我决定将此事实从此文中删除。这并不意味着此事实不存在，只是此事实和本文的主题不是很相关。并且它对上一小节中展示的问题于事无补。请阅读下一个事实以获取根由。）</i>
 
-<h4>事实四：我们可以将一个值的指针传递给<code>runtime.KeepAlive</code>函数调用来确保此值在此调用之前仍然处于被使用中</h4>
-
+<strike>
 <div>
 <p>
 为了确保一个值部和它所引用着的值部仍然被认为在使用中，我们应该将引用着此值的另一个值传给一个<code>runtime.KeepAlive</code>函数调用。
@@ -333,7 +333,7 @@ func foo() {
 </p>
 
 比如，通过在上一小节的例子中的最后添加一个<code>runtime.KeepAlive(z)</code>调用，
-<code>*(*int)(unsafe.Pointer(p2))) = 3</code>可以被安全地执行了。
+<code>*(*int)(unsafe.Pointer(p2)) = 3</code>可以被安全地执行了。
 
 <pre class="line-numbers"><code class="language-go">func foo() {
 	p0, y, z := createInt(), createInt(), createInt()
@@ -344,7 +344,7 @@ func foo() {
 
 	*p0 = 1
 	*(*int)(p1) = 2
-	*(*int)(unsafe.Pointer(p2))) = 3 // 转危为安！
+	*(*int)(unsafe.Pointer(p2)) = 3 // 转危为安！
 
 	runtime.KeepAlive(z) // 确保z所引用的值仍在使用中
 }
@@ -354,6 +354,15 @@ func foo() {
 </p>
 
 </div>
+</strike>
+
+<a class="anchor" id="fact-value-address-might-change"></a>
+<h4>事实四：一个值的地址在程序运行中可能改变</h4>
+
+<p>
+详情请阅读<a href="memory-block.html#where-to-allocate">内存块</a>一文（见链接所指一节的尾部）。
+这里我们只需要知道当一个协程的栈的大小改变时，开辟在此栈上的内存块需要移动，从而相应的值的地址将改变。
+</p>
 
 <h4>事实五：一个值的可被使用范围可能并没有代码中看上去的大</h4>
 
@@ -565,6 +574,7 @@ func main() {
 一旦这样的bug爆发出来，将很让人摸不到头脑。这是为什么使用非类型安全指针是危险的原因之一。
 </p>
 
+<strike>
 如果我们确实希望将上面提到的转换拆成两行，我们应该在拆分后的两行后添加一条<code>runtime.KeepAlive</code>函数调用并将（直接或间接）引用着<code>t.y[2]</code>值的一个值传递给此调用做为实参。
 比如：
 <pre class="line-numbers"><code class="language-go">func main() {
@@ -584,6 +594,10 @@ func main() {
 因为存在着这样一种可能：当Go运行时为变量<code>ty2</code>开辟内存的时候，当前协程的栈的大小需要进行增大调整。调整之后<code>t</code>的地址将改变，但是存储在变量<code>addr</code>中的地址值却未得到更新（因为只有开辟在栈上的指针类型的值才会被更新，而变量<code>addr</code>的类型为整数类型<code>uintptr</code>）。这直接导致存储在变量<code>ty2</code>的地址值时无效的（野指针）。
 但是，实事求是地讲，如果上例中的代码使用官方标准编译器编译，则此潜在的危险并不存在。
 原因是在官方标准编译器的实现中，一个<code>runtime.KeepAlive</code>调用将使被它的实参引用着的值开辟到堆上，并且开辟在堆上的内存块从不会被移动。
+</p>
+</strike>
+<p>
+<i>（上面这一段的解说是不正确的。一个<code>runtime.KeepAlive</code>调用并不能使被它的实参引用着的值开辟到堆上）</i>
 </p>
 
 <p>
@@ -741,7 +755,7 @@ func main() {
 	bs := []byte("Golang")
 	hdr := (*reflect.SliceHeader)(unsafe.Pointer(&bs))
 	hdr.Data = uintptr(unsafe.Pointer(&a))
-	runtime.KeepAlive(&a) // 必不可少！
+	// runtime.KeepAlive(&a) // 并不需要
 	hdr.Len = 2
 	hdr.Cap = len(a)
 	fmt.Printf("%s\n", bs) // Go
@@ -751,8 +765,12 @@ func main() {
 </code></pre>
 
 <p>
+<strike>
 注意：上例中的<code>runtime.KeepAlive</code>调用必不可少。
 否则，在转换<code>uintptr(unsafe.Pointer(&amp;a))</code>被执行之前，分配给数组<code>a</code>的内存可能已经被回收或者移动。
+</strike>
+
+<i>（此<code>runtime.KeepAlive</code>调用并不需要。）</i>
 </p>
 
 一般说来，我们只应该从一个已经存在的字符串值得到一个<code>*reflect.StringHeader</code>指针，
@@ -784,12 +802,13 @@ import (
 	"unsafe"
 )
 
+// 传递给此函数的string实参在此函数退出后不应被继续使用。
 func String2ByteSlice(str string) (bs []byte) {
 	strHdr := (*reflect.StringHeader)(unsafe.Pointer(&str))
 	sliceHdr := (*reflect.SliceHeader)(unsafe.Pointer(&bs))
 	sliceHdr.Data = strHdr.Data
-	sliceHdr.Len = strHdr.Len
 	sliceHdr.Cap = strHdr.Len
+	sliceHdr.Len = strHdr.Len
 	// 下面的KeepAlive是必要的。
 	runtime.KeepAlive(&str)
 	return
@@ -843,8 +862,8 @@ func String2ByteSlice(str string) (bs []byte) {
 	strHdr := (*StringHeader)(unsafe.Pointer(&str))
 	sliceHdr := (*SliceHeader)(unsafe.Pointer(&bs))
 	sliceHdr.Data = strHdr.Data
-	sliceHdr.Len = strHdr.Len
 	sliceHdr.Cap = strHdr.Len
+	sliceHdr.Len = strHdr.Len
 	
 	// 此KeepAlive调用变得不再必需。
 	//runtime.KeepAlive(&str)

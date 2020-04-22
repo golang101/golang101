@@ -564,18 +564,23 @@ func main() {
 
 <pre class="line-numbers"><code class="language-go">package main
 
-import "reflect"
-import "fmt"
+import (
+	"fmt"
+	"reflect"
+	"time"
+)
 
 func main() {
 	vx := reflect.ValueOf(123)
 	vy := reflect.ValueOf("abc")
 	vz := reflect.ValueOf([]bool{false, true})
+	vt := reflect.ValueOf(time.Time{})
 
 	x := vx.Interface().(int)
 	y := vy.Interface().(string)
 	z := vz.Interface().([]bool)
-	fmt.Println(x, y, z) // 123 abc [false true]
+	m := vt.MethodByName("IsZero").Interface().(func() bool)
+	fmt.Println(x, y, z, m()) // 123 abc [false true] true
 }
 </code></pre>
 

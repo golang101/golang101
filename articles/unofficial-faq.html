@@ -46,7 +46,7 @@
 	<li><a class="index" href="#nil-equality">为什么两个<code>nil</code>值有时候会不相等？</a></li>
 	<li><a class="index" href="#slice-conversion">为什么类型<code>[]T1</code>和<code>[]T2</code>没有共享相同底层类型，即使不同的类型<code>T1</code>和<code>T2</code>共享相同的底层类型？</a></li>
 	<li><a class="index" href="#unaddressable-values">哪些值可以被取地址，哪些值不可以被取地址？</a></li>
-	<li><a class="index" href="#maps-are-unaddressable">为什么映射元素不可被取地址？</a></li>
+	<li><a class="index" href="#map-elements-are-unaddressable">为什么映射元素不可被取地址？</a></li>
 	<li><a class="index" href="#slice-elements-always-addressable">为什么非空切片的元素总是可被取地址，即便对于不可取地址的切片也是如此？</a></li>
 	<li><a class="index" href="#method-set-relation">对任意的非指针、非接口定义类型<code>T</code>，为什么类型<code>*T</code>的方法集总是类型<code>T</code>的方法集的超集，但是反之却不然？</a></li>
 	<li><a class="index" href="#types-can-have-methods">我们可以为哪些类型声明方法？</a></li>
@@ -445,7 +445,7 @@ func main() {
 
 <p>
 请记住，有一些终结器函数永远不会被调用，并且有时候不当的设置终结器函数将会阻止对象被垃圾回收。
-关于更多细节请阅读<a href="https://golang.google.cn/pkg/runtime/#SetFinalizer">runtime.SetFinalizer函数的文档</a>。
+关于更多细节，请阅读<a href="https://golang.google.cn/pkg/runtime/#SetFinalizer">runtime.SetFinalizer函数的文档</a>。
 </p>
 
 <!-- 标准库  -->
@@ -839,14 +839,27 @@ func main() {
 </div>
 
 <a class="anchor" id="maps-are-unaddressable"></a>
+<a class="anchor" id="map-elements-are-unaddressable"></a>
 <h3>
 	为什么映射元素不可被取地址？
 </h3>
 
 <p>
-如果映射元素可以被取地址，则每个映射元素的地址在它的生命期内必须保持不变。
-这阻碍了Go编译器在实现映射时使用更加有效率的算法。
-对于标准编译器，映射元素的内部地址在运行时刻有可能发生改变。
+在Go中，映射的设计保证一个映射值在内存允许的情况下可以加入任意个条目。
+另外为了防止一个映射中为其条目开辟的内存段支离破碎，官方标准编译器使用了哈希表来实现映射。
+并且为了保证元素索引的效率，一个映射值的底层哈希表只为其中的所有条目维护一段连续的内存段。
+因此，一个映射值随着其中的条目数量逐渐增加时，其维护的连续的内存段需要不断重新开辟来增容，并把原来内存段上的条目全部复制到新开辟的内存段上。
+另外，即使一个映射值维护的内存段没有增容，某些哈希表实现也可能在当前内存段中移动其中的条目。
+总之，映射中的元素的地址会因为各种原因而改变。
+如果映射元素可以被取地址，则Go运行时（runtime）必须在元素地址改变的时候修改所有存储了元素地址的指针值。
+这极大得增加了Go编译器和运行时的实现难度，并且严重影响了程序运行效率。
+因此，目前，Go中禁止取映射元素的地址。
+</p>
+
+<p>
+映射元素不可被取地址的另一个原因是表达式<code>aMap[key]</code>可能返回一个存储于<code>aMap</code>中的元素，也可能返回一个不存储于其中的元素零值。
+这意味着表达式<code>aMap[key]</code>在<code>(&aMap[key]).Modify()</code>调用执行之后可能仍然被估值为元素零值。
+这将使很多人感到困惑，因此在Go中禁止取映射元素的地址。
 </p>
 
 <a class="anchor" id="slice-elements-always-addressable"></a>

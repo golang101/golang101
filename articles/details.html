@@ -1845,7 +1845,7 @@ func main() {
 <p>
 </p>
 
-如果你的项目只支持Go 1.13+，则更推荐使用<code>errors.Is(err, os.ErrNotExist)</code>来检查文件是否存在。
+如果你的项目只支持Go 1.13+，则<a href="https://github.com/golang/go/issues/38198">更推荐</a>使用<code>errors.Is(err, os.ErrNotExist)</code>来检查文件是否存在。
 
 <pre class="line-numbers"><code class="language-go">package main
 
