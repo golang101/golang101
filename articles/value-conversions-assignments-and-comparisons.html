@@ -148,7 +148,7 @@ func main() {
 <h4>3. 通道相关的类型转换规则</h4>
 
 <div class="well">
-假设类型<code>Tx</code>是一个双向通道类型，<code>T</code>也是一个通道类型（无论是双向的还是单向的），如果<code>Tx</code>和<code>T</code>的元素类型相同并且它们中至少有一个为非定义类型，则<code>x</code>可以被<u><b>隐式</b></u>转换为类型<code>T</code>。
+给定一个通道值<code>x</code>，假设它的类型<code>Tx</code>是一个双向通道类型，<code>T</code>也是一个通道类型（无论是双向的还是单向的）。如果<code>Tx</code>和<code>T</code>的元素类型相同并且它们中至少有一个为非定义类型，则<code>x</code>可以被<u><b>隐式</b></u>转换为类型<code>T</code>。
 </div>
 
 <!--
