@@ -364,7 +364,7 @@ https://github.com/golang/go/issues/32115
 这里我们只需要知道当一个协程的栈的大小改变时，开辟在此栈上的内存块需要移动，从而相应的值的地址将改变。
 </p>
 
-<h4>事实五：一个值的可被使用范围可能并没有代码中看上去的大</h4>
+<h4>事实五：一个值的生命范围可能并没有代码中看上去的大</h4>
 
 <div>
 <p>
@@ -435,7 +435,7 @@ func main() {
 
 <p>
 利用前面列出的非类型安全指针相关的转换规则，我们可以将一个<code>*T1</code>值转换为类型<code>*T2</code>，其中<code>T1</code>和<code>T2</code>为两个任意类型。
-然而，我们只有在<code>T1</code>的尺寸不大于<code>T2</code>并且此转换具有实际意义的时候才应该实施这样的转换。
+然而，我们只有在<code>T1</code>的尺寸不小于<code>T2</code>并且此转换具有实际意义的时候才应该实施这样的转换。
 </p>
 
 <p>
@@ -504,9 +504,9 @@ import "unsafe"
 func main() {
 	type T struct{a int}
 	var t T
-	fmt.Println(&t)                                 // &{0}
-	fmt.Printf("%x\n", uintptr(unsafe.Pointer(&t))) // c6233120a8
+	fmt.Printf("%p\n", &t)                          // 0xc6233120a8
 	println(&t)                                     // 0xc6233120a8
+	fmt.Printf("%x\n", uintptr(unsafe.Pointer(&t))) // c6233120a8
 }
 </code></pre>
 
@@ -521,7 +521,7 @@ func main() {
 
 <div>
 
-一个例子：
+转换前后的非类型安全指针必须指向同一个内存块。一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -533,7 +533,7 @@ type T struct {
 }
 
 const N = unsafe.Offsetof(T{}.y)
-const M = unsafe.Sizeof([3]int16{}[0])
+const M = unsafe.Sizeof(T{}.y[0])
 
 func main() {
 	t := T{y: [3]int16{123, 456, 789}}
@@ -601,6 +601,10 @@ func main() {
 </p>
 
 <p>
+中间uintptr值可以参与<code>&amp;^</code>清位运算来进行内存对齐计算，只要转换前后的非类型安全指针必须指向同一个内存块，整个转换就是合法安全的。
+</p>
+
+<p>
 另一个需要注意的细节是最好不要将一个内存块的结尾边界地址存储在一个（安全或非安全）指针中。
 这样做将导致紧随着此内存块的另一个内存块肯定不会被垃圾回收掉。
 请阅读<a href="unofficial-faq.html#final-zero-size-field">这个问答</a>以获取更多解释。
@@ -662,7 +666,7 @@ syscall.Syscall(SYS_READ, uintptr(fd), u, uintptr(n))
 
 </div>
 
-<h4>使用模式五：将<code>reflect.Value.Pointer</code>或者<code>reflect.Value.UnsafeAddr</code>方法的<code>uintptr</code>返回值转换为非类型安全指针。</h4>
+<h4>使用模式五：将<code>reflect.Value.Pointer</code>或者<code>reflect.Value.UnsafeAddr</code>方法的<code>uintptr</code>返回值立即转换为非类型安全指针。</h4>
 
 <div>
 
@@ -772,6 +776,9 @@ func main() {
 
 <i>（此<code>runtime.KeepAlive</code>调用并不需要。）</i>
 </p>
+<!--
+https://groups.google.com/forum/#!topic/golang-nuts/MgIP2KvEAaU
+-->
 
 一般说来，我们只应该从一个已经存在的字符串值得到一个<code>*reflect.StringHeader</code>指针，
 或者从一个已经存在的切片值得到一个<code>*reflect.SliceHeader</code>指针，
