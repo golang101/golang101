@@ -816,8 +816,7 @@ func String2ByteSlice(str string) (bs []byte) {
 	sliceHdr.Data = strHdr.Data
 	sliceHdr.Cap = strHdr.Len
 	sliceHdr.Len = strHdr.Len
-	// 下面的KeepAlive是必要的。
-	runtime.KeepAlive(&str)
+	// runtime.KeepAlive(&str) // 并不需要
 	return
 }
 
@@ -834,9 +833,11 @@ func main() {
 </code></pre>
 
 <p>
-<code>reflect</code>标准库包中<code>SliceHeader</code>和<code>StringHeader</code>类型的<a href="https://golang.google.cn/pkg/reflect/#SliceHeader">文档</a>提到这两个结构体类型的定义不保证在以后的版本中不发生改变。
-好在目前的两个主流Go编译器（标准编译器和gccgo编译器）都认可当前版本中的定义。
-这也可以看作是使用非类型安全指针的另一个潜在风险。
+<i>（本文曾经认为上面这个例子中的<code>runtime.KeepAlive</code>调用是必须的。非常抱歉，这个观点是错误的。至少对于官方标准编译器，此调用在这里是不必要的。）</i>
+</p>
+
+<p>
+<code>reflect</code>标准库包中<code>SliceHeader</code>和<code>StringHeader</code>类型的<a href="https://golang.google.cn/pkg/reflect/#SliceHeader">文档</a>提到这两个结构体类型的定义不保证在以后的版本中不发生改变。好在目前的两个主流Go编译器（标准编译器和gccgo编译器）都认可当前版本中的定义。这也可以看作是使用非类型安全指针的另一个潜在风险。
 </p>
 
 我们可以使用类似的实现来将一个字节切片转换为字符串。
@@ -852,6 +853,7 @@ func main() {
 此实现利用了上述第一个使用模式。
 </p>
 
+<!--
 事实上，为了避免因为忘记调用<code>runtime.KeepAlive</code>函数而造成的危险，在日常编程中更推荐使用我们自定义<code>Data</code>字段的类型为<code>unsafe.Pointer</code><code>SliceHeader</code>和<code>StringHeader</code>结构体。比如：
 
 <pre class="line-numbers"><code class="language-go">type SliceHeader struct {
@@ -881,6 +883,7 @@ func String2ByteSlice(str string) (bs []byte) {
 <p>
 Matthew Dempsky提议将上述两个自定义类型<code>SliceHeader</code>和<code>StringHeader</code><a href="https://github.com/golang/go/issues/19367">置入</a><code>unsafe</code>标准库。
 </p>
+-->
 
 </div>
 
