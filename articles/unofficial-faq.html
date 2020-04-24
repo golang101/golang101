@@ -858,7 +858,7 @@ func main() {
 
 <p>
 映射元素不可被取地址的另一个原因是表达式<code>aMap[key]</code>可能返回一个存储于<code>aMap</code>中的元素，也可能返回一个不存储于其中的元素零值。
-这意味着表达式<code>aMap[key]</code>在<code>(&aMap[key]).Modify()</code>调用执行之后可能仍然被估值为元素零值。
+这意味着表达式<code>aMap[key]</code>在<code>(&amp;aMap[key]).Modify()</code>调用执行之后可能仍然被估值为元素零值。
 这将使很多人感到困惑，因此在Go中禁止取映射元素的地址。
 </p>
 
