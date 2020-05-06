@@ -1,3 +1,14 @@
+
+### 1.14.e (2020/?/?)
+
+* 加了[一个细节](https://go101.org/article/details.html#compare-values-with-both-comparable-and-incomprable-parts)：比较同时含有可比较和不可比较字段的结构体值或者同时含有可比较和不可比较字段的数组值的行为是未定义的。
+* 加了[一个细节](https://go101.org/article/details.html#blank-fields-are-ignored-in-comparisons)：在结构体值的比较中，名为空标识符的字段将被忽略。
+
+### 1.14.d (2020/Apr/25)
+
+* `runtime.KeepAlive`相关的内容被从[非类型安全指针](https://gfw.go101.org/article/unsafe.html)一文中删除了。
+  我很抱歉之前在此文中传播了错误的信息。
+
 ### 1.13.i (2019/十月/31)
 
 * 改正了“数组、切片和映射”一文中对[删除一段切片元素](https://gfw.go101.org/article/container.html#delete-slice-elements)一节中的错误代码。
@@ -11,7 +22,7 @@
 
 ### 1.13.e (2019/十月/07)
 
-* 我决定撤回1.13.d中的勘误。
+* 我决定撤回1.13.d中的勘误。（重新在1.14.d中加入）
 
 ### 1.13.d (2019/九月/30)
 

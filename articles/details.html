@@ -196,6 +196,12 @@
 	<li>
 		<a class="index" href="#non-exported-names-from-different-packages">不同代码包中的两个非导出方法名和结构体字段名总是被视为不同的名称。</a>
 	</li>
+	<li>
+		<a class="index" href="#compare-values-with-both-comparable-and-incomparable-parts">比较同时含有可比较和不可比较字段的结构体值或者同时含有可比较和不可比较字段的数组值的行为是未定义的。</a>
+	</li>
+	<li>
+		<a class="index" href="#blank-fields-are-ignored-in-comparisons">在结构体值的比较中，名为空标识符的字段将被忽略。</a>
+	</li>
 	</ul>
 </li>
 <li>
@@ -1602,6 +1608,84 @@ func main() {
 	var _ bar.I = x
 }
 </code></pre>
+
+</div>
+
+
+<a class="anchor" id="compare-values-with-both-comparable-and-incomparable-parts"></a>
+<h3>比较同时含有可比较和不可比较字段的结构体值或者同时含有可比较和不可比较字段的数组值的行为是未定义的。</h3>
+
+<div>
+<p>
+当然，这里提到的不可比较值必须呈现为接口值，否则，这样的比较是编译不通过的。
+</p>
+
+尽管看上去目前的官方标准编译器对结构值的比较是一个字段一个字段比较，对数组的比较是一个元素一个元素比较，直到一个不相等的情况发生或者一个恐慌产生，
+但是这样的比较的行为目前（Go 1.14）确实是<a href="https://github.com/golang/go/issues/8606">未定义的</a>。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import "fmt"
+
+func cmpS(a, b S) {
+	defer func() {
+		if recover() != nil {
+			fmt.Println("panic")
+		}
+	}()
+	fmt.Println(a == b)
+}
+
+func cmpA(x, y A) {
+	defer func() {
+		if recover() != nil {
+			fmt.Println("panic")
+		}
+	}()
+	fmt.Println(x == y)
+}
+
+type S struct{x, y interface{}}
+type A [2]interface{}
+
+func main() {
+	var f func()
+	cmpS(S{1, f}, S{2, f}) // false（panic也是可以的）
+	cmpS(S{f, 1}, S{f, 2}) // panic（false也是可以的）
+	cmpA(A{1, f}, A{2, f}) // false（panic也是可以的）
+	cmpA(A{f, 1}, A{f, 2}) // panic（false也是可以的）
+}
+</code></pre>
+
+<p>
+</p>
+
+</div>
+
+<a class="anchor" id="blank-fields-are-ignored-in-comparisons"></a>
+<h3>在结构体值的比较中，名为空标识符的字段将被忽略。</h3>
+
+<div>
+比如，下面这个程序将打印出<code>true</code>。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import "fmt"
+
+type T struct {
+	_ int
+	_ bool
+}
+
+func main() {
+	var t1 = T{123, true}
+	var t2 = T{789, false}
+	fmt.Println(t1 == t2) // true
+}
+</code></pre>
+
+<p>
+</p>
 
 </div>
 

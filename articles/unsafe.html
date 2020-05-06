@@ -486,13 +486,35 @@ func main() {
 <p>
 </p>
 
+此模式在实践中的另一个应用是将一个不再使用的字节切片转换为一个字符串（从而避免对底层字节序列的一次开辟和复制）。如下例所示：
+
+<pre class="line-numbers"><code class="language-go">func ByteSlice2String(bs []byte) string {
+	return *(*string)(unsafe.Pointer(&bs))
+}
+</code></pre>
+
+<p>
+此实现借鉴于<code>strings</code>标准库包中的<code>Builder</code>类型的<code>String</code>方法的实现。
+字节切片的尺寸比字符串的尺寸要大，并且<a href="value-part.html#internal-definitions">它们的底层结构</a>类似，所以此转换是安全的。
+</p>
+
+反过来，下面这个例子中的转换是非法的，因为字符串的尺寸比字节切片的尺寸小。
+<pre class="line-numbers"><code class="language-go">func String2ByteSlice(s string) []byte {
+	return *(*[]byte)(unsafe.Pointer(&s)) // 危险
+}
+</code></pre>
+
+<p>
+在后面的模式六中展示了一种合法的（无需复制底层字节序列即可）将一个字符串转换为字节切片的实现。
+</p>
+
 </div>
 
 <h4>使用模式二：将一个非类型安全指针值转换为一个uintptr值，然后使用此uintptr值。</h4>
 
 <div>
 <p>
-此模式不是很有用。一般我们将最终的转换结果uintptr值输出到日志中用来调试，但是有很多其它安全的途径也可以实现此目的。
+此模式不是很有用。一般我们将最终的转换结果uintptr值输出到日志中用来调试，但是有很多其它安全并且简洁的途径也可以实现此目的。
 </p>
 
 一个例子：
@@ -840,7 +862,12 @@ func main() {
 <code>reflect</code>标准库包中<code>SliceHeader</code>和<code>StringHeader</code>类型的<a href="https://golang.google.cn/pkg/reflect/#SliceHeader">文档</a>提到这两个结构体类型的定义不保证在以后的版本中不发生改变。好在目前的两个主流Go编译器（标准编译器和gccgo编译器）都认可当前版本中的定义。这也可以看作是使用非类型安全指针的另一个潜在风险。
 </p>
 
+<p>
 我们可以使用类似的实现来将一个字节切片转换为字符串。
+不过在模式一中展示的方法更为推荐。
+</p>
+
+<!--
 然而，当前（Go 1.14），有一个更简单和更有效的方法来实现这一转换：
 
 <pre class="line-numbers"><code class="language-go">func ByteSlice2String(bs []byte) string {
@@ -852,6 +879,7 @@ func main() {
 此实现借鉴于<code>strings</code>标准库包中的<code>Builder</code>类型的<code>String</code>方法的实现。
 此实现利用了上述第一个使用模式。
 </p>
+-->
 
 <!--
 事实上，为了避免因为忘记调用<code>runtime.KeepAlive</code>函数而造成的危险，在日常编程中更推荐使用我们自定义<code>Data</code>字段的类型为<code>unsafe.Pointer</code><code>SliceHeader</code>和<code>StringHeader</code>结构体。比如：
@@ -909,7 +937,7 @@ Matthew Dempsky提议将上述两个自定义类型<code>SliceHeader</code>和<c
 </p>
 
 <p>
-最后值得提一下的是，Go SDK 1.14中将加入一个<code>-gcflags=all=-d=checkptr</code>编译器动态分析选项。
+最后值得提一下的是，Go SDK 1.14中加入了一个<code>-gcflags=all=-d=checkptr</code>编译器动态分析选项。
 当此选项被使用的时候，编译出的程序在运行时会监测到很多（但并非所有）非类型安全指针的错误使用。一旦错误的使用被监测到，恐慌将产生（当前，暂不推荐在Windows平台上使用此选项）。
 感谢<a href="https://github.com/golang/go/issues/22218">Matthew Dempsky实现了此特性</a>。
 </p>
