@@ -92,7 +92,7 @@ https://github.com/golang/go/commit/451cf3e2cd8950571f436896a3987343f8c2d7f6
 	变量<code>a</code>肯定在变量<code>b</code>之后初始化；
 </li>
 <li>
-	但是变量<code>x</code>有可能在变量<code>b</code>之间、或者在变量<code>b</code>和变量<code>a</code>之间、或者在变量<code>a</code>之后初始化，取决于具体的编译器实现；
+	但是变量<code>x</code>有可能在变量<code>b</code>之前、或者在变量<code>b</code>和变量<code>a</code>之间、或者在变量<code>a</code>之后初始化，取决于具体的编译器实现；
 </li>
 <li>
 	函数<code>sideEffect()</code>有可能在变量<code>x</code>初始化之前或者之后被调用，取决于具体的编译器实现。
