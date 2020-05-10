@@ -1,0 +1,14 @@
+[Unit]
+Description=Golang 101
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5s
+WorkingDirectory=/var/www/golang101
+ExecStart=/var/www/golang101/golang101 -port=12345
+StandardOutput=null
+
+[Install]
+WantedBy=multi-user.target
+
