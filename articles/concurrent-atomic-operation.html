@@ -39,7 +39,7 @@ func CompareAndSwapInt32(addr *int32, old, new int32) (swapped bool)
 
 <pre class="line-numbers"><code class="language-go">func LoadPointer(addr *unsafe.Pointer) (val unsafe.Pointer)
 func StorePointer(addr *unsafe.Pointer, val unsafe.Pointer)
-func SwapPointer(addr *unsafe.Pointer, new T) (old unsafe.Pointer)
+func SwapPointer(addr *unsafe.Pointer, new unsafe.Pointer) (old unsafe.Pointer)
 func CompareAndSwapPointer(addr *unsafe.Pointer,
 				old, new unsafe.Pointer) (swapped bool)
 </code></pre>
