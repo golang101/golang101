@@ -1,7 +1,0 @@
-server {
-    server_name gfw.go101.org;
-
-    location / {
-        proxy_pass http://localhost:12345;
-    }
-}
