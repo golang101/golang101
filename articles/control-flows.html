@@ -528,7 +528,7 @@ switch {
 上例中的后两个<code>switch-case</code>流程控制中的<code>CompareOperand0</code>表达式都为<code>bool</code>类型的<code>true</code>值。
 同理，下例中的代码将打印出<code>hello</code>。
 
-<pre class="line-numbers"><code class="language-go">switch {
+<pre class="line-numbers"><code class="language-go">switch { // <=> switch true {
 case true: fmt.Println("hello")
 default: fmt.Println("bye")
 }

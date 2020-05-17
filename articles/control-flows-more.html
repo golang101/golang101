@@ -472,7 +472,7 @@ b: 3
 
 <p>
 第一个匿名函数中的循环打印出<code>2</code>、<code>1</code>和<code>0</code>这个序列，但是第二个匿名函数中的循环打印出三个<code>3</code>。
-因为第一个循环中的<code>i</code>是在<code>fmt.Println</code>函数被延迟调用的时候估的值，而第二个循环中的<code>i</code>是在第二个匿名函数调用的退出阶段估的值（此时循环变量<code>i</code>的值已经变为<code>3</code>）。
+因为第一个循环中的<code>i</code>是在<code>fmt.Println</code>函数调用被推入延迟调用堆栈的时候估的值，而第二个循环中的<code>i</code>是在第二个匿名函数调用的退出阶段估的值（此时循环变量<code>i</code>的值已经变为<code>3</code>）。
 </p>
 
 我们可以对第二个循环略加修改（使用两种方法），使得它和第一个循环打印出相同的结果。

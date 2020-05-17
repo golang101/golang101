@@ -219,16 +219,19 @@ goroutine 5 [running]:
 
 import "runtime"
 
+func f() {
+	// 此调用产生的Goexit信号将压制先前
+	// 产生的恐慌"bye"，但是不应该如此。
+	defer runtime.Goexit()
+	panic("bye")
+}
+
 func main() {
-	c := make(chan struct{})
-	go func() {
-		defer close(c)
-		// 此调用产生的Goexit信号将压制先前
-		// 产生的恐慌"bye"，但是不应该如此。
-		defer runtime.Goexit()
-		panic("bye")
-	}()
-	<-c
+	go f()
+	
+	for runtime.NumGoroutine() > 1 {
+		runtime.Gosched()
+	}
 }
 </code></pre>
 
