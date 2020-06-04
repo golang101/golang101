@@ -239,7 +239,7 @@ func main() {
 标准编译器和gccgo编译器将在以后的版本中修复<a href="https://github.com/golang/go/issues/35378">此问题</a>。
 </p>
 
-下面这个例子程序运行时应该马上退出，但是当前版本的gccgo编译器（v8.0）和Go SDK 1.14之前的官方标准编译器均未正确实现之，从而导致此程序在运行时永不退出。
+下面这个例子程序运行时应该马上退出，但是当前版本的gccgo编译器（v8.0）和Go官方工具链1.14之前的官方标准编译器均未正确实现之，从而导致此程序在运行时永不退出。
 
 <pre class="line-numbers"><code class="language-go">package main
 

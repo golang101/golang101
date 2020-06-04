@@ -7,7 +7,7 @@ Go是一个内存安全的语言。在数组和切片的索引和子切片操作
 </p>
 
 <p>
-从Go SDK 1.7开始，官方标准编译器使用了一个新的基于SSA（single-assignment form，静态单赋值形式）的后端。
+从Go官方工具链1.7开始，官方标准编译器使用了一个新的基于SSA（single-assignment form，静态单赋值形式）的后端。
 SSA使得Go编译器可以有效利用诸如<a href="https://en.wikipedia.org/wiki/Bounds-checking_elimination">BCE</a>（bounds check elimination，边界检查消除）和<a href="https://en.wikipedia.org/wiki/Common_subexpression_elimination">CSE</a>（common subexpression elimination，公共子表达式消除）等优化。
 BCE可以避免很多不必要的边界检查，CSE可以避免很多重复表达式的计算，从而使得编译器编译出的程序执行效率更高。有时候这些优化的效果非常明显。
 </p>
@@ -17,7 +17,7 @@ BCE可以避免很多不必要的边界检查，CSE可以避免很多重复表�
 </p>
 
 <p>
-对于Go SDK 1.7+，我们可以运行<code>go build <b>-gcflags="-d=ssa/check_bce/debug=1"</b></code>来列出哪些代码行仍然需要边界检查。
+对于Go官方工具链1.7+，我们可以运行<code>go build <b>-gcflags="-d=ssa/check_bce/debug=1"</b></code>来列出哪些代码行仍然需要边界检查。
 </p>
 
 <h3>例子1</h3>
@@ -128,7 +128,7 @@ func main() {}
 </p>
 
 <p>
-注意：在Go SDK 1.11之前，官方标准编译器没有足够聪明到认为第<i>22</i>行是不需要边界检查的。
+注意：在Go官方工具链1.11之前，官方标准编译器没有足够聪明到认为第<i>22</i>行是不需要边界检查的。
 </p>
 
 </div>
@@ -256,7 +256,7 @@ func main() {}
 </ul>
 
 <p>
-注意：Go SDK 1.9之前中的标准编译器没有出推断出第<i>8</i>行不需要边界检查。
+注意：Go官方工具链1.9之前中的标准编译器没有出推断出第<i>8</i>行不需要边界检查。
 </p>
 
 </div>
@@ -308,7 +308,7 @@ func main() {}
 </code></pre>
 
 <!--
-since Go SDK 1.11, the compiler becomes more smarter
+since Go官方工具链1.11, the compiler becomes more smarter
 
 func ff(s []int) []int {
 	s2 := make([]int, len(s))

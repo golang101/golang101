@@ -561,6 +561,7 @@ func main() {
 
 从上面的例子中，我们知道，使用空接口<code>interface{}</code>值做为中介，一个Go值可以转换为一个<code>reflect.Value</code>值。
 逆过程类似，通过调用一个<code>reflect.Value</code>值的<code>Interface</code>方法得到一个<code>interface{}</code>值，然后将此<code>interface{}</code>断言为原来的Go值。
+但是，请注意，调用一个代表着非导出字段的<code>reflect.Value</code>值的<code>Interface</code>方法将导致一个恐慌。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -581,6 +582,12 @@ func main() {
 	z := vz.Interface().([]bool)
 	m := vt.MethodByName("IsZero").Interface().(func() bool)
 	fmt.Println(x, y, z, m()) // 123 abc [false true] true
+
+	type T struct {x int}
+	t := &T{3}
+	v := reflect.ValueOf(t).Elem().Field(0)
+	fmt.Println(v)             // 3
+	fmt.Println(v.Interface()) // panic
 }
 </code></pre>
 
@@ -601,76 +608,3 @@ func main() {
 
 
 
-<!--
-
-bug setcion in reflect docs
-
-interface type numbe methods, non-exported, ...
-
-
-https://github.com/golang/go/issues/15924
-https://github.com/golang/go/issues/16522
-https://github.com/golang/go/issues/20824
-
-https://github.com/golang/go/issues/22073
-
-https://github.com/golang/go/issues/22075
-* bug on reflect query method of interface type and value
-
-https://github.com/golang/go/issues/22143
-
-https://github.com/golang/go/issues/20541
-
-https://github.com/golang/go/issues/20013
-
-
-
-https://groups.google.com/forum/#!msg/golang-dev/coyYwxU3dfM/K_nSPAbOY4kJ;context-place=searchin/golang-dev/closure$20$20callable$20pointer%7Csort:date
-
-reflect.StructOf: StructOf currently does not generate wrapper methods for embedded fields.
-                  This limitation may be lifted in a future version.
-
-reflect.StructOf: anonymous fileds: will not produce methods table
-
-https://github.com/golang/go/issues/15924
-
-https://github.com/golang/go/issues/24781
-
-https://github.com/golang/go/issues/20633
-https://github.com/golang/go/issues/20632
-https://github.com/golang/go/issues/20824
-
-https://github.com/golang/go/issues/24782
-* https://play.golang.org/p/Kd4igw-vOp7
-* https://play.golang.org/p/KCvFWtWRC1b
-
-https://github.com/golang/go/issues/25400 (not a bug)
-https://github.com/golang/go/issues/25401
-https://github.com/golang/go/issues/25402
-https://github.com/golang/go/issues/25403
-
-https://github.com/golang/go/issues/28761
-https://github.com/golang/go/issues/28748
-
-============================================
-
-
-
-
-================
-
-reflectutil
-* UnderlyingTypeOf(.)
-* IsZeroValue(.)
-  make using of reflect.Zero(type)
-
-======================
-
-generally, reflect can do any things non-reflect ways can do (not including the unsafe ways)
-reflect even can do non-relfect ways can't do.
-* SetLen and SetCap
-* select any number of cases
-* get the kind of a value
-* convert []MyByte to []byte
-
--->

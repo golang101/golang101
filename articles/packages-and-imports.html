@@ -72,7 +72,7 @@ Go has 25 keywords.
 
 <p>
 我们可以访问<a href="https://golang.org/pkg/">Go官网</a>（<a href="https://golang.google.cn/pkg/">墙内版</a>）来查看各个标准库包的文档，
-我们也可以<a href="go-sdk.html#doc">开启一个本地文档服务器</a>来查看这些文档。
+我们也可以<a href="go-toolchain.html#doc">开启一个本地文档服务器</a>来查看这些文档。
 </p>
 
 <p>
@@ -224,8 +224,8 @@ type of a: int, type of b: string
 </p>
 
 <p>
-对于官方Go SDK来说，一个引入路径中包含有<code>internal</code>目录名的代码包被视为一个特殊的代码包。
-它只能被此<code>internal</code>目录的直接父目录中的代码包所引入。
+对于Go官方工具链来说，一个引入路径中包含有<code>internal</code>目录名的代码包被视为一个特殊的代码包。
+它只能被此<code>internal</code>目录的直接父目录（和此父目录的子目录）中的代码包所引入。
 比如，代码包<code>.../a/b/c/internal/d/e/f</code>和<code>.../a/b/c/internal</code>只能被引入路径含有<code>.../a/b/c</code>前缀的代码包引入。
 </p>
 
@@ -234,7 +234,7 @@ type of a: int, type of b: string
 </p>
 
 <p>
-Go SDK 1.11版本引入了模块（modules）特性的概念。
+Go官方工具链1.11版本引入了模块（modules）特性的概念。
 一个模块可以被看做是一些拥有一个共同的根目录的代码包集合，即一个代码包树。
 每个模块关联着一个根引入路径和一个<a href="https://semver.org/">语义化版本号</a>。
 语义化版本号的主版本须体现在根引入路径中，除了<code>v0</code>和<code>v1</code>主版本号。
@@ -242,8 +242,8 @@ Go SDK 1.11版本引入了模块（modules）特性的概念。
 </p>
 
 <p>
-Go SDK 1.11也引入了一个<code>GO111MODULE</code>环境变量，它的值可以为<code>auto</code>、<code>on</code>或<code>off</code>。
-截至到目前（Go SDK v1.14），它的默认（和推荐）值为<code>auto</code>。
+Go官方工具链1.11也引入了一个<code>GO111MODULE</code>环境变量，它的值可以为<code>auto</code>、<code>on</code>或<code>off</code>。
+截至到目前（Go官方工具链v1.14），它的默认（和推荐）值为<code>auto</code>。
 根据具体情景，不同的SDK版本将根据不同的规则把<code>auto</code>解读为<code>on</code>或者<code>off</code>。
 请阅读<a href="https://github.com/golang/go/wiki/Modules">官方维基</a>以获取详情。
 </p>

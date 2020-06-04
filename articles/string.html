@@ -105,7 +105,7 @@ func main() {
 </ul>
 
 <p>
-注意：如果在<code>aString[i]</code>和<code>aString[start:end]</code>中，<code>aString</code>和各个下标均为常量，则编译器将在编译时刻验证这些下标的合法性，但是这样的元素访问和子切片表达式的估值结果总是非常量（但<a href="https://blog.golang.org/go1.15-proposals">此规则可能从Go 1.15开始得到改变</a>）。
+注意：如果在<code>aString[i]</code>和<code>aString[start:end]</code>中，<code>aString</code>和各个下标均为常量，则编译器将在编译时刻验证这些下标的合法性，但是这样的元素访问和子切片表达式的估值结果总是非常量（<a href="https://blog.golang.org/go1.15-proposals">此规则以后可能会得到改变</a>）。
 </p>
 
 一个例子：
@@ -304,7 +304,7 @@ func main() {
 <div>
 上面已经提到了字符串和字节切片之间的转换将深复制它们的底层字节序列。
 标准编译器做了一些优化，从而在某些情形下避免了深复制。
-至少这些优化在当前（Go SDK 1.14）是存在的。
+至少这些优化在当前（Go官方工具链1.14）是存在的。
 这样的情形包括：
 <ul>
 <li>

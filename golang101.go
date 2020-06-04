@@ -55,14 +55,13 @@ func (go101 *Go101) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if strings.HasPrefix(item, "res/") {
 			w.Header().Set("Cache-Control", "max-age=31536000") // one year
 			go101.articleResHandler.ServeHTTP(w, r)
-			return
 		} else if go101.IsLocalServer() && (strings.HasPrefix(item, "print-") || strings.HasPrefix(item, "pdf-")) {
 			w.Header().Set("Cache-Control", "no-cache, private, max-age=0")
 			idx := strings.IndexByte(item, '-')
 			go101.RenderPrintPage(w, r, item[:idx], item[idx+1:])
-			return
+		} else if !go101.RedirectArticlePage(w, r, item) {
+			go101.RenderArticlePage(w, r, item)
 		}
-		go101.RenderArticlePage(w, r, item)
 	case "":
 		http.Redirect(w, r, "/article/101.html", http.StatusTemporaryRedirect)
 	default:
@@ -155,7 +154,7 @@ func (go101 *Go101) RenderArticlePage(w http.ResponseWriter, r *http.Request, fi
 	}
 
 	if len(page) == 0 { // blank page means page not found.
-		log.Printf("article page %s is not found", file)
+		log.Printf("文章%s未找到", file)
 		//w.Header().Set("Cache-Control", "no-cache, private, max-age=0")
 		http.Redirect(w, r, "/article/101.html", http.StatusNotFound)
 		return
@@ -342,6 +341,7 @@ type PageTemplate uint
 const (
 	Template_Article PageTemplate = iota
 	Template_PrintBook
+	Template_Redirect
 	NumPageTemplates
 )
 
@@ -369,6 +369,8 @@ func retrievePageTemplate(which PageTemplate, cacheIt bool) *template.Template {
 			t = parseTemplate(filepath.Join(rootPath, "web", "templates"), "base", "article")
 		case Template_PrintBook:
 			t = parseTemplate(filepath.Join(rootPath, "web", "templates"), "pdf")
+		case Template_Redirect:
+			t = parseTemplate(filepath.Join(rootPath, "web", "templates"), "redirect")
 		default:
 			t = template.New("blank")
 		}
@@ -425,7 +427,6 @@ func (go101 *Go101) Update() {
 	//	log.Println("find git remote failed:", output)
 	//	return
 	//}
-
 	//configItem := "remote." + string(bytes.TrimSpace(output[:k])) + ".url"
 	//output, err = runShellCommand(time.Minute/2, "git", "config", "--get", configItem)
 	//if err != nil {
@@ -460,7 +461,6 @@ func parseTemplate(path string, files ...string) *template.Template {
 	return template.Must(template.ParseFiles(ts...))
 }
 
-// https://stackoverflow.com/questions/39320371/how-start-web-server-to-open-page-in-browser-in-golang
 func openBrowser(url string) error {
 	var cmd string
 	var args []string

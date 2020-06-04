@@ -318,14 +318,11 @@ func foo() {
 
 <!--
 https://github.com/golang/go/issues/32115
--->
-<strike>
 <h4>事实三：我们可以将一个值的指针传递给<code>runtime.KeepAlive</code>函数调用来确保此值在此调用之前仍然处于被使用中</h4>
-</strike>
+
 
 <i>（我决定将此事实从此文中删除。这并不意味着此事实不存在，只是此事实和本文的主题不是很相关。并且它对上一小节中展示的问题于事无补。请阅读下一个事实以获取根由。）</i>
 
-<strike>
 <div>
 <p>
 为了确保一个值部和它所引用着的值部仍然被认为在使用中，我们应该将引用着此值的另一个值传给一个<code>runtime.KeepAlive</code>函数调用。
@@ -340,7 +337,7 @@ https://github.com/golang/go/issues/32115
 	var p1 = unsafe.Pointer(y)
 	var p2 = uintptr(unsafe.Pointer(z))
 
-	p2 += 2; p2--; p2--
+	p2 += 2; p2 - -; p2 - -
 
 	*p0 = 1
 	*(*int)(p1) = 2
@@ -354,17 +351,17 @@ https://github.com/golang/go/issues/32115
 </p>
 
 </div>
-</strike>
+-->
 
 <a class="anchor" id="fact-value-address-might-change"></a>
-<h4>事实四：一个值的地址在程序运行中可能改变</h4>
+<h4>事实三：一个值的地址在程序运行中可能改变</h4>
 
 <p>
 详情请阅读<a href="memory-block.html#where-to-allocate">内存块</a>一文（见链接所指一节的尾部）。
 这里我们只需要知道当一个协程的栈的大小改变时，开辟在此栈上的内存块需要移动，从而相应的值的地址将改变。
 </p>
 
-<h4>事实五：一个值的生命范围可能并没有代码中看上去的大</h4>
+<h4>事实四：一个值的生命范围可能并没有代码中看上去的大</h4>
 
 <div>
 <p>
@@ -396,7 +393,7 @@ func bar() {
 
 </div>
 
-<h4>事实六：<code>*unsafe.Pointer</code>是一个类型安全指针类型</h4>
+<h4>事实五：<code>*unsafe.Pointer</code>是一个类型安全指针类型</h4>
 
 <div>
 <p>
@@ -596,7 +593,7 @@ func main() {
 一旦这样的bug爆发出来，将很让人摸不到头脑。这是为什么使用非类型安全指针是危险的原因之一。
 </p>
 
-<strike>
+<!--
 如果我们确实希望将上面提到的转换拆成两行，我们应该在拆分后的两行后添加一条<code>runtime.KeepAlive</code>函数调用并将（直接或间接）引用着<code>t.y[2]</code>值的一个值传递给此调用做为实参。
 比如：
 <pre class="line-numbers"><code class="language-go">func main() {
@@ -617,10 +614,10 @@ func main() {
 但是，实事求是地讲，如果上例中的代码使用官方标准编译器编译，则此潜在的危险并不存在。
 原因是在官方标准编译器的实现中，一个<code>runtime.KeepAlive</code>调用将使被它的实参引用着的值开辟到堆上，并且开辟在堆上的内存块从不会被移动。
 </p>
-</strike>
 <p>
 <i>（上面这一段的解说是不正确的。一个<code>runtime.KeepAlive</code>调用并不能使被它的实参引用着的值开辟到堆上）</i>
 </p>
+-->
 
 <p>
 中间uintptr值可以参与<code>&amp;^</code>清位运算来进行内存对齐计算，只要转换前后的非类型安全指针必须指向同一个内存块，整个转换就是合法安全的。
@@ -781,7 +778,7 @@ func main() {
 	bs := []byte("Golang")
 	hdr := (*reflect.SliceHeader)(unsafe.Pointer(&bs))
 	hdr.Data = uintptr(unsafe.Pointer(&a))
-	// runtime.KeepAlive(&a) // 并不需要
+
 	hdr.Len = 2
 	hdr.Cap = len(a)
 	fmt.Printf("%s\n", bs) // Go
@@ -790,17 +787,19 @@ func main() {
 }
 </code></pre>
 
+<!-- not right
 <p>
-<strike>
+
 注意：上例中的<code>runtime.KeepAlive</code>调用必不可少。
 否则，在转换<code>uintptr(unsafe.Pointer(&amp;a))</code>被执行之前，分配给数组<code>a</code>的内存可能已经被回收或者移动。
-</strike>
+
 
 <i>（此<code>runtime.KeepAlive</code>调用并不需要。）</i>
 </p>
-<!--
 https://groups.google.com/forum/#!topic/golang-nuts/MgIP2KvEAaU
 -->
+<p>
+</p>
 
 一般说来，我们只应该从一个已经存在的字符串值得到一个<code>*reflect.StringHeader</code>指针，
 或者从一个已经存在的切片值得到一个<code>*reflect.SliceHeader</code>指针，
@@ -838,7 +837,6 @@ func String2ByteSlice(str string) (bs []byte) {
 	sliceHdr.Data = strHdr.Data
 	sliceHdr.Cap = strHdr.Len
 	sliceHdr.Len = strHdr.Len
-	// runtime.KeepAlive(&str) // 并不需要
 	return
 }
 
@@ -855,7 +853,9 @@ func main() {
 </code></pre>
 
 <p>
+<!--
 <i>（本文曾经认为上面这个例子中的<code>runtime.KeepAlive</code>调用是必须的。非常抱歉，这个观点是错误的。至少对于官方标准编译器，此调用在这里是不必要的。）</i>
+-->
 </p>
 
 <p>
@@ -937,7 +937,7 @@ Matthew Dempsky提议将上述两个自定义类型<code>SliceHeader</code>和<c
 </p>
 
 <p>
-最后值得提一下的是，Go SDK 1.14中加入了一个<code>-gcflags=all=-d=checkptr</code>编译器动态分析选项。
+最后值得提一下的是，Go官方工具链1.14中加入了一个<code>-gcflags=all=-d=checkptr</code>编译器动态分析选项。
 当此选项被使用的时候，编译出的程序在运行时会监测到很多（但并非所有）非类型安全指针的错误使用。一旦错误的使用被监测到，恐慌将产生（当前，暂不推荐在Windows平台上使用此选项）。
 感谢<a href="https://github.com/golang/go/issues/22218">Matthew Dempsky实现了此特性</a>。
 </p>

@@ -90,7 +90,7 @@
 	转换结果等同于字符串字面量<code>"\uFFFD"</code>（亦即<code>"\xef\xbf\xbd"</code>）。
 	<code>0xFFFD</code>是Unicode标准中的（非法码点的）替换字符值。
 	（但是请注意，今后的Go版本可能<a href="https://github.com/golang/go/issues/3939">只允许rune整数被转换为字符串</a>。
-	从Go SDK 1.15版本开始，<code>go vet</code>命令将对从非rune整数到字符串的转换做出警告。）
+	从Go官方工具链1.15版本开始，<code>go vet</code>命令将对从非rune整数到字符串的转换做出警告。）
 </li>
 </ol>
 

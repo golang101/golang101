@@ -98,7 +98,7 @@ Go是一门支持自动内存管理的语言，比如自动内存开辟和自动
 
 <p><i>
 （注意：对于标准编译器来说，每个协程维护的栈的大小有一个最大限制。
-对于Go SDK 1.11中编译器来说，此最大限制的默认值在64位系统上为1GB，在32位系统上为250MB。
+对于Go官方工具链1.11中编译器来说，此最大限制的默认值在64位系统上为1GB，在32位系统上为250MB。
 我们可以在运行时刻调用<code>runtime/debug</code>标准库包中的<code>SetMaxStack</code>来修改此值。）
 </i></p>
 
@@ -152,7 +152,7 @@ The values referenced by values allocated on heap will never be allocated in sta
 
 <p>
 如果一个局部声明的变量的某些值部被开辟在堆上，则我们说这些值部以及此局部变量逃逸到了堆上。
-我们可以运行官方Go SDK中提供的<code>go build -gcflags -m</code>命令来查看代码中哪些局部值的值部在运行时刻会逃逸到堆上。
+我们可以运行Go官方工具链中提供的<code>go build -gcflags -m</code>命令来查看代码中哪些局部值的值部在运行时刻会逃逸到堆上。
 如上所述，目前官方Go编译器中的逃逸分析器并不十分完美，因此某些可以安全地开辟在栈上的值也可能会逃逸到了堆上。
 </p>
 
@@ -374,7 +374,7 @@ func main() {
 </p>
 
 <p>
-目前（Go SDK 1.14），对于使用标准编译器编译的Go程序，一轮新的垃圾回收过程开启的默认条件是通过<a href="https://golang.google.cn/pkg/runtime/#hdr-Environment_Variables"><code>GOGC</code>环境变量</a>来控制的。
+目前（Go官方工具链1.14），对于使用标准编译器编译的Go程序，一轮新的垃圾回收过程开启的默认条件是通过<a href="https://golang.google.cn/pkg/runtime/#hdr-Environment_Variables"><code>GOGC</code>环境变量</a>来控制的。
 当从上一轮垃圾回收结束后新申请的内存块的内存总和占上一轮垃圾回收结束时仍在被使用的所有内存块的内存总和的百分比超过此值时，新的一轮垃圾回收过程将开始。
 所以此值决定了垃圾回收过程的频率。
 此环境变量的默认值为100。

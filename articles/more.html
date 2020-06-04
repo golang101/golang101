@@ -10,9 +10,9 @@
 <h3>程序性能分析、单元测试和基准测试</h3>
 
 <div>
-我们可以使用官方Go SDK中的<code>go test</code>命令来运行单元测试和基准测试。
+我们可以使用Go官方工具链中的<code>go test</code>命令来运行单元测试和基准测试。
 测试源文件名必须以<code>_test.go</code>结尾。
-官方Go SDK也支持程序性能分析。
+Go官方工具链也支持程序性能分析。
 请阅读下列文章获取详情：
 <ul>
 <li>
@@ -136,7 +136,7 @@ Go汇编汇编常用来实现一些对性能要求很高的函数。
 <h3>更多的编译模式（build mode）</h3>
 
 <p>
-官方Go SDK中的<code>go build</code>命令支持更多的编译模式。
+Go官方工具链中的<code>go build</code>命令支持更多的编译模式。
 运行<code>go help buildmode</code>可以列出所有支持的模式，或者查看<a href="https://golang.google.cn/cmd/go/#hdr-Build_modes">官方文档</a>来查看这些模式的解释说明。
 除了最常用的default模式，plugin（插件）模式可能是另一种用的较多的模式。
 我们可以使用<a href="https://golang.google.cn/pkg/plugin/"><code>plugin</code>标准库包</a>中的函数来加载和使用Go插件。

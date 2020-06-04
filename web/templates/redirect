@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="refresh" content="1; url={{- .RedirectPage -}}">
+		<title>跳转中......</title>
+	</head>
+
+	<body>
+		<div class="container">
+		<div>将跳转至<a href="{{- .RedirectPage -}}">{{- .RedirectPage -}}</a></div>
+		</div>
+	</body>
+</html>
+
+
+
