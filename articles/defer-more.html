@@ -74,12 +74,34 @@ func main() {
 }
 </code></pre>
 
-<p>
-</p>
+</div>
 
-<p>
-一个延迟调用的实参<a href="control-flows-more.html#argument-evaluation-moment">也是在此调用被推入延迟调用堆栈之前估值的</a>。
-</p>
+<h3>延迟方法调用的属主实参的估值时刻</h3>
+
+<div>
+
+前面的文章曾经解释过：一个延迟调用的实参<a href="control-flows-more.html#argument-evaluation-moment">也是在此调用被推入延迟调用堆栈之前估值的</a>。
+方法的属主实参也不例外。比如，下面这个程序将打印出<code>1342</code>。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+type T int
+
+func (t T) M(n int) T {
+  print(n)
+  return t
+}
+
+func main() {
+	var t T
+	// t.M(1)是方法调用M(2)的属主实参，因此它
+	// 将在M(2)调用被推入延迟调用堆栈之前被估值。
+	defer t.M(1).M(2)
+	t.M(3).M(4)
+}
+</code></pre>
+
+<p></p>
 </div>
 
 <h3>延迟调用使得代码更简洁和鲁棒</h3>

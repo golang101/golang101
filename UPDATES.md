@@ -1,12 +1,17 @@
 
+### 1.14.g (2020/六月/12)
+
+* 删除了1.14.e中增加的一个细节：比较同时含有可比较和不可比较字段的结构体值或者同时含有可比较和不可比较字段的数组值的行为是未定义的。原因是[此行为将被明确下来](https://github.com/golang/go/issues/8606)。
+* 加了[一个细节](https://gfw.go101.org/article/details.html#impossible-to-interface-assertion)：关于在编译时刻即可确定总是失败的目标类型为接口类型的断言。
+
 ### 1.14.f (2020/六月/02)
 
 * 所用的"Go SDK"用词都替换成了"Go官方工具链"。
 
 ### 1.14.e (2020/五月/06)
 
-* 加了[一个细节](https://go101.org/article/details.html#compare-values-with-both-comparable-and-incomprable-parts)：比较同时含有可比较和不可比较字段的结构体值或者同时含有可比较和不可比较字段的数组值的行为是未定义的。
-* 加了[一个细节](https://go101.org/article/details.html#blank-fields-are-ignored-in-comparisons)：在结构体值的比较中，名为空标识符的字段将被忽略。
+* 加了[一个细节](https://gfw.go101.org/article/details.html#compare-values-with-both-comparable-and-incomparable-parts)：比较同时含有可比较和不可比较字段的结构体值或者同时含有可比较和不可比较字段的数组值的行为是未定义的。
+* 加了[一个细节](https://gfw.go101.org/article/details.html#blank-fields-are-ignored-in-comparisons)：在结构体值的比较中，名为空标识符的字段将被忽略。
 
 ### 1.14.d (2020/四月/25)
 

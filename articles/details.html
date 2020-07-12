@@ -157,6 +157,9 @@
 	<li>
 		<a class="index" href="#failed-type-assertion-may-panic">一个失败的类型断言的可选的第二个结果是否被舍弃将影响此类型断言的行为。</a>
 	</li>
+	<li>
+		<a class="index" href="#impossible-to-interface-assertion">关于在编译时刻即可确定总是失败的目标类型为接口类型的断言。</a>
+	</li>
 	<!--
 	<li>
 		<a class="index" href="#interface-comparison-complexity">对于标准编译器来说，比较两个接口值的时间复杂度可能是<code><i>O</i>(1)</code>，也可能是<code><i>O</i>(n)</code>。</a>
@@ -196,9 +199,10 @@
 	<li>
 		<a class="index" href="#non-exported-names-from-different-packages">不同代码包中的两个非导出方法名和结构体字段名总是被视为不同的名称。</a>
 	</li>
-	<li>
+	<!--li>
 		<a class="index" href="#compare-values-with-both-comparable-and-incomparable-parts">比较同时含有可比较和不可比较字段的结构体值或者同时含有可比较和不可比较字段的数组值的行为是未定义的。</a>
-	</li>
+
+	</li-->
 	<li>
 		<a class="index" href="#blank-fields-are-ignored-in-comparisons">在结构体值的比较中，名为空标识符的字段将被忽略。</a>
 	</li>
@@ -1346,6 +1350,39 @@ func main() {
 </p>
 </div>
 
+<a class="anchor" id="impossible-to-interface-assertion"></a>
+<h3>关于在编译时刻即可确定总是失败的目标类型为接口类型的断言。</h3>
+
+<div>
+在编译时刻，编译可以发现某些目标类型为接口类型的断言是不可能成功的。比如下面这个程序中的断言：
+
+<pre class="line-numbers"><code class="language-go">package main
+
+type Ia interface {
+	m()
+}
+
+type Ib interface {
+	m() int
+}
+
+type T struct{}
+
+func (T) m() {}
+
+func main() {
+	var x Ia = T{}
+	_ = x.(Ib) // panic: main.T is not main.Ib
+}
+</code></pre>
+
+<p>
+这样的断言并不会导致编译失败（但编译后的程序将在运行时刻产生恐慌）。
+从官方Go工具链1.15开始，<code>go vet</code>会对对这样的断言做出警告。
+<p>
+
+</div>
+
 
 
 <!--
@@ -1611,7 +1648,7 @@ func main() {
 
 </div>
 
-
+<!--
 <a class="anchor" id="compare-values-with-both-comparable-and-incomparable-parts"></a>
 <h3>比较同时含有可比较和不可比较字段的结构体值或者同时含有可比较和不可比较字段的数组值的行为是未定义的。</h3>
 
@@ -1661,6 +1698,7 @@ func main() {
 </p>
 
 </div>
+-->
 
 <a class="anchor" id="blank-fields-are-ignored-in-comparisons"></a>
 <h3>在结构体值的比较中，名为空标识符的字段将被忽略。</h3>

@@ -563,7 +563,7 @@ func main() {
 但是，我们从没有为这两个类型声明过这几个方法。这几个方法从哪来的呢？
 </p>
 
-事实上，假设结构体类型<code>S</code>内嵌了一个类型<code>T</code>，并且此内嵌是合法的，
+事实上，假设结构体类型<code>S</code>内嵌了一个类型（或者类型别名）<code>T</code>，并且此内嵌是合法的，
 <ul>
 <li>
 	对内嵌类型<code>T</code>的每一个方法，如果此方法对应的选择器既不和其它选择器碰撞也未被其它选择器遮挡，则编译器将会隐式地为结构体类型<code>S</code>声明一个同样原型的方法。
@@ -574,18 +574,13 @@ func main() {
 </li>
 </ul>
 
-<p>
-上述事实在类型<code>*T</code>不可内嵌的情况下（即<code>T</code>是一个指针或者接口类型时）仍存在。
-如果即<code>T</code>是一个指针或者接口类型时，则类型<code>*T</code>的方法集为空。
-</p>
-
 简单说来，
 <ul>
 <li>
-	类型<code>struct{T}</code>和<code>*struct{T}</code>将获取类型<code>T</code>的所有方法。
+	类型<code>struct{T}</code>和<code>*struct{T}</code>均将获取类型<code>T</code>的所有方法。
 </li>
 <li>
-	类型<code>*struct{T}</code>、<code>struct{*T}</code>和<code>*struct{*T}</code>将获取类型<code>*T</code>的所有方法。
+	类型<code>*struct{T}</code>、<code>struct{*T}</code>和<code>*struct{*T}</code>都将获取类型<code>*T</code>的所有方法。
 </li>
 </ul>
 

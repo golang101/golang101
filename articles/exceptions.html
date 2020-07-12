@@ -19,14 +19,10 @@
 如果一个函数调用刚好返回一个结果，则此函数调用总是可以被当作一个单值实参用在其它函数调用中，并且此函数调用可以和其它实参混合出现在其它函数调用的实参列表中。
 </div>
 
-例外：
+例外（对于Go官方工具链1.15之前的版本）：
 <div class="alert alert-success">
 对于官方标准编译器，上述基本规则不适用于内置函数<code>print</code>和<code>println</code>。这两个函数的调用不能内嵌多返回值函数调用。
 </div>
-
-<p>
-<i>（刚提到的例外<a href="https://github.com/golang/go/issues/35576">将在Go官方工具链1.15中被移除</a>。）</i>
-</p>
 
 例子：
 <pre class="line-numbers"><code class="language-go">package main
@@ -59,8 +55,10 @@ func main() {
 	/*
 	f3(123, f1())
 	f3(f1(), 123)
-	println(f1())
 	*/
+
+	// 此行从Go官方工具链1.15开始才能够编译通过。
+	println(f1())
 
 	// 下面这三行从Go官方工具链1.13开始才能够编译通过。
 	copy(f4())

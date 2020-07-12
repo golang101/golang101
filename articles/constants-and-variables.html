@@ -89,8 +89,8 @@
 	对于不在合法的Unicode码点取值范围内的整数<code>v</code>，
 	转换结果等同于字符串字面量<code>"\uFFFD"</code>（亦即<code>"\xef\xbf\xbd"</code>）。
 	<code>0xFFFD</code>是Unicode标准中的（非法码点的）替换字符值。
-	（但是请注意，今后的Go版本可能<a href="https://github.com/golang/go/issues/3939">只允许rune整数被转换为字符串</a>。
-	从Go官方工具链1.15版本开始，<code>go vet</code>命令将对从非rune整数到字符串的转换做出警告。）
+	（但是请注意，今后的Go版本可能<a href="https://github.com/golang/go/issues/3939">只允许rune或者byte整数被转换为字符串</a>。
+	从Go官方工具链1.15版本开始，<code>go vet</code>命令会对从非rune和非byte整数到字符串的转换做出警告。）
 </li>
 </ol>
 
@@ -799,8 +799,7 @@ var a, b, c = b+1, c+1, y // 7 6 5
 
 <ul>
 <li>
-	当从一个比特位数多的整数类型的非常量整数值向一个比特位数少的整数类型转换的时候，高位的比特将被舍弃，低位的比特将被保留。
-    我们称这种处理方式为截断（truncated）或者回绕（wrapped around）。
+	当从一个比特位数多的整数类型的非常量整数值向一个比特位数少的整数类型转换的时候，高位的比特将被舍弃，低位的比特将被保留。我们称这种处理方式为截断（truncated）或者回绕（wrapped around）。
 </li>
 <li>
 	当从一个非常量的浮点数向一个整数类型转换的时候，浮点数的小数部分将被舍弃（向零靠拢）。
@@ -839,7 +838,7 @@ var h = uint8(n + 1) // ok: h == 0，变量h的类型为uint8。
 </code></pre>
 
 <p>
-第<i>3</i>行和第<i>13</i>行的隐式转换中，<code>a</code>和<code>k</code>被转换为它们各自的默认类型。
+第<i>3</i>行的隐式转换中，<code>a</code>被转换为它的默认类型（<code>float64</code>）；因此<code>b</code>的类型被推断为<code>float64</code>。
 </p>
 
 </div>

@@ -86,12 +86,16 @@
 	<div class="col-xs-6 col-sm-3 nav-item-inactive" style="color: #ccc;">Go测验101</div>
 </div>
 	
-	{{- if (and (call $.Value "top-bar")  (true)) -}}
-		<div class="alert alert-warning text-center"><small>
-		Go工具介绍：<b><a href="https://github.com/go101/gold">Gold</a></b> - 一款本地Go文档服务器和文档生成工具。<span style="color: #090; font-weight: bold;"><sup>新！</sup></span>
-		</small></div>
-		<p>
-		</p>
+	{{- if (and (call $.Value "top-bar")  (ne .FilenameWithoutExt "tool-gold")) -}}
+<div class="alert alert-success text-center"><small>
+<b><a href="https://github.com/go101/gold">Gold</a></b> - 一款本地Go文档服务器、文档生成工具和代码阅读器。<span style="color: #090; font-weight: bold;"><sup>新！</sup></span>
+<br/>-- 展示类型实现关系 --
+<br/>-- 展示代码统计 --
+<br/>-- 良好的代码阅读体验 --
+<br/>-- 更多功能... --
+</small></div>
+<p>
+</p>
 	{{- end -}}
 
 {{ end }}

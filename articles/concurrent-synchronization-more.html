@@ -342,7 +342,7 @@ func main() {
 https://github.com/golang/go/issues/17973
 -->
 
-上一个例子中的<code>Counter</code>类型的<code>m</code>字段的类型可以更改为<code>sync.RWMutex</code>，从而使得执行效率更高，如下面的代码所示。
+在上一个例子中，如果<code>Value</code>方法被十分频繁调用而<code>Increase</code>方法并不频繁被调用，则<code>Counter</code>类型的<code>m</code>字段的类型可以更改为<code>sync.RWMutex</code>，从而使得执行效率更高，如下面的代码所示。
 
 <pre class="line-numbers"><code class="language-go">...
 type Counter struct {
@@ -362,6 +362,7 @@ func (c *Counter) Value() uint64 {
 </code></pre>
 
 <p>
+<code>sync.RWMutex</code>值的另一个应用场景是将一个写任务分隔成若干小的写任务。下一节中展示了一个这样的例子。
 </p>
 
 根据上面列出的后两条规则，下面这个程序最有可能输出<code>abdc</code>。

@@ -662,6 +662,11 @@ func DoSomething(addr uintptr) {
 我们可以认为编译器针对每个<code>syscall.Syscall</code>函数调用中的每个被转换为<code>uintptr</code>类型的非类型安全指针实参添加了一些指令，从而保证此非类型安全指针所引用着的内存块在此调用返回之前不会被垃圾回收和移动。
 </p>
 
+<p>
+注意：在Go 1.15之前，类型转换表达式<code>uintptr(anUnsafePointer)</code>可以呈现为相关实参的子表达式。
+但是，从Go 1.15开始，使用此模式的要求变得略加严格：相关实参必须呈现为<code>uintptr(anUnsafePointer)</code>这种形式。
+</p>
+
 下面这个调用是安全的：
 
 <pre class="line-numbers"><code class="language-go">syscall.Syscall(syscall.SYS_READ, uintptr(fd),
@@ -674,6 +679,12 @@ func DoSomething(addr uintptr) {
 // 被p所引用着的值在此时有可能会被回收掉，
 // 或者它的地址已经发生了改变。
 syscall.Syscall(SYS_READ, uintptr(fd), u, uintptr(n))
+
+// 相关实参必须呈现为"uintptr(anUnsafePointer)"
+// 这种形式。事实上，Go 1.15之前，此调用是合法的；
+// 但是Go 1.15略改了一点规则。
+syscall.Syscall(SYS_XXX, uintptr(uintptr(fd)),
+			uint(uintptr(unsafe.Pointer(p))), uintptr(n))
 </code></pre>
 
 <p>
