@@ -1431,12 +1431,11 @@ func RandomGenerator() <-chan uint64 {
 <pre class="line-numbers"><code class="language-go">func Aggregator(inputs ...<-chan uint64) <-chan uint64 {
 	out := make(chan uint64)
 	for _, in := range inputs {
-		in := in // 此行是必要的
-		go func() {
+		go func(in <-chan uint64) {
 			for {
 				out <- <-in // <=> out <- (<-in)
 			}
-		}()
+		}(in)
 	}
 	return out
 }
@@ -1454,8 +1453,7 @@ func Aggregator(inputs ...<-chan uint64) <-chan uint64 {
 	var wg sync.WaitGroup
 	for _, in := range inputs {
 		wg.Add(1)
-		in := in // 此行是必要的
-		go func() {
+		go func(in <-chan uint64) {
 			for {
 				x, ok := <-in
 				if ok {
@@ -1464,7 +1462,7 @@ func Aggregator(inputs ...<-chan uint64) <-chan uint64 {
 					wg.Done()
 				}
 			}
-		}()
+		}(in)
 	}
 	go func() {
 		wg.Wait()
@@ -1507,12 +1505,11 @@ func Aggregator(inputs ...<-chan uint64) <-chan uint64 {
 
 <pre class="line-numbers"><code class="language-go">func Divisor(input <-chan uint64, outputs ...chan<- uint64) {
 	for _, out := range outputs {
-		out := out // 此行是必要的
-		go func() {
+		go func(o chan<- uint64) {
 			for {
-				out <- <-input // <=> out <- (<-input)
+				o <- <-input // <=> o <- (<-input)
 			}
-		}()
+		}(out)
 	}
 }
 </code></pre>
