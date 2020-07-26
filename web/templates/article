@@ -3,7 +3,7 @@
 
 {{ $.Content }}
 
-
+<hr>
 
 <div class="alert alert-success text-center" style="margin-bottom: 0px;">
 
@@ -16,6 +16,9 @@ Go语言101项目目前托管在<a href="https://github.com/golang101/golang101"
 </p>
 
 </div>
+
+<p>
+</p>
 
 {{- if ne $.FilenameWithoutExt "101" -}}
 <div class="text-center">

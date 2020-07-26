@@ -11,10 +11,18 @@
 
 		<title>{{.Title}} - Go语言101（通俗版白皮书）</title>
 
-		<link href="/static/bootstrap/v3.3.7-a/css/bootstrap.min.css" rel="stylesheet">
-		<link href="/static/go101/css/v9.css" rel="stylesheet">
-		<link href="/static/prism/2019-05-11/prism.css" rel="stylesheet">
-		<script src="/static/prism/2019-05-11/prism.js"></script>
+		{{- if true -}}
+		<link href="/static/bootstrap/v4.0.3-dark/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/static/go101/css/v9-dark.css" rel="stylesheet">
+		<link href="/static/prism/2020-07-25-dark/prism.css" rel="stylesheet">
+		<script src="/static/prism/2020-07-25-dark/prism.js"></script>
+		{{- else -}}
+		<link href="/static/bootstrap/v4.5.0/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/static/go101/css/v9-light.css" rel="stylesheet">
+		<link href="/static/prism/2020-07-25-light/prism.css" rel="stylesheet">
+		<script src="/static/prism/2020-07-25-light/prism.js"></script>
+		{{- end -}}
+
 		<script src="/static/jquery/jquery.min-v1.11.2.js"></script>
 		<!--[if lt IE 9]>
 		<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>

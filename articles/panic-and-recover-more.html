@@ -351,7 +351,7 @@ func main() {
 
 事实上，当前版本的白皮书也没有解释清楚为什么下面这个例子中的第二个<code>recover</code>调用没有起作用。此调用本用来恢复恐慌1。
 
-<pre class="line-numbers"><code class="language-go">// 此程序将带着未被恢复的恐慌1而退出。
+<pre class="line-numbers"><code class="language-go">// 此程序将带着未被恢复的恐慌1而崩溃退出。
 package main
 
 func demo() {
