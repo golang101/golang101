@@ -345,7 +345,7 @@ type Tb    *MyInt
 </li>
 <li>
 	类型<code>Ta</code>的值不能直接被转换为类型<code>Tb</code>，即使是显式转换也是不行的。
-	但是，通过上述三条事实，通过三层显式转换<code>Tb((*MyInt)((*int64)(pa)))</code>，一个<code>pa</code>的指针值可以被间接地转换为类型<code>Tb</code>。
+	但是，通过上述三条事实，通过三层显式转换<code>Tb((*MyInt)((*int64)(ta)))</code>，一个<code>ta</code>的指针值可以被间接地转换为类型<code>Tb</code>。
 </li>
 </ol>
 
