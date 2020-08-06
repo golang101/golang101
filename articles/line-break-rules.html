@@ -139,7 +139,7 @@ print(a); print(b)
 </p>
 
 <p>
-从以上两条规则可以看出，一个分号永远不会插入在<code>for</code>关键字后，这就是为什么上面的裸<code>for</code>循环例子是合法的原因。
+从以上两条规则可以看出，一个分号永远不会插入在<code>for</code>关键字后，这就是为什么上面的裸<code>for</code>循环例子是合法的。
 </p>
 
 分号自动插入规则导致的一个结果是：自增和自减运算必须呈现为单独的语句，它们不能被当作表达式使用。
@@ -270,7 +270,7 @@ func main() {
 </code></pre>
 
 <p>
-这就是它为什么输出<code>true</code>的原因。
+这就是它输出<code>true</code>的原因。
 </p>
 
 <p>
@@ -323,7 +323,7 @@ func main() {
 
 <p>
 一个单独的分号实际上表示一条<a href="expressions-and-statements.html#simple-statements">空语句</a>。
-这就是为什么<code>A:</code>和<code>C:</code>标签声明之后确实跟随了一条语句的原因，所以它们是合法的。
+这就意味着<code>A:</code>和<code>C:</code>标签声明之后确实跟随了一条语句，所以它们是合法的。
 而<code>B:</code>标签声明跟随的<code>case 0:</code>不是一条语句，所以它是不合法的。
 </p>
 

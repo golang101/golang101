@@ -298,7 +298,7 @@ main.Singer has 1 methods:
 
 <p>
 在Go中，（不考虑下面将要介绍的选择器碰撞和遮挡），<b><i>如果一个选择器中的中部某项对应着一个内嵌字段，则此项可被省略掉</i></b>。
-这是为什么内嵌字段又被称为匿名字段的原因。
+因此内嵌字段又被称为匿名字段。
 </p>
 
 <div>
@@ -335,7 +335,7 @@ func main() {
 </code></pre>
 
 <p>
-这就是为什么在上一节的例子中选择器表达式<code>gaga.Name</code>是合法的原因，
+这就是为什么在上一节的例子中选择器表达式<code>gaga.Name</code>是合法的，
 因为它只不过是<code>gaga.Person.Name</code>的一个缩写形式。
 <code>Name</code>被称为类型<code>Singer</code>的提升字段（promoted field）。
 </p>
