@@ -422,7 +422,7 @@ func main() {
 	case 4, 5, 6:
 		fmt.Println(n, "mod 9 is 4, 5 or 6.")
 	// case 6, 7, 8:
-		// 上一行行可能编译不过，因为6和上一个case中的
+		// 上一行可能编译不过，因为6和上一个case中的
 		// 6重复了。是否能编译通过取决于具体编译器实现。
 	default:
 		fmt.Println(n, "mod 9 is 7 or 8.")
@@ -705,7 +705,7 @@ Exit:
 <p>
 一个<code>goto</code>语句必须包含一个跳转标签名。
 一个<code>break</code>或者<code>continue</code>语句也可以包含一个跳转标签名，但此跳转标签名是可选的。
-包含跳转标签名的<code>break</code>语句一般用于可跳出外层的嵌套可跳出流程控制代码块。
+包含跳转标签名的<code>break</code>语句一般用于跳出外层的嵌套可跳出流程控制代码块。
 包含跳转标签名的<code>continue</code>语句一般用于提前结束外层的嵌套循环流程控制代码块的当前循环步。
 </p>
 

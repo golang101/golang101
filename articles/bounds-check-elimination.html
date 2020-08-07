@@ -207,7 +207,7 @@ func main() {
 </code></pre>
 
 <p>
-所以<b>如果<code>s[:index]</code>是安全的则<code>s[index:]</code>是无需边界检查的</b>这条论述只有在<code>len(s)</code>和<code>cap(s)</code>相等的情况下才正确。这就是为什么函数<code>fb</code>和<code>fc</code>中的代码仍旧需要边界检查的原因。
+所以<b>如果<code>s[:index]</code>是安全的则<code>s[index:]</code>是无需边界检查的</b>这条论述只有在<code>len(s)</code>和<code>cap(s)</code>相等的情况下才正确。这就是函数<code>fb</code>和<code>fc</code>中的代码仍旧需要边界检查的原因。
 </p>
 
 <p>
