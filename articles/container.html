@@ -852,7 +852,7 @@ func main() {
 </p>
 
 <p>
-截至目前（Go 1.14），<code>append</code>函数调用的第一个实参不能为类型不确定的<code>nil</code>。
+截至目前（Go 1.15），<code>append</code>函数调用的第一个实参不能为类型不确定的<code>nil</code>。
 </p>
 
 </div>
@@ -1284,7 +1284,7 @@ func Copy(dest, src []T) int {
 </p>
 
 <p>
-截至目前（Go 1.14），<code>copy</code>函数调用的两个实参均不能为类型不确定的<code>nil</code>。
+截至目前（Go 1.15），<code>copy</code>函数调用的两个实参均不能为类型不确定的<code>nil</code>。
 </p>
 
 </div>
@@ -1708,7 +1708,7 @@ fmt.Println(len(pa), cap(pa)) // 5 5
 此优化在官方Go编译器1.5版本中被引入。
 </p>
 
-此优化也适用于<code>a</code>为一个切片的情形。但是，有点遗憾，此优化不适用于<code>a</code>为一个数组指针的情形，至少到目前（Go 1.14）为止。
+此优化也适用于<code>a</code>为一个切片的情形。但是，有点遗憾，此优化不适用于<code>a</code>为一个数组指针的情形，至少到目前（Go 1.15）为止。
 所以，如果你打算重置一个数组，最好不要在<code>range</code>关键字后跟随此数组的指针。
 特别地，推荐在<code>range</code>关键字后跟随一个从此数组派生出来的切片，如下：
 
@@ -1811,7 +1811,7 @@ Go不支持更多的内置切片操作，比如切片克隆、元素删除和插
 <h4>切片克隆</h4>
 
 <div>
-对于目前的标准编译器（1.14版本），最有效的克隆一个切片的方法为：
+对于目前的标准编译器（1.15版本），最有效的克隆一个切片的方法为：
 <pre class="disable-line-numbers111"><code class="language-go">sClone := append(s[:0:0], s...)
 </code></pre>
 

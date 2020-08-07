@@ -318,7 +318,7 @@ func main() {
 
 <div>
 <p>
-目前的官方Go标准运行时（1.14版本）使用<a href="https://blog.golang.org/go15gc">一个并发三色（tri-color）标记清扫（mark-sweep）算法</a>来实现垃圾回收。
+目前的官方Go标准运行时（1.15版本）使用<a href="https://blog.golang.org/go15gc">一个并发三色（tri-color）标记清扫（mark-sweep）算法</a>来实现垃圾回收。
 这里仅会对此算法的原理做一个大致的描述。一个具体实现可能和此大致描述会有很多细节上的差别。
 </p>
 
@@ -374,7 +374,7 @@ func main() {
 </p>
 
 <p>
-目前（Go官方工具链1.14），对于使用标准编译器编译的Go程序，一轮新的垃圾回收过程开启的默认条件是通过<a href="https://golang.google.cn/pkg/runtime/#hdr-Environment_Variables"><code>GOGC</code>环境变量</a>来控制的。
+目前（Go官方工具链1.15），对于使用标准编译器编译的Go程序，一轮新的垃圾回收过程开启的默认条件是通过<a href="https://golang.google.cn/pkg/runtime/#hdr-Environment_Variables"><code>GOGC</code>环境变量</a>来控制的。
 当从上一轮垃圾回收结束后新申请的内存块的内存总和占上一轮垃圾回收结束时仍在被使用的所有内存块的内存总和的百分比超过此值时，新的一轮垃圾回收过程将开始。
 所以此值决定了垃圾回收过程的频率。
 此环境变量的默认值为100。
@@ -387,7 +387,7 @@ func main() {
 </p>
 
 <p>
-另一点需要注意的是，当前的官方Go运行时（v1.14）同时采取了另一个策略：<a href="https://github.com/golang/go/blob/895b7c85addfffe19b66d8ca71c31799d6e55990/src/runtime/proc.go#L4481-L4486">一个Go程序的最大垃圾回收时间间隔为两分钟</a>。
+另一点需要注意的是，当前的官方Go运行时（v1.15）同时采取了另一个策略：<a href="https://github.com/golang/go/blob/895b7c85addfffe19b66d8ca71c31799d6e55990/src/runtime/proc.go#L4481-L4486">一个Go程序的最大垃圾回收时间间隔为两分钟</a>。
 </p>
 
 <p>
