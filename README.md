@@ -50,6 +50,12 @@ Server started:
 
 本书起始页将自动在用户默认浏览器中打开。如果没有，请手动访问http://localhost:12345
 
+命令行选项：
+```
+-port=1234
+-theme=light # 或者 dark （默认）
+```
+
 ### 一些注意事项
 
 * 如果在线版被墙了，请运行如上所述本地版或者下载[离线版](https://github.com/golang101/golang101/releases)阅读。

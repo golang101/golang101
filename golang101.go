@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+
 	//"errors"
 	"go/build"
 	"html/template"
@@ -24,6 +25,7 @@ type Go101 struct {
 	isLocalServer     bool
 	articlePages      map[string][]byte
 	serverMutex       sync.Mutex
+	theme             string // default is "dark"
 }
 
 var (
@@ -125,6 +127,7 @@ func (go101 *Go101) RenderArticlePage(w http.ResponseWriter, r *http.Request, fi
 			pageParams := map[string]interface{}{
 				"Article":       article,
 				"Title":         article.TitleWithoutTags,
+				"Theme":         go101.theme,
 				"IsLocalServer": isLocal,
 				"Value": func() func(string, ...interface{}) interface{} {
 					var kvs = map[string]interface{}{}
@@ -234,11 +237,9 @@ func retrieveArticleContent(file string) (Article, error) {
 //				page = buf.Bytes()
 //			}
 //		}
-//
 //		if err != nil {
 //			page = []byte(err.Error())
 //		}
-//
 //		if !isLocal {
 //			go101.CacheArticlePage(item, page)
 //		}
@@ -318,14 +319,12 @@ func retrieveArticleContent(file string) (Article, error) {
 //		if i < 0 {
 //			break
 //		}
-//
 //		article, err := retrieveArticleContent(content[:i])
 //		if err != nil {
 //			log.Printf("retrieve article %s error: %s", content[:i], err)
 //		} else {
 //			articles = append(articles, article)
 //		}
-//
 //		content = content[i+len(_Anchor):]
 //	}
 //
