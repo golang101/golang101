@@ -35,6 +35,13 @@
 <p>
 </p>
 
+
+<div class="alert alert-danger"><small>
+	<i>2020/08/13</i>: 更正：<a href="string.html#conversion-optimizations">字符串和字节切片之间的转换的编译器优化</a>一节曾列出
+	“一个在映射元素索引语法中被用做键值的从字节切片到字符串的转换（不需复制底层字节）”。实际上此优化只对元素读取索引语法有效。
+	目前描述和代码一并得到了更正。
+</small></div>
+
 <!--
 <div class="alert alert-warning"><small>
 	<i>2020/06/02</i>: 将所有的“Go SDK”用词都替换成了“Go工具链”。

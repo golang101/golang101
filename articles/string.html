@@ -311,7 +311,7 @@ func main() {
 	一个<code>for-range</code>循环中跟随<code>range</code>关键字的从字符串到字节切片的转换；
 </li>
 <li>
-	一个在映射元素索引语法中被用做键值的从字节切片到字符串的转换；
+	一个在映射元素读取索引语法中被用做键值的从字节切片到字符串的转换（注意：对修改写入索引语法无效）；
 </li>
 <li>
 	一个字符串比较表达式中被用做比较值的从字节切片到字符串的转换；
@@ -335,14 +335,17 @@ func main() {
 
 	key := []byte{'k', 'e', 'y'}
 	m := map[string]string{}
-	// 这里，转换string(key)将不需要一个深复制。
-	// 即使key是一个包级变量，此优化仍然有效。
+	// 这个string(key)转换仍然需要深复制。
 	m[string(key)] = "value"
+	// 这里的转换string(key)将不需要一个深复制。
+	// 即使key是一个包级变量，此优化仍然有效。
 	fmt.Println(m[string(key)]) // value
 }
 </code></pre>
 
 <p>
+注意：在最后一行中，如果在估值<code>string(key)</code>的时候有数据竞争的情况，则这行的输出有可能并不是<code>value</code>。
+但是，无论如何，此行都不会造成恐慌（即使有数据竞争的情况发生）。
 </p>
 
 另一个例子：
