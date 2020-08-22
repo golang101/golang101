@@ -630,8 +630,8 @@ func main() {
 	wgReceivers.Add(NumReceivers)
 
 	// ...
-	dataCh := make(chan int)   // 仍就不会被关闭
-	middleCh := make(chan int) // 将被关闭
+	dataCh := make(chan int)   // 将被关闭
+	middleCh := make(chan int) // 不会被关闭
 	closing := make(chan string)
 	closed := make(chan struct{})
 
