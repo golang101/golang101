@@ -1815,13 +1815,25 @@ Go不支持更多的内置切片操作，比如切片克隆、元素删除和插
 <pre class="disable-line-numbers111"><code class="language-go">sClone := append(s[:0:0], s...)
 </code></pre>
 
-对于长度较大（并且元素值的直接部分不含有指针）的切片，上面这种方法比下面这种方法效率更高。
+我们也可以使用如下方法来克隆一个切片：
 <pre class="disable-line-numbers111"><code class="language-go">sClone := make([]T, len(s))
 copy(sClone, s)
 </code></pre>
 
 <p>
-刚提到的第二种方法有一个缺点：如果<code>s</code>是一个nil切片，此第二种方法将得到一个非nil切片。
+</p>
+
+此第二种方法有一个缺点：如果<code>s</code>是一个nil切片，则使用此方法将得到一个非nil切片。
+不过，在编程实践中，我们常常并不需要追求克隆的完美性。如果我们确实需要，则需要多写几行：
+<pre class="disable-line-numbers111"><code class="language-go">var sClone []T
+if s != nil {
+	sClone := make([]T, len(s))
+	copy(sClone, s)
+}
+</code></pre>
+
+<p>
+在Go官方工具链1.15版本之前，对于一些常见的使用场景，使用<code>append</code>来克隆切片比使用<code>make</code>加<code>copy</code>要<a href="https://github.com/go101/go101/wiki/How-to-efficiently-clone-a-slice%3F">高效得多</a>。但是从1.15版本开始，官方标准编译器对<code>make</code>加<code>copy</code>这种方法做了特殊的优化，从而使得此方法总是比使用<code>append</code>来克隆切片高效。
 </p>
 
 </div>

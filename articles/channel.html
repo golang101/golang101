@@ -611,7 +611,7 @@ func main() {
 此循环将不断地尝试从一个通道接收数据，直到此通道关闭并且它的缓冲队列中为空为止。
 和应用于数组/切片/映射的<code>for-range</code>语法不同，应用于通道的<code>for-range</code>语法中最多只能出现一个循环变量，此循环变量用来存储接收到的值。
 
-<pre class="line-numbers"><code class="language-go">for v = range aChannel {
+<pre class="line-numbers"><code class="language-go">for v := range aChannel {
 	// 使用v
 }
 </code></pre>

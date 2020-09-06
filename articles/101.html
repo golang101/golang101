@@ -1,40 +1,49 @@
 ﻿<h1>Go语言101</h1>
 <!-- Go Language Blue Book -->
 
-
-
 <div>
 	<p>
-	《Go语言101》是一本着墨于Go语法和语义的编程指导书（Go 1.15就绪）。
-	这本书也搜集了很多Go编程中的细节和讲解了一些底层实现原理（不含具体实现细节）。
-	这本书的宗旨是尽量帮助Go程序员更深和更全面地理解Go。
+	《Go语言101》是一本着墨于Go语法语义以及运行时相关知识点的编程指导书（Go 1.15就绪）。
+	此书旨在尽可能地帮助Go程序员更深更全面地理解Go语言。
+	此书也搜集了Go语言和Go编程中的很多细节。
 	此书同时适合Go初学者和有一定经验的Go程序员阅读。
 	</p>
-	<ul>
-	<li>
-	本书由<a href="https://gfw.tapirgames.com">老貘</a>编写。
-	</li>
-	<li>
-	English version is <a href="https://go101.org">here</a>.
-	</li>
-	<li>
-	此项目源代码目前托管在<a href="https://github.com/golang101/golang101">Github</a>上。你可以将代码拉取到本地并在项目目录下运行<code>go run .</code>命令来启动一个本地服务器来阅读本书以获取更好的阅读体验。
-	</li>
-	<li>
-	本书微信公众号名称为"Go 101"。此公众号将时不时地发表一些Go语言相关的原创短文。各位如果感兴趣，可以搜索关注一下。 
-	</li>
-	</ul>
 </div>
 
 
+<div class="row">
+	<div class="col-xs-12 col-sm-7">
+		<ul>
+		<li>
+		English version is <a href="https://go101.org">here</a>.
+		</li>
+		<li>
+		此项目源代码目前托管在<a href="https://github.com/golang101/golang101">Github</a>上。
+		你可以将代码拉取到本地并在项目目录下运行<code>go run .</code>命令来启动一个本地服务器来阅读本书以获取更好的阅读体验。
+		</li>
+		<li>
+		本书微信公众号名称为"Go 101"。此公众号将时不时地发表一些Go语言相关的原创短文。各位如果感兴趣，可以搜索关注一下。 
+		</li>
+		<li>
+		本书由<a href="https://gfw.tapirgames.com">老貘</a>历时三年写成。目前本书仍在不断改进和增容中。
+		你的赞赏是本书和Go101.org网站不断增容和维护的动力。
+		</li>
+		</ul>
+	</div>
 
-<div class="text-center">
-	<img src="res/101-reward-qrcode-5.png" alt="赞赏" style="max-width: 100%; height: auto; width: auto\9;"></img>
+	<div class="col-xs-12 col-sm-5 text-center">
+		<img src="res/101-reward-qrcode-8.png" alt="赞赏" style="max-width: 100%; height: auto; width: auto\9;"></img>
+	</div>
+
 </div>
 
 <p>
 </p>
 
+<div class="alert alert-danger"><small>
+	<i>2020/09/06</i>: 本书曾经提到使用append来克隆切片常常比使用make+copy来克隆切片
+	高效得多。但是从官方工具链1.15版本开始，官方标准编译器对后者进行了特殊的优化，从而使得后者总是比前者高效。
+</small></div>
 
 <div class="alert alert-danger"><small>
 	<i>2020/08/13</i>: 更正：<a href="string.html#conversion-optimizations">字符串和字节切片之间的转换的编译器优化</a>一节曾列出
