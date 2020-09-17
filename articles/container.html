@@ -1827,7 +1827,7 @@ copy(sClone, s)
 不过，在编程实践中，我们常常并不需要追求克隆的完美性。如果我们确实需要，则需要多写几行：
 <pre class="disable-line-numbers111"><code class="language-go">var sClone []T
 if s != nil {
-	sClone := make([]T, len(s))
+	sClone = make([]T, len(s))
 	copy(sClone, s)
 }
 </code></pre>
@@ -1980,8 +1980,6 @@ s = append(elements, s...)
 </code></pre>
 
 <p>
-上面这个代码片段中的<code>make</code>函数调用将开辟给切片<code>x</code>的内存清零。事实上，对于这个特例来说，此清零操作是完全没有必要的。
-此清零操作可能会在以后的官方标准编译器版本中<a href="https://github.com/golang/go/issues/31592">被优化掉</a>。
 </p>
 
 </div>
@@ -2009,6 +2007,8 @@ s = append(s, e)
 </code></pre>
 
 <p>
+请注意：使用<code>append<code>函数来插入元素常常是比较低效的，因为插入点后的所有元素都要向后挪，并且当空余容量不足时还需要开辟一个更大的内存空间来容纳插入完成后所有的元素。
+对于元素个数不多的切片来说，这些可能并不是严重的问题；但是在元素个数很多的切片上进行如上的插入操作常常是耗时的。所以如果元素个数很多，最好使用链表来实现元素插入操作。
 </p>
 </div>
 
