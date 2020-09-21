@@ -1858,8 +1858,10 @@ runtime stack:
 
 <pre class="line-numbers"><code class="language-go">package main
 
-import "fmt"
-import "reflect"
+import (
+	"fmt"
+	"reflect"
+)
 
 func main() {
 	type Book struct {page int}
@@ -1889,12 +1891,34 @@ func main() {
 </code></pre>
 
 <p>
-注意：如果传递给一个<code>DeepEqual</code>调用的两个实参均为函数类型值，则此调用只有在这两个实参都为nil并且它们的类型相同的情况下才返回<code>true</code>。
 </p>
 
+注意：如果传递给一个<code>DeepEqual</code>调用的两个实参均为函数类型值，则此调用只有在这两个实参都为nil并且它们的类型相同的情况下才返回<code>true</code>。
+比较元素中含有函数值的容器值或者比较字段中含有函数值的结构体值也是类似的。
+另外要注意：如果两个同类型切片共享相同的元素序列（即它们的长度相同并且它们的各对相应元素的地址也相同），则使用<code>DeepEqual</code>比较它们时返回的结果总是为<code>true</code>，即使它们的元素中含有函数值。
+一个例子：
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import (
+	"fmt"
+	"reflect"
+)
+
+func main() {
+	a := [1]func(){func(){}}
+	b := a
+	fmt.Println(reflect.DeepEqual(a, a))       // false
+	fmt.Println(reflect.DeepEqual(a[:], a[:])) // true
+	fmt.Println(reflect.DeepEqual(a[:], b[:])) // false
+	a[0] = nil
+	fmt.Println(reflect.DeepEqual(a, a)) // true
+}
+</code></pre>
+
 <p>
-所以，当使用<code>reflect.DeepEqual</code>函数比较两个值时，我们必须清楚地知道这两个值的类型的结构。
 </p>
+
 </div>
 
 <a class="anchor" id="reflect-value-bytes"></a>
