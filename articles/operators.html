@@ -329,6 +329,53 @@ Go也支持三个一元算术运算符：
 
 </div>
 
+<h4>关于溢出</h4>
+
+<div>
+
+上一篇文章提到了
+<ul>
+<li>
+	一个类型确定数字型常量所表示的值是不能溢出它的类型的表示范围的。
+</li>
+<li>
+	一个类型不确定数字型常量所表示的值是可以溢出它的默认类型的表示范围的。
+	当一个类型不确定数字常量值溢出它的默认类型的表示范围时，此数值不会被截断（亦即回绕）。
+</li>
+<li>
+	将一个非常量数字值转换为其它数字类型时，此非常量数字值可以溢出转化结果的类型。
+	在此转换中，当溢出发生时，转化结果为此非常量数字值的截断（亦即回绕）表示。
+</li>
+</ul>
+
+<p>
+对于一个算数运算的结果，上述规则同样适用。
+</p>
+
+示例：
+<pre class="line-numbers"><code class="language-go">// 结果为非常量
+var a, b uint8 = 255, 1
+var c = a + b  // c==0。a+b是一个非常量表达式，
+               // 结果中溢出的高位比特将被截断舍弃。
+var d = a << b // d == 254。同样，结果中溢出的
+               // 高位比特将被截断舍弃。
+
+// 结果为类型不确定常量，允许溢出其默认类型。
+const X = 0x1FFFFFFFF * 0x1FFFFFFFF // 没问题，尽管X溢出
+const R = 'a' + 0x7FFFFFFF          // 没问题，尽管R溢出
+
+// 运算结果或者转换结果为类型确定常量
+var e = X                // error: X溢出int。
+var h = R                // error: R溢出rune。
+const Y = 128 - int8(1)  // error: 128溢出int8。
+const Z = uint8(255) + 1 // error: 256溢出uint8。
+</code></pre>
+
+<p>
+</p>
+
+</div>
+
 <h4>关于算术运算的结果</h4>
 
 <div>
@@ -453,53 +500,29 @@ var _ = 1.0 << m // error: shift of type float64
 <p>
 </p>
 
-</div>
+另一个例子：
 
-<h4>关于溢出</h4>
+<pre class="line-numbers"><code class="language-go">package main
 
-<div>
+const n = uint(8)
+var m = uint(8)
 
-上一篇文章提到了
-<ul>
-<li>
-	一个类型确定数字型常量所表示的值是不能溢出它的类型的表示范围的。
-</li>
-<li>
-	一个类型不确定数字型常量所表示的值是可以溢出它的默认类型的表示范围的。
-	当一个类型不确定数字常量值溢出它的默认类型的表示范围时，此数值不会被截断（亦即回绕）。
-</li>
-<li>
-	将一个非常量数字值转换为其它数字类型时，此非常量数字值可以溢出转化结果的类型。
-	在此转换中，当溢出发生时，转化结果为此非常量数字值的截断（亦即回绕）表示。
-</li>
-</ul>
+func main() {
+	println(a, b) // 2 0
+}
 
-<p>
-对于一个算数运算的结果，上述规则同样适用。
-</p>
+var a byte = 1 << n / 128
+var b byte = 1 << m / 128
+</code></pre>
 
-示例：
-<pre class="line-numbers"><code class="language-go">// 结果为非常量
-var a, b uint8 = 255, 1
-var c = a + b  // c==0。a+b是一个非常量表达式，
-               // 结果中溢出的高位比特将被截断舍弃。
-var d = a << b // d == 254。同样，结果中溢出的
-               // 高位比特将被截断舍弃。
+上面这个程序打印出<code>2 0</code>，因为最后两行等价于：
 
-// 结果为类型不确定常量，允许溢出其默认类型。
-const X = 0x1FFFFFFFF * 0x1FFFFFFFF // 没问题，尽管X溢出
-const R = 'a' + 0x7FFFFFFF          // 没问题，尽管R溢出
-
-// 运算结果或者转换结果为类型确定常量
-var e = X                // error: X溢出int。
-var h = R                // error: R溢出rune。
-const Y = 128 - int8(1)  // error: 128溢出int8。
-const Z = uint8(255) + 1 // error: 256溢出uint8。
+<pre class="line-numbers"><code class="language-go">var a = byte(int(1) << n / 128)
+var b = byte(1) << m / 128
 </code></pre>
 
 <p>
 </p>
-
 </div>
 
 <h4>关于除法和余数运算</h4>

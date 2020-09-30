@@ -503,7 +503,7 @@ func main() {
 但是，如果将其中所有出现的<code>m()</code>改为<code>M()</code>，则此程序将编译不过。
 原因是<code>A.M</code>和<code>B.M</code>碰撞了，导致<code>c.M</code>为一个非法的选择器。
 
-<pre class="line-numbers"><code class="language-go">package foo // x.y/foo
+<pre class="line-numbers"><code class="language-go">package foo // import "x.y/foo"
 
 import "fmt"
 
