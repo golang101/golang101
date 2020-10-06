@@ -124,7 +124,7 @@ Go中的指针和结构体类型的内存结构和C语言很类似。
 一个值可能被间接引用，比如
 <ul>
 <li>
-	如果一个结构体值<code>a</code>含有一个指针字段<code>b</code>并且这个指针地段引用着另外一个值<code>c</code>，那么我们可以说结构体值<code>a</code>也引用着值<code>c</code>。
+	如果一个结构体值<code>a</code>含有一个指针字段<code>b</code>并且这个指针字段<code>b</code>引用着另外一个值<code>c</code>，那么我们可以说结构体值<code>a</code>也引用着值<code>c</code>。
 </li>
 <li>
 	如果一个值<code>x</code>（直接或者间接地）引用着另一个值<code>y</code>，并且值<code>y</code>（直接或者间接地）引用着第三个值<code>z</code>，则我们可以说值<code>x</code>间接地引用着值<code>z</code>。
