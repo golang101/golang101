@@ -1,4 +1,12 @@
 
+### 1.15.b (2020/九月/28)
+
+* 对[reflect.DeepEqual](https://gfw.go101.org/article/details.html#reflect-deep-equal)相关细节增加了一些描述。
+
+### 1.15.a (2020/八月/07)
+
+* 指出从Go工具链1.15开始，使用make+copy总是比使用append来克隆切片更快。
+
 ### 1.14.g (2020/六月/12)
 
 * 删除了1.14.e中增加的一个细节：比较同时含有可比较和不可比较字段的结构体值或者同时含有可比较和不可比较字段的数组值的行为是未定义的。原因是[此行为将被明确下来](https://github.com/golang/go/issues/8606)。

@@ -154,6 +154,10 @@ func main() {
 	ts, ti, tb := tf.In(0), tf.In(1), tf.Out(0)
 	// 下一行打印出：string int bool
 	fmt.Println(ts.Kind(), ti.Kind(), tb.Kind())
+
+	// 包路径（PkgPath）是非导出字段（或者方法）的内在属性。
+	fmt.Println(tx.Field(0).PkgPath) // 
+	fmt.Println(tx.Field(1).PkgPath) // main
 }
 </code></pre>
 
