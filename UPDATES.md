@@ -2,6 +2,7 @@
 ### 1.15.b (2020/九月/28)
 
 * 对[reflect.DeepEqual](https://gfw.go101.org/article/details.html#reflect-deep-equal)相关细节增加了一些描述。
+* 添加了[一个语法例外](https://gfw.go101.org/article/exceptions.html#code-block-following-else).
 
 ### 1.15.a (2020/八月/07)
 

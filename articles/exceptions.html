@@ -765,7 +765,57 @@ func main() {
 
 </div>
 
-<!--
-https://github.com/golang/go/issues/27451
--->
+<a class="anchor" id="code-block-following-else"></a>
+<h3><code>else</code>关键字后跟随另一个代码块</h3>
+
+<div>
+基本规则：
+<div class="alert alert-info">
+<code>else</code>关键字后必须跟随一个显式代码块<code>{...}</code>。
+</div>
+
+语法糖：
+<div class="alert alert-success">
+<code>else</code>关键字后可以跟随一个（隐式）<code>if</code>代码块，
+</div>
+
+比如，在下面这个例子中，函数<code>foo</code>编译没问题，但是函数<code>bar</code>编译不过。
+<pre class="line-numbers"><code class="language-go">func f() []int {
+	return nil
+}
+
+func foo() {
+	if vs := f(); len(vs) == 0 {
+	} else if len(vs) == 1 {
+	}
+
+	if vs := f(); len(vs) == 0 {
+	} else {
+		switch {
+		case len(vs) == 1:
+		default:
+		}
+	}
+	
+	if vs := f(); len(vs) == 0 {
+	} else {
+		for _, _ = range vs {
+		}
+	}
+}
+
+func bar() {
+	if vs := f(); len(vs) == 0 {
+	} else switch { // error
+	case len(vs) == 1:
+	default:
+	}
+	
+	if vs := f(); len(vs) == 0 {
+	} else for _, _ = range vs { // error
+	}
+}
+</code></pre>
+
+</div>
 

@@ -541,7 +541,6 @@ func main() {
 	var values [N]string
 
 	cond := sync.NewCond(&sync.Mutex{})
-	cond.L.Lock()
 
 	for i := 0; i < N; i++ {
 		d := time.Second * time.Duration(rand.Intn(10)) / 10
@@ -567,10 +566,12 @@ func main() {
 		}
 		return true
 	}
+
+	cond.L.Lock()
+	defer cond.L.Unlock()
 	for !checkCondition() {
 		cond.Wait() // 必须在cond.L被锁定的时候调用
 	}
-	cond.L.Unlock()
 }
 </code></pre>
 

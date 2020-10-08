@@ -6,11 +6,9 @@
 <hr>
 
 
-<div class="row">
+<div class="row alert alert-success">
 	{{ if ne $.FilenameWithoutExt "101" -}}
 	<div class="col-xs-12 col-sm-7 alert alert-success">
-	{{ else }}
-	<div class="alert alert-success">
 	{{ end }}
 		<p>
 		《Go语言101》项目目前托管在<a href="https://github.com/golang101/golang101">Github</a>上。欢迎各位在此项目中通过提交bug和PR的方式来改进完善Go语言101中的各篇文章。
@@ -24,9 +22,8 @@
 		本书由<a href="https://gfw.tapirgames.com">老貘</a>历时三年写成。目前本书仍在不断改进和增容中。
 		你的赞赏是本书和Go101.org网站不断增容和维护的动力。
 		</p>
-	</div>
-
 	{{ if ne $.FilenameWithoutExt "101" }}
+	</div>
 	<div class="col-xs-12 col-sm-5 text-center">
 		<img src="res/101-reward-qrcode-8.png" alt="赞赏" style="max-width: 100%; height: auto; width: auto\9;"></img>
 	</div>
