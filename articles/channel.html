@@ -824,10 +824,10 @@ If the step ids change, please also update the above reference ones.
 	将当前协程从各个<code>case</code>操作中对应的通道的发送数据协程队列或接收数据协程队列中（可能以非弹出的方式）移除。
 	<ol>
 	<li>
-		如果当前协程时被一个通道关闭操作所唤醒，则跳到第<i>5</i>步。
+		如果当前协程是被一个通道关闭操作所唤醒，则跳到第<i>5</i>步。
 	</li>
 	<li>
-		如果当前协程时被一个数据发送/接收操作所唤醒，则相应的<code>case</code>分支已经在第<i>9</i>步中知晓。
+		如果当前协程是被一个数据发送/接收操作所唤醒，则相应的<code>case</code>分支已经在第<i>9</i>步中知晓。
 		按照通道锁逆序解锁所有的通道并执行此<code>case</code>分支代码块。
 	</li>
 	</ol>
