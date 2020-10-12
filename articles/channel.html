@@ -806,7 +806,7 @@ If the step ids change, please also update the above reference ones.
 	当前协程可能会被多次推入到同一个通道的这两个队列中，因为多个<code>case</code>操作中对应的通道可能为同一个。
 </li>
 <li>
-	使当前协程进入阻塞状态并则按照通道锁逆序解锁所有的通道。
+	使当前协程进入阻塞状态并且按照通道锁逆序解锁所有的通道。
 </li>
 <li>
 	...，当前协程处于阻塞状态，等待其它协程通过通道操作唤醒当前协程，...
