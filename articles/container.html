@@ -3,7 +3,7 @@
 <p>
 在严格意义上，Go中有三种一等公民容器类型：数组、切片和映射。
 有时候，我们可以认为字符串类型和通道类型也属于容器类型。
-但是，此篇文章只谈及数组、切片和映射类型。
+但是，此篇文章只谈及数组、切片和映射类型
 </p>
 
 <p>
@@ -616,7 +616,7 @@ func main() {
 </p>
 
 <p>
-注意，一般我们不能单独单独修改一个切片值的某个内部字段，除非使用<a href="#modify-slice-length-and-capacity">反射</a>或者<a href="unsafe.html">非类型安全指针</a>。
+注意，一般我们不能单独修改一个切片值的某个内部字段，除非使用<a href="#modify-slice-length-and-capacity">反射</a>或者<a href="unsafe.html">非类型安全指针</a>。
 换句话说，一般我们只能通过将其它切片赋值给一个切片来同时修改这个切片的三个字段。
 </p>
 
@@ -1125,7 +1125,7 @@ baseContainer[low : high : max] // 三下标形式
 	只要上述关系均满足，下标<code>low</code>和<code>high</code>都可以大于<code>len(baseContainer)</code>。但是它们一定不能大于<code>cap(baseContainer)</code>。
 </li>
 <li>
-	如果<code>baseContainer</code>是一个零值nil切片，只要上面所示的子切片表达式中下标的值均为<code>0</code>，则此这两个子切片表达式不会造成恐慌。
+	如果<code>baseContainer</code>是一个零值nil切片，只要上面所示的子切片表达式中下标的值均为<code>0</code>，则这两个子切片表达式不会造成恐慌。
 	在这种情况下，结果切片也是一个nil切片。
 </li>
 </ul>
