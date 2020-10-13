@@ -769,7 +769,7 @@ If the step ids change, please also update the above reference ones.
 	在赋值语句中做为源值的数据接收操作对应的目标值在此时刻不需要被估值。
 </li>
 <li>
-	将所有分支的随机排序。<code>default</code>分支总是排在最后。
+	将所有分支随机排序。<code>default</code>分支总是排在最后。
 	所有<code>case</code>操作中相关的通道可能会有重复的。
 </li>
 <li>
@@ -806,7 +806,7 @@ If the step ids change, please also update the above reference ones.
 	当前协程可能会被多次推入到同一个通道的这两个队列中，因为多个<code>case</code>操作中对应的通道可能为同一个。
 </li>
 <li>
-	使当前协程进入阻塞状态并则按照通道锁逆序解锁所有的通道。
+	使当前协程进入阻塞状态并且按照通道锁逆序解锁所有的通道。
 </li>
 <li>
 	...，当前协程处于阻塞状态，等待其它协程通过通道操作唤醒当前协程，...
@@ -824,10 +824,10 @@ If the step ids change, please also update the above reference ones.
 	将当前协程从各个<code>case</code>操作中对应的通道的发送数据协程队列或接收数据协程队列中（可能以非弹出的方式）移除。
 	<ol>
 	<li>
-		如果当前协程时被一个通道关闭操作所唤醒，则跳到第<i>5</i>步。
+		如果当前协程是被一个通道关闭操作所唤醒，则跳到第<i>5</i>步。
 	</li>
 	<li>
-		如果当前协程时被一个数据发送/接收操作所唤醒，则相应的<code>case</code>分支已经在第<i>9</i>步中知晓。
+		如果当前协程是被一个数据发送/接收操作所唤醒，则相应的<code>case</code>分支已经在第<i>9</i>步中知晓。
 		按照通道锁逆序解锁所有的通道并执行此<code>case</code>分支代码块。
 	</li>
 	</ol>
