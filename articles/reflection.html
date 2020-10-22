@@ -132,43 +132,50 @@ import "fmt"
 import "reflect"
 
 type F func(string, int) bool
-func (f F) Validate(s string) bool {
+func (f F) m(s string) bool {
 	return f(s, 32)
 }
+func (f F) M() {}
+
+type I interface{m(s string) bool; M()}
 
 func main() {
 	var x struct {
-		N int
-		f F
+		F F
+		i I
 	}
 	tx := reflect.TypeOf(x)
 	fmt.Println(tx.Kind())        // struct
 	fmt.Println(tx.NumField())    // 2
-	fmt.Println(tx.Field(1).Name) // f
-	tf := tx.Field(1).Type
-	fmt.Println(tf.Kind())               // func
-	fmt.Println(tf.IsVariadic())         // false
-	fmt.Println(tf.NumIn(), tf.NumOut()) // 2 1
-	fmt.Println(tf.NumMethod())          // 1
-	fmt.Println(tf.Method(0).Name)       // Validate
-	ts, ti, tb := tf.In(0), tf.In(1), tf.Out(0)
-	// 下一行打印出：string int bool
-	fmt.Println(ts.Kind(), ti.Kind(), tb.Kind())
-
+	fmt.Println(tx.Field(1).Name) // i
 	// 包路径（PkgPath）是非导出字段（或者方法）的内在属性。
 	fmt.Println(tx.Field(0).PkgPath) // 
 	fmt.Println(tx.Field(1).PkgPath) // main
+
+	tf, ti := tx.Field(0).Type, tx.Field(1).Type
+	fmt.Println(tf.Kind())               // func
+	fmt.Println(tf.IsVariadic())         // false
+	fmt.Println(tf.NumIn(), tf.NumOut()) // 2 1
+	t0, t1, t2 := tf.In(0), tf.In(1), tf.Out(0)
+	// 下一行打印出：string int bool
+	fmt.Println(t0.Kind(), t1.Kind(), t2.Kind())
+
+	fmt.Println(tf.NumMethod(), ti.NumMethod()) // 1 2
+	fmt.Println(tf.Method(0).Name)              // M
+	fmt.Println(ti.Method(1).Name)              // m
+	_, ok1 := tf.MethodByName("m")
+	_, ok2 := ti.MethodByName("m")
+	fmt.Println(ok1, ok2) // false true
 }
 </code></pre>
 
-<p>
-</p>
-
-注意：
+从上面这个例子我们可以看出：
 <ol>
 <li>
-	<code>reflect.Type.NumMethod</code>方法只返回一个类型的所有导出的方法的个数。
-	方法<code>reflect.Type.MethodByName</code>不能用来获取一个类型的非导出方法。
+	对于非接口类型，<code>reflect.Type.NumMethod</code>方法只返回一个类型的所有导出的方法（包括通过内嵌得来的隐式方法）的个数，并且
+	方法<code>reflect.Type.MethodByName</code>不能用来获取一个类型的非导出方法；
+    而对于接口类型，则并无这些限制（Go 1.16之前的文档对这两个方法的描述不准确，并没有体现出这个差异）。
+    此情形同样存在于下一节将要介绍的<code>reflect.Value</code>类型上的相应方法。
 </li>
 <li>
 	虽然<code>reflect.Type.NumField</code>方法返回一个结构体类型的所有字段（包括非导出字段）的数目，但是<a href="https://golang.org/pkg/reflect/#pkg-note-BUG">不推荐</a>使用方法<code>reflect.Type.FieldByName</code>来获取非导出字段。
