@@ -340,7 +340,7 @@ func main() {
 <code>Name</code>被称为类型<code>Singer</code>的提升字段（promoted field）。
 </p>
 
-因为任何内嵌其它类型的类型必然是结构体类型，并且<a href="struct.html#use-pointer-as-struct">结构体</a>一文中已经了我们可以通过一个可寻址的结构体值的指针选择此结构体的字段，所以下面的代码也是合法的：
+因为任何内嵌其它类型的类型必然是结构体类型，并且<a href="struct.html#use-pointer-as-struct">结构体</a>一文中已经知道了我们可以通过一个可寻址的结构体值的指针选择此结构体的字段，所以下面的代码也是合法的：
 <pre class="line-numbers"><code class="language-go">func main() {
 	var c C
 	pc = &c
