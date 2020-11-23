@@ -153,7 +153,7 @@ The values referenced by values allocated on heap will never be allocated in sta
 <p>
 如果一个局部声明的变量的某些值部被开辟在堆上，则我们说这些值部以及此局部变量逃逸到了堆上。
 我们可以运行Go官方工具链中提供的<code>go build -gcflags -m</code>命令来查看代码中哪些局部值的值部在运行时刻会逃逸到堆上。
-如上所述，目前官方Go编译器中的逃逸分析器并不十分完美，因此某些可以安全地开辟在栈上的值也可能会逃逸到了堆上。
+如上所述，目前官方Go标准编译器中的逃逸分析器并不十分完美，因此某些可以安全地开辟在栈上的值也可能会逃逸到了堆上。
 </p>
 
 <p>

@@ -50,7 +50,7 @@ func demo() {
 此种防止临时性内存泄露的方法不是很高效，因为在此过程中底层的字节序列被复制了两次，其中一次是不必要的。
 </p>
 
-我们可以利用<a href="string.html#conversion-optimizations">官方Go编译器对字符串衔接所做的优化</a>来防止一次不必要的复制，代价是有一个字节的浪费。
+我们可以利用<a href="string.html#conversion-optimizations">官方Go标准编译器对字符串衔接所做的优化</a>来防止一次不必要的复制，代价是有一个字节的浪费。
 
 <pre class="line-numbers"><code class="language-go">func f(s1 string) {
 	s0 = (" " + s1[:50])[1:]

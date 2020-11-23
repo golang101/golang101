@@ -145,7 +145,7 @@ func (sep string, tokens ...string) string
 
 <pre class="line-numbers"><code class="language-go">// Sum返回所有输入实参的和。
 func Sum(values ...int64) (sum int64) {
-	// values的类型为int64。
+	// values的类型为[]int64。
 	sum = 0
 	for _, v := range values {
 		sum += v

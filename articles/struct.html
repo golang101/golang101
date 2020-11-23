@@ -308,7 +308,7 @@ func main() {
 <h3>关于结构体值的比较</h3>
 
 <p>
-大多数的结构体类型都是可比较类型，除了<a href="type-system-overview.html#types-not-support-comparison">少数含有不可比较字段的结构体类型</a>。
+如果一个结构体类型是可比较的，则它肯定不包含<a href="type-system-overview.html#types-not-support-comparison">不可比较类型</a>的字段（这里不忽略名为空标识符<code>_</code>的字段）。
 </p>
 
 <p>
@@ -318,7 +318,7 @@ func main() {
 <p>
 如果两个结构体值可以相互比较，则它们的比较结果等同于逐个比较它们的相应字段（按照字段在代码中的声明顺序）。
 两个结构体值只有在它们的相应字段都相等的情况下才相等；当一对字段被发现不相等的或者<a href="interface.html#comparison">在比较中产生恐慌</a>的时候，对结构体的比较将提前结束结束。
-在比较中，字段名为空标识符<code>_</code>的字段将被忽略掉。
+在比较中，名为空标识符<code>_</code>的字段将被忽略掉。
 </p>
 
 <h3>关于结构体值的类型转换</h3>
