@@ -176,7 +176,7 @@ https://joeshaw.org/dont-defer-close-on-writable-files/
 </p>
 
 下面是另外一个延迟调用使得代码更鲁棒的例子。
-如果<code>doSomething</code>函数产生恐慌一个恐慌，则函数<code>f2</code>在退出时将导致互斥锁未解锁。
+如果<code>doSomething</code>函数产生一个恐慌，则函数<code>f2</code>在退出时将导致互斥锁未解锁。
 所以函数<code>f1</code>更鲁棒。
 
 <pre class="line-numbers"><code class="language-go">var m sync.Mutex
