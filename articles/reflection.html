@@ -193,25 +193,54 @@ import "fmt"
 import "reflect"
 
 type T struct {
-	X int  `max:"99" min:"0"`
-	Y bool `optional:"yes"`
+	X    int    `max:"99" min:"0" default:"0"`
+	Y    int    `max:"22" min default:"5"`
+	Z, W bool   `optional:"yes"`
+	Foo  string `json xml:"foo"` // `json:"foo" xml:"foo"`
 }
 
 func main() {
 	t := reflect.TypeOf(T{})
 	x, y := t.Field(0).Tag, t.Field(1).Tag
+	z, w := t.Field(2).Tag, t.Field(3).Tag
 	fmt.Println(reflect.TypeOf(x)) // reflect.StructTag
 
-	tag, present := y.Lookup("default")
-	fmt.Println(len(tag), present)    // 0 false
-	fmt.Println(y.Lookup("optional")) // yes true
-
-	fmt.Println(x.Get("max"), x.Get("min")) // 99 0
+	dv, present := x.Lookup("max")    // dv的类型为string
+	fmt.Println(len(dv), present)     // 2 true
+	fmt.Println(x.Get("max"))         // 99
+	fmt.Println(x.Get("optional"))    //
+	fmt.Println(z.Lookup("optional")) // yes true
+	fmt.Println(w.Lookup("optional")) // yes true
+	fmt.Println(y.Lookup("optional")) //  false
+	fmt.Println(y.Lookup("min"))      // 5 yes
+	fmt.Println(y.Lookup("default"))  // 5 yes
+	// 从Go 1.16开始，上面两行都打印出"5 yes"。
+	// 但是在Go 1.16之前，它们均打印出" false"。
 }
 </code></pre>
 
-<p>
-</p>
+注意：
+<ul>
+<li>
+	从Go 1.16开始，<code>Foo</code>字段包含两个键值对。实际上，它等价于<br>
+	<code>`json:"foo" xml:"foo"`</code> 。<br>
+	换句话说，值相同的键值对可以合并在一起。同理，<code>Y</code>字段包含三个键值对。
+	但是我们应该知道这种合并形式是从Go 1.16才开始支持的。
+	在Go 1.16之前，这种合并形式不形成任何键值对。
+</li>
+<li>
+	为了形成键值对，所设想的键值对形式中的冒号的两侧不能紧挨着任何空格字符。所以<br>
+	<code>`json: "title`</code>和<br>
+	<code>`json :"title`</code>都不形成任何键值对。
+</li>
+<li>
+	值中的空格不会被忽略。所以<br>
+	<code>`json:"author, omitempty`</code>、<br>
+	<code>`json:" author,omitempty`</code>以及<br>
+	<code>`json:"author,omitempty`</code>各不相同。
+</li>
+</ul>
+</ul>
 
 <code>reflect</code>代码包也提供了一些其它函数来动态地创建出来一些非定义组合类型。
 
