@@ -354,7 +354,7 @@ func (c *Counter) Value() uint64 {
 </code></pre>
 
 <p>
-通过时此方法，<code>Counter</code>类型可以自由地用做其它结构体的任何字段的类型，而无需担心此类型中维护的64位字段值可能不是8字节对齐的。
+通过采用此方法，<code>Counter</code>类型可以自由地用做其它结构体的任何字段的类型，而无需担心此类型中维护的64位字段值可能不是8字节对齐的。
 此方法的缺点是，对于每个<code>Counter</code>类型的值，都有7个字节浪费了。而且此方法使用了非类型安全指针。
 <code>sync</code>标准库包中的<a href="https://github.com/golang/go/blob/master/src/sync/waitgroup.go#L23"><code>WaitGroup</code>类型的实现</a>采用了此方法，但使用的是<code>[3]uint32</code>类型而不是<code>[15]byte</code>类型。
 这基于<code>uint32</code>类型的对齐保证为4的倍数这个假设。
