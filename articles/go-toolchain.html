@@ -149,10 +149,10 @@ Go官方工具链工具要求所有的Go源代码文件必须以<code>.go</code>
 我们可以使用<code>go fmt</code>子命令来用同一种代码风格格式化Go代码。
 </p>
 
-<p>
+<!--p>
 我们可以使用<code>go get</code>子命令将一个远程Go代码库拉取到本地以便将其做为第三方Go包引入并使用其中的资源。
-<code>go get</code>子命令需要首先安装相应的代码版本管理工具。
-</p>
+<code>go get</code>子命令需要首先安装相应的代码版本管理工具（比如git）。
+</p-->
 
 <p>
 我们可以使用<code>go test</code>子命令来运行单元和基准测试用例。
@@ -190,15 +190,13 @@ Go官方工具链工具要求所有的Go源代码文件必须以<code>.go</code>
 </p>
 
 <p>
-我们也可以使用命令<code>go get -u golang.org/x/tools/cmd/godoc</code>来安装<b>godoc</b>程序，然后运行<code>godoc -http=:9999</code>来开启官网的一个本地镜像（<a href="http://localhost:9999">localhost:9999</a>）来阅读Go官方文档。此<b>godoc</b>工具也可用来查看本地Go项目代码的文档。
+我们也可以安装<b>godoc</b>程序（<code>golang.org/x/tools/cmd/godoc</code>），然后运行<code>godoc -http=:9999</code>来开启官网的一个本地镜像（<a href="http://localhost:9999">localhost:9999</a>）来阅读Go官方文档。此<b>godoc</b>工具也可用来查看本地Go项目代码的文档。
 </p>
 
 <p>
-另一款用来查看本地Go项目代码文档的工具是<b>Golds</b>（由本书作者老貘开发）。
+另一款用来查看本地Go项目代码文档的工具是<a href="https://github.com/go101/golds"><b>Golds</b></a>（由本书作者老貘开发）。
 此工具将列出类型的实现关系，并且支持良好的代码阅读体验。
-我们可以使用命令<code>go get -u go101.org/golds</code>来安装<b>Golds</b>（目前，在安装之前需要临时将<code>GO111MODULE</code>环境变量设为<code>on</code>）。
-我们也可以将<a href="https://github.com/go101/golds"><b>Golds</b>项目的代码</a>克隆下来，然后运行<code>go install</code>来安装<b>Golds</b>。
-安装完成之后，我们可以运行<code>golds std</code>来阅读标准库的文档。
+安装<b>Golds</b>完成之后，我们可以运行<code>golds std</code>来阅读标准库的文档。
 </p>
 
 </div>
