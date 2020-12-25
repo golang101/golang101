@@ -184,10 +184,10 @@ func main() {
 
 <a class="anchor" id="struct-field-tag"></a>
 我们可以<a href="https://golang.org/pkg/reflect/#StructTag">通过反射来检视结构体字段的标签信息</a>。
-结构体字段标签的类型为<code>reflect.StructTag</code>，它有两个方法：<code>Get</code>和<code>Lookup</code>。
+结构体字段标签的类型为<code>reflect.StructTag</code>，它的方法<code>Get</code>和<code>Lookup</code>用来检视字段标签中的键值对。
 一个例子：
 
-<pre class="line-numbers"><code class="language-go">package main
+<!--pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 import "reflect"
@@ -217,27 +217,61 @@ func main() {
 	// 从Go 1.16开始，上面两行都打印出"5 yes"。
 	// 但是在Go 1.16之前，它们均打印出" false"。
 }
+</code></pre-->
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import "fmt"
+import "reflect"
+
+type T struct {
+	X    int  `max:"99" min:"0" default:"0"`
+	Y, Z bool `optional:"yes"`
+}
+
+func main() {
+	t := reflect.TypeOf(T{})
+	x := t.Field(0).Tag
+	y := t.Field(1).Tag
+	z := t.Field(2).Tag
+	fmt.Println(reflect.TypeOf(x)) // reflect.StructTag
+	// v is a string
+	v, present := x.Lookup("max")     
+	fmt.Println(len(v), present)      // 2 true
+	fmt.Println(x.Get("max"))         // 99
+	fmt.Println(x.Lookup("optional")) //  false
+	fmt.Println(y.Lookup("optional")) // yes true
+	fmt.Println(z.Lookup("optional")) // yes true
+}
 </code></pre>
 
 注意：
 <ul>
-<li>
+<!--li>
 	从Go 1.16开始，<code>Foo</code>字段包含两个键值对。实际上，它等价于<br/>
 	<code>`json:"foo" xml:"foo"`</code> 。<br/>
 	换句话说，值相同的键值对可以合并在一起。同理，<code>Y</code>字段包含三个键值对。
 	但是我们应该知道这种合并形式是从Go 1.16才开始支持的。
 	在Go 1.16之前，这种合并形式不形成任何键值对。
-</li>
+</li-->
 <li>
 	为了形成键值对，所设想的键值对形式中的冒号的两侧不能紧挨着任何空格字符。所以<br/>
-	<code>`json: "title`</code>和<br/>
-	<code>`json :"title`</code>都不形成任何键值对。
+	<code>`optional: "yes"`</code>和<br/>
+	<code>`optional :"yes"`</code>都不形成任何键值对。
 </li>
 <li>
 	值中的空格不会被忽略。所以<br/>
-	<code>`json:"author, omitempty`</code>、<br/>
-	<code>`json:" author,omitempty`</code>以及<br/>
-	<code>`json:"author,omitempty`</code>各不相同。
+	<code>`json:"author, omitempty“`</code>、<br/>
+	<code>`json:" author,omitempty“`</code>以及<br/>
+	<code>`json:"author,omitempty“`</code>各不相同。
+</li>
+<li>
+	每个字段标签应该呈现为单行才能使它的整个部分都对键值对的形成有贡献。
+	<!--
+	https://github.com/golang/go/issues/43379
+	https://github.com/golang/go/issues/38641
+	https://github.com/golang/go/issues/15893
+	-->
 </li>
 </ul>
 
