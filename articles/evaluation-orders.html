@@ -85,6 +85,23 @@ https://github.com/golang/go/commit/451cf3e2cd8950571f436896a3987343f8c2d7f6
 或者说，在它们的初始化之间不会有其它包级变量被初始化。
 </p>
 
+在初始化所有包级变量之前，含有多个源值表达式的包级变量声明将被拆解为多个单源值表达式变量声明。
+比如
+
+<pre class="line-numbers"><code class="language-go">var m, n = expr1, expr2
+</code></pre>
+
+和
+
+<pre class="line-numbers"><code class="language-go">var m = expr1
+var n = expr2
+</code></pre>
+
+是等价的。
+
+<p>
+</p>
+
 如果一些包级变量之间存在着编译器难以觉察的依赖关系，则这些包级变量的初始化顺序是未定义的，依赖于具体编译器实现。
 在下面这个Go白皮书中的例子中，
 <ul>
