@@ -155,7 +155,7 @@ func main() {
 </code></pre>
 
 <p>
-注意，上面程序中的注释所暗示的输出结果是此程序在AMD64架构上使用标准编译器1.15版本编译时的结果。
+注意，上面程序中的注释所暗示的输出结果是此程序在AMD64架构上使用标准编译器1.16版本编译时的结果。
 </p>
 
 <p>
@@ -223,7 +223,7 @@ They are as dangerous as C pointers, which is Go always tries to avoid.
 <h3>非类型安全指针相关的类型转换</h3>
 
 <div>
-目前（Go 1.15），Go支持下列和非类型安全指针相关的类型转换：
+目前（Go 1.16），Go支持下列和非类型安全指针相关的类型转换：
 <ul>
 <li>
 	一个类型安全指针值可以被显式转换为一个非类型安全指针类型，反之亦然。
@@ -888,7 +888,7 @@ func main() {
 </p>
 
 <!--
-然而，当前（Go 1.15），有一个更简单和更有效的方法来实现这一转换：
+然而，当前（Go 1.16），有一个更简单和更有效的方法来实现这一转换：
 
 <pre class="line-numbers"><code class="language-go">func ByteSlice2String(bs []byte) string {
 	return *(*string)(unsafe.Pointer(&bs))

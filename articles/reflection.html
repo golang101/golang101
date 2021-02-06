@@ -24,7 +24,7 @@ Go中提供的反射功能带来了很多动态特性，从而从一定程度上
 
 <p>
 Go反射机制设计的目标之一是任何非反射操作都可以通过反射机制来完成。
-由于各种各样的原因，此目标目前（Go 1.15）并没有得到100%的实现。
+由于各种各样的原因，此目标目前（Go 1.16）并没有得到100%的实现。
 但是，目前大部分的非反射操作都可以通过反射机制来完成。
 另一方面，通过反射，我们也可以完成一些使用非反射操作不可能完成的操作。
 不能或者只能通过反射完成的操作将在下面的讲解中提及。
@@ -187,38 +187,6 @@ func main() {
 结构体字段标签的类型为<code>reflect.StructTag</code>，它的方法<code>Get</code>和<code>Lookup</code>用来检视字段标签中的键值对。
 一个例子：
 
-<!--pre class="line-numbers"><code class="language-go">package main
-
-import "fmt"
-import "reflect"
-
-type T struct {
-	X    int    `max:"99" min:"0" default:"0"`
-	Y    int    `max:"22" min default:"5"`
-	Z, W bool   `optional:"yes"`
-	Foo  string `json xml:"foo"` // `json:"foo" xml:"foo"`
-}
-
-func main() {
-	t := reflect.TypeOf(T{})
-	x, y := t.Field(0).Tag, t.Field(1).Tag
-	z, w := t.Field(2).Tag, t.Field(3).Tag
-	fmt.Println(reflect.TypeOf(x)) // reflect.StructTag
-
-	dv, present := x.Lookup("max")    // dv的类型为string
-	fmt.Println(len(dv), present)     // 2 true
-	fmt.Println(x.Get("max"))         // 99
-	fmt.Println(x.Get("optional"))    //
-	fmt.Println(z.Lookup("optional")) // yes true
-	fmt.Println(w.Lookup("optional")) // yes true
-	fmt.Println(y.Lookup("optional")) //  false
-	fmt.Println(y.Lookup("min"))      // 5 yes
-	fmt.Println(y.Lookup("default"))  // 5 yes
-	// 从Go 1.16开始，上面两行都打印出"5 yes"。
-	// 但是在Go 1.16之前，它们均打印出" false"。
-}
-</code></pre-->
-
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
@@ -235,7 +203,7 @@ func main() {
 	y := t.Field(1).Tag
 	z := t.Field(2).Tag
 	fmt.Println(reflect.TypeOf(x)) // reflect.StructTag
-	// v is a string
+	// v的类型为string
 	v, present := x.Lookup("max")     
 	fmt.Println(len(v), present)      // 2 true
 	fmt.Println(x.Get("max"))         // 99
@@ -247,20 +215,15 @@ func main() {
 
 注意：
 <ul>
-<!--li>
-	从Go 1.16开始，<code>Foo</code>字段包含两个键值对。实际上，它等价于<br/>
-	<code>`json:"foo" xml:"foo"`</code> 。<br/>
-	换句话说，值相同的键值对可以合并在一起。同理，<code>Y</code>字段包含三个键值对。
-	但是我们应该知道这种合并形式是从Go 1.16才开始支持的。
-	在Go 1.16之前，这种合并形式不形成任何键值对。
-</li-->
 <li>
-	为了形成键值对，所设想的键值对形式中的冒号的两侧不能紧挨着任何空格字符。所以<br/>
-	<code>`optional: "yes"`</code>和<br/>
-	<code>`optional :"yes"`</code>都不形成任何键值对。
+	键值对中的键不能包含空格（Unicode值为32）、双引号（Unicode值为34）和冒号（Unicode值为58）。
 </li>
 <li>
-	值中的空格不会被忽略。所以<br/>
+	为了形成键值对，所设想的键值对形式中的冒号的后面不能紧跟着空格字符。所以<br/>
+	<code>`optional: "yes"`</code>不形成键值对。
+</li>
+<li>
+	键值对中的值中的空格不会被忽略。所以<br/>
 	<code>`json:"author, omitempty“`</code>、<br/>
 	<code>`json:" author,omitempty“`</code>以及<br/>
 	<code>`json:"author,omitempty“`</code>各不相同。
@@ -313,7 +276,7 @@ func main() {
 </p>
 
 <p>
-注意，到目前为止（Go 1.15），我们无法通过反射动态创建一个接口类型。这是Go反射目前的一个限制。
+注意，到目前为止（Go 1.16），我们无法通过反射动态创建一个接口类型。这是Go反射目前的一个限制。
 </p>
 
 <p>
@@ -412,10 +375,10 @@ func main() {
 从上两例中，我们可以得知有两种方法获取一个代表着一个指针所引用着的值的<code>reflect.Value</code>值：
 <ol>
 <li>
-	通过调用代表着被此指针值的<code>reflect.Value</code>值的<code>Elem</code>方法。
+	通过调用代表着此指针值的<code>reflect.Value</code>值的<code>Elem</code>方法。
 </li>
 <li>
-	将代表着被此指针值的<code>reflect.Value</code>值的传递给一个<code>reflect.Indirect</code>函数调用。
+	将代表着此指针值的<code>reflect.Value</code>值的传递给一个<code>reflect.Indirect</code>函数调用。
 	（如果传递给一个<code>reflect.Indirect</code>函数调用的实参不代表着一个指针值，则此调用返回此实参的一个复制。）
 </li>
 </ol>
@@ -528,12 +491,12 @@ import "fmt"
 import "reflect"
 
 func main() {
-	vakueOf := reflect.ValueOf
+	valueOf := reflect.ValueOf
 	m := map[string]int{"Unix": 1973, "Windows": 1985}
-	v := vakueOf(m)
+	v := valueOf(m)
 	// 第二个实参为Value零值时，表示删除一个映射条目。
-	v.SetMapIndex(vakueOf("Windows"), reflect.Value{})
-	v.SetMapIndex(vakueOf("Linux"), vakueOf(1991))
+	v.SetMapIndex(valueOf("Windows"), reflect.Value{})
+	v.SetMapIndex(valueOf("Linux"), valueOf(1991))
 	for i := v.MapRange(); i.Next(); {
 		fmt.Println(i.Key(), "\t:", i.Value())
 	}

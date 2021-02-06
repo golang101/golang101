@@ -2,15 +2,17 @@
 
 <p>
 目前，Go官方工具链中提供的工具是使用得最广泛的Go开发工具。
-《Go语言101》所有中所有的实例代码都使用标准编译器编译验证过。
+《Go语言101》所有中所有的实例代码都使用Go官方工具链中提供的标准编译器编译验证过。
 </p>
 
 <p>
-本文将介绍如何配置Go开发环境和如何使用Go官方工具链中的<code>go</code>命令运行简单的Go程序。
-各种<code>go</code>子命令也将获得简单的介绍。
+本文将介绍如何配置Go开发环境和如何使用Go官方工具链中提供的<code>go</code>命令。
+一些非官方工具链中的工具也将简单提及。
 </p>
 
 <h3>安装Go官方工具链</h3>
+
+<div>
 
 <p>
 请从<a href="https://golang.org/doc/install">国际官网</a>或者<a href="https://golang.google.cn/doc/install">国内官网</a>下载Go官方工具链，
@@ -19,14 +21,35 @@
 
 <p>
 Go官方工具链的版本和其所支持的最高Go语言版本是一致的。
-比如，Go官方工具链1.15.x支持从1.0到1.15的所有Go语言版本。
+比如，Go官方工具链1.16.x支持从1.0到1.16的所有Go语言版本。
 </p>
 
 <p>
-为了从任意目录运行Go官方工具链中工具命令（主要各种<code>go</code>子命令），
+为了从任意目录运行Go官方工具链中工具命令（通过<code>go</code>命令），
 Go官方工具链安装目录下的<code>bin</code>子目录路径必须配置在<code>PATH</code>环境变量中。
+当使用安装程序安装Go官方工具链时，安装程序很可能已经自动地将此配置好了。
 </p>
 
+<p>
+Go官方工具链近来的版本均支持一个称为Go模块（Go modules）的特性，用来管理项目依赖。
+此特性在版本1.11中被试验性地引入并从版本1.16开始被默认支持。
+</p>
+
+我们应该了解一个环境变量：<code>GOPATH</code>。此环境变量的默认值为当前用户的HOME目录下的名为<code>go</code>文件夹对应的目录路径。
+<code>GOPATH</code>环境变量可以被手动地配置多个路径。
+以后，当<code>GOPATH</code>文件夹被提及的时候，它表示<code>GOPATH</code>环境变量中的第一个路径对应的文件夹。
+<ul>
+<li>
+	<code>GOPATH</code>文件夹中的<code>pkg</code>子文件夹用来缓存被本地项目所依赖的Go模块（一个Go模块为若干Go库包的集合）的版本。
+</li>
+<li>
+	<code>GOBIN</code>环境变量用来指定<code>go install</code>子命令产生的Go应用程序二进制可执行文件应该存储在何处。
+	它的默认值为<code>GOPATH</code>文件夹中的<code>bin</code>子目录所对应的目录路径。
+	<code>GOBIN</code>路径需配置在<code>PATH</code>环境变量中，以便从任意目录运行这些Go应用程序。
+</li>
+</ul>
+
+<!--
 <p>
 一些老的Go官方工具链版本可能需要配置<code>GOROOT</code>和<code>GOPATH</code>环境变量。
 当前最新的Go官方工具链版本对这些没有做强制要求。
@@ -58,10 +81,9 @@ Go官方工具链1.11引入了一个试验性的特性：Go模块（Go modules�
 </p>
 
 <p>
-Go模块模式将在下一个版本（1.16）中被默认支持。
+从Go官方工具链1.16开始，Go模块模式已成为Go项目开发中的默认模式。
 </p>
 
-<!--
 <p><i>
 在Go官方工具链1.9之前，<code>GOROOT</code>环境变量必须被配置为Go官方工具链的安装目录。
 自从Go官方工具链1.9，此环境变量变为可选的，并且不推荐配置之。
@@ -73,6 +95,8 @@ Go模块模式将在下一个版本（1.16）中被默认支持。
 此环境变量可以包含多个路径。
 </p>
 -->
+
+</div>
 
 <h3>最简单的Go程序</h3>
 
@@ -130,40 +154,59 @@ Go官方工具链工具要求所有的Go源代码文件必须以<code>.go</code>
 <pre class="output"><code>$ go run .
 </code></pre>
 
-<p>
-注意：<code>go run</code>子命令并不推荐在正式的大项目中使用。<code>go run</code>子命令只是一种方便的方式来运行简单的Go程序。
-对于正式的项目，最好使用<code>go build</code>或者<code>go install</code>子命令来编译生成可执行程序文件。
-</p>
+注意：
+<ul>
+<li>
+	<code>go run</code>子命令并不推荐在正式的大项目中使用。<code>go run</code>子命令只是一种方便的方式来运行简单的Go程序。
+对于正式的项目，最好使用<code>go build</code>或者<code>go install</code>子命令构建可执行程序文件来运行Go程序。
+</li>
+<li>
+	支持Go模块特性的Go项目的根目录下需要一个<code>go.mod</code>文件。此文件可以使用<code>go mod init</code>子命令来生成（见下）。
+</li>
+</ul>
 
 </div>
 
 <h3>更多<code>go</code>子命令</h3>
 
+<div>
 <p>
 上面提到的三个<code>go</code>子命令（<code>go run</code>、<code>go build</code>和<code>go install</code>）
 将只会输出代码语法错误。它们不会输出可能的代码逻辑错误（即警告）。
-<code>go vet</code>子命令可以用来检查可能的代码逻辑错误。
+<code>go vet</code>子命令可以用来检查可能的代码逻辑错误（即警告）。
 </p>
 
 <p>
-我们可以使用<code>go fmt</code>子命令来用同一种代码风格格式化Go代码。
+我们可以（并且应该常常）使用<code>go fmt</code>子命令来用同一种代码风格格式化Go代码。
 </p>
-
-<!--p>
-我们可以使用<code>go get</code>子命令将一个远程Go代码库拉取到本地以便将其做为第三方Go包引入并使用其中的资源。
-<code>go get</code>子命令需要首先安装相应的代码版本管理工具（比如git）。
-</p-->
 
 <p>
 我们可以使用<code>go test</code>子命令来运行单元和基准测试用例。
 </p>
 
 <p>
-我们可以使用<code>go doc</code>子命令来查看Go代码库包的文档。
+我们可以使用<code>go doc</code>子命令来（在终端中）查看Go代码库包的文档。
 </p>
 
+强烈推荐让你的Go项目支持Go模块特性来简化依赖管理。对一个支持Go模块特性的项目：
+<ul>
+<li>
+	<code>go mod init example.com/myproject</code>命令可以用来在当前目录中生成一个<code>go.mod</code>文件。
+	当前目录将被视为一个名为<code>example.com/myproject</code>的模块（即当前项目）的根目录。
+	此<code>go.mod</code>文件将被用来记录当前项目需要的依赖模块和版本信息。
+	我们可以手动编辑或者使用<code>go</code>子命令来修改此文件。
+</li>
+<li>
+	<code>go mod tidy</code>命令用来通过扫描当前项目中的所有代码来添加未被记录的依赖至<code>go.mod</code>文件或从<code>go.mod</code>文件中删除不再被使用的依赖。
+</li>
+<li>
+	<code>go get</code>命令用拉添加、升级、降级或者删除单个依赖。此命令不如<code>go mod tidy</code>命令常用。
+</li>
+</ul>
+
 <p>
-从Go官方工具链1.11版本开始，我们可以运行<code>go mod</code>子命令来管理包依赖。
+从Go官方工具链1.16版本开始，我们可以运行<code>go install example.com/program@latest</code>来安装一个第三方Go程序的最新版本（至<code>GOBIIN</code>目录）。
+在Go官方工具链1.16版本之前，对应的命令是<code>go get -u example.com/program</code>（现在已经被废弃而不再推荐被使用了）。
 </p>
 
 <p>
@@ -179,6 +222,7 @@ Go官方工具链工具要求所有的Go源代码文件必须以<code>.go</code>
 请阅读<a href="https://golang.google.cn/cmd/go/">官方文档</a>
 （<a href="https://golang.org/cmd/go/">墙外版</a>）以获取更多信息。
 </p>
+</div>
 
 <a class="anchor" id="doc"></a>
 <h3>查看Go文档</h3>
@@ -190,13 +234,13 @@ Go官方工具链工具要求所有的Go源代码文件必须以<code>.go</code>
 </p>
 
 <p>
-我们也可以安装<b>godoc</b>程序（<code>golang.org/x/tools/cmd/godoc</code>），然后运行<code>godoc -http=:9999</code>来开启官网的一个本地镜像（<a href="http://localhost:9999">localhost:9999</a>）来阅读Go官方文档。此<b>godoc</b>工具也可用来查看本地Go项目代码的文档。
+我们也可以安装<b>godoc</b>程序（<code>golang.org/x/tools/cmd/godoc</code>），然后运行<code>godoc -http=:9999</code>开启一个本地服务器（<a href="http://localhost:9999">localhost:9999</a>）来阅读Go标准库和当前项目中的库包的文档。
 </p>
 
 <p>
 另一款用来查看本地Go项目代码文档的工具是<a href="https://github.com/go101/golds"><b>Golds</b></a>（<code>go101.org/golds</code>，由本书作者老貘开发）。
 此工具将列出类型的实现关系，并且支持良好的代码阅读体验。
-安装<b>Golds</b>完成之后，我们可以运行<code>golds std</code>来阅读标准库的文档。
+安装<b>Golds</b>完成之后，我们可以运行<code>golds std ./...</code>来阅读Go标准库和当前文件夹下的所有库包的文档。
 </p>
 
 </div>
