@@ -19,29 +19,35 @@ _(若上面二维码未显示出来，请点击此[墙内版链接](https://tool
 
 见[本书致谢一章](https://gfw.go101.org/article/acknowledgements.html)。
 
+### 安装、更新以及本地阅读本书
+
+如果你使用官方Go工具链v1.16+，则不需克隆本项目代码：
+
+```shell
+### 安装和更新
+
+$ go install go101.org/golang101@latest
+
+### 本地阅读（GOBIN路径需配置在PATH中。GOBIN路径的默认值为GOPATH/bin。）
+
+$ golang101
+Server started:
+   http://localhost:12345 (non-cached version)
+   http://127.0.0.1:12345 (cached version)
+```
+
+如果你使用官方Go工具链v1.15-或者欲做一些本地修改（比如准备提交PR等）：
+```shell
 ### 安装
 
-运行
-
-```
 $ git clone https://github.com/golang101/golang101.git
-```
 
+### 更新. 进入本书项目目录（包含当前`README.md`文件的目录），然后运行：
 
-### 更新
-
-进入本书项目目录（包含当前`README.md`文件的目录），然后运行：
-
-```
 $ git pull
-```
 
-### 本地阅读本书
+### 本地阅读本书. 进入本书项目目录，然后运行：
 
-
-进入本书项目目录（包含当前`README.md`文件的目录），然后运行：
-
-```
 $ go run .
 Server started:
    http://localhost:12345 (non-cached version)
@@ -59,7 +65,7 @@ Server started:
 ### 一些注意事项
 
 * 如果在线版被墙了，请运行如上所述本地版或者下载[离线版](https://github.com/golang101/golang101/releases)阅读。
-* 这本书仍处于beta阶段，很多章节还在不断改进中。请阅读[UPDATES.md](UPDATES.md)以注意各种更新。
+* 这本书仍在不断改进中。请阅读[UPDATES.md](UPDATES.md)以注意各种更新。
 * 本人保留本书的出版权（包括纸质和各种电子版）。请勿随意在线转载（转载之前请在本项目中开一个issue问询）。
 
 ![](articles/res/101-reward-qrcode-5.png?raw=true)

@@ -3,11 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
-
-	//"errors"
-	"go/build"
 	"html/template"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -28,15 +24,12 @@ type Go101 struct {
 	theme             string // default is "dark"
 }
 
-var (
-	rootPath = findGo101ProjectRoot()
-	go101    = &Go101{
-		staticHandler:     http.StripPrefix("/static/", http.FileServer(http.Dir(filepath.Join(rootPath, "web", "static")))),
-		articleResHandler: http.StripPrefix("/article/res/", http.FileServer(http.Dir(filepath.Join(rootPath, "articles", "res")))),
-		isLocalServer:     false, // may be modified later
-		articlePages:      map[string][]byte{},
-	}
-)
+var go101 = &Go101{
+	staticHandler:     http.StripPrefix("/static/", staticFilesHandler),
+	articleResHandler: http.StripPrefix("/article/res/", resFilesHandler),
+	isLocalServer:     false, // may be modified later
+	articlePages:      map[string][]byte{},
+}
 
 func (go101 *Go101) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	group, item := "", ""
@@ -89,6 +82,15 @@ func (go101 *Go101) IsLocalServer() (isLocal bool) {
 	isLocal = go101.isLocalServer
 	go101.serverMutex.Unlock()
 	return
+}
+
+func pullGolang101Project(wd string) {
+	<-time.After(time.Minute / 2)
+	gitPull(wd)
+	for {
+		<-time.After(time.Hour * 24)
+		gitPull(wd)
+	}
 }
 
 func (go101 *Go101) ArticlePage(file string) ([]byte, bool) {
@@ -177,7 +179,7 @@ var TagSigns = [2]rune{'<', '>'}
 
 func retrieveArticleContent(file string) (Article, error) {
 	article := Article{}
-	content, err := ioutil.ReadFile(filepath.Join(rootPath, "articles", file))
+	content, err := loadArticleFile(file)
 	if err != nil {
 		return article, err
 	}
@@ -365,11 +367,11 @@ func retrievePageTemplate(which PageTemplate, cacheIt bool) *template.Template {
 	if t == nil {
 		switch which {
 		case Template_Article:
-			t = parseTemplate(filepath.Join(rootPath, "web", "templates"), "base", "article")
+			t = parseTemplate(filepath.Join("web", "templates"), "base", "article")
 		case Template_PrintBook:
-			t = parseTemplate(filepath.Join(rootPath, "web", "templates"), "pdf")
+			t = parseTemplate(filepath.Join("web", "templates"), "pdf")
 		case Template_Redirect:
-			t = parseTemplate(filepath.Join(rootPath, "web", "templates"), "redirect")
+			t = parseTemplate(filepath.Join("web", "templates"), "redirect")
 		default:
 			t = template.New("blank")
 		}
@@ -392,73 +394,8 @@ func unloadPageTemplates() {
 }
 
 //===================================================
-// git
-//===================================================
-
-func gitPull() {
-	output, err := runShellCommand(time.Minute/2, "git", "pull")
-	if err != nil {
-		log.Println("git pull:", err)
-	} else {
-		log.Printf("git pull: %s", output)
-	}
-}
-
-func goGet(pkgPath string) {
-	_, err := runShellCommand(time.Minute/2, "go", "get", "-u", pkgPath)
-	if err != nil {
-		log.Println("go get -u "+pkgPath+":", err)
-	} else {
-		log.Println("go get -u " + pkgPath + " succeeded.")
-	}
-}
-
-func (go101 *Go101) Update() {
-	<-time.After(time.Minute / 2)
-
-	//output, err := runShellCommand(time.Minute/2, "git", "remote")
-	//if err != nil {
-	//	log.Println("list git remotes error:", err)
-	//	return
-	//}
-	//k := bytes.IndexRune(output, '\n')
-	//if k < 0 {
-	//	log.Println("find git remote failed:", output)
-	//	return
-	//}
-	//configItem := "remote." + string(bytes.TrimSpace(output[:k])) + ".url"
-	//output, err = runShellCommand(time.Minute/2, "git", "config", "--get", configItem)
-	//if err != nil {
-	//	log.Println("get "+configItem+" error:", err)
-	//	return
-	//}
-	//a, b := bytes.Index(output, []byte("://")), bytes.Index(output, []byte(".git"))
-	//if a += 3; a < 3 {
-	//	a = 0
-	//}
-	//if b < 0 {
-	//	b = len(output)
-	//}
-
-	//pkgPath := string(bytes.TrimSpace(output[a:b]))
-	gitPull() // goGet(pkgPath)
-	for {
-		<-time.After(time.Hour * 24)
-		gitPull() // goGet(pkgPath)
-	}
-}
-
-//===================================================
 // utils
 //===================================================
-
-func parseTemplate(path string, files ...string) *template.Template {
-	ts := make([]string, len(files))
-	for i, f := range files {
-		ts[i] = filepath.Join(path, f)
-	}
-	return template.Must(template.ParseFiles(ts...))
-}
 
 func openBrowser(url string) error {
 	var cmd string
@@ -475,24 +412,6 @@ func openBrowser(url string) error {
 	return exec.Command(cmd, append(args, url)...).Start()
 }
 
-func findGo101ProjectRoot() string {
-	if _, err := os.Stat(filepath.Join(".", "golang101.go")); err == nil {
-		return "."
-	}
-
-	for _, name := range []string{
-		"gitlab.com/golang101/golang101", "gitlab.com/Golang101/golang101",
-		"github.com/golang101/golang101", "github.com/Golang101/golang101",
-	} {
-		pkg, err := build.Import(name, "", build.FindOnly)
-		if err == nil {
-			return pkg.Dir
-		}
-	}
-
-	return "."
-}
-
 func isLocalRequest(r *http.Request) bool {
 	end := strings.Index(r.Host, ":")
 	if end < 0 {
@@ -502,10 +421,28 @@ func isLocalRequest(r *http.Request) bool {
 	return hostname == "localhost" // || hostname == "127.0.0.1" // 127.* for local cached version now
 }
 
-func runShellCommand(timeout time.Duration, cmd string, args ...string) ([]byte, error) {
+func runShellCommand(timeout time.Duration, wd string, cmd string, args ...string) ([]byte, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	command := exec.CommandContext(ctx, cmd, args...)
-	command.Dir = rootPath
+	command.Dir = wd
 	return command.Output()
+}
+
+func gitPull(wd string) {
+	output, err := runShellCommand(time.Minute/2, wd, "git", "pull")
+	if err != nil {
+		log.Println("git pull:", err)
+	} else {
+		log.Printf("git pull: %s", output)
+	}
+}
+
+func goGet(pkgPath, wd string) {
+	_, err := runShellCommand(time.Minute/2, wd, "go", "get", "-u", pkgPath)
+	if err != nil {
+		log.Println("go get -u "+pkgPath+":", err)
+	} else {
+		log.Println("go get -u " + pkgPath + " succeeded.")
+	}
 }
