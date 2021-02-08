@@ -18,21 +18,30 @@
 		English version is <a href="https://go101.org">here</a>.
 		</li>
 		<li>
-		此项目源代码目前托管在<a href="https://github.com/golang101/golang101">Github</a>上。
-		你可以将代码拉取到本地并在项目目录下运行<code>go run .</code>命令来启动一个本地服务器来阅读本书以获取更好的阅读体验。
-		</li>
-		<li>
 		本书微信公众号名称为"Go 101"。此公众号将时不时地发表一些Go语言相关的原创短文。各位如果感兴趣，可以搜索关注一下。 
 		</li>
 		<li>
-		本书由<a href="https://gfw.tapirgames.com">老貘</a>历时三年写成。目前本书仍在不断改进和增容中。
-		你的赞赏是本书和Go101.org网站不断增容和维护的动力。
+		此项目源代码目前托管在<a href="https://github.com/golang101/golang101">Github</a>上。
+		</li>
+		<li>
+		你可以启动一个本地服务器来阅读本书以获取更快的阅读体验：
+		<ul>
+			<li>
+			方法一：将本书项目克隆到本地，然后在项目目录中运行<code>go run .</code>。
+			</li>
+			<li>
+			方法二（只适用于官方工具链1.16+版本）：运行
+			<code>go install -tags=embed go101.org/golang101@latest</code>来安装和更新<code>golang101</code>可执行程序，然后在任意目录中运行<code>golang101</code>。
+			</li>
+		</ul>
 		</li>
 		</ul>
 	</div>
 
 	<div class="col-xs-12 col-sm-5 text-center">
 		<img src="res/101-reward-qrcode-8.png" alt="赞赏" style="max-width: 100%; height: auto; width: auto\9;"></img>
+		<br/>
+		<span style="font-size: smaller;">（本书由<a href="https://gfw.tapirgames.com">老貘</a>历时三年写成。目前本书仍在不断改进和增容中。你的赞赏是本书和Go101.org网站不断增容和维护的动力。）</span>
 	</div>
 
 </div>
@@ -134,7 +143,7 @@ Go编程入门
 	<li><a class="index" href="keywords-and-identifiers.html">关键字和标识符</a></li>
 	<li><a class="index" href="basic-types-and-value-literals.html">基本类型和它们的字面量表示</a></li>
 	<li><a class="index" href="constants-and-variables.html">常量和变量</a> - 顺便介绍了类型不确定值和类型推断</li>
-	<li><a class="index" href="operators.html">运算操作符</a> - 介绍了更多的类型推断规则</li>
+	<li><a class="index" href="operators.html">运算操作符</a> - 顺便介绍了更多的类型推断规则</li>
 	<li><a class="index" href="function-declarations-and-calls.html">函数声明和调用</a></li>
 	<li><a class="index" href="packages-and-imports.html">代码包和包引入</a></li>
 	<li><a class="index" href="expressions-and-statements.html">表达式、语句和简单语句</a></li>
