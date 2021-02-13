@@ -255,10 +255,10 @@ for i < 20 {
 在一个<code>for</code>循环流程控制中，如果条件表达式部分被省略，则编译器视其为<code>true</code>。
 
 <pre class="line-numbers"><code class="language-go">for i := 0; ; i++ { // 等价于：for i := 0; true; i++ {
-	fmt.Println(i)
 	if i >= 10 {
 		break
 	}
+	fmt.Println(i)
 }
 
 // 下面这几个循环是等价的。
@@ -292,15 +292,15 @@ for {
 </p>
 
 一条<code>break</code>语句可以用来提前跳出包含此<code>break</code>语句的最内层<code>for</code>循环。
-下面这段代码同样逐行打印出<code>0</code>到<code>9</code>十个数字。
+下面这段代码同样逐行打印出<code>0</code>到<code>9</code>十行数字。
 
 <pre class="line-numbers"><code class="language-go">i := 0
 for {
 	if i >= 10 {
 		break
 	}
-	i++
 	fmt.Println(i)
+	i++
 }
 </code></pre>
 
