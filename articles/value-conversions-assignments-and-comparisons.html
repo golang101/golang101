@@ -518,15 +518,19 @@ Go白皮书<a href="https://golang.google.cn/ref/spec#Comparison_operators">提�
 <p>
 所以，值比较规则和赋值规则非常相似。
 换句话说，两个值是否可以比较取决于其中一个值是否可以隐式转换为另一个值的类型。
-很简单？此规则描述基本正确，但是有一个例外：
+很简单？此规则描述基本正确，但是存在另外一条优先级更高的规则：
 </p>
 
 <!--
 https://github.com/golang/go/issues/28164#issuecomment-430733364
 -->
 <div class="alert alert-danger">
-如果两个值中有一个为接口值，而另一个为非接口值并且它的类型为一个<a href="type-system-overview.html#types-not-support-comparison">不可比较类型</a>，则这两个值不可比较，即使此非接口值可以被隐式转换为接口值的类型（即此不可比较类型实现了接口值的类型）。
+如果一个比较表达式中的两个比较值均为类型确定值，则它们的类型必须都属于<a href="type-system-overview.html#types-not-support-comparison">可比较类型</a>。
 </div>
+
+<p>
+按照上面这条规则，如果一个不可比较类型（肯定是一个非接口类型）实现了一个接口类型，则比较这两个类型的值是非法的，即使前者的值可以隐式转化为后者。
+</p>
 
 <p>
 注意，尽管切片/映射/函数类型为不可比较类型，但是它们的值可以和类型不确定的预声明<code>nil</code>标识符比较。

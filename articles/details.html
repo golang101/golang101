@@ -129,6 +129,12 @@
 	<li>
 		<a class="index" href="#different-loops">对于切片<code>s</code>，循环<code>for i = range s {...}</code>并不等价于循环<code>for i = 0; i &lt; len(s); i++ {...}</code>。</a>
 	</li>
+	<li>
+		<a class="index" href="#map-entry-iteration">一个映射中的条目的遍历次序在两次遍历中可能并不相同。我们可以认为映射中的条目的遍历次序是随机的。</a>
+	</li>
+	<li>
+		<a class="index" href="#create-entry-in-map-entry-iteration">在对一个映射进行条目遍历期间，在此映射中创建的新条目可能会在当前遍历中被遍历出来，也可能不会。</a>
+	</li>
 	</ul>
 </li>
 <li>
@@ -1257,6 +1263,73 @@ func main() {
 </code></pre>
 
 <p>
+</p>
+</div>
+
+<a class="anchor" id="map-entry-iteration"></a>
+<h3>一个映射中的条目的遍历次序在两次遍历中可能并不相同。我们可以认为映射中的条目的遍历次序是随机的。</h3>
+
+<div>
+
+比如下面这个例子不会无穷尽地循环下去（注意每次退出前的循环次数可能不同）：
+<pre class="line-numbers"><code class="language-go">package main
+
+import "fmt"
+
+func f(m map[byte]byte) string {
+	bs := make([]byte, 0, 2*len(m))
+	for k, v := range m {
+		bs = append(bs, k, v)
+	}
+	return string(bs)
+}
+
+func main() {
+	m := map[byte]byte{'a':'A', 'b':'B', 'c':'C'}
+	s0 := f(m)
+	for i := 1; ; i++{
+		if s := f(m); s != s0 {
+			fmt.Println(s0)
+			fmt.Println(s)
+			fmt.Println(i)
+			return
+		}
+	}
+}
+</code></pre>
+
+<p>
+注意：对映射进行JSON格式化输出中的映射条目是按照它们的键值排序的。
+另外，从Go 1.12开始，使用<code>fmt</code>标准库包中的打印函数打印映射时，输出的映射条目也是按照它们的键值排序的；
+而在Go 1.12之前，这些打印输出时乱序的。
+</p>
+</div>
+
+<a class="anchor" id="create-entry-in-map-entry-iteration"></a>
+<h3>在对一个映射进行条目遍历期间，在此映射中创建的新条目可能会在当前遍历中被遍历出来，也可能不会。</h3>
+
+<div>
+有例为证：
+<pre class="line-numbers"><code class="language-go">package main
+
+import "fmt"
+
+func main() {
+	m := map[int]int{0: 0, 1: 100, 2: 200}
+	r, n, i:= len(m), len(m), 0
+	for range m {
+		m[n] = n*100
+		n++
+		i++
+	}
+	fmt.Printf("新增了%d个条目，其中%d个被遍历出来，%d个没有。\n",
+		i, i - r, n - i,
+	)
+}
+</code></pre>
+
+<p>
+感谢Valentin Deleplace提出了上面<a href="https://twitter.com/val_deleplace/status/1358784287399698434">两条细节建议</a>。
 </p>
 </div>
 

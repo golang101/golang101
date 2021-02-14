@@ -89,7 +89,7 @@ func main() {
 		调用内置函数<code>len</code>来获取一个字符串值的长度（此字符串中存储的字节数）。
 	</li>
 	<li>
-		使用<a href="container.html#element-accessment">容器元素索引</a>语法<code>aString[i]</code>来获取<code>aString</code>中的第<i><b>i</b></i>个字节。
+		使用<a href="container.html#element-accessment">容器元素索引</a>语法<code>aString[i]</code>来获取<code>aString</code>中的第<code>i</code>个字节。
 		表达式<code>aString[i]</code>是不可寻址的。换句话说，<code>aString[i]</code>不可被修改。
 	</li>
 	<li>
@@ -103,10 +103,6 @@ func main() {
 	一个子切片表达式<code>aString[start:end]</code>的估值结果也将和基础字符串<code>aString</code>共享一部分底层字节。
 </li>
 </ul>
-
-<p>
-注意：如果在<code>aString[i]</code>和<code>aString[start:end]</code>中，<code>aString</code>和各个下标均为常量，则编译器将在编译时刻验证这些下标的合法性，但是这样的元素访问和子切片表达式的估值结果总是非常量（<a href="https://github.com/golang/go/issues/28591">此规则以后可能会得到改变</a>）。
-</p>
 
 一个例子：
 <pre class="line-numbers"><code class="language-go">package main
@@ -136,6 +132,30 @@ func main() {
 			strings.HasPrefix(helloWorld, hello))
 }
 </code></pre>
+
+<p>
+</p>
+
+注意：如果在<code>aString[i]</code>和<code>aString[start:end]</code>中，<code>aString</code>和各个下标均为常量，则编译器将在编译时刻验证这些下标的合法性，但是这样的元素访问和子切片表达式的估值结果总是非常量（这是Go语言设计之初的一个失误，但<a href="https://github.com/golang/go/issues/28591">因为兼容性的原因导致难以弥补</a>）。比如下面这个程序将打引出<code>4 0</code>。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import "fmt"
+
+const s = "Go101.org" // len(s) == 9
+
+// len(s)是一个常量表达式，但len(s[:])却不是。
+var a byte = 1 << len(s) / 128
+var b byte = 1 << len(s[:]) / 128
+
+func main() {
+	fmt.Println(a, b) // 4 0
+}
+</code></pre>
+
+<p>
+<code>a</code>和<code>b</code>两个变量估值不同的具体原因请阅读<a href="operators.html#bitwise-shift-left-operand-type-deduction">移位操作类型推断规则</a>和<a href="summeries.html#compile-time-evaluation">哪些函数调用在编译时刻被估值</a>。
+</p>
 </div>
 
 <h3>字符串编码和Unicode码点</h3>
