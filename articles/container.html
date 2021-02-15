@@ -764,7 +764,7 @@ func main() {
 
 <p>
 注意，内置<code>append</code>函数是一个<a href="function.html#variadic-function">变长参数函数</a>（下下篇文章中介绍）。
-它有两个参数，其中第二个参数（形参）为一个<a href="function.html#variadic-parameter">变长参数参数</a>。
+它有两个参数，其中第二个参数（形参）为一个<a href="function.html#variadic-parameter">变长参数</a>。
 </p>
 
 <p>
@@ -1108,7 +1108,7 @@ baseContainer[low : high : max] // 三下标形式
 （注意：三下标形式是从Go 1.2开始支持的。）
 </p>
 
-上面所示的取子切片表达式的语法形式中得下标必须满足下列关系，否则代码要么编译不通过，要么在运行时刻将造成恐慌。
+上面所示的取子切片表达式的语法形式中的下标必须满足下列关系，否则代码要么编译不通过，要么在运行时刻将造成恐慌。
 <pre class="disable-line-numbers111"><code class="language-go">// 双下标形式
 0 <= low <= high <= cap(baseContainer)
 
