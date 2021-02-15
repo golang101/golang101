@@ -468,7 +468,7 @@ func main() {
 对于一个可寻址的<code>Cond</code>值<code>c</code>，
 <ul>
 <li>
-	<code>c.Wait()</code>必须在<code>c.L</code>字段值的锁被成功加锁的时候调用；否则，<code>c.Wait()</code>调用将造成一个恐慌。
+	<code>c.Wait()</code>必须在<code>c.L</code>字段值的锁处于加锁状态的时候调用；否则，<code>c.Wait()</code>调用将造成一个恐慌。
 	一个<code>c.Wait()</code>调用将
 	<ol>
 	<li>
