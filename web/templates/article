@@ -17,12 +17,12 @@
 		<p>
 		本书微信公众号名称为"Go 101"。此公众号将时不时地发表一些Go语言相关的原创短文。各位如果感兴趣，可以搜索关注一下。
 		</p>
+	{{ if ne $.FilenameWithoutExt "101" }}
 		<br/>
 		<p>
 		本书由<a href="https://gfw.tapirgames.com">老貘</a>历时三年写成。目前本书仍在不断改进和增容中。
 		你的赞赏是本书和Go101.org网站不断增容和维护的动力。
 		</p>
-	{{ if ne $.FilenameWithoutExt "101" }}
 	</div>
 	<div class="col-xs-12 col-sm-5 text-center">
 		<img src="res/101-reward-qrcode-8.png" alt="赞赏" style="max-width: 100%; height: auto; width: auto\9;"></img>

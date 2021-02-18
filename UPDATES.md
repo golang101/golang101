@@ -1,4 +1,8 @@
 
+### 1.16.a (2021/二月/18)
+
+* 支持Go 1.16中新增的资源内嵌功能。
+
 ### 1.15.b (2020/九月/28)
 
 * 对[reflect.DeepEqual](https://gfw.go101.org/article/details.html#reflect-deep-equal)相关细节增加了一些描述。
