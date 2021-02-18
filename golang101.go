@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"runtime"
 	"strings"
 	"sync"
@@ -348,6 +347,7 @@ const (
 
 var pageTemplates [NumPageTemplates + 1]*template.Template
 var pageTemplatesMutex sync.Mutex //
+var pageTemplatesCommonPaths = []string{"web", "templates"}
 
 func init() {
 	for i := range pageTemplates {
@@ -367,11 +367,11 @@ func retrievePageTemplate(which PageTemplate, cacheIt bool) *template.Template {
 	if t == nil {
 		switch which {
 		case Template_Article:
-			t = parseTemplate(filepath.Join("web", "templates"), "base", "article")
+			t = parseTemplate(pageTemplatesCommonPaths, "base", "article")
 		case Template_PrintBook:
-			t = parseTemplate(filepath.Join("web", "templates"), "pdf")
+			t = parseTemplate(pageTemplatesCommonPaths, "pdf")
 		case Template_Redirect:
-			t = parseTemplate(filepath.Join("web", "templates"), "redirect")
+			t = parseTemplate(pageTemplatesCommonPaths, "redirect")
 		default:
 			t = template.New("blank")
 		}
