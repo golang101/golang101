@@ -26,7 +26,7 @@ _(若上面二维码未显示出来，请点击此[墙内版链接](https://tool
 ```shell
 ### 安装和更新
 
-$ go install -tags=embed go101.org/golang101@latest
+$ go install go101.org/golang101@latest
 
 ### 本地阅读（GOBIN路径需配置在PATH中。GOBIN路径的默认值为GOPATH/bin。）
 

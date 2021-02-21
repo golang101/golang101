@@ -1,54 +1,18 @@
-// +build !embed
+// +build !go1.16
 
 package main
 
-import (
-	"go/build"
-	"html/template"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"path/filepath"
-)
-
-var staticFilesHandler = http.FileServer(http.Dir(filepath.Join(rootPath, "web", "static")))
-var resFilesHandler = http.FileServer(http.Dir(filepath.Join(rootPath, "articles", "res")))
+var staticFilesHandler = staticFilesHandler_NonEmbedding
+var resFilesHandler = resFilesHandler_NonEmbedding
 
 func loadArticleFile(file string) ([]byte, error) {
-	return ioutil.ReadFile(filepath.Join(rootPath, "articles", file))
+	return loadArticleFile_NonEmbedding(file)
 }
 
 func parseTemplate(commonPaths []string, files ...string) *template.Template {
-	cp := filepath.Join(commonPaths...)
-	ts := make([]string, len(files))
-	for i, f := range files {
-		ts[i] = filepath.Join(rootPath, cp, f)
-	}
-	return template.Must(template.ParseFiles(ts...))
+	parseTemplate_NonEmbedding(commonPaths, files...)
 }
 
 func updateGolang101() {
-	pullGolang101Project(rootPath)
-}
-
-//=================================
-
-var rootPath = findGo101ProjectRoot()
-
-func findGo101ProjectRoot() string {
-	if _, err := os.Stat(filepath.Join(".", "golang101.go")); err == nil {
-		return "."
-	}
-
-	for _, name := range []string{
-		"gitlab.com/golang101/golang101", "gitlab.com/Golang101/golang101",
-		"github.com/golang101/golang101", "github.com/Golang101/golang101",
-	} {
-		pkg, err := build.Import(name, "", build.FindOnly)
-		if err == nil {
-			return pkg.Dir
-		}
-	}
-
-	return "."
+	updateGolang101_NonEmbedding()
 }
