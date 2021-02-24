@@ -65,7 +65,7 @@ func loadArticleFile(file string) ([]byte, error) {
 
 func parseTemplate(commonPaths []string, files ...string) *template.Template {
 	if wdIsGo101ProjectRoot {
-		parseTemplate_NonEmbedding(commonPaths, files...)
+		return parseTemplate_NonEmbedding(commonPaths, files...)
 	}
 
 	cp := path.Join(commonPaths...)
@@ -79,6 +79,7 @@ func parseTemplate(commonPaths []string, files ...string) *template.Template {
 func updateGolang101() {
 	if wdIsGo101ProjectRoot {
 		updateGolang101_NonEmbedding()
+		return
 	}
 
 	if _, err := os.Stat(filepath.Join(".", "golang101.go")); err == nil {
