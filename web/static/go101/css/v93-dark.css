@@ -7,7 +7,7 @@ table.list td {vertical-align:top; padding-right:0.5em; padding-bottom:0.2em;}
 pre code {background-color: inherit; border-style: none; font-size: 16px;}
 .alert code {background-color: inherit; border-style: solid; border-width: 1px; padding-top:3px; margin-left: 1px; margin-right: 1px;}
 div > code, p > code, i > code, b > code, a > code, u > code, li code, h1 code, h2 code, h3 code, h4 code {background: #555; padding: 1px 6px;}
-pre.output {background:#555; color:#ee0; font-size: 16px;}
+pre.output {background:#555; color:#ee0; font-size: 16px; padding: 5px 9px}
 .anchor {display:block; height:10px; margin-top:-16px; visibility:hidden;}
 .nav-bar-with-borders {border-top: 1px solid #555; border-bottom: 1px solid #555; margin: 16px 0px; padding: 3px 6px;}
 .nav-item-active {text-align: center; padding: 3px 0px; background-color: #555;}

@@ -492,7 +492,9 @@ func main() {
 
 <p>
 此实现借鉴于<code>strings</code>标准库包中的<code>Builder</code>类型的<code>String</code>方法的实现。
-字节切片的尺寸比字符串的尺寸要大，并且<a href="value-part.html#internal-definitions">它们的底层结构</a>类似，所以此转换是安全的。
+字节切片的尺寸比字符串的尺寸要大，并且<a href="value-part.html#internal-definitions">它们的底层结构</a>类似，所以此转换（对于当前的主流Go编译器来说）是安全的。
+即使这样，此实现也只推荐在标准库中使用，而不推荐在用户代码中使用。
+在用户代码中，最好尽量使用文末提供的另一种实现。
 </p>
 
 反过来，下面这个例子中的转换是非法的，因为字符串的尺寸比字节切片的尺寸小。
@@ -845,7 +847,6 @@ import (
 	"unsafe"
 )
 
-// 传递给此函数的string实参在此函数退出后不应被继续使用。
 func String2ByteSlice(str string) (bs []byte) {
 	strHdr := (*reflect.StringHeader)(unsafe.Pointer(&str))
 	sliceHdr := (*reflect.SliceHeader)(unsafe.Pointer(&bs))
@@ -874,7 +875,7 @@ func main() {
 </p>
 
 <p>
-<code>reflect</code>标准库包中<code>SliceHeader</code>和<code>StringHeader</code>类型的<a href="https://golang.google.cn/pkg/reflect/#SliceHeader">文档</a>提到这两个结构体类型的定义不保证在以后的版本中不发生改变。好在目前的两个主流Go编译器（标准编译器和gccgo编译器）都认可当前版本中的定义。这也可以看作是使用非类型安全指针的另一个潜在风险。
+<code>reflect</code>标准库包中<code>SliceHeader</code>和<code>StringHeader</code>类型的<a href="https://golang.google.cn/pkg/reflect/#SliceHeader">文档</a>提到这两个结构体类型的定义不保证在以后的版本中不发生改变。好在目前的两个主流Go编译器（标准编译器和gccgo编译器）都认可当前版本中的定义。这也可以看作是使用非类型安全指针的另一个（较低的）潜在风险。
 </p>
 
 <p>
@@ -887,52 +888,22 @@ func main() {
 事实上，更为推荐的是最好永远不要修改结果字节切片中的字节值。此非类型安全方式的目的主要是为了在局部感知范围内避免一次内存开辟，而不是一种通用的方式。
 </p>
 
-<!--
-然而，当前（Go 1.16），有一个更简单和更有效的方法来实现这一转换：
 
-<pre class="line-numbers"><code class="language-go">func ByteSlice2String(bs []byte) string {
-	return *(*string)(unsafe.Pointer(&bs))
-}
-</code></pre>
+</div>
 
-<p>
-此实现借鉴于<code>strings</code>标准库包中的<code>Builder</code>类型的<code>String</code>方法的实现。
-此实现利用了上述第一个使用模式。
-</p>
--->
+<h4>更多模式？</h4>
 
-<!--
-事实上，为了避免因为忘记调用<code>runtime.KeepAlive</code>函数而造成的危险，在日常编程中更推荐使用我们自定义<code>Data</code>字段的类型为<code>unsafe.Pointer</code><code>SliceHeader</code>和<code>StringHeader</code>结构体。比如：
-
-<pre class="line-numbers"><code class="language-go">type SliceHeader struct {
-	Data unsafe.Pointer
-	Len  int
-	Cap  int
-}
-
-type StringHeader struct {
-	Data unsafe.Pointer
-	Len  int
-}
-
-func String2ByteSlice(str string) (bs []byte) {
-	strHdr := (*StringHeader)(unsafe.Pointer(&str))
-	sliceHdr := (*SliceHeader)(unsafe.Pointer(&bs))
-	sliceHdr.Data = strHdr.Data
-	sliceHdr.Cap = strHdr.Len
-	sliceHdr.Len = strHdr.Len
-	
-	// 此KeepAlive调用变得不再必需。
-	//runtime.KeepAlive(&str)
-	return
-}
-</code></pre>
-
-<p>
-Matthew Dempsky提议将上述两个自定义类型<code>SliceHeader</code>和<code>StringHeader</code><a href="https://github.com/golang/go/issues/19367">置入</a><code>unsafe</code>标准库。
-</p>
--->
-
+<div>
+暂时没有更多合法的使用模式了。但是需要指出的是：合法使用非类型安全指针的模式设计仍在不断演化和改进中。
+下面是一些已经被批准从而将采纳在后续的Go版本中的提案：
+<ul>
+<li>
+	<a href="https://github.com/golang/go/issues/19367">在code>unsafe</code>包中添加一个<code>Slice(ptr *T, len anyIntegerType) []T</code>函数。</a>
+</li>
+<li>
+	<a href="https://github.com/golang/go/issues/40481">在code>unsafe</code>包中添加一个<code>Add(p Pointer, x uintptr) Pointer</code>函数。</a>
+</li>
+</ul>
 </div>
 
 <h3>总结一下</h3>
