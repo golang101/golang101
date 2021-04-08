@@ -174,7 +174,7 @@ func main() {
 事实上，在隐式声明上述两个函数的同时，编译器也将改写这两个函数对应的显式方法（至少，我们可以这样认为），让这两个方法在体内直接调用这两个隐式函数：
 
 <pre class="line-numbers"><code class="language-go">func (b Book) Pages() int {
-	return Book.pages(b)
+	return Book.Pages(b)
 }
 func (b *Book) SetPages(pages int) {
 	(*Book).SetPages(b, pages)
