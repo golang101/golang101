@@ -339,8 +339,7 @@ type Counter struct {
 func (c *Counter) xAddr() *uint64 {
 	// 此返回结果总是8字节对齐的。
 	return (*uint64)(unsafe.Pointer(
-		uintptr(unsafe.Pointer(&c.x)) + 8 -
-		uintptr(unsafe.Pointer(&c.x))%8))
+		(uintptr(unsafe.Pointer(&c.x)) + 7)/8*8))
 }
 
 func (c *Counter) Add(delta uint64) {
