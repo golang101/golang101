@@ -16,6 +16,7 @@
 		<br/>
 		<p>
 		本书微信公众号名称为"Go 101"。此公众号将时不时地发表一些Go语言相关的原创短文。各位如果感兴趣，可以搜索关注一下。
+		关注本书的twitter帐号<a href="https://twitter.com/Golang_101">@Golang_101</a>亦可获取这些信息。
 		</p>
 	{{ if ne $.FilenameWithoutExt "101" }}
 		<br/>

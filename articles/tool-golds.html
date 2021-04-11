@@ -1,0 +1,115 @@
+﻿
+<h1>Golds</h1>
+
+<div>
+<p>
+<b><i>Golds</i></b>（<b>Go</b> <b>lo</b>cal <b>d</b>ocs <b>s</b>erver）是一款实验性的本地Go文档服务器、Go文档生成器以及Go代码阅读器。
+</p>
+
+<ul>
+<li>
+演示地址：<a href="https://docs.go101.org/index.html" target="_blank">标准库文档和代码</a>（使用命令<code>golds -gen -nouses -only-list-exporteds std</code>生成）。
+</li>
+
+<li>
+项目代码托管于<a href="https://github.com/go101/golds">Github</a>上。欢迎提交PR和发现的问题。
+</li>
+
+<li>
+请关注官方twitter帐号<a href="https://twitter.com/go100and1">@Go100and1</a>或微信号"Go 101"来获取<b><i>Golds</i></b>的最新动态（以及各种关于Go语言的细节、事实和技巧等）。
+</li>
+</ul>
+
+<h3 id="faq">特性和当前版本的限制</h3>
+
+请阅读<a href="https://github.com/go101/golds">项目主页</a>以获取详情。
+
+<h3 id="faq">安装</h3>
+
+<ul>
+<li>如果你已经在使用官方工具链1.16+版本，则可运行<code>go install go101.org/golds@latest</code>来安装Golds；</li>
+<li>如果你仍在在使用官方工具链1.15-版本，则可运行<code>go get -u go101.org/golds</code>来安装Golds（注意：<code>GO111MODULE</code>环境变量需要暂时设置成<code>on</code>以利用<code>GOPROXY</code>设置）。</li>
+</ul>
+
+如果程序名<code>golds</code>和其它程序冲突，也可将Golds程序安装为其它名称：
+<ul>
+<li>
+<b>Go</b> <b>do</b>cs <b>ge</b>nerator<br/>
+如果你已经在使用官方工具链1.16+版本，运行<code>go install go101.org/golds/godoge@latest</code><br/>
+如果你仍在在使用官方工具链1.15-版本，运行<code>go get -u go101.org/golds/godoge</code>
+</li>
+<li>
+<b>Go</b> <b>co</b>de <b>re</b>ader<br/>
+如果你已经在使用官方工具链1.16+版本，运行<code>go install go101.org/golds/gocore@latest</code><br/>
+如果你仍在在使用官方工具链1.15-版本，运行<code>go get -u go101.org/golds/gocore</code>
+</li>
+</ul>
+
+<p>
+你也可以先将此项目代码克隆下来，然后进入相应的程序目录，运行<code>go install</code>来安装此程序。
+</p>
+
+<p>
+（注意：Go程序的默认安装路径为<code>GOBIN</code>环境变量设置的路径。它的默认值为<code>GOPATH</code>环境变量指定的第一个路径下的<code>bin</code>子文件夹对应的目录。<code>GOPATH</code>环境变量的默认值为当前用户HOME目录下的<code>go</code>子文件夹对应的目录。请将Go程序默认安装路径配置在<code>PATH</code>环境变量中以便从任何目录运行安装的Go程序。）
+</p>
+
+<h3>使用说明</h3>
+
+<b><i>Golds</i></b> 的主要用途是针对一个Go项目开启一个本地文档服务器，用来查看此项目的文档和源代码。我们可以
+<ul>
+<li>运行<code>golds .</code>来查看处于当前目录下的Go库包（以及它的依赖包）的文档和代码。</li>
+<li>运行<code>golds ./...</code>来查看处于当前目录下的所有Go库包（以及它们的依赖包）的文档和代码。</li>
+<li>运行<code>golds toolchain</code>来查看处于官方工具链中的所有Go库包（以及它们的依赖包）的文档和代码； <code>toolchain</code>和上面两个参数（<code>.</code>和<code>./...</code>）互斥。</li>
+<li>运行<code>golds std</code>来查看处于所有Go标准库包库包的文档和代码；<code>std</code>可以和上面的三个参数并用。</li>
+<li>运行<code>golds aPackage</code>来查看某个库包（以及它的依赖包）的文档和代码。</li>
+<li>运行<code>golds foo.go bar.go baz.go</code>来查看一些Go文件（以及它们的依赖包）的文档和代码。</li>
+</ul>
+
+<p>
+上述所用命令都将自动打开一个浏览器窗口用来浏览文档和代码。我们可以使用<code>-s</code>或<code>-silent</code>选项来关闭这一行为。
+</p>
+
+<b><i>Golds</i></b>的第二个用途是使用<code>-gen</code>选项来生成一个项目的静态HTML文档。
+比如：
+<ul>
+<li><code>golds -gen -dir=generated -nouses .</code></li>
+<li><code>golds -gen -dir=generated -nouses ./...</code></li>
+<li><code>golds -gen -dir=generated -nouses std</code></li>
+</ul>
+
+<p>
+其中的<code>-dir</code>选项的默认值为<code>.</code>（即当前目录）。
+使用<code>-nouses</code>选项来避免生成的文档占用过多磁盘空间（减少特性换取空间）。
+</p>
+
+主要的控制占用磁盘空间的选项：
+<ul>
+<li><code>-nouses</code>：不生成标识符的使用列表页面（此选项将减少2/3的磁盘占用空间）。</li>
+<li><code>-plainsrc</code>：生成简单代码页面（无高亮和代码间跳转，将减少1/6的磁盘占用空间）。</li>
+<li><code>-only-list-exporteds</code>：不列出非导出资源。</li>
+<li><code>-compact</code>为上面几个选项的叠加。</li>
+</ul>
+
+<p>
+<code>golds -gen -compact ./...</code>命令生成的文档占用的磁盘空间为<code>golds -gen ./...</code>命令的1/6，为<code>golds -gen -nouses ./...</code>命令的1/2。
+</p>
+
+<code>-wdpkgs-listing</code>选项用来控制如何列出当前目录下的所有库包。它的值可以为：
+<ul>
+<li><code>general</code>（默认值，和其它依赖库包一起按照字母顺序列出）。</li>
+<li><code>promoted</code>（将它们列出在其它依赖库包之前）。</li>
+<li><code>solo</code>（只列出它们，不列其它依赖包）。</li>
+</ul>
+
+<p>
+<b><i>Golds</i></b>的第三个用途是作为文件服务器（<b>Go</b> <b>lo</b>cal <b>d</b>irectory <b>s</b>erver）。
+比如我们可以运行<code>golds -dir=.</code>（或者<code>golds</code>）来在浏览其中浏览当前目录的文件。
+<code>-s</code>和<code>-silent</code>选项在此用途中也有效。
+</p>
+
+<p>
+<code>golds</code>命令可以识别<code>GOOS</code>和<code>GOARCH</code>环境变量。
+</p>
+
+</div>
+

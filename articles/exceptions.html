@@ -553,12 +553,12 @@ func main() {
 <div>
 基本规则：
 <div class="alert alert-info">
-如果一个值可以被赋给另一个值，则这两个值可以用<code>==</code>和<code>!=</code>比较符来做比较。
+如果一个值可以隐式转换为一个可比较类型，则这此值和此可比较类型的值可以用<code>==</code>和<code>!=</code>比较符来做比较。
 </div>
 
 例外：
 <div class="alert alert-success">
-一个不可比较类型（一定是一个非接口类型）的值不能和一个接口类型的值比较，即使此不可比较类型实现了此接口类型（从而此不可比较类型的值可以赋给此接口类型的值）。
+一个不可比较类型（一定是一个非接口类型）的值不能和一个接口类型的值比较，即使此不可比较类型实现了此接口类型（从而此不可比较类型的值可以被隐式转换为此接口类型）。
 </div>
 
 请阅读<a href="value-conversions-assignments-and-comparisons.html#comparison-rules">值比较规则</a>获取详情。
