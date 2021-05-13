@@ -98,7 +98,7 @@
 	<td>未做特别要求</td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center">指针</th>
+	<th scope="row" class="text-center">指针和非类型安全指针</th>
 	<td>1 word</td>
 	<td>未做特别要求</td>
 	</tr>
@@ -149,7 +149,7 @@
 <p>
 一般说来，复制一个值的成本正比于此值的尺寸。
 但是，值尺寸并非是值复制成本的唯一决定因素。
-不同的CPU架构可能会对某些特定尺寸的值的复制做了优化。
+不同的CPU型号和编译器版本可能会对某些特定尺寸的值的复制做了优化。
 </p>
 
 <p>
@@ -180,7 +180,7 @@
 
 import "testing"
 
-type S struct{a, b, c, d, e int64}
+type S [12]int64
 var sX = make([]S, 1000)
 var sY = make([]S, 1000)
 var sZ = make([]S, 1000)
@@ -190,7 +190,7 @@ func Benchmark_Loop(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		sumX = 0
 		for j := 0; j < len(sX); j++ {
-			sumX += sX[j].a
+			sumX += sX[j][0]
 		}
 	}
 }
@@ -199,7 +199,7 @@ func Benchmark_Range_OneIterVar(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		sumY = 0
 		for j := range sY {
-			sumY += sY[j].a
+			sumY += sY[j][0]
 		}
 	}
 }
@@ -208,7 +208,7 @@ func Benchmark_Range_TwoIterVar(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		sumZ = 0
 		for _, v := range sZ {
-			sumZ += v.a
+			sumZ += v[0]
 		}
 	}
 }
@@ -216,15 +216,15 @@ func Benchmark_Range_TwoIterVar(b *testing.B) {
 
 运行此基准测试，我们将得到下面的结果：
 
-<pre class="output"><code>Benchmark_Loop-4                500000   3228 ns/op
-Benchmark_Range_OneIterVar-4    500000   3203 ns/op
-Benchmark_Range_TwoIterVars-4   200000   6616 ns/op
+<pre class="output"><code>Benchmark_Loop-4             424342 2708 ns/op
+Benchmark_Range_OneIterVar-4 407905 2808 ns/op
+Benchmark_Range_TwoIterVar-4 214860 5222 ns/op
 </code></pre>
 
 <p>
 可以看出，使用双循环变量的方法的效率比另外两种方法的效率低得多。
 但是请注意，某些编译器版本可能会做出一些特别的优化从而消除上面几种遍历方法的效率差异。
-上面的基准测试结果基于Go标准编译器1.13版本。
+上面的基准测试结果基于Go标准编译器1.16版本。
 </p>
 
 </div>

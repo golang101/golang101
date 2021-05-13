@@ -151,10 +151,6 @@ func main() {
 给定一个通道值<code>x</code>，假设它的类型<code>Tx</code>是一个双向通道类型，<code>T</code>也是一个通道类型（无论是双向的还是单向的）。如果<code>Tx</code>和<code>T</code>的元素类型相同并且它们中至少有一个为非定义类型，则<code>x</code>可以被<u><b>隐式</b></u>转换为类型<code>T</code>。
 </div>
 
-<!--
-a potentail bug: https://github.com/golang/go/issues/29469
--->
-
 <div>
 一个例子：
 <pre class="line-numbers"><code class="language-go">package main
@@ -203,93 +199,13 @@ func main() {
 </ul>
 </div>
 
-<!--
-<div>
-一个例子：
-<pre class="line-numbers"><code class="language-go">package main
-
-type Filter interface {
-	Filte(n int) bool
-}
-
-type MultipleFilter struct {
-	Divisor int
-}
-
-func (mf MultipleFilter) Filte(n int) bool {
-	return n % mf.Divisor == 0
-}
-
-func main() {
-	var mf = MultipleFilter{11}
-	// mf的类型MultipleFilter实现了接口类型Filter，
-	// 所以下面这个隐式转换是没问题的。
-	var filter = mf
-
-	// 任何类型都实现了空接口类型interface{}，所以任何
-	// 值都可以被隐式转换为类型interface{}。
-
-	var n int = 123
-	var b bool = true
-	var s string = "abc"
-
-	var _ interface{} = n
-	var _ interface{} = b
-	var _ interface{} = s
-	var _ interface{} = mf
-
-	// 接口类型Filter也实现了空接口类型interface{}。
-	var _ interface{} = filter
-}
-</code></pre>
-<p>
-</p>
-</div>
-
-<a class="anchor" id="conversion-rule-type-assertion"></a>
-<h4>4. 类型断言中的类型转换规则</h4>
--->
-
-<div class="well">
+<!--div class="well">
 给定一个动态类型为<code>T</code>的接口值<code>x</code>，<code>x</code>可以通过类型断言的方式<code>x.(T)</code>安全地转换为类型<code>T</code>。
 </div>
 
 <div class="well">
 给定一个接口值<code>x</code>和一个接口类型<code>I</code>，如果<code>x</code>的动态类型实现了接口类型<code>I</code>，则<code>x</code>可以通过类型断言的方式<code>x.(I)</code>安全地转换为接口类型<code>I</code>。
-</div>
-
-<!--
-<div>
-一个例子：
-<pre class="line-numbers"><code class="language-go">package main
-
-type I interface {
-	f()
-}
-
-type T string
-func (T) f(){}
-
-func main() {
-	var it interface{} = T("abc")
-	var is interface{} = "abc"
-
-	// 这两个断言既编译没问题，也不会导致恐慌，因为
-	// 类型T同时实现了接口类型I和interface{}。
-	var _ T = it.(T)
-	var _ I = it.(I)
-
-	// 这个断言也没问题，因为内置类型string实现了interface{}。
-	var _ string = is.(string)
-
-	// 下面这三行均编译没问题，但是都将在运行时刻产生一个恐慌。
-	// _ = is.(I)
-	// _ = is.(T)
-	// _ = it.(string)
-}
-</code></pre>
-</div>
--->
+</div-->
 
 <p>
 请阅读<a href="interface.html">接口</a>一文获取更多详情和示例。
@@ -420,7 +336,18 @@ func main() {
 请阅读<a href="string.html#conversions">字符串</a>一文获取更多详情和示例。
 </p>
 
-<h4>9. 非类型安全指针相关的类型转换规则</h4>
+<h4>9. 切片相关的类型转换规则</h4>
+
+<div class="well">
+从Go 1.17开始，一个切片可以被转化为一个相同元素类型的数组的指针类型。
+但是如果数组的长度大于被转化切片的长度，则将导致恐慌产生。
+</div>
+
+<p>
+这里有<a href="container.html#slice-to-array-pointer">一个例子</a>。
+</p>
+
+<h4>10. 非类型安全指针相关的类型转换规则</h4>
 
 <p>
 非类型安全指针类型是指底层类型为<code>unsafe.Pointer</code>的类型。

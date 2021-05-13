@@ -79,6 +79,11 @@ func f(s1 string) {
 从Go 1.12开始，此函数将利用<code>strings.Builder</code>来防止一次不必要的复制。
 </p>
 
+<p>
+从Go 1.17开始，<code>strings</code>标准库包中引入了一个<code>Clone</code>函数。
+调用此函数为克隆一个字符串的最佳实现方式。
+</p>
+
 </div>
 
 <a class="anchor" id="subslice"></a>
@@ -103,11 +108,15 @@ func g(s1 []int) {
 如果我们想防止这样的临时性内存泄露，我们必须在函数<code>g</code>中将30个元素均复制一份，使得切片<code>s0</code>和<code>s1</code>不共享承载底层元素的内存块。
 
 <pre class="line-numbers"><code class="language-go">func g(s1 []int) {
-	s0 = append(s1[:0:0], s1[len(s1)-30:]...)
+	s0 = make([]int, 30)
+	copy(s0, s1[len(s1)-30:])
 	// 现在，如果再没有其它值引用着承载着s1元素的内存块，
 	// 则此内存块可以被回收了。
 }
 </code></pre>
+
+<p>
+</p>
 
 </div>
 

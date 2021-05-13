@@ -196,9 +196,28 @@ The values referenced by values allocated on heap will never be allocated in sta
 使用内置<code>new</code>函数开辟的内存可能开辟在堆上，也可能开辟在栈上。这是与C++不同的一点。
 </p>
 
-<p>
 当一个协程的栈的大小改变时，一个新的内存段将申请给此栈使用。原先已经开辟在老的内存段上的内存块将很有可能被转移到新的内存段上，或者说这些内存块的地址将改变。
 相应地，引用着这些开辟在此栈上的内存块的指针（它们同样开辟在此栈上）中存储的地址也将得到刷新。
+下面是一个展示开辟在栈上的值的地址改变的例子。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+func f(i int) byte {
+	type T int // 防止f被内联
+	var a [1<<20]byte // 使栈增长
+	return a[i]
+}
+
+func main(){
+	var x int
+	println(&x)
+	f(100)
+	println(&x)
+}
+</code></pre>
+
+<p>
+我们可以看到，上例打引出的两个地址不一样（如果使用官方标准编译器v1.16编译之）。
 </p>
 
 <!--p>

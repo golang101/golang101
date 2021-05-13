@@ -1219,6 +1219,38 @@ func main() {
 
 </div>
 
+<a class="anchor" id="slice-to-array-pointer"></a>
+<h3>切片转化为数组指针</h3>
+
+<div>
+从Go 1.17开始，一个切片可以被转化为一个相同元素类型的数组的指针类型。
+但是如果数组的长度大于被转化切片的长度，则将导致恐慌产生。一个例子：
+
+<pre class="line-numbers"><code class="language-go">package main
+
+type S []int
+type A [2]int
+type P *A
+
+func main() {
+    var x = make([]int, 3, 5)
+    var _ = (*[3]int)(x) // ok
+    var _ = (*[2]int)(x) // ok
+    var _ = (*A)(x)      // ok
+    var _ = P(x)         // ok
+    
+    var y = S(x)
+    var _ = (*[3]int)(y) // ok
+    var _ = (*[2]int)(y) // ok
+    var _ = (*A)(y)      // ok
+    var _ = P(y)         // ok
+    
+    var _ = (*[4]int)(x) // panic
+}
+</code></pre>
+
+</div>
+
 <a class="anchor" id="copy-slice-elements"></a>
 <h3>使用内置<code>copy</code>函数来复制切片元素</h3>
 
@@ -1701,7 +1733,7 @@ fmt.Println(len(pa), cap(pa)) // 5 5
 <h3><code>memclr</code>优化</h3>
 
 <div>
-假设<code>t0</code>是一个类型<code>T</code>的零值字面量，并且<code>a</code>是一个元素类型为<code>T</code>的数组，则官方标准编译器将把下面的单循环变量<code>for-range</code>代码块优化为一个<a href="https://github.com/golang/go/issues/5373">内部的<code>memclr</code>调用</a>。
+假设<code>t0</code>是一个类型<code>T</code>的零值字面量，并且<code>a</code>是一个元素类型为<code>T</code>的数组或者切片，则官方标准编译器将把下面的单循环变量<code>for-range</code>代码块优化为一个<a href="https://github.com/golang/go/issues/5373">内部的<code>memclr</code>调用</a>。
 大多数情况下，此<code>memclr</code>调用比一个一个地重置元素要快。
 
 <pre class="line-numbers"><code class="language-go">for i := range a {
@@ -1713,19 +1745,8 @@ fmt.Println(len(pa), cap(pa)) // 5 5
 此优化在官方标准编译器1.5版本中被引入。
 </p>
 
-此优化也适用于<code>a</code>为一个切片的情形。但是，有点遗憾，此优化不适用于<code>a</code>为一个数组指针的情形，至少到目前（Go 1.16）为止。
+此优化不适用于<code>a</code>为一个数组指针的情形，至少到目前（Go 1.16）为止是这样。
 所以，如果你打算重置一个数组，最好不要在<code>range</code>关键字后跟随此数组的指针。
-特别地，推荐在<code>range</code>关键字后跟随一个从此数组派生出来的切片，如下：
-
-<pre class="line-numbers"><code class="language-go">s := a[:]
-for i := range s {
-	s[i] = t0
-}
-</code></pre>
-
-<p>
-不推荐在<code>range</code>关键字后直接跟随数组指针，原因是其它可能的第三方编译器可能并没有实现此优化，导致<code>range</code>关键字后跟随的数组将被复制，从而影响性能。
-</p>
 
 </div>
 
@@ -1820,15 +1841,26 @@ Go不支持更多的内置切片操作，比如切片克隆、元素删除和插
 <pre class="disable-line-numbers111"><code class="language-go">sClone := append(s[:0:0], s...)
 </code></pre>
 
-我们也可以使用如下方法来克隆一个切片：
-<pre class="disable-line-numbers111"><code class="language-go">sClone := make([]T, len(s))
+我们也可以使用下面这种实现。但是和上面这个实现相比，它有一个不完美之处：如果源切片<code>s</code>是一个空切片（但是非nil），则结果切片是一个nil切片。
+<pre class="disable-line-numbers111"><code class="language-go">sClone := append([]T(nil), s...)
+</code></pre>
+
+上面这两种append实现都有一个缺点：它们开辟的内存块常常会比需要的略大一些从而可能造成一点小小的不必要的性能损失。
+我们可以使用这两种方法来避免这个缺点：
+<pre class="disable-line-numbers111"><code class="language-go">// 两行make+copy实现：
+sClone := make([]T, len(s))
 copy(sClone, s)
+
+// 或者下面的make+append实现。
+// 对于目前的官方Go工具链v1.16来说，这种
+// 实现比上面的make+copy实现略慢一点。
+sClone := append(make([]T, 0, len(s)), s...)
 </code></pre>
 
 <p>
 </p>
 
-此第二种方法有一个缺点：如果<code>s</code>是一个nil切片，则使用此方法将得到一个非nil切片。
+上面这两种make方法都有一个缺点：如果<code>s</code>是一个nil切片，则使用此方法将得到一个非nil切片。
 不过，在编程实践中，我们常常并不需要追求克隆的完美性。如果我们确实需要，则需要多写几行：
 <pre class="disable-line-numbers111"><code class="language-go">var sClone []T
 if s != nil {
@@ -1838,7 +1870,7 @@ if s != nil {
 </code></pre>
 
 <p>
-在Go官方工具链1.15版本之前，对于一些常见的使用场景，使用<code>append</code>来克隆切片比使用<code>make</code>加<code>copy</code>要<a href="https://github.com/go101/go101/wiki/How-to-efficiently-clone-a-slice%3F">高效得多</a>。但是从1.15版本开始，官方标准编译器对<code>make</code>加<code>copy</code>这种方法做了特殊的优化，从而使得此方法总是比使用<code>append</code>来克隆切片高效。
+在Go官方工具链1.15版本之前，对于一些常见的使用场景，使用<code>append</code>来克隆切片比使用<code>make</code>加<code>copy</code>要<a href="https://github.com/go101/go101/wiki/How-to-efficiently-clone-a-slice%3F">高效得多</a>。但是从1.15版本开始，官方标准编译器对<code>make+copy</code>这种方法做了特殊的优化，从而使得此方法总是比使用<code>append</code>来克隆切片高效。
 </p>
 
 </div>

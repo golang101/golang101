@@ -303,14 +303,9 @@ func main() {
 </p>
 
 <p>
-类型<code>*Value</code>有两个方法：<code>Load</code>和<code>Store</code>。
-它没有<code>Add</code>和<code>Swap</code>方法。
-</p>
-
-<p>
-<code>Load</code>方法的结果类型和<code>Store</code>方法的参数类型均为<code>interface{}</code>。
-所以<code>Store</code>方法调用的实参可以是任何类型的值。
-但是对于一个可寻址的<code>Value</code>类型的值<code>v</code>，一旦<code>v.Store</code>方法（<code>(&amp;v).Store</code>的简写形式）被曾经调用一次，则传递给此方法的后续调用的实参的具体类型必须和传递给它的第一次调用的实参的具体类型一致；
+类型<code>*Value</code>有几个方法：<code>Load</code>、<code>Store</code>、<code>Swap</code>和<code>CompareAndSwap</code>（其中后两个方法实在Go 1.17中引入的）。
+这些方法均以<code>interface{}</code>做为参数类型，所以传递给它们的实参可以是任何类型的值。
+但是对于一个可寻址的<code>Value</code>类型的值<code>v</code>，一旦<code>v.Store</code>方法（<code>(&amp;v).Store</code>的简写形式）被曾经调用一次，则传递给值<code>v</code>的后续方法调用的实参的具体类型必须和传递给它的第一次调用的实参的具体类型一致；
 否则，将产生一个恐慌。<code>nil</code>接口类型实参也将导致<code>v.Store()</code>方法调用产生恐慌。
 </p>
 
@@ -332,6 +327,32 @@ func main() {
 	fmt.Println(ta == tb) // true
 
 	v.Store("hello") // 将导致一个恐慌
+}
+</code></pre>
+
+另一个例子（针对Go 1.17+）：
+<pre class="line-numbers"><code class="language-go">package main
+
+import (
+	"fmt"
+	"sync/atomic"
+)
+
+func main() {
+	type T struct {a, b, c int}
+	var x = T{1, 2, 3}
+	var y = T{4, 5, 6}
+	var z = T{7, 8, 9}
+	var v atomic.Value
+	v.Store(x)
+	fmt.Println(v) // {{1 2 3}}
+	old := v.Swap(y)
+	fmt.Println(v)       // {{4 5 6}}
+	fmt.Println(old.(T)) // {1 2 3}
+	swapped := v.CompareAndSwap(x, z)
+	fmt.Println(swapped, v) // false {{4 5 6}}
+	swapped = v.CompareAndSwap(y, z)
+	fmt.Println(swapped, v) // true {{7 8 9}}
 }
 </code></pre>
 

@@ -38,8 +38,7 @@
 </code></pre>
 
 <p>
-当然，这不是一个普通的类型定义。这里的<code>ArbitraryType</code>仅仅是暗示<code>unsafe.Pointer</code>类型值可以被转换为任意类型安全指针（反之亦然）。
-换句话说，<code>unsafe.Pointer</code>类似于C语言中的<code>void*</code>。
+当然，这不是一个普通的类型定义。这里的<code>ArbitraryType</code>仅仅是暗示<code>unsafe.Pointer</code>类型值可以被转换为任意类型安全指针（反之亦然）。换句话说，<code>unsafe.Pointer</code>类似于C语言中的<code>void*</code>。
 </p>
 
 <p>
@@ -50,7 +49,7 @@
 非类型安全指针的零值也使用预声明的<code>nil</code>标识符来表示。
 </p>
 
-<code>unsafe</code>标准库包提供了三个函数：
+在Go 1.17之前，<code>unsafe</code>标准库包只提供了三个函数：
 <ul>
 <li>
 	<code>func Alignof(variable ArbitraryType) uintptr</code>。
@@ -160,10 +159,57 @@ func main() {
 
 <p>
 <code>unsafe</code>包提供的这三个函数看上去并不怎么危险。
-它们的原型在以后的Go 1版本中<a href="https://groups.google.com/forum/?_escaped_fragment_=topic/golang-nuts/Pi7VveWDUPc">几乎不可能会发生改变</a>。
+它们的原型在以后的Go 1版本中<a href="https://groups.google.com/g/golang-nuts/c/Pi7VveWDUPc">几乎不可能会发生改变</a>。
 Rob Pike甚至曾经<a href="https://github.com/golang/go/issues/5602">将这几个函数挪到其它包中</a>。
 <code>unsafe</code>包的危险性基本上来自于非类型安全指针。它们和C指针一样危险，这是Go安全指针千方百计设法去避免的。
 </p>
+
+Go 1.17引入了一个新类型和两个新函数。
+此新类型为<code>IntegerType</code>。它的定义如下。
+此类型不代表着一个具体类型，它只是表示任意整数类型（有点泛型的意思）。
+<pre class="disable-line-numbers111"><code class="language-go">type IntegerType int
+</code></pre>
+
+Go 1.17引入的两个函数为：
+<ul>
+<li>
+	<code>func Add(ptr Pointer, len IntegerType) Pointer</code>。
+	此函数在一个（非安全）指针表示的地址上添加一个偏移量，然后返回表示新地址的一个指针。
+	此函数以一种更正规的形式部分地覆盖了下面将要介绍的使用模式3中展示的合法用法。
+</li>
+<li>
+	<code>func Slice(ptr *ArbitraryType, len IntegerType) []ArbitraryType</code>。
+	此函数用来从一个任意（安全）指针派生出一个指定长度的切片。
+</li>
+</ul>
+
+Go 1.17引入的这两个函数具有一定的危险性，需谨慎使用。下面时使用了这两个函数的一个例子。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import (
+	"fmt"
+	"unsafe"
+)
+
+func main() {
+	a := [16]int{3: 3, 9: 9, 11: 11}
+	fmt.Println(a) // 使a开辟在堆上
+	eleSize := int(unsafe.Sizeof(a[0]))
+	p9 := &a[9]
+	up9 := unsafe.Pointer(p9)
+	p3 := (*int)(unsafe.Add(up9, -6 * eleSize))
+	fmt.Println(*p3) // 3
+	s := unsafe.Slice(p9, 5)[:3]
+	fmt.Println(s) // [9 0 11]
+	fmt.Println(len(s), cap(s)) // 3 5
+	
+	// 下面是两个不正确的调用。因为它们
+	// 的返回结果引用了未知的内存块。
+	_ = unsafe.Add(up9, 7 * eleSize)
+	_ = unsafe.Slice(p9, 8)
+}
+</code></pre>
 
 </div>
 
@@ -219,6 +265,8 @@ They are as dangerous as C pointers, which is Go always tries to avoid.
 
 </div>
 -->
+
+
 
 <h3>非类型安全指针相关的类型转换</h3>
 
@@ -570,6 +618,7 @@ func main() {
 </code></pre>
 
 <p>
+其实，对于这样地址加减运算，更推荐使用上面介绍的Go 1.17中引入的<code>unsafe.Add</code>函数来完成。
 </p>
 
 注意：在上面这个例子中，转换<code>unsafe.Pointer(uintptr(p) + N + M + M)</code>不应该像下面这样被拆成两行。
@@ -889,21 +938,6 @@ func main() {
 </p>
 
 
-</div>
-
-<h4>更多模式？</h4>
-
-<div>
-暂时没有更多合法的使用模式了。但是需要指出的是：合法使用非类型安全指针的模式设计仍在不断演化和改进中。
-下面是一些已经被批准从而将采纳在后续的Go版本中的提案：
-<ul>
-<li>
-	<a href="https://github.com/golang/go/issues/19367">在code>unsafe</code>包中添加一个<code>Slice(ptr *T, len anyIntegerType) []T</code>函数。</a>
-</li>
-<li>
-	<a href="https://github.com/golang/go/issues/40481">在code>unsafe</code>包中添加一个<code>Add(p Pointer, x uintptr) Pointer</code>函数。</a>
-</li>
-</ul>
 </div>
 
 <h3>总结一下</h3>

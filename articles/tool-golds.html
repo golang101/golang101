@@ -82,16 +82,29 @@
 使用<code>-nouses</code>选项来避免生成的文档占用过多磁盘空间（减少特性换取空间）。
 </p>
 
-主要的控制占用磁盘空间的选项：
+选项<code>-source-code-reading</code>用来控制如何生成源代码页面。支持的值：
 <ul>
-<li><code>-nouses</code>：不生成标识符的使用列表页面（此选项将减少2/3的磁盘占用空间）。</li>
-<li><code>-plainsrc</code>：生成简单代码页面（无高亮和代码间跳转，将减少1/6的磁盘占用空间）。</li>
-<li><code>-only-list-exporteds</code>：不列出非导出资源。</li>
-<li><code>-compact</code>为上面几个选项的叠加。</li>
+<li><code>plain</code>：简单朴素的代码页页面（无高亮和代码间跳转，将减少1/6的磁盘占用空间）</li>
+<li><code>highlight</code>：仅仅高亮关键字和基本字面值（无代码间跳转）。</li>
+<li><code>rich</code>：丰富的阅读体验。</li>
+<li><code>external</code>：链接至外部代码托管网站（将尽力而为，若失败则采用highlight方式）。</li>
 </ul>
 
 <p>
-<code>golds -gen -compact ./...</code>命令生成的文档占用的磁盘空间为<code>golds -gen ./...</code>命令的1/6，为<code>golds -gen -nouses ./...</code>命令的1/2。
+选项<code>-allow-network-connection</code>用来指定在确定Go模块外部代码托管网站的时候是否可以进行网络连接。
+</p>
+
+主要的控制占用磁盘空间的选项：
+<ul>
+<li><code>-nouses</code>：不生成标识符的使用列表页面（此选项将减少2/3的磁盘占用空间）。</li>
+<li><code>-source-code-reading=plain</code></li>
+<li><code>-only-list-exporteds</code>：不列出非导出资源。</li>
+<li><code>-compact</code>为上面几个选项的叠加。</li>
+<li>同时使用<code>-source-code-reading=external</code>和<code>-compact</code>将进一步减小最终生成的文档的磁盘占用空间。</li>
+</ul>
+
+<p>
+<code>golds -gen -compact ./...</code>命令生成的文档占用的磁盘空间为<code>golds -gen ./...</code>命令的1/6，为<code>golds -gen -nouses ./...</code>命令的1/2。<code>golds -gen -compact -source-code-reading=external ./...</code>命令生成的文档占用的磁盘空间为<code>golds -gen -compact ./...</code>命令的1/5。
 </p>
 
 <code>-wdpkgs-listing</code>选项用来控制如何列出当前目录下的所有库包。它的值可以为：
