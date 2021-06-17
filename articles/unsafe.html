@@ -194,7 +194,7 @@ import (
 
 func main() {
 	a := [16]int{3: 3, 9: 9, 11: 11}
-	fmt.Println(a) // 使a开辟在堆上
+	fmt.Println(a)
 	eleSize := int(unsafe.Sizeof(a[0]))
 	p9 := &a[9]
 	up9 := unsafe.Pointer(p9)
@@ -529,6 +529,7 @@ func main() {
 </code></pre>
 
 <p>
+当然，从Go 1.17开始，我们也可以使用<code>unsafe.Slice((*string)(&ms[0]), len(ms))</code>来实现此类型转换。
 </p>
 
 此模式在实践中的另一个应用是将一个不再使用的字节切片转换为一个字符串（从而避免对底层字节序列的一次开辟和复制）。如下例所示：

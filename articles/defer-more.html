@@ -289,7 +289,7 @@ func (t *T) IncreaseB() {
 			if err != nil {
 				return err
 			}
-			defer f.Close() // 将在此循环步步尾执行
+			defer f.Close() // 将在此循环步内执行
 
 			_, err = f.WriteString(file.content)
 			if err != nil {

@@ -217,8 +217,9 @@ func main() {
 <h4>浮点数类型值的字面量形式</h4>
 
 <div>
-一个浮点数的完整字面量形式包含一个十进制整数部分、一个小数点、一个十进制小数部分和一个整数指数部分。
-常常地，某些部分可以根据情况省略掉。一些例子（<code>xEn</code>表示<code>x</code>乘以<code>10<sup>n</sup></code>的意思，而<code>xE-n</code>表示<code>x</code>除以<code>10<sup>n</sup></code>的意思）：
+一个浮点数的完整十进制字面量形式可能包含一个十进制整数部分、一个小数点、一个十进制小数部分和一个以10为底数的整数指数部分。
+整数指数部分由字母<code>e</code>或者<code>E</code>带一个十进制的整数字面量组成（<code>xEn</code>表示<code>x</code>乘以<code>10<sup>n</sup></code>的意思，而<code>xE-n</code>表示<code>x</code>除以<code>10<sup>n</sup></code>的意思）。
+常常地，某些部分可以根据情况省略掉。一些例子：
 
 <pre class="disable-line-numbers111"><code class="language-go">1.23
 01.23 // == 1.23
@@ -238,39 +239,38 @@ func main() {
 <p>
 </p>
 
-从Go 1.13开始，Go也支持另一种浮点数字面量形式（权称为十六进制浮点数文字表示）。
-在一个十六进制浮点数文字表示中，
+从Go 1.13开始，Go也支持另一种浮点数字面量形式：十六进制浮点数字面量。
+在一个十六进制浮点数字面量中，
 <ul>
 <li>
-	和整数的十六进制文字表示一样，浮点数的十六进制文字表示也必须使用<code>0x</code>或者<code>0X</code>开头。
+	一个十六进制浮点数字面量必须以一个以2为底数的整数指数部分。
+	这样的一个整数指数部分由字母<code>p</code>或者<code>P</code>带一个十进制的整数字面量组成（<code>yPn</code>表示<code>y</code>乘以<code>2<sup>n</sup></code>的意思，而<code>yP-n</code>表示<code>y</code>除以<code>2<sup>n</sup></code>的意思）。
 </li>
 <li>
-	和整数的十六进制文字表示不同的是，字母<code>p</code>或者<code>P</code>可以出现在浮点数的十六进制文字表示中，其后跟随着一个幂指数（底数为2）。
-</li>
-<li>
-	另外要注意，<code>e</code>和<code>E</code>不能出现在浮点数的十六进制文字表示中。
+	和整数的十六进制字面量一样，一个十六进制浮点数字面量也必须使用<code>0x</code>或者<code>0X</code>开头。
+	和整数的十六进制字面量不同的是，一个十六进制浮点数字面量可以包括一个小数点和一个十六进制小数部分。
 </li>
 </ul>
 
-一些合法的浮点数的十六进制文字表示例子（<code>yPn</code>表示<code>y</code>乘以<code>2<sup>n</sup></code>的意思，而<code>yP-n</code>表示<code>y</code>除以<code>2<sup>n</sup></code>的意思）：
-<pre class="disable-line-numbers111"><code class="language-go">0x1p-2     // == 0.25
-0x2.p10    // == 2048.0
-0x1.Fp+0   // == 1.9375
-0X.8p-0    // == 0.5
+一些合法的浮点数的十六进制字面量例子：
+<pre class="disable-line-numbers111"><code class="language-go">0x1p-2     // == 1.0/4 = 0.25
+0x2.p10    // == 2.0 * 1024 == 2048.0
+0x1.Fp+0   // == 1+15.0/16 == 1.9375
+0X.8p1     // == 8.0/16 * 2 == 1.0
 0X1FFFP-16 // == 0.1249847412109375
 </code></pre>
 
 <p></p>
 
-而下面这几个均是不合法的浮点数的十六进制文字表示。
+而下面这几个均是不合法的浮点数的十六进制字面量。
 <pre class="disable-line-numbers111"><code class="language-go">0x.p1    // 整数部分表示必须包含至少一个数字
-1p-2     // p指数形式只能出现在浮点数的十六进制文字表示中
-0x1.5e-2 // e和E不能出现在浮点数的十六进制文字表示中
+1p-2     // p指数形式只能出现在浮点数的十六进制字面量中
+0x1.5e-2 // e和E不能出现在十六进制浮点数字面量的指数部分中
 </code></pre>
 
 <p></p>
 
-注意：下面这个表示是合法的，但是它不是浮点数的十六进制文字表示。事实上，它是一个减法算术表达式。其中的<code>e</code>为是十进制中的<code>14</code>，<code>0x15e</code>为一个整数十六进制文字表示，<code>-2</code>并不是此整数十六进制文字表示的一部分。
+注意：下面这个表示是合法的，但是它不是浮点数的十六进制字面量。事实上，它是一个减法算术表达式。其中的<code>e</code>为是十进制中的<code>14</code>，<code>0x15e</code>为一个整数十六进制字面量，<code>-2</code>并不是此整数十六进制字面量的一部分。
 (算术运算将在后续的文章<a href="operators.html">常用操作符</a>一文中详细介绍。)
 
 <pre class="disable-line-numbers111"><code class="language-go">0x15e-2 // == 0x15e - 2 (整数相减表达式)

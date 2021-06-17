@@ -20,9 +20,9 @@ Go是一门属于C语言家族的编程语言，所以本文谈及的很多概�
 
 <div>
 <p>
-类型对齐保证也称为值地址对齐保证。
-如果一个类型<code>T</code>的对齐保证为<code>N</code>（一个正整数），则在运行时刻<code>T</code>类型的每个（可寻址的）值的地址都是<code>N</code>的倍数。
-我们也可以说类型<code>T</code>的值的地址保证为<code>N</code>字节对齐的。
+为了充分利用CPU指令来达到最佳程序性能，为一个特定类型的值开辟的内存块的起始地址必须为某个整数N的倍数。
+N被称为此类型的值地址对齐保证，或者简单地称为此类型的对齐保证。
+我们也可以说此类型的值的地址保证为N字节对齐的。
 </p>
 
 <p>
@@ -67,7 +67,7 @@ Go白皮书仅列出了<a href="https://golang.google.cn/ref/spec#Size_and_align
 
 <pre class="fixed-width"><code class="language-go">类型种类                   对齐保证（字节数）
 ------                    ------
-bool, byte, uint8, int8   1
+bool, uint8, int8         1
 uint16, int16             2
 uint32, int32             4
 float32, complex64        4
@@ -103,7 +103,7 @@ Go白皮书只对以下种类的类型的尺寸进行了<a href="https://golang.
 
 <pre class="fixed-width"><code class="language-go">类型种类                  尺寸（字节数）
 ------                   ------
-byte, uint8, int8        1
+uint8, int8              1
 uint16, int16            2
 uint32, int32, float32   4
 uint64, int64            8
@@ -125,7 +125,7 @@ Go白皮书没有对其它种类的类型的尺寸做出明确规定。
 </p>
 
 <p>
-为了满足上一节中规定的地址对齐保证要求，Go编译器可能会在结构体的相邻字段之间填充一些字节。
+为了满足前面提到的各条地址对齐保证要求规则，Go编译器可能会在结构体的相邻字段之间填充一些字节。
 这使得一个结构体类型的尺寸并非等于它的各个字段类型尺寸的简单相加之和。
 </p>
 

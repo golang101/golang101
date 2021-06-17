@@ -494,7 +494,7 @@ func main() {
 
 <p>
 两者都会将当前的goroutine执行暂停一段时间。
-区别在于<code>time.Sleep(d)</code>函数调用将使当前的协程进入睡眠字状态，但是当前协程的<a href="control-flows-more.html#states-of-goroutine">（主）状态</a>依然为运行状态；
+区别在于<code>time.Sleep(d)</code>函数调用将使当前的协程进入睡眠子状态，但是当前协程的<a href="control-flows-more.html#states-of-goroutine">（主）状态</a>依然为运行状态；
 而通道接收<code>&lt;-time.After(d)</code>操作将使当前协程进入阻塞状态。
 </p>
 
