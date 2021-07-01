@@ -871,7 +871,7 @@ func main() {
 顺便说一句，内置<code>make</code>函数也可以用来创建以后将要介绍的<a href="channel.html">通道</a>值。
 </p>
 
-假设<code>M</code>是一个映射类型并且<code>n</code>是一个非负整数，我们可以用下面的两种函数调用来各自生成一个类型为<code>M</code>的映射值。
+假设<code>M</code>是一个映射类型并且<code>n</code>是一个整数，我们可以用下面的两种函数调用来各自生成一个类型为<code>M</code>的映射值。
 
 <pre class="line-numbers"><code class="language-go">make(M, n)
 make(M)
@@ -880,6 +880,10 @@ make(M)
 <p>
 第一个函数调用形式创建了一个可以容纳至少<code>n</code>个条目而无需再次开辟内存的空映射值。
 第二个函数调用形式创建了一个可以容纳一个小数目的条目而无需再次开辟内存的空映射值。此小数目的值取决于具体编译器实现。
+</p>
+
+<p>
+注意：第二个参数<code>n</code>可以为负或者零，这时对应的调用将被视为上述第二种调用形式。
 </p>
 
 假设<code>S</code>是一个切片类型，<code>length</code>和<code>capacity</code>是两个非负整数，并且<code>length</code>小于等于<code>capacity</code>，我们可以用下面的两种函数调用来各自生成一个类型为<code>S</code>的切片值。<code>length</code>和<code>capacity</code>的类型必须均为整数类型（两者可以不一致）。
