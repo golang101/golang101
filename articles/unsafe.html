@@ -839,7 +839,6 @@ import (
 	"fmt"
 	"unsafe"
 	"reflect"
-	"runtime"
 )
 
 func main() {
@@ -894,7 +893,6 @@ s := *(*string)(unsafe.Pointer(&hdr)) // 危险！
 import (
 	"fmt"
 	"reflect"
-	"runtime"
 	"strings"
 	"unsafe"
 )
@@ -931,15 +929,69 @@ func main() {
 </p>
 
 <p>
-我们可以使用类似的实现来将一个字节切片转换为字符串。
-不过在模式一中展示的方法更为推荐。
-</p>
-
-<p>
-注意：当使用上面展示的使用非类型安全指针将一个字符串转换为字节切片时，请确保结果此字符串在后续使用过程中务必不要修改结果字节切片中的字节值。
+注意：当使用上面展示的使用非类型安全指针将一个字符串转换为字节切片时，请确保结果此源字符串的生命期内务必不要修改结果字节切片中的字节值（上面的例子违背了此原则）。
 事实上，更为推荐的是最好永远不要修改结果字节切片中的字节值。此非类型安全方式的目的主要是为了在局部感知范围内避免一次内存开辟，而不是一种通用的方式。
 </p>
 
+我们可以使用类似的实现（如下所示）来将一个字节切片转换为字符串。
+此实现被模式一中展示的方法略为安全一些（但是也更慢一些）。
+
+<pre class="line-numbers"><code class="language-go">func ByteSlice2String(bs []byte) (str string) {
+	sliceHdr := (*reflect.SliceHeader)(unsafe.Pointer(&bs))
+	strHdr := (*reflect.StringHeader)(unsafe.Pointer(&str))
+	strHdr.Data = sliceHdr.Data
+	strHdr.Len = sliceHdr.Len
+	return
+}
+</code></pre>
+
+<p>
+同样地，请确保结果此结果字符串的生命期内务必不要修改实参字节切片中的字节值。
+</p>
+
+最后，顺便举一个违背了模式三的使用原则的例子：
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import (
+	"fmt"
+	"reflect"
+	"unsafe"
+)
+
+func Example_Bad() *byte {
+	var str = "godoc"
+	hdr := (*reflect.StringHeader)(unsafe.Pointer(&str))
+	pbyte := (*byte)(unsafe.Pointer(hdr.Data + 2))
+	return pbyte // *pbyte == 'd'
+}
+
+func main() {
+	fmt.Println(string(*Example_Bad()))
+}
+</code></pre>
+
+下面是两个正确的实现：
+
+<pre class="line-numbers"><code class="language-go">func Example_Good1() *byte {
+	var str = "godoc"
+	hdr := (*reflect.StringHeader)(unsafe.Pointer(&str))
+	pbyte := (*byte)(unsafe.Pointer(uintptr(unsafe.Pointer(hdr.Data)) + 2))
+	return pbyte
+}
+
+// 从Go 1.17开始也可以使用此实现。
+func Example_Good2() *byte {
+	var str = "godoc"
+	hdr := (*reflect.StringHeader)(unsafe.Pointer(&str))
+	pbyte := (*byte)(unsafe.Add(unsafe.Pointer(hdr.Data), 2))
+	return pbyte
+}
+</code></pre>
+
+<p>
+上面这几个例子借鉴自Bryan C. Mills在slack中发表的一个留言。
+</p>
 
 </div>
 
@@ -965,8 +1017,8 @@ func main() {
 </p>
 
 <p>
-最后值得提一下的是，Go官方工具链1.14中加入了一个<code>-gcflags=all=-d=checkptr</code>编译器动态分析选项。
-当此选项被使用的时候，编译出的程序在运行时会监测到很多（但并非所有）非类型安全指针的错误使用。一旦错误的使用被监测到，恐慌将产生（当前，暂不推荐在Windows平台上使用此选项）。
+最后值得提一下的是，Go官方工具链1.14中加入了一个<code>-gcflags=all=-d=checkptr</code>编译器动态分析选项（在Windows平台上推荐使用工具链1.15+）。
+当此选项被使用的时候，编译出的程序在运行时会监测到很多（但并非所有）非类型安全指针的错误使用。一旦错误的使用被监测到，恐慌将产生。
 感谢<a href="https://github.com/golang/go/issues/22218">Matthew Dempsky实现了此特性</a>。
 </p>
 

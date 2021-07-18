@@ -414,7 +414,7 @@ func main() {
 import "fmt"
 import "reflect"
 
-func InvertSlice(args []reflect.Value) (result []reflect.Value) {
+func InvertSlice(args []reflect.Value) []reflect.Value {
 	inSlice, n := args[0], args[0].Len()
 	outSlice := reflect.MakeSlice(inSlice.Type(), 0, n)
 	for i := n-1; i >= 0; i-- {
@@ -424,7 +424,8 @@ func InvertSlice(args []reflect.Value) (result []reflect.Value) {
 	return []reflect.Value{outSlice}
 }
 
-func Bind(p interface{}, f func ([]reflect.Value) []reflect.Value) {
+func Bind(p interface{}, 
+		f func ([]reflect.Value) []reflect.Value) {
 	// invert代表着一个函数值。
 	invert := reflect.ValueOf(p).Elem()
 	invert.Set(reflect.MakeFunc(invert.Type(), f))

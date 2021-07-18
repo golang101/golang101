@@ -17,7 +17,7 @@ BCE可以避免很多不必要的边界检查，CSE可以避免很多重复表�
 </p>
 
 <p>
-对于Go官方工具链1.7+，我们可以运行<code>go build <b>-gcflags="-d=ssa/check_bce/debug=1"</b></code>来列出哪些代码行仍然需要边界检查。
+对于Go官方工具链1.7+，我们可以使用编译器选项<code>-gcflags="-d=ssa/check_bce/debug=1"</code>来列出哪些代码行仍然需要边界检查。
 </p>
 
 <h3>例子1</h3>
@@ -50,7 +50,7 @@ func f4(a [5]int) {
 func main() {}
 </code></pre>
 
-<pre class="output"><code>$ go build -gcflags="-d=ssa/check_bce/debug=1" example1.go
+<pre class="output"><code>$ go run -gcflags="-d=ssa/check_bce/debug=1" example1.go
 ./example1.go:5: Found IsInBounds
 ./example1.go:6: Found IsInBounds
 ./example1.go:7: Found IsInBounds
@@ -120,7 +120,7 @@ func f9(s []int) {
 func main() {}
 </code></pre>
 
-<pre class="output"><code>$ go build -gcflags="-d=ssa/check_bce/debug=1" example2.go
+<pre class="output"><code>$ go run -gcflags="-d=ssa/check_bce/debug=1" example2.go
 </code></pre>
 
 <p>
@@ -164,7 +164,7 @@ func fc() {
 func main() {}
 </code></pre>
 
-<pre class="output"><code>$ go build -gcflags="-d=ssa/check_bce/debug=1" example3.go
+<pre class="output"><code>$ go run -gcflags="-d=ssa/check_bce/debug=1" example3.go
 ./example3.go:9: Found IsSliceInBounds
 ./example3.go:14: Found IsSliceInBounds
 ./example3.go:15: Found IsSliceInBounds
@@ -240,7 +240,7 @@ func fc2() {
 func main() {}
 </code></pre>
 
-<pre class="output"><code>$ go build -gcflags="-d=ssa/check_bce/debug=1" example4.go
+<pre class="output"><code>$ go run -gcflags="-d=ssa/check_bce/debug=1" example4.go
 ./example4.go:7:7: Found IsSliceInBounds
 ./example4.go:15:7: Found IsSliceInBounds
 </code></pre>
@@ -328,7 +328,7 @@ func ff2(s []int) []int {
 }
 -->
 
-<pre class="output"><code>$ go build -gcflags="-d=ssa/check_bce/debug=1" example5.go
+<pre class="output"><code>$ go run -gcflags="-d=ssa/check_bce/debug=1" example5.go
 ./example5.go:7: Found IsInBounds
 ./example5.go:24: Found IsInBounds
 </code></pre>

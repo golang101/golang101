@@ -255,7 +255,7 @@ func (t *T) IncreaseB() {
 
 <div>
 一个较大的延迟调用堆栈可能会消耗很多内存，而且延迟调用堆栈中尚未执行的延迟调用可能会导致某些资源未被及时释放。
-比如，如果下面的例子中的函数需要处理大量的文件，则在此函数推出之前，将有大量的文件句柄得不到释放。
+比如，如果下面的例子中的函数需要处理大量的文件，则在此函数退出之前，将有大量的文件句柄得不到释放。
 
 <pre class="line-numbers"><code class="language-go">func writeManyFiles(files []File) error {
 	for _, file := range files {
