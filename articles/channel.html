@@ -138,7 +138,7 @@ Go中有五种通道相关的操作。假设一个通道（值）为<code>ch</co
 </li>
 <li>
 	使用下面的语法向通道<code>ch</code>发送一个值<code>v</code>：
-<pre class="disable-line-numbers111"><code class="language-go">ch &lt;- v
+<pre class="disable-line-numbers111"><code class="language-go">ch <- v
 </code></pre>
 	<p>
 	<code>v</code>必须能够赋值给通道<code>ch</code>的元素类型。
@@ -148,7 +148,7 @@ Go中有五种通道相关的操作。假设一个通道（值）为<code>ch</co
 </li>
 <li>
 	使用下面的语法从通道<code>ch</code>接收一个值：
-<pre class="disable-line-numbers111"><code class="language-go">&lt;-ch
+<pre class="disable-line-numbers111"><code class="language-go"><-ch
 </code></pre>
 	如果一个通道操作不永久阻塞，它总会返回至少一个值，此值的类型为通道<code>ch</code>的元素类型。
 	<code>ch</code>不能为单向发送通道。
@@ -166,8 +166,8 @@ Go中有五种通道相关的操作。假设一个通道（值）为<code>ch</co
 	</p>
 
 	数据接收操作在赋值中被用做源值的例子：
-<pre class="disable-line-numbers111"><code class="language-go">v = &lt;-ch
-v, sentBeforeClosed = &lt;-ch
+<pre class="disable-line-numbers111"><code class="language-go">v = <-ch
+v, sentBeforeClosed = <-ch
 </code></pre>
 </li>
 <li>

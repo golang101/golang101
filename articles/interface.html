@@ -280,7 +280,7 @@ func main() {
 
 	// 将接口值i中包裹的值清除掉。
 	i = nil
-	fmt.Println(i) // &lt;nil&gt;
+	fmt.Println(i) // <nil>
 }
 </code></pre>
 
@@ -590,7 +590,7 @@ func main() {
 
 	// y的动态类型为string。string类型并没有实现Writer。
 	w, ok = y.(Writer)
-	fmt.Println(w, ok) // &lt;nil&gt; false
+	fmt.Println(w, ok) // <nil> false
 	w = y.(Writer)     // 将产生一个恐慌
 }
 </code></pre>

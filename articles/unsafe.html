@@ -529,7 +529,7 @@ func main() {
 </code></pre>
 
 <p>
-当然，从Go 1.17开始，我们也可以使用<code>unsafe.Slice((*string)(&ms[0]), len(ms))</code>来实现此类型转换。
+当然，从Go 1.17开始，我们也可以使用<code>unsafe.Slice((*string)(&amp;ms[0]), len(ms))</code>来实现此类型转换。
 </p>
 
 此模式在实践中的另一个应用是将一个不再使用的字节切片转换为一个字符串（从而避免对底层字节序列的一次开辟和复制）。如下例所示：

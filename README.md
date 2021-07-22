@@ -13,7 +13,7 @@
 
 ![](articles/res/101-group-qrcode-2.jpg?raw=true)
 
-_(若上面二维码未显示出来，请点击此[墙内版链接](https://tool.oschina.net/action/qrcode/generate?data=http%3A%2F%2Fweixin.qq.com%2Fr%2FRy6ju1TE0AmvrRDY93tV&output=image%2Fgif&error=L&type=0&margin=12&size=4)。)_
+_(若上面二维码未显示出来，请点击此[墙内版链接](https://tool.oschina.net/action/qrcode/generate?data=http%3A%2F%2Fweixin.qq.com%2Fr%2FRy6ju1TE0AmvrRDY93tV&output=image%2Fgif&error=L&type=0&margin=12&size=4)或者在微信中搜索"Go 101"公众号。)_
 
 ### 致谢
 
