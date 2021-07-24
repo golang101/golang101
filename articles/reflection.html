@@ -629,10 +629,37 @@ func main() {
 </code></pre>
 
 <p>
+<code>Value.IsZero</code>方法是Go 1.13中引进的，此方法用来查看一个值是否为零值。
 </p>
 
 <p>
-从Go 1.13开始，我们可以使用<code>Value.IsZero</code>方法来查看一个值是否为零值。
+从Go 1.17开始，<a href="container.html#slice-to-array-pointer">一个切片可以被转化为一个相同元素类型的数组的指针类型</a>。
+但是如果在这样的一个转换中数组类型的长度过长，将导致恐慌产生。
+因此Go 1.17同时引入了一个<code>Value.CanConvert(T Type)</code>方法，用来检查一个转换是否会成功（即不会产生恐慌）。
+</a>
+
+一个使用了<code>CanConvert</code>方法的例子：
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import (
+	"fmt"
+	"reflect"
+)
+
+func main() {
+	s := reflect.ValueOf([]int{1, 2, 3, 4, 5})
+	ts := s.Type()
+	t1 := reflect.TypeOf(&[5]int{})
+	t2 := reflect.TypeOf(&[6]int{})
+	fmt.Println(ts.ConvertibleTo(t1)) // true
+	fmt.Println(ts.ConvertibleTo(t2)) // true
+	fmt.Println(s.CanConvert(t1))     // true
+	fmt.Println(s.CanConvert(t2))     // false
+}
+</code></pre>
+
+<p>
 </p>
 
 <a class="anchor" id="deep-equal"></a>

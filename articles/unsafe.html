@@ -203,7 +203,10 @@ func main() {
 	s := unsafe.Slice(p9, 5)[:3]
 	fmt.Println(s) // [9 0 11]
 	fmt.Println(len(s), cap(s)) // 3 5
-	
+
+	t := unsafe.Slice((*int)(nil), 0)
+	fmt.Println(t == nil) // true
+
 	// 下面是两个不正确的调用。因为它们
 	// 的返回结果引用了未知的内存块。
 	_ = unsafe.Add(up9, 7 * eleSize)
