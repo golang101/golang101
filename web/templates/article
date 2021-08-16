@@ -161,13 +161,13 @@
 		本Go101.org网站将推出一些其它Go学习和使用栏目（比如Go实战，Go测验，Go工具等），敬请收藏关注期待。
 		</p>
 		<p>
-		本书微信公众号名称为<b>"Go 101"</b>。此公众号将时不时地发表一些Go语言相关的原创短文。各位如果感兴趣，可以搜索关注一下。
+		本书微信公众号名称为<b>"Go 101"</b>。此公众号将时不时地发表一些Go语言相关的原创短文。各位如果感兴趣，可以搜索关注一下（联系方式一）。
 		</p>
 		<p>
-		本书的twitter帐号为<a href="https://twitter.com/Golang_101">@Golang_101</a>。玩推的Go友可以适当关注。
+		《Go语言101》项目目前托管在<a href="https://github.com/golang101/golang101">Github</a>上（联系方式二）。欢迎各位在此项目中通过提交bug和PR的方式来改进完善Go语言101中的各篇文章。
 		</p>
 		<p>
-		《Go语言101》项目目前托管在<a href="https://github.com/golang101/golang101">Github</a>上。欢迎各位在此项目中通过提交bug和PR的方式来改进完善Go语言101中的各篇文章。
+		本书的twitter帐号为<a href="https://twitter.com/Golang_101">@Golang_101</a>（联系方式三）。玩推的Go友可以适当关注。
 		</p>
 		<p>
 		你或许对本书作者老貘开发的<a href="https://gfw.tapirgames.com">一些App</a>感兴趣。
