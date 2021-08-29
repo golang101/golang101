@@ -636,7 +636,7 @@ func main() {
 从Go 1.17开始，<a href="container.html#slice-to-array-pointer">一个切片可以被转化为一个相同元素类型的数组的指针类型</a>。
 但是如果在这样的一个转换中数组类型的长度过长，将导致恐慌产生。
 因此Go 1.17同时引入了一个<code>Value.CanConvert(T Type)</code>方法，用来检查一个转换是否会成功（即不会产生恐慌）。
-</a>
+</p>
 
 一个使用了<code>CanConvert</code>方法的例子：
 

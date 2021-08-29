@@ -90,12 +90,15 @@ func (ss StringSet) Remove(key string) {
 }
 
 // 为自定义的结构体类型Book和它的指针类型*Book声明方法。
+
 type Book struct {
 	pages int
 }
+
 func (b Book) Pages() int {
 	return b.pages
 }
+
 func (b *Book) SetPages(pages int) {
 	b.pages = pages
 }
@@ -153,9 +156,11 @@ import "fmt"
 type Book struct {
 	pages int
 }
+
 func (b Book) Pages() int {
 	return b.pages
 }
+
 func (b *Book) SetPages(pages int) {
 	b.pages = pages
 }
@@ -190,11 +195,11 @@ func (b *Book) SetPages(pages int) {
 <h3>为指针类型属主隐式声明的方法</h3>
 
 <div>
-对每一个为值类型属主<code>T</code>声明的方法，编译器将自动隐式地为其对应的指针类型属主<code>*T</code>声明一个相应的同名方法。
-以上面的为类型<code>Book</code>声明的<code>Pages</code>方法为例，编译器将自动为类型<code>*Book</code>声明一个同名方法：
+对每一个为值类型属主<code>T</code>声明的方法，一个相应的同名方法将自动隐式地为其对应的指针类型属主<code>*T</code>而声明。
+以上面的为类型<code>Book</code>声明的<code>Pages</code>方法为例，一个同名方法将自动为类型<code>*Book</code>而声明：
 
 <pre class="line-numbers"><code class="language-go">func (b *Book) Pages() int {
-	return Book.Pages(*b) // 调用上节中隐式声明的函数
+	return (*b).Pages() // 调用上节中显式声明的方法
 }
 </code></pre>
 
@@ -521,6 +526,53 @@ func main() {
 	fmt.Println(books) // [{500} {456} {789}]
 }
 </code></pre>
+</div>
+
+<a class="anchor" id="implicit-method-evaluation"></a>
+<h3>一个隐式方法的值将总是被估值为对应显式方法的值</h3>
+
+<div>
+
+一个隐式方法的值将总是被估值为此隐式方法定义体内被调用的方法的值。
+使用上面使用的显式和隐式方法<code>Pages</code>为例，在下面的程序代码中，方法值<code>p.Pages</code>将被估值为<code>(*p).Pages</code>。
+所以此程序中的<code>g()</code>调用将输出<code>123</code>。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import "fmt"
+
+type Book struct {
+	pages int
+}
+
+func (b Book) Pages() int {
+	return b.pages
+}
+
+// This method is implicitly declared.
+/*
+func (b *Book) Pages() int {
+	return (*b).Pages()
+}
+*/
+
+func (b *Book) Pages2() int {
+	return (*b).Pages()
+}
+
+func main() {
+	var b = Book{pages: 123}
+	var f = b.Pages
+	var p = &b
+	var g = p.Pages
+	var h = p.Pages2
+	b.pages = 789
+	fmt.Println(f()) // 123
+	fmt.Println(g()) // 123
+	fmt.Println(h()) // 789
+}
+</code></pre>
+
 </div>
 
 <h3>如何决定一个方法声明使用值类型属主还是指针类型属主？</h3>

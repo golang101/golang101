@@ -731,6 +731,51 @@ type Z X
 
 </div>
 
+<a class="anchor" id="implicit-method-evaluation"></a>
+<h3>一个隐式提升方法的值将总是被估值为对应显式方法的值</h3>
+
+<div>
+
+一个隐式提升方法的值将总是被估值为此隐式方法定义体内被调用的方法的值。
+举个例子，在下面的程序代码中，<code>s.Age</code>被估值为<code>(*s.Person).age</code>，因此函数调用<code>f()</code>总是打印出<code>26</code>。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import "fmt"
+
+type Person struct {
+	age  int
+}
+
+func (p Person) Age() int{
+	return p.age
+}
+
+type Singer struct {
+	*Person
+}
+
+// This method is implicitly declared.
+/*
+func (s *Singer) Age() int{
+	return (*s.Person).age
+}
+*/
+
+func main() {
+	var p = Person{age: 26}
+	var s = Singer{Person: &p}
+	var f = s.Age
+	p.age = 35
+	fmt.Println(f()) // 26
+	s.Person = nil
+	fmt.Println(f()) // 26
+	_ = s.Age        // panic
+}
+</code></pre>
+
+</div>
+
 <h3>接口类型内嵌接口类型</h3>
 
 <p>
