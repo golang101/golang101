@@ -181,6 +181,7 @@ func main() {
 <pre class="line-numbers"><code class="language-go">func (b Book) Pages() int {
 	return Book.Pages(b)
 }
+
 func (b *Book) SetPages(pages int) {
 	(*Book).SetPages(b, pages)
 }
@@ -198,9 +199,10 @@ func (b *Book) SetPages(pages int) {
 对每一个为值类型属主<code>T</code>声明的方法，一个相应的同名方法将自动隐式地为其对应的指针类型属主<code>*T</code>而声明。
 以上面的为类型<code>Book</code>声明的<code>Pages</code>方法为例，一个同名方法将自动为类型<code>*Book</code>而声明：
 
-<pre class="line-numbers"><code class="language-go">func (b *Book) Pages() int {
-	return (*b).Pages() // 调用上节中显式声明的方法
-}
+<pre class="line-numbers"><code class="language-go">// 注意：这不是合法的Go语法。这里这样表示只是
+// 为了解释目的。它表明表达式(&aBook).Pages
+// 将被估值为aBook.Pages（见随后几节）。
+func (b *Book) Pages = (*b).Pages
 </code></pre>
 
 <p>
@@ -528,14 +530,72 @@ func main() {
 </code></pre>
 </div>
 
-<a class="anchor" id="implicit-method-evaluation"></a>
-<h3>一个隐式方法的值将总是被估值为对应显式方法的值</h3>
+
+
+<a class="anchor" id="method-value-normnalization"></a>
+<h3>方法值的正规化</h3>
 
 <div>
 
-一个隐式方法的值将总是被估值为此隐式方法定义体内被调用的方法的值。
-使用上面使用的显式和隐式方法<code>Pages</code>为例，在下面的程序代码中，方法值<code>p.Pages</code>将被估值为<code>(*p).Pages</code>。
-所以此程序中的<code>g()</code>调用将输出<code>123</code>。
+假设值<code>v</code>的类型为<code>T</code>，并且<code>v.m</code>是一个合法的方法值表达式，
+<ul>
+<li>
+	如果<code>m</code>是一个为类型<code>*T</code>显式声明的方法，那么编译器将把它正规化<code>(&amp;v).m</code>；
+</li>
+<li>
+	如果<code>m</code>是一个为类型<code>T</code>显式声明的方法，那么<code>v.m</code>已经是一个正规化的方法值表达式。
+</li>
+</ul>
+
+假设值<code>p</code>的类型为<code>*T</code>，并且<code>p.m</code>是一个合法的方法值表达式，
+<ul>
+<li>
+	如果<code>m</code>是一个为类型<code>T</code>显式声明的方法，那么编译器将把它正规化<code>(*p).m</code>；
+</li>
+<li>
+	如果<code>m</code>是一个为类型<code>*T</code>显式声明的方法，那么<code>p.m</code>已经是一个正规化的方法值表达式。
+</li>
+</ul>
+
+<p>
+提升方法值的正规化将在随后的<a href="type-embedding.html#method-value-evaluation">类型内嵌</a>一文中解释。
+</p>
+
+</div>
+
+<a class="anchor" id="method-value-evaluation"></a>
+<h3>方法值的估值</h3>
+
+<div>
+
+<p>
+假设<code>v.m</code>是一个已经正规化的方法值表达式，在运行时刻，当<code>v.m</code>被估值的时候，属主实参<code>v</code>的估值结果的一个副本将被存储下来以供后面调用此方法值的时候使用。
+</p>
+
+以下面的代码为例：
+<ul>
+<li>
+	<code>b.Pages</code>是一个已经正规化的方法值表达式。
+	在运行时刻对其进行估值时，属主实参<code>b</code>的一个副本将被存储下来。
+	此副本等于<code>b</code>的当前值：<code>Book{pages: 123}</code>，此后对<code>b</code>值的修改不影响此副本值。
+	这就是为什么调用<code>f1()</code>打印出<code>123</code>。
+</li>
+<li>
+	在编译时刻，方法值表达式<code>p.Pages</code>将被正规化为<code>(*p).Pages</code>。
+	在运行时刻，属主实参<code>*p</code>被估值为当前的<code>b</code>值，也就是<code>Book{pages: 123}</code>。
+	这就是为什么调用<code>f2()</code>也打印出<code>123</code>。
+</li>
+<li>
+	<code>p.Pages2</code>是一个已经正规化的方法值表达式。
+	在运行时刻对其进行估值时，属主实参<code>p</code>的一个副本将被存储下来，此副本的值为<code>b</code>值的地址。
+	当<code>b</code>被修改后，此修改可以通过对此地址值解引用而反映出来，这就是为什么调用<code>g1()</code>打印出<code>789</code>。
+</li>
+<li>
+	在编译时刻，方法值表达式<code>b.Pages2</code>将被正规化为<code>(&b).Pages2</code>。
+	在运行时刻，属主实参<code>&b</code>的估值结果的一个副本将被存储下来，此副本的值为<code>b</code>值的地址。
+	这就是为什么调用<code>g2()</code>也打印出<code>789</code>。
+</li>
+</ul>
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -549,27 +609,22 @@ func (b Book) Pages() int {
 	return b.pages
 }
 
-// This method is implicitly declared.
-/*
-func (b *Book) Pages() int {
-	return (*b).Pages()
-}
-*/
-
 func (b *Book) Pages2() int {
 	return (*b).Pages()
 }
 
 func main() {
 	var b = Book{pages: 123}
-	var f = b.Pages
 	var p = &b
-	var g = p.Pages
-	var h = p.Pages2
+	var f1 = b.Pages
+	var f2 = p.Pages
+	var g1 = p.Pages2
+	var g2 = b.Pages2
 	b.pages = 789
-	fmt.Println(f()) // 123
-	fmt.Println(g()) // 123
-	fmt.Println(h()) // 789
+	fmt.Println(f1()) // 123
+	fmt.Println(f2()) // 123
+	fmt.Println(g1()) // 789
+	fmt.Println(g2()) // 789
 }
 </code></pre>
 

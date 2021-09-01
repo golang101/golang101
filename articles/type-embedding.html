@@ -308,58 +308,37 @@ main.Singer has 1 methods:
 type A struct {
 	x int
 }
+
 func (a A) MethodA() {}
 
 type B struct {
-	A
+	*A
 }
+
 type C struct {
 	B
 }
 
 func main() {
-	var c C
+	var c = &C{B: B{A: &A{FieldX: 5}}}
 
-	// 下面的赋值语句中的选择器都是相互等价的。
-	_ = c.B.A.x
-	_ = c.B.x
-	_ = c.A.x
-	_ = c.x // x被称为类型C的一个提升字段
+	// 这几行是等价的。
+	_ = c.B.A.FieldX
+	_ = c.B.FieldX
+	_ = c.A.FieldX // A是类型C的一个提升字段
+	_ = c.FieldX   // FieldX也是一个提升字段
 
-	// 这下面的几个方法调用都是互相等价的。
+	// 这几行是等价的。
 	c.B.A.MethodA()
 	c.B.MethodA()
 	c.A.MethodA()
-	c.MethodA()
+	c.MethodA() // MethodA是类型C的一个提升方法
 }
 </code></pre>
 
 <p>
 这就是为什么在上一节的例子中选择器表达式<code>gaga.Name</code>是合法的，
 因为它只不过是<code>gaga.Person.Name</code>的一个缩写形式。
-<code>Name</code>被称为类型<code>Singer</code>的提升字段（promoted field）。
-</p>
-
-因为任何内嵌其它类型的类型必然是结构体类型，并且<a href="struct.html#use-pointer-as-struct">结构体</a>一文中已经知道了我们可以通过一个可寻址的结构体值的指针选择此结构体的字段，所以下面的代码也是合法的：
-<pre class="line-numbers"><code class="language-go">func main() {
-	var c C
-	pc = &c
-
-	// 这几行等价。
-	fmt.Println(pc.B.A.x)
-	fmt.Println(pc.B.x)
-	fmt.Println(pc.A.x)
-	fmt.Println(pc.x)
-
-	// 这几行等价。
-	pc.B.A.MethodA()
-	pc.B.MethodA()
-	pc.A.MethodA()
-	pc.MethodA()
-}
-</code></pre>
-
-<p>
 </p>
 
 <p>
@@ -370,12 +349,17 @@ func main() {
 </p>
 
 <p>
+<code>Name</code>被称为类型<code>Singer</code>的一个提升字段（promoted field）。
+<code>PrintName</code>被称为类型<code>Singer</code>的一个提升方法（promoted method）。
+</p>
+
+<p>
 注意：我们也可以使用选择器<code>gaga.SetAge</code>，但是只有在<code>gaga</code>是一个可寻址的类型为<code>Singer</code>的值的情况下。
 它只不过是<code>(&amp;gaga).SetAge</code>的一个<a href="method.html#call">语法糖</a>。
 </p>
 
 <p>
-在上面的例子中，<code>c.B.A.x</code>称为选择器表达式<code>c.x</code>、<code>c.B.x</code>和<code>c.A.x</code>的完整形式。
+在上面的例子中，<code>c.B.A.FieldX</code>称为选择器表达式<code>c.FieldX</code>、<code>c.B.FieldX</code>和<code>c.A.FieldX</code>的完整形式。
 类似的，<code>c.B.A.MethodA</code>可以称为<code>c.MethodA</code>、<code>c.B.MethodA</code>和<code>c.A.MethodA</code>的完整形式。
 </p>
 
@@ -584,27 +568,17 @@ func main() {
 </li>
 </ul>
 
-下面展示了编译器为类型<code>Singer</code>和<code>*Singer</code>隐式声明的三个方法：
+下面展示了编译器为类型<code>Singer</code>和<code>*Singer</code>隐式声明的三个（提升）方法：
 
-<pre class="line-numbers"><code class="language-go">func (s Singer) PrintName() {
-	s.Person.PrintName()
-	// 编译器在这里会做一个优化。对于一个
-	// 传递给形参s的实参来说，只有它的
-	// Person部分将在传参过程中被复制。
-}
-
-func (s *Singer) PrintName() {
-	(*s).Person.PrintName()
-}
-
-func (s *Singer) SetAge(age int) {
-	(&s.Person).SetAge(age)
-	// <=> (&((*s).Person)).SetAge(age)
-}
+<pre class="line-numbers"><code class="language-go">// 注意：这些声明不是合法的Go语法。这里这样表示只是为了
+// 解释目的。它们有助于解释提升方法值是如何被估值的。
+func (s Singer) PrintName = s.Person.PrintName
+func (s *Singer) PrintName = s.Person.PrintName
+func (s *Singer) SetAge = s.Person.SetAge
 </code></pre>
 
 <p>
-隐式方法亦称提升方法（promoted method）。
+右边的部分为各个提升方法相应的完整形式选择器形式。
 </p>
 
 <p>
@@ -612,6 +586,7 @@ func (s *Singer) SetAge(age int) {
 但是，通过类型内嵌，这样的类型也可以拥有方法。
 </p>
 
+<!--
 下面是另一个证明了类型内嵌导致了一些方法被隐式声明的例子：
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -678,6 +653,7 @@ func main() {
 
 <p>
 </p>
+-->
 
 <p>
 如果一个结构体类型内嵌了一个实现了一个接口类型的类型（此内嵌类型可以是此接口类型自己），则一般说来，此结构体类型也实现了此接口类型，除非发生了选择器碰撞和遮挡。
@@ -732,47 +708,71 @@ type Z X
 </div>
 
 <a class="anchor" id="implicit-method-evaluation"></a>
-<h3>一个隐式提升方法的值将总是被估值为对应显式方法的值</h3>
+<h3>提升方法值的正规化和估值</h3>
 
 <div>
 
-一个隐式提升方法的值将总是被估值为此隐式方法定义体内被调用的方法的值。
-举个例子，在下面的程序代码中，<code>s.Age</code>被估值为<code>(*s.Person).age</code>，因此函数调用<code>f()</code>总是打印出<code>26</code>。
+<p>
+假设<code>v.m</code>是一个合法的提升方法表达式，在编译时刻，编译器将把此提升方法表达式正规化。
+正规化过程分为两步：首先找出此提升方法表达式的完整形式；然后将此完整形式中的隐式取地址和解引用操作均转换为显式操作。
+</p>
+
+<p>
+和其它<a href="method.html#method-value-evaluation">方法值估值</a>的规则一样，对于一个已经正规化的方法值表达式<code>v.m</code>，在运行时刻，当<code>v.m</code>被估值的时候，属主实参<code>v</code>的估值结果的一个副本将被存储下来以供后面调用此方法值的时候使用。
+</p>
+
+以下面的代码为例：
+<ul>
+<li>
+	提升方法表达式<code>s.M1</code>的完整形式为<code>s.T.X.M1</code>。
+	将此完整形式中的隐式取地址和解引用操作转换为显式操作之后的结果为<code>(*s.T).X.M1</code>。
+	在运行时刻，属主实参<code>(*s.T).X</code>被估值并且估值结果的一个副本被存储下来以供后用。
+	此估值结果为<code>1</code>，这就是为什么调用<code>f()</code>总是打印出<code>1</code>。
+</li>
+<li>
+	提升方法表达式<code>s.M2</code>的完整形式为<code>s.T.X.M2</code>。
+	将此完整形式中的隐式取地址和解引用操作转换为显式操作之后的结果为<code>(&(*s.T).X).M2</code>。
+	在运行时刻，属主实参<code>&(*s.T).X</code>被估值并且估值结果的一个副本被存储下来以供后用。
+	此估值结果为提升字段<code>s.X</code>（也就是<code>(*s.T).X</code>）的地址。
+	任何对<code>s.X</code>的修改都可以通过解引用此地址而反映出来，但是对<code>s.T</code>的修改是不会通过此地址反映出来的。
+	这就是为什么两个<code>g()</code>调用都打印出了<code>2</code>。
+</li>
+</ul>
 
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
-type Person struct {
-	age  int
+type X int
+
+func (x X) M1() {
+	fmt.Println(x)
 }
 
-func (p Person) Age() int{
-	return p.age
+func (x *X) M2() {
+	fmt.Println(*x)
 }
 
-type Singer struct {
-	*Person
-}
+type T struct { X }
 
-// This method is implicitly declared.
-/*
-func (s *Singer) Age() int {
-	return (*s.Person).Age()
-}
-*/
+type S struct { *T }
 
 func main() {
-	var p = Person{age: 26}
-	var s = Singer{Person: &p}
-	var f = s.Age
-	p.age = 35
-	fmt.Println(f()) // 26
-	s.Person = nil
-	fmt.Println(f()) // 26
-	_ = s.Age        // panic
+	var t = &T{X: 1}
+	var s = S{T: t}
+	var f = s.M1 // <=> (*s.T).X.M1
+	var g = s.M2 // <=> (&(*s.T).X).M2
+	s.X = 2
+	f() // 1
+	g() // 2
+	s.T = &T{X: 3}
+	f() // 1
+	g() // 2
 }
 </code></pre>
+
+<p>
+</p>
 
 </div>
 
