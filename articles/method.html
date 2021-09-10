@@ -595,8 +595,8 @@ func main() {
 	当<code>b</code>被修改后，此修改可以通过对此地址值解引用而反映出来，这就是为什么调用<code>g1()</code>打印出<code>789</code>。
 </li>
 <li>
-	在编译时刻，方法值表达式<code>b.Pages2</code>将被正规化为<code>(&b).Pages2</code>。
-	在运行时刻，属主实参<code>&b</code>的估值结果的一个副本将被存储下来，此副本的值为<code>b</code>值的地址。
+	在编译时刻，方法值表达式<code>b.Pages2</code>将被正规化为<code>(&amp;b).Pages2</code>。
+	在运行时刻，属主实参<code>&amp;b</code>的估值结果的一个副本将被存储下来，此副本的值为<code>b</code>值的地址。
 	这就是为什么调用<code>g2()</code>也打印出<code>789</code>。
 </li>
 </ul>
