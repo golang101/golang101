@@ -1505,6 +1505,7 @@ func main() {
 		// 此修改将不会体现在这个遍历过程中，
 		// 因为被遍历的数组是persons的一个副本。
 		persons[1].name = "Jack"
+
 		// 此修改不会反映到persons数组中，因为p
 		// 是persons数组的副本中的一个元素的副本。
 		p.age = 31
@@ -1882,8 +1883,33 @@ if s != nil {
 </code></pre>
 
 <p>
-在Go官方工具链1.15版本之前，对于一些常见的使用场景，使用<code>append</code>来克隆切片比使用<code>make</code>加<code>copy</code>要<a href="https://github.com/go101/go101/wiki/How-to-efficiently-clone-a-slice%3F">高效得多</a>。但是从1.15版本开始，官方标准编译器对<code>make+copy</code>这种方法做了特殊的优化，从而使得此方法总是比使用<code>append</code>来克隆切片高效。
 </p>
+
+在Go官方工具链1.15版本之前，对于一些常见的使用场景，使用<code>append</code>来克隆切片比使用<code>make</code>加<code>copy</code>要<a href="https://github.com/go101/go101/wiki/How-to-efficiently-clone-a-slice%3F">高效得多</a>。但是从1.15版本开始，官方标准编译器对<code>make+copy</code>这种方法做了特殊的优化，从而使得此方法总是比使用<code>append</code>来克隆切片高效。
+但是请注意：此优化只在被克隆的切片呈现为一个标识符（包括限定标识符）并且<code>make</code>调用只有两个实参的时候才有效。
+比如，在下面的代码中，它只在第一种情况中才有效：
+
+<pre class="disable-line-numbers111"><code class="language-go">	// 情况一：
+	var s = make{[]byte, 10000)
+	y = make([]T, len(s)) // works
+	copy(y, s)
+
+	// 情况二：
+	var s = make{[]byte, 10000)
+	y = make([]T, len(s), len(s)) // not work
+	copy(y, s)
+
+	// 情况三：
+	var a = [1][]byte{s}
+	y = make([]T, len(a[0])) // not work
+	copy(y, a[0])
+
+	// 情况四：
+	type T struct {x []byte}
+	var t = T{x: s}
+	y = make([]T, len(t.x)) // not work
+	copy(y, t.x)
+</code></pre>
 
 </div>
 
