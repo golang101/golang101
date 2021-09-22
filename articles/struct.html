@@ -275,15 +275,13 @@ func main() {
 </div>
 
 <a class="anchor" id="use-pointer-as-struct"></a>
-<h3>在选择器中，结构体值的指针可以当作结构值来使用</h3>
+<h3>在字段选择器中，属主结构体值可以是指针，它将被隐式解引用</h3>
 
 <div>
-<p>
-和C语言不同，Go中没有<code>-&gt;</code>操作符用来通过一个结构体值的指针来访为此结构体值的字段。
-在Go中，<code>-&gt;</code>操作符也是用句点<code>.</code>来表示的。
-</p>
 
-一个例子：
+比如，在下面的例子中，为了简洁，<code>(*bookN).pages</code>可以被写成<code>bookN.pages</code>。
+换句话说，在这种简写形式中，<code>bookN</code>将被隐式解引用。
+
 <pre class="line-numbers"><code class="language-go">package main
 
 func main() {
