@@ -1920,7 +1920,7 @@ runtime stack:
 </p>
 
 <p>
-第三个区别是当<code>x</code>和<code>y</code>处于一个循环引用链中时，<code>DeepEqual</code>调用的结果可能未必正确。
+第三个区别是当<code>x</code>和<code>y</code>均处于某个循环引用链中时，为了防止死循环，<code>DeepEqual</code>调用的结果可能为<code>true</code>。
 </p>
 
 <p>
@@ -1947,11 +1947,13 @@ func main() {
 	fmt.Println(reflect.DeepEqual(&z, &y)) // true
 	fmt.Println(&z == &y)                  // false
 
-	type T struct{p *T}
-	t := &T{&T{nil}}
-	t.p.p = t // form a cyclic reference chain.
-	fmt.Println(reflect.DeepEqual(t, t.p)) // true
-	fmt.Println(t == t.p)                  // false
+	type Node struct{peer *Node}
+	var q, r, s Node
+	q.peer = &q // 形成一个循环引用链
+	r.peer = &s // 形成一个循环引用链
+	s.peer = &r
+	println(reflect.DeepEqual(&q, &r)) // true
+	fmt.Println(q == r)                // false
 
 	var f1, f2 func() = nil, func(){}
 	fmt.Println(reflect.DeepEqual(f1, f1)) // true
@@ -1959,7 +1961,7 @@ func main() {
 
 	var a, b interface{} = []int{1, 2}, []int{1, 2}
 	fmt.Println(reflect.DeepEqual(a, b)) // true
-	fmt.Println(a == b)                  // panic
+	fmt.Println(a == b)                  // 产生恐慌
 }
 </code></pre>
 

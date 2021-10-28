@@ -336,6 +336,7 @@ Go是一门支持垃圾回收的语言。
 <pre class="line-numbers"><code class="language-go">import "unsafe"
 
 // 假设此函数不会被内联（inline）。
+//go:noinline
 func createInt() *int {
 	return new(int)
 }

@@ -113,7 +113,7 @@ https://github.com/golang/go/issues/18640
 </p>
 
 <div>
-假设<code>S</code>是一个结构体类型并且它的底层类型为<code>struct{ x int; y bool}</code>，<code>S</code>的零值可以表示成下面所示的组合字面量两种变种形式：
+假设<code>S</code>是一个结构体类型并且它的底层类型为<code>struct{x int; y bool}</code>，<code>S</code>的零值可以表示成下面所示的组合字面量两种变种形式：
 <ol>
 <li>
 	<code>S{0, false}</code>。在此变种形式中，所有的字段名称均不出现，但每个字段的值必须指定，并且每个字段的出现顺序和它们的声明顺序必须一致。

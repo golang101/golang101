@@ -1890,12 +1890,12 @@ if s != nil {
 比如，在下面的代码中，它只在第一种情况中才有效：
 
 <pre class="disable-line-numbers111"><code class="language-go">	// 情况一：
-	var s = make{[]byte, 10000)
+	var s = make([]byte, 10000)
 	y = make([]T, len(s)) // works
 	copy(y, s)
 
 	// 情况二：
-	var s = make{[]byte, 10000)
+	var s = make([]byte, 10000)
 	y = make([]T, len(s), len(s)) // not work
 	copy(y, s)
 
