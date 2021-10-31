@@ -539,7 +539,7 @@ func main() {
 	m = nil
 	fmt.Println(m["abc"]) // 0
 
-	// 下面这两行编译不同过。
+	// 下面这两行编译不通过。
 	/*
 	_ = a[3]  // 下标越界
 	_ = s[-1] // 下标越界
@@ -1083,7 +1083,7 @@ func main() {
 </code></pre>
 
 <p>
-注意：刚提到的这个限制<a href="https://github.com/golang/go/issues/3117">m可能会在以后被移除</a>。
+注意：刚提到的这个限制<a href="https://github.com/golang/go/issues/3117">可能会在以后被移除</a>。
 </p>
 
 </div>
@@ -1949,7 +1949,7 @@ s = s[:len(s)-(to-from)]
 <pre class="line-numbers"><code class="language-go">// "len(s)+to-from"是删除操作之前切片s的长度。
 temp := s[len(s):len(s)+to-from]
 for i := range temp {
-	temp[i] = t0
+	temp[i] = t0 // t0是类型T的零值
 }
 </code></pre>
 
