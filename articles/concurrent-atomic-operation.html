@@ -194,7 +194,7 @@ func main() {
 </p>
 
 <p>
-一个<code>CompareAndSwapT</code>函数调用仅在新值和旧值不相等的情况下才会执行修改操作，并返回<code>true</code>；否则立即返回<code>false</code>。
+一个<code>CompareAndSwapT</code>函数调用传递的旧值和目标值的当前值匹配的情况下才会将目标值改为新值，并返回<code>true</code>；否则立即返回<code>false</code>。
 </p>
 
 一个例子：
