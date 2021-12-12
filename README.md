@@ -11,7 +11,7 @@
 
 微信公众号（用于发布一些Go细节、常识和技巧）：
 
-![](articles/res/101-group-qrcode-2.jpg?raw=true)
+![](not-embedded/website/res/101-group-qrcode-2.jpg?raw=true)
 
 _(若上面二维码未显示出来，请点击此[墙内版链接](https://tool.oschina.net/action/qrcode/generate?data=http%3A%2F%2Fweixin.qq.com%2Fr%2FRy6ju1TE0AmvrRDY93tV&output=image%2Fgif&error=L&type=0&margin=12&size=4)或者在微信中搜索"Go 101"公众号。)_
 
@@ -68,4 +68,4 @@ Server started:
 * 这本书仍在不断改进中。请阅读[UPDATES.md](UPDATES.md)以注意各种更新。
 * 本人保留本书的出版权（包括纸质和各种电子版）。请勿随意在线转载（转载之前请在本项目中开一个issue问询）。
 
-![](articles/res/101-reward-qrcode-5.png?raw=true)
+![](pages/fundamentals/res/101-reward-qrcode-5.png?raw=true)

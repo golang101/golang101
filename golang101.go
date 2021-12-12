@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"errors"
 	"go/build"
 	"html/template"
 	"io/ioutil"
@@ -18,73 +19,86 @@ import (
 )
 
 type Go101 struct {
-	staticHandler     http.Handler
-	articleResHandler http.Handler
-	isLocalServer     bool
-	articlePages      map[string][]byte
-	indexContent      template.HTML
-	serverMutex       sync.Mutex
-	theme             string // default is "dark"
+	staticHandler http.Handler
+	isLocalServer bool
+	pageGroups    map[string]*PageGroup
+	articlePages  map[[2]string][]byte
+	serverMutex   sync.Mutex
+	theme         string // default is "dark"
+}
+
+type PageGroup struct {
+	resHandler   http.Handler
+	indexContent template.HTML
 }
 
 var go101 = &Go101{
-	staticHandler:     http.StripPrefix("/static/", staticFilesHandler),
-	articleResHandler: http.StripPrefix("/article/res/", resFilesHandler),
-	isLocalServer:     false, // may be modified later
-	articlePages:      map[string][]byte{},
-	indexContent:      retrieveIndexContent(),
+	staticHandler: http.StripPrefix("/static/", staticFilesHandler),
+	isLocalServer: false, // may be modified later
+	pageGroups:    collectPageGroups(),
+}
+
+func init() {
+	for group, pg := range go101.pageGroups {
+		pg.indexContent = retrieveIndexContent(group)
+	}
 }
 
 func (go101 *Go101) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	group, item := "", ""
-	tokens := strings.SplitN(r.URL.Path, "/", 3)
-	if len(tokens) > 1 {
-		group = strings.ToLower(tokens[1])
-		if len(tokens) > 2 {
-			item = tokens[2]
-		}
+	var group, item string
+	if tokens := strings.SplitN(r.URL.Path[1:], "/", 2); len(tokens) == 2 {
+		group, item = tokens[0], tokens[1]
+	} else { // len(tokens) == 1
+		item = tokens[0]
 	}
 
 	switch go101.ConfirmLocalServer(isLocalRequest(r)); group {
+	case "":
+		if item == "" {
+			item = "index.html"
+		}
+		go101.serveGroupItem(w, r, "website", item)
+	case "res":
+		go101.serveGroupItem(w, r, "website", r.URL.Path[1:])
 	case "static":
 		w.Header().Set("Cache-Control", "max-age=31536000") // one year
 		go101.staticHandler.ServeHTTP(w, r)
 	case "article":
-		item = strings.ToLower(item)
-		if strings.HasPrefix(item, "res/") {
-			w.Header().Set("Cache-Control", "max-age=31536000") // one year
-			go101.articleResHandler.ServeHTTP(w, r)
-			//} else if go101.IsLocalServer() && (strings.HasPrefix(item, "print-") || strings.HasPrefix(item, "pdf-")) {
-			//	w.Header().Set("Cache-Control", "no-cache, private, max-age=0")
-			//	idx := strings.IndexByte(item, '-')
-			//	go101.RenderPrintPage(w, r, item[:idx], item[idx+1:])
-		} else if !go101.RedirectArticlePage(w, r, item) {
-			go101.RenderArticlePage(w, r, item)
-		}
-	case "":
-		http.Redirect(w, r, "/article/101.html", http.StatusTemporaryRedirect)
+		// for history reason, fundamentals pages use "article/xxx" URLs
+		go101.serveGroupItem(w, r, "fundamentals", item)
+	case "optimizations", "details-and-tips", "quizzes", "apps-and-libs":
+		go101.serveGroupItem(w, r, group, item)
 	default:
-		http.Redirect(w, r, "/article/101.html", http.StatusNotFound)
+		http.Redirect(w, r, "/", http.StatusNotFound)
 	}
+}
 
+func (go101 *Go101) serveGroupItem(w http.ResponseWriter, r *http.Request, group, item string) {
+	item = strings.ToLower(item)
+	if strings.HasPrefix(item, "res/") {
+		w.Header().Set("Cache-Control", "max-age=31536000") // one year
+		go101.pageGroups[group].resHandler.ServeHTTP(w, r)
+	} else if !go101.RedirectArticlePage(w, r, group, item) {
+		go101.RenderArticlePage(w, r, group, item)
+	}
 }
 
 func (go101 *Go101) ConfirmLocalServer(isLocal bool) {
 	go101.serverMutex.Lock()
+	defer go101.serverMutex.Unlock()
 	if go101.isLocalServer != isLocal {
 		go101.isLocalServer = isLocal
 		if go101.isLocalServer {
-			unloadPageTemplates()                    // loaded in one init function
-			go101.articlePages = map[string][]byte{} // invalidate article caches
+			unloadPageTemplates()                       // loaded in one init function
+			go101.articlePages = map[[2]string][]byte{} // invalidate article caches
 		}
 	}
-	go101.serverMutex.Unlock()
 }
 
 func (go101 *Go101) IsLocalServer() (isLocal bool) {
 	go101.serverMutex.Lock()
+	defer go101.serverMutex.Unlock()
 	isLocal = go101.isLocalServer
-	go101.serverMutex.Unlock()
 	return
 }
 
@@ -97,18 +111,18 @@ func pullGolang101Project(wd string) {
 	}
 }
 
-func (go101 *Go101) ArticlePage(file string) ([]byte, bool) {
+func (go101 *Go101) ArticlePage(group, file string) ([]byte, bool) {
 	go101.serverMutex.Lock()
-	page := go101.articlePages[file]
+	defer go101.serverMutex.Unlock()
+	page := go101.articlePages[[2]string{group, file}]
 	isLocal := go101.isLocalServer
-	go101.serverMutex.Unlock()
 	return page, isLocal
 }
 
-func (go101 *Go101) CacheArticlePage(file string, page []byte) {
+func (go101 *Go101) CacheArticlePage(group, file string, page []byte) {
 	go101.serverMutex.Lock()
-	go101.articlePages[file] = page
-	go101.serverMutex.Unlock()
+	defer go101.serverMutex.Unlock()
+	go101.articlePages[[2]string{group, file}] = page
 }
 
 //===================================================
@@ -118,33 +132,23 @@ func (go101 *Go101) CacheArticlePage(file string, page []byte) {
 type Article struct {
 	Content, Title, Index template.HTML
 	TitleWithoutTags      string
-	Filename              string
+	Group, Filename       string
 	FilenameWithoutExt    string
 }
 
 var schemes = map[bool]string{false: "http://", true: "https://"}
 
-func (go101 *Go101) RenderArticlePage(w http.ResponseWriter, r *http.Request, file string) {
-	page, isLocal := go101.ArticlePage(file)
+func (go101 *Go101) RenderArticlePage(w http.ResponseWriter, r *http.Request, group, file string) {
+	page, isLocal := go101.ArticlePage(group, file)
 	if page == nil {
-		article, err := retrieveArticleContent(file)
+		article, err := retrieveArticleContent(group, file)
 		if err == nil {
-			article.Index = disableArticleLink(go101.indexContent, file)
+			article.Index = disableArticleLink(go101.pageGroups[group].indexContent, file)
 			pageParams := map[string]interface{}{
 				"Article":       article,
 				"Title":         article.TitleWithoutTags,
 				"Theme":         go101.theme,
 				"IsLocalServer": isLocal,
-				"Value": func() func(string, ...interface{}) interface{} {
-					var kvs = map[string]interface{}{}
-					return func(k string, v ...interface{}) interface{} {
-						if len(v) == 0 {
-							return kvs[k]
-						}
-						kvs[k] = v[0]
-						return ""
-					}
-				}(),
 			}
 			t := retrievePageTemplate(Template_Article, !isLocal)
 			var buf bytes.Buffer
@@ -158,14 +162,14 @@ func (go101 *Go101) RenderArticlePage(w http.ResponseWriter, r *http.Request, fi
 		}
 
 		if !isLocal {
-			go101.CacheArticlePage(file, page)
+			go101.CacheArticlePage(group, file, page)
 		}
 	}
 
 	if len(page) == 0 { // blank page means page not found.
-		log.Printf("文章%s未找到", file)
+		log.Printf("文章%s/%s未找到", group, file)
 		//w.Header().Set("Cache-Control", "no-cache, private, max-age=0")
-		http.Redirect(w, r, "/article/101.html", http.StatusNotFound)
+		http.Redirect(w, r, "/", http.StatusNotFound)
 		return
 	}
 
@@ -177,30 +181,33 @@ func (go101 *Go101) RenderArticlePage(w http.ResponseWriter, r *http.Request, fi
 	w.Write(page)
 }
 
-const H1, _H1, MaxLen = "<h1>", "</h1>", 128
+var H1, _H1 = []byte("<h1>"), []byte("</h1>")
+
+const MaxTitleLen = 128
 
 var TagSigns = [2]rune{'<', '>'}
 
-func retrieveArticleContent(file string) (Article, error) {
+func retrieveArticleContent(group, file string) (Article, error) {
 	article := Article{}
-	content, err := loadArticleFile(file)
+	content, err := loadArticleFile(group, file)
 	if err != nil {
 		return article, err
 	}
 
 	article.Content = template.HTML(content)
+	article.Group = group
 	article.Filename = file
 	article.FilenameWithoutExt = strings.TrimSuffix(file, ".html")
 
 	// retrieve titles
-	j, i := -1, strings.Index(string(article.Content), H1)
+	j, i := -1, bytes.Index([]byte(article.Content), H1)
 	if i >= 0 {
 		i += len(H1)
-		j = strings.Index(string(article.Content[i:i+MaxLen]), _H1)
+		j = bytes.Index(bytesWithLength([]byte(article.Content[i:]), MaxTitleLen), _H1)
 		if j >= 0 {
 			article.Title = article.Content[i-len(H1) : i+j+len(_H1)]
 			article.Content = article.Content[i+j+len(_H1):]
-			k, s := 0, make([]rune, 0, MaxLen)
+			k, s := 0, make([]rune, 0, MaxTitleLen)
 			for _, r := range article.Title {
 				if r == TagSigns[k] {
 					k = (k + 1) & 1
@@ -212,40 +219,47 @@ func retrieveArticleContent(file string) (Article, error) {
 		}
 	}
 	if j < 0 {
-		log.Println("retrieveTitlesForArticle", article.FilenameWithoutExt, "failed")
+		//log.Println("retrieveTitlesForArticle failed:", group, file)
 	}
 
 	return article, nil
 }
 
-func retrieveIndexContent() template.HTML {
-	page101, err := retrieveArticleContent("101.html")
+func retrieveIndexContent(group string) template.HTML {
+	page101, err := retrieveArticleContent(group, "101.html")
 	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return ""
+		}
 		panic(err)
 	}
 	content := []byte(page101.Content)
 	start := []byte("<!-- index starts (don't remove) -->")
 	i := bytes.Index(content, start)
 	if i < 0 {
-		panic("index not found")
+		//panic("index not found")
+		//log.Printf("index not found in %s/101/html", group)
+		return ""
 	}
 	content = content[i+len(start):]
 	end := []byte("<!-- index ends (don't remove) -->")
 	i = bytes.Index(content, end)
 	if i < 0 {
-		panic("index not found")
+		//panic("index not found")
+		//log.Printf("index not found in %s/101/html", group)
+		return ""
 	}
 	content = content[:i]
-	comments := [][]byte{
-		[]byte("<!-- (to remove) for printing"),
-		[]byte("(to remove) -->"),
-	}
-	for _, cmt := range comments {
-		i = bytes.Index(content, cmt)
-		if i >= 0 {
-			filleBytes(content[i:i+len(cmt)], ' ')
-		}
-	}
+	//comments := [][]byte{
+	//	[]byte("<!-- (to remove) for printing"),
+	//	[]byte("(to remove) -->"),
+	//}
+	//for _, cmt := range comments {
+	//	i = bytes.Index(content, cmt)
+	//	if i >= 0 {
+	//		filleBytes(content[i:i+len(cmt)], ' ')
+	//	}
+	//}
 	return template.HTML(content)
 }
 
@@ -277,126 +291,6 @@ func disableArticleLink(htmlContent template.HTML, page string) (r template.HTML
 	return template.HTML(content)
 }
 
-//const Anchor, _Anchor, LineToRemoveTag, endl = `<li><a class="index" href="`, `">`, `(to remove)`, "\n"
-//const IndexContentStart, IndexContentEnd = `<!-- index starts (don't remove) -->`, `<!-- index ends (don't remove) -->`
-//
-//func (go101 *Go101) RenderPrintPage(w http.ResponseWriter, r *http.Request, printTarget, item string) {
-//	page, isLocal := go101.ArticlePage(item)
-//	if page == nil {
-//		var err error
-//		var pageParams map[string]interface{}
-//		switch item {
-//		case "book101":
-//			pageParams, err = buildBook101PrintParams()
-//		}
-//
-//		if err == nil {
-//			if pageParams == nil {
-//				pageParams = map[string]interface{}{}
-//			}
-//			pageParams["PrintTarget"] = printTarget
-//			pageParams["IsLocalServer"] = isLocal
-//
-//			t := retrievePageTemplate(Template_PrintBook, !isLocal)
-//			var buf bytes.Buffer
-//			if err = t.Execute(&buf, pageParams); err == nil {
-//				page = buf.Bytes()
-//			}
-//		}
-//		if err != nil {
-//			page = []byte(err.Error())
-//		}
-//		if !isLocal {
-//			go101.CacheArticlePage(item, page)
-//		}
-//	}
-//
-//	// ...
-//	if len(page) == 0 { // blank page means page not found.
-//		log.Printf("print page %s is not found", item)
-//		//w.Header().Set("Cache-Control", "no-cache, private, max-age=0")
-//		http.Redirect(w, r, "/article/101.html", http.StatusNotFound)
-//		return
-//	}
-//
-//	if isLocal {
-//		w.Header().Set("Cache-Control", "no-cache, private, max-age=0")
-//	} else {
-//		w.Header().Set("Cache-Control", "max-age=50000") // about 14 hours
-//	}
-//	w.Write(page)
-//}
-//
-//func buildBook101PrintParams() (map[string]interface{}, error) {
-//	article, err := retrieveArticleContent("101.html")
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	// get all index article content by removing some lines
-//	var builder strings.Builder
-//
-//	content := string(article.Content)
-//	i := strings.Index(content, IndexContentStart)
-//	if i < 0 {
-//		err = errors.New(IndexContentStart + " not found")
-//		return nil, err
-//	}
-//	i += len(IndexContentStart)
-//	content = content[i:]
-//	i = strings.Index(content, IndexContentEnd)
-//	if i >= 0 {
-//		content = content[:i]
-//	}
-//
-//	for range [1000]struct{}{} {
-//		i = strings.Index(content, LineToRemoveTag)
-//		if i < 0 {
-//			break
-//		}
-//		start := strings.LastIndex(content[:i], endl)
-//		if start >= 0 {
-//			builder.WriteString(content[:start])
-//		}
-//		end := strings.Index(content[i:], endl)
-//		content = content[i:]
-//		if end < 0 {
-//			end = len(content)
-//		}
-//		content = content[end:]
-//	}
-//	builder.WriteString(content)
-//
-//	// the index article
-//	articles := make([]Article, 0, 100)
-//	article.FilenameWithoutExt = "101"
-//	article.Content = template.HTML(builder.String())
-//	articles = append(articles, article)
-//
-//	// find all articles from links
-//	content = string(article.Content)
-//	for range [1000]struct{}{} {
-//		i = strings.Index(content, Anchor)
-//		if i < 0 {
-//			break
-//		}
-//		content = content[i+len(Anchor):]
-//		i = strings.Index(content, _Anchor)
-//		if i < 0 {
-//			break
-//		}
-//		article, err := retrieveArticleContent(content[:i])
-//		if err != nil {
-//			log.Printf("retrieve article %s error: %s", content[:i], err)
-//		} else {
-//			articles = append(articles, article)
-//		}
-//		content = content[i+len(_Anchor):]
-//	}
-//
-//	return map[string]interface{}{"Articles": articles}, nil
-//}
-
 //===================================================
 // templates
 //==================================================
@@ -405,7 +299,6 @@ type PageTemplate uint
 
 const (
 	Template_Article PageTemplate = iota
-	Template_PrintBook
 	Template_Redirect
 	NumPageTemplates
 )
@@ -433,8 +326,6 @@ func retrievePageTemplate(which PageTemplate, cacheIt bool) *template.Template {
 		switch which {
 		case Template_Article:
 			t = parseTemplate(pageTemplatesCommonPaths, "article")
-		case Template_PrintBook:
-			t = parseTemplate(pageTemplatesCommonPaths, "pdf")
 		case Template_Redirect:
 			t = parseTemplate(pageTemplatesCommonPaths, "redirect")
 		default:
@@ -452,21 +343,54 @@ func retrievePageTemplate(which PageTemplate, cacheIt bool) *template.Template {
 
 func unloadPageTemplates() {
 	pageTemplatesMutex.Lock()
+	defer pageTemplatesMutex.Unlock()
 	for i := range pageTemplates {
 		pageTemplates[i] = nil
 	}
-	pageTemplatesMutex.Unlock()
 }
 
 //===================================================
-// non-embedding
+// non-embedding functions
 //===================================================
 
-var staticFilesHandler_NonEmbedding = http.FileServer(http.Dir(filepath.Join(rootPath, "web", "static")))
-var resFilesHandler_NonEmbedding = http.FileServer(http.Dir(filepath.Join(rootPath, "articles", "res")))
+var dummyHandler http.Handler = http.HandlerFunc(func(http.ResponseWriter, *http.Request) {})
 
-func loadArticleFile_NonEmbedding(file string) ([]byte, error) {
-	return ioutil.ReadFile(filepath.Join(rootPath, "articles", file))
+var staticFilesHandler_NonEmbedding = http.FileServer(http.Dir(filepath.Join(rootPath, "web", "static")))
+
+func collectPageGroups_NonEmbedding() map[string]*PageGroup {
+	infos, err := ioutil.ReadDir(filepath.Join(rootPath, "pages"))
+	if err != nil {
+		panic("collect page groups error: " + err.Error())
+	}
+
+	pageGroups := make(map[string]*PageGroup, len(infos))
+
+	for _, e := range infos {
+		if e.IsDir() {
+			group, handler := e.Name(), dummyHandler
+			resPath := filepath.Join(rootPath, "pages", group, "res")
+			if _, err := os.Stat(resPath); err == nil {
+				var urlGroup string
+				// For history reason, fundamentals pages uses "/article/xxx" URLs.
+				if group == "fundamentals" {
+					urlGroup = "/article"
+				} else if group != "website" {
+					urlGroup = "/" + group
+				}
+				handler = http.StripPrefix(urlGroup+"/res/", http.FileServer(http.Dir(resPath)))
+			} else if !errors.Is(err, os.ErrNotExist) {
+				log.Println(err)
+			}
+
+			pageGroups[group] = &PageGroup{resHandler: handler}
+		}
+	}
+
+	return pageGroups
+}
+
+func loadArticleFile_NonEmbedding(group, file string) ([]byte, error) {
+	return ioutil.ReadFile(filepath.Join(rootPath, "pages", group, file))
 }
 
 func parseTemplate_NonEmbedding(commonPaths []string, files ...string) *template.Template {
@@ -490,8 +414,10 @@ func findGo101ProjectRoot() (string, bool) {
 	}
 
 	for _, name := range []string{
-		"gitlab.com/golang101/golang101", "gitlab.com/Golang101/golang101",
-		"github.com/golang101/golang101", "github.com/Golang101/golang101",
+		"gitlab.com/golang101/golang101",
+		"gitlab.com/Golang101/golang101",
+		"github.com/golang101/golang101",
+		"github.com/Golang101/golang101",
 	} {
 		pkg, err := build.Import(name, "", build.FindOnly)
 		if err == nil {
@@ -505,6 +431,13 @@ func findGo101ProjectRoot() (string, bool) {
 //===================================================
 // utils
 //===================================================
+
+func bytesWithLength(s []byte, n int) []byte {
+	if n > len(s) {
+		n = len(s)
+	}
+	return s[:n]
+}
 
 func filleBytes(s []byte, b byte) {
 	for i := range s {

@@ -126,10 +126,23 @@ func genStaticFiles(rootURL string) {
 	files["index.html"] = readFile(fullPath("web", "index.html"))
 
 	{
-		dir := fullPath("articles", "res")
+		dir := fullPath("web", "static")
+		filenames := readFolderRecursively(dir)
+		for _, f := range filenames {
+			name, err := filepath.Rel(dir, f)
+			if err != nil {
+				log.Fatalf("filepath.Rel(%s, %s) error: %s", dir, f, err)
+			}
+			files["static/"+name] = readFile(f)
+		}
+	}
+
+	{
+		// For history reason, fundamentals pages use "/article/xxx" URLs.
+		dir := fullPath("pages", "fundamentals", "res")
 		filenames, _ := readFolder(dir)
 		for _, f := range filenames {
-			if strings.HasSuffix(f, ".png") || strings.HasSuffix(f, ".jpg") || strings.HasSuffix(f, ".jpeg") {
+			if strings.HasSuffix(f, ".png") || strings.HasSuffix(f, ".jpg") {
 				name, err := filepath.Rel(dir, f)
 				if err != nil {
 					log.Fatalf("filepath.Rel(%s, %s) error: %s", dir, f, err)
@@ -140,7 +153,8 @@ func genStaticFiles(rootURL string) {
 	}
 
 	{
-		dir := fullPath("articles")
+		// For history reason, fundamentals pages use "/article/xxx" URLs.
+		dir := fullPath("pages", "fundamentals")
 		filenames, _ := readFolder(dir)
 		for _, f := range filenames {
 			if strings.HasSuffix(f, ".html") {
@@ -150,18 +164,6 @@ func genStaticFiles(rootURL string) {
 				}
 				files["article/"+name] = loadFile("article/" + name)
 			}
-		}
-	}
-
-	{
-		dir := fullPath("web", "static")
-		filenames := readFolderRecursively(dir)
-		for _, f := range filenames {
-			name, err := filepath.Rel(dir, f)
-			if err != nil {
-				log.Fatalf("filepath.Rel(%s, %s) error: %s", dir, f, err)
-			}
-			files["static/"+name] = readFile(f)
 		}
 	}
 
