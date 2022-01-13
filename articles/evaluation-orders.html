@@ -295,7 +295,7 @@ Go白皮书并没有清楚地说明在第二个阶段中发生的赋值操作是
 
 <pre class="line-numbers"><code class="language-go">// 估值阶段
 P0 := &a; P1 := &b
-R0 := a; R1 := b
+R0 := b; R1 := a
 
 // 最基本形式：*P0, *P1 = R0, R1
 
