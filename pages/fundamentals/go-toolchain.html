@@ -164,6 +164,9 @@ Go官方工具链工具要求所有的Go源代码文件必须以<code>.go</code>
 <li>
 	支持Go模块特性的Go项目的根目录下需要一个<code>go.mod</code>文件。此文件可以使用<code>go mod init</code>子命令来生成（见下）。
 </li>
+<li>
+	名称以<code>_</code>和<code>.</code>开头的源代码文件将被Go官方工具链工具忽略掉。
+</li>
 </ul>
 
 </div>

@@ -752,6 +752,13 @@ syscall.Syscall(SYS_XXX, uintptr(uintptr(fd)),
 <p>
 </p>
 
+<!--
+https://github.com/golang/go/issues/34684#issuecomment-540103545
+-->
+<p>
+注意：此使用模式也适用于Windows系统中的<a href="https://golang.org/pkg/syscall/?GOOS=windows#Proc.Call">syscall.Proc.Call</a>和<a href="https://golang.org/pkg/syscall/?GOOS=windows#LazyProc.Call">syscall.LazyProc.Call</a>系统调用。
+</p>
+
 <p>
 再提醒一次，此使用模式不适用于其它自定义函数。
 </p>
@@ -789,11 +796,10 @@ p := (*int)(unsafe.Pointer(u))
 <p>
 </p>
 
-<!--
-https://github.com/golang/go/issues/34684#issuecomment-540103545
--->
 <p>
-注意：此使用模式也适用于Windows系统中的<a href="https://golang.org/pkg/syscall/?GOOS=windows#Proc.Call">syscall.Proc.Call</a>和<a href="https://golang.org/pkg/syscall/?GOOS=windows#LazyProc.Call">syscall.LazyProc.Call</a>系统调用。
+注意：Go 1.18引入了一个新的方法：<code>reflect.Value.UnsafePointer()</code>。
+官方推荐以后使用此方法来替换上述两个方法。也就说，承认了原来的设计思路并不太对路。
+<code>UnsafePointer()</code>放回一个<code>unsafe.Pointer</code>值。
 </p>
 
 </div>
