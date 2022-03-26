@@ -178,16 +178,16 @@ func main() {
 <div>
 基本规则：
 <div class="alert alert-info">
-一般说来，<a href="type-system-overview.html#underlying-type">定义</a>的指针类型的值不能使用在选择器语法形式中。
+一般说来，<a href="type-system-overview.html#named-type">具名</a>的指针类型的值不能使用在选择器语法形式中。
 </div>
 
 语法糖：
 <div class="alert alert-info">
-如果值<code>x</code>的类型为一个一级定义指针类型，并且<code>(*x).f</code>是一个合法的选择器，则<code>x.f</code>也是合法的。
+如果值<code>x</code>的类型为一个一级具名指针类型，并且<code>(*x).f</code>是一个合法的选择器，则<code>x.f</code>也是合法的。
 </div>
 
 <p>
-多级指针均不能出现在选择器语法形式中。
+任何多级指针均不能出现在选择器语法形式中。
 </p>
 
 上述语法糖的例外：
@@ -409,12 +409,17 @@ func main() {
 声明的函数可以被用做函数值。
 </div>
 
+<!--
 例外1：
 <div class="alert alert-success">
 内置函数（展示在<code>builtin</code>和<code>unsafe</code>标准库包中的函数）不可被用做函数值。
 </div>
 
-例外2：
+	var _ = panic
+	var _ = unsafe.Sizeof
+-->
+
+例外：
 <div class="alert alert-success">
 <code>init</code>函数不可被用做函数值。
 </div>
@@ -432,12 +437,28 @@ func main() {
 	var _ = main
 	var _ = fmt.Println
 
-	// 这几行编译不通过。
-	var _ = panic
-	var _ = unsafe.Sizeof
+	// 下面这行编译不通过。
 	var _ = init
 }
 </code></pre>
+</div>
+
+<a class="anchor" id="generic-arguments-passing"></a>
+<h3>泛型类型实参的传递方式</h3>
+
+<div>
+基本规则：
+<div class="alert alert-info">
+在泛型类型实参列表中，所有实参均包裹在同一对方括号中，各个实参之间使用逗号分开
+</div>
+
+例外：
+<div class="alert alert-success">
+内置泛型类型的类型实参传递形态各异。映射类型的键值类型实参单独包裹在一对方括号中，其它实参并没有被包裹。
+内置<code>new</code>泛型函数的类型实参是包裹在一对圆括号中。
+内置<code>make</code>泛型函数的类型实参是和值实参混杂在一起并包裹在同一对圆括号中。
+</div>
+
 </div>
 
 <a class="anchor" id="discard-return-results"></a>

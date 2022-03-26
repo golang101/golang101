@@ -90,7 +90,7 @@ Go代码中有四种代码块。
 <ul>
 <li>包引入；</li>
 <li>定义类型和类型别名；</li>
-<li>有名常量；</li>
+<li>具名常量；</li>
 <li>变量；</li>
 <li>函数；</li>
 <li>跳转标签。</li>
@@ -136,7 +136,7 @@ Go代码中有四种代码块。
 	<td valign="middle" align="center">可以</td>
 	</tr>
 	<tr>
-	<th scope="row" class="text-center" valign="middle" align="center">有名常量（不含内置常量）</th>
+	<th scope="row" class="text-center" valign="middle" align="center">具名常量（不含内置常量）</th>
 	<td></td>
 	<td valign="middle" align="center">可以</td>
 	<td valign="middle" align="center">可以</td>
@@ -216,7 +216,7 @@ Go代码中有四种代码块。
 
 <p>
 声明在包代码块中并且在所有局部代码块之外的代码元素称为包级（package-level）元素。
-包级元素可以是有名常量、变量、函数、定义类型或类型别名。
+包级元素可以是具名常量、变量、函数、定义类型或类型别名。
 </p>
 
 <a class="anchor" id="scope"></a>
@@ -249,6 +249,9 @@ Go代码中有四种代码块。
 </li>
 <li>
 	一个跳转标签的标识符的作用域为包含此标签的声明的最内层函数体代码块，但要排除掉此内嵌在此最内层函数体代码块中的各个匿名函数体代码块。
+</li>
+<li>
+	关于类型参数的作用域，请阅读<a href="https://gfw.go101.org/generics/555-type-constraints-and-parameters.html#type-parameter-scope">《Go自定义泛型101》</a>一书。
 </li>
 </ul>
 </div>

@@ -2,7 +2,11 @@
 
 <p>
 此篇文章将列出Go中所有的类型转换、赋值和值比较规则。
+请注意：在阐述这些规则的时候，自定义泛型中频繁使用的类型参数类型被特意忽略掉了。
+也就是说，本文不考虑涉及到<a href="https://gfw.go101.org/generics/101.html">自定义泛型</a>的情形。
 </p>
+
+
 
 <a class="anchor" id="conversion"></a>
 <h3>类型转换规则大全</h3>
@@ -58,10 +62,10 @@ Go白皮书中的类型转换只包括显式类型转换，但是《Go语言101�
 	如果类型<code>Tx</code>和<code>T</code>的<a href="type-system-overview.html#underlying-type">底层类型</a>相同（忽略掉结构体字段标签），则<code>x</code>可以被显式转换为类型<code>T</code>。
 </li>
 <li>
-	如果类型<code>Tx</code>和<code>T</code>中至少有一个是<a href="type-system-overview.html#non-defined-type">非定义类型</a>并且它们的底层类型相同（考虑结构体字段标签），则<code>x</code>可以被<u><b>隐式</b></u>转换为类型<code>T</code>。
+	如果类型<code>Tx</code>和<code>T</code>中至少有一个是<a href="type-system-overview.html#named-type">无名类型</a>并且它们的底层类型相同（考虑结构体字段标签），则<code>x</code>可以被<u><b>隐式</b></u>转换为类型<code>T</code>。
 </li>
 <li>
-	如果类型<code>Tx</code>和<code>T</code>的底层类型不同，但是两者都是非定义的指针类型并且它们的基类型的底层类型相同（忽略掉结构体字段标签），则<code>x</code>可以（而且只能）被显式转换为类型<code>T</code>。
+	如果类型<code>Tx</code>和<code>T</code>的底层类型不同，但是两者都是无名的指针类型并且它们的基类型的底层类型相同（忽略掉结构体字段标签），则<code>x</code>可以（而且只能）被显式转换为类型<code>T</code>。
 </li>
 </ul>
 </div>
@@ -78,12 +82,14 @@ func main() {
 	// 类型[]int、IntSlice和MySlice共享底层类型：[]int。
 	type IntSlice []int
 	type MySlice  []int
+	type Foo = struct{n int `foo`}
+	type Bar = struct{n int `bar`}
 
 	var s  = []int{}
 	var is = IntSlice{}
 	var ms = MySlice{}
-	var x struct{n int `foo`}
-	var y struct{n int `bar`}
+	var x map[Bar]Foo
+	var y map[Foo]Bar
 
 	// 这两行隐式转换编译不通过。
 	/*
@@ -94,8 +100,8 @@ func main() {
 	// 必须使用显式转换。
 	is = IntSlice(ms)
 	ms = MySlice(is)
-	x = struct{n int `foo`}(y)
-	y = struct{n int `bar`}(x)
+	x = map[Bar]Foo(y)
+	y = map[Foo]Bar(x)
 
 	// 这些隐式转换是没问题的。
 	s = is
@@ -118,7 +124,7 @@ func main() {
 
 	var pi = new(int)  // pi的类型为*int
 	var ip IntPtr = pi // 没问题，因为底层类型相同
-	                   // 并且pi的类型为非定义类型。
+	                   // 并且pi的类型为无名类型。
 
 	// var _ *MyInt = pi // 不能隐式转换
 	var _ = (*MyInt)(pi) // 显式转换是没问题的
@@ -148,7 +154,7 @@ func main() {
 <h4>3. 通道相关的类型转换规则</h4>
 
 <div class="well">
-给定一个通道值<code>x</code>，假设它的类型<code>Tx</code>是一个双向通道类型，<code>T</code>也是一个通道类型（无论是双向的还是单向的）。如果<code>Tx</code>和<code>T</code>的元素类型相同并且它们中至少有一个为非定义类型，则<code>x</code>可以被<u><b>隐式</b></u>转换为类型<code>T</code>。
+给定一个通道值<code>x</code>，假设它的类型<code>Tx</code>是一个双向通道类型，<code>T</code>也是一个通道类型（无论是双向的还是单向的）。如果<code>Tx</code>和<code>T</code>的元素类型相同并且它们中至少有一个为无名类型，则<code>x</code>可以被<u><b>隐式</b></u>转换为类型<code>T</code>。
 </div>
 
 <div>

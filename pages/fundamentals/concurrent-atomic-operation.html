@@ -36,7 +36,8 @@ func CompareAndSwapInt32(addr *int32,
 <p>
 </p>
 
-下列四个原子操作函数提供给了（安全）指针类型。因为Go目前（1.17）并不支持自定义泛型，所以这些函数是通过<a href="unsafe.html">非类型安全指针</a><code>unsafe.Pointer</code>来实现的。
+下列四个原子操作函数提供给了（安全）指针类型。
+因为这几个函数被引入标准库的时候，Go还不支持自定义泛型，所以这些函数是通过<a href="unsafe.html">非类型安全指针</a><code>unsafe.Pointer</code>来实现的。
 
 <pre class="line-numbers"><code class="language-go">func LoadPointer(addr *unsafe.Pointer) (val unsafe.Pointer)
 func StorePointer(addr *unsafe.Pointer, val unsafe.Pointer)
@@ -222,7 +223,7 @@ func main() {
 </p>
 
 <p>
-请注意，到目前为止（Go 1.17），一个64位字（int64或uint64值）的原子操作要求此64位字的内存地址必须是8字节对齐的。
+请注意，到目前为止（Go 1.18），一个64位字（int64或uint64值）的原子操作要求此64位字的内存地址必须是8字节对齐的。
 请阅读<a href="memory-layout.html">关于Go值的内存布局</a>一文获取详情。
 </p>
 

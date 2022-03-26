@@ -6,47 +6,50 @@
 </p>
 
 <p>
-本文剩余的部分将详细解释接口类型和接口值。一些接口相关的细节也将得到介绍。
-</p>
-
-<h3>什么是接口类型？</h3>
-
-<p>
-一个接口类型指定了一个<a href="method.html#method-set">方法原型</a>的集合。
-换句话说，一个接口类型定义了一个<a href="method.html#method-set">方法集</a>。
-事实上，我们可以把一个接口类型看作是一个方法集。
-接口类型中指定的任何方法原型中的方法名称都不能为空标识符<code>_</code>。
+自从1.18版本开始，Go已经支持自定义泛型。
+在自定义泛型中，接口类型总可以被用做类型约束。
+事实上，所有的类型约束都是接口类型。
+在Go 1.18版本之前，所有的接口类型均可用做值类型。
+但是从Go 1.18版本开始，有些接口类型只能被用做类型约束。
+可被用做值类型的接口类型称为基本接口类型。
 </p>
 
 <p>
-我们也常说一个接口类型规定了一个（用此接口类型指定的方法集表示的）行为规范。
+本文大体是在Go支持自定义泛型之前写成的，所以本文主要讲述基本接口类型。
+关于非基本接口类型（只能用做类型约束的接口类型），请阅读<a href="https://gfw.go101.org/generics/101.html">《Go自定义泛型101》</a>一书以了解详情。
 </p>
+
+<h3>接口类型介绍和类型集（Type Set）</h3>
 
 <div>
-一些接口类型的例子：
-<pre class="line-numbers"><code class="language-go">// 一个非定义接口类型。
-interface {
-	About() string
-}
+<p>
+一个接口类型定义了一些类型条件。
+所有满足了全部这些条件的非接口类型形成了一个类型集合。
+此类型集合称为此接口类型的类型集。
+</p>
 
-// ReadWriter是一个定义的接口类型。
-type ReadWriter interface {
-	Read(buf []byte) (n int, err error)
-	Write(buf []byte) (n int, err error)
-}
+接口类型是通过内嵌若干接口元素来定义类型条件的。
+目前（Go 1.18）支持两种接口元素：方法元素和类型元素。
 
-// Runnable是一个非定义接口类型的别名。
-type Runnable = interface {
-	Run()
-}
-</code></pre>
+<ul>
+<li>
+	一个方法元素呈现为一个<a href="method.html#method-set">方法描述</a>（method specification）。
+	内嵌在接口类型中的方法描述不能使用空标识符<code>_</code>命名。
+</li>
+<li>
+	一个类型元素可以是一个类型名称、一个类型字面表示形式、一个近似类型或者一个类型并集。
+	本文不过多介绍后两者。对于前两者，也只谈及当它们表示接口类型的情况。
+</li>
+</ul>
 
 <p>
 </p>
 
-请注意<code>ReadWriter</code>接口类型中指定的方法原型都有一个<code>error</code>类型的返回值。
-<code>error</code>类型为一个<a href="https://golang.google.cn/pkg/builtin/#error">内置接口类型</a>。
-它的定义声明如下：
+<p>
+举个例子，预声明的<a href="https://golang.org/pkg/builtin/#error"><code>error</code>接口类型</a>的定义如下。
+它内嵌了一个方法描述<code>Error() string</code>。
+在此定义中，<code>interface{...}</code>称为接口类型的字面表示形式，其中<code>interface</code>为一个关键字。
+</p>
 
 <pre class="line-numbers"><code class="language-go">type error interface {
         Error() string
@@ -54,62 +57,185 @@ type Runnable = interface {
 </code></pre>
 
 <p>
+我们可以说此<code>error</code>接口类型（直接）指定了一个方法（描述）：<code>Error() string</code>。
+它的类型集由所有拥有此同样描述的<a href="method.html">方法</a>的非接口类型组成。
+理论上，此类型集是一个无限集。当然对于一个具体的Go项目，此集合是有限的。
 </p>
 
-特别地，一个没有指定任何方法原型的接口类型称为一个空接口类型。
-下面是两个空接口类型：
+<p>
+下面是一些其它接口类型定义和别名声明。
+</p>
 
-<pre class="line-numbers"><code class="language-go">// 一个非定义空接口类型。
-interface{}
+<pre class="line-numbers"><code class="language-go">// 此接口直接指定了两个方法和内嵌了两个其它接口。
+// 其中一个为类型名称，另一个为类型字面表示形式。
+type ReadWriteCloser = interface {
+	Read(buf []byte) (n int, err error)
+	Write(buf []byte) (n int, err error)
+	error                      // 一个类型名称
+	interface{ Close() error } // 一个类型字面表示形式
+}
 
-// 类型I是一个定义的空接口类型。
-type I interface{}
+// 此接口类型内嵌了一个近似类型。
+// 它的类型集由所有底层类型为[]byte的类型组成。
+type AnyByteSlice = interface {
+	~[]byte
+}
+
+// 此接口类型内嵌了一个类型并集。它的类型集包含6个类型：
+// uint、uint8、uint16、uint32、uint64和uintptr。
+type Unsigned interface {
+	uint | uint8 | uint16 | uint32 | uint64 | uintptr
+}
 </code></pre>
+
+<p>
+</p>
+
+<p>
+将一个接口类型（无论呈现为类型名称还是类型字面表示形式）内嵌到另一个接口类型中等价于将前者中的元素（递归）展开放入后者。
+比如，别名<code>ReadWriteCloser</code>表示的接口类型等价于下面这个类型字面表示形式表示的直接指定了4个方法的接口类型。
+</p>
+
+<pre class="line-numbers"><code class="language-go">interface {
+	Read(buf []byte) (n int, err error)
+	Write(buf []byte) (n int, err error)
+	Error() string
+	Close() error
+}
+</code></pre>
+
+<p>
+上面这个接口类型（即别名<code>ReadWriteCloser</code>表示的接口类型）的类型集由所有拥有全部这4个指定方法的非接口类型组成。
+从理论上，这也是一个无限集。它肯定是<code>error</code>接口类型的类型集的子集。
+</p>
+
+<p>
+请注意：在Go 1.18之前，只有接口类型名称可以内嵌在接口类型中。
+</p>
+
+<p>
+下面的代码片段中展示的接口类型都称为空接口类型。它们什么也没有内嵌。
+</p>
+
+<pre class="line-numbers"><code class="language-go">// 一个无名空接口类型。
+interface{}
+	
+// Nothing是一个定义空接口类型。
+type Nothing interface{}
+}
+</code></pre>
+
+<p>
+事实上，Go 1.18引入了一个预声明的类型别名<code>any</code>，用来表示空接口类型<code>interface{}</code>。
+</p>
+
+<p>
+一个空接口类型的类型集由所有由非接口类型组成。
+</p>
+
 </div>
 
 <h3>类型的方法集</h3>
 
 <div>
-每个类型都有一个<a href="method.html#method-set">方法集</a>。
+
+每个类型有一个方法集。
+
 <ul>
 <li>
-	对于一个非接口类型，它的方法集由所有为它<a href="method.html">声明的（包括显式和隐式的）方法</a>的原型组成。
+	对于一个非接口类型，它的方法集由为此类型（无论显式还是隐式）声明 <a href="method.html">所有方法</a>的方法描述组成。
 </li>
 <li>
-	对于一个接口类型，它的方法集就是它所指定的方法集。
+	对于一个接口类型，它的方法集由此接口类型（无论直接还是间接）指定的所有方法描述组成。
 </li>
 </ul>
-</div>
+
+对于上一节中提到的接口类型，
+
+<ul>
+<li>
+	别名<code>ReadWriteCloser</code>表示的接口类型的方法集包含4个方法（描述）。
+</li>
+<li>
+	预声明的<code>error</code>接口类型的方法集包含一个方法（描述）。
+</li>
+<li>
+	一个空接口类型的方法集为空。
+</li>
+</ul>
 
 <p>
-为了解释方便，一个类型的方法集常常也可称为它的任何值的方法集。
+为了方便起见，一个类型的方法集常常也称为此方法的任何一个值的方法集。
+</p>
+
+</div>
+
+<h3>基本接口类型</h3>
+
+<div>
+<p>
+基本接口类型是指可以用做值类型的接口类型。
+一个非基本接口类型只能为用做（自定义泛型中使用的）约束接口类型（即类型约束）。
 </p>
 
 <p>
-如果两个非定义接口类型指定的方法集是等价的，则这两个接口类型为同一个类型。
+目前（Go 1.18），每一个基本接口类型都可以使用一个方法集来完全定义。
+换句话说，一个基本接口类型不需要内嵌任何类型元素。
+</p>
+
+<p>
+在上上一节中的例子中，别名<code>ReadWriteCloser</code>表示的接口类型为一个基本接口类型，
+但是<code>Unsigned</code>接口类型和别名<code>AnyByteSlice</code>表示的接口类型均不是基本接口类型。
+后两者均只能用做约束接口类型。
+</p>
+
+<p>
+空接口类型和预声明的<code>error</code>接口类型也都是基本接口类型。
+</p>
+
+<p>
+如果两个无名基本接口类型的方法集是相同的，则这两个类型肯定为同一个类型。
 但是请注意：不同代码包中的同名非导出方法名将总被认为是不同名的。
 </p>
 
+</div>
+
 <a class="anchor" id="implementation"></a>
-<h3>什么是实现（implementation）？</h3>
+<h3>类型实现（implementation）</h3>
+
+<div>
 
 <p>
-如果一个任意类型<code>T</code>的方法集为一个接口类型的方法集的超集，则我们说类型<code>T</code>实现了此接口类型。
-<code>T</code>可以是一个非接口类型，也可以是一个接口类型。
+如果一个非接口类型处于一个接口类型的类型集中，则我们说此非接口类型实现了此接口类型。
+如果一个接口类型的类型集是另一个接口类型的类型集的子集，则我们说前者实现了后者。
 </p>
 
 <p>
-实现关系在Go中是隐式的。两个类型之间的实现关系不需要在代码中显式地表示出来。Go中没有类似于<code>implements</code>的关键字。
+因为一个类型集的总是它自己的子集，一个接口类型总是实现了它自己。
+类似地，如果两个接口类型的类型集相同，则它们相互实现了对方。
+事实上，两个拥有相同类型集的无名接口类型为同一个接口类型。
+</p>
+
+<p>
+如果一个（接口或者非接口）类型<code>T</code>实现了一个接口类型<code>X</code>，那么类型<code>T</code>的方法集肯定是接口类型<code>X</code>的方法集的超集。
+一般说来，反之并不成立。但是如果<code>X</code>是一个基本接口类型，则反之也成立。
+比如，在前面的例子中，别名<code>ReadWriteCloser</code>表示的接口类型实现了预声明的<code>error</code>接口类型。
+</p>
+
+<p>
+在Go中，实现关系是隐式的。
+两个类型之间的实现关系不需要在代码中显式地表示出来。
+Go中没有类似于<code>implements</code>的关键字。
 Go编译器将自动在需要的时候检查两个类型之间的实现关系。
 </p>
 
-<p>
-一个接口类型总是实现了它自己。两个指定了一个相同的方法集的接口类型相互实现了对方。
-</p>
 
-<div>
-比如，在下面的例子中，类型<code>*Book</code>、<code>MyInt</code>和<code>*MyInt</code>都拥有一个原型为<code>About() string</code>的方法，所以它们都实现了接口类型<code>interface {About() string}</code>。
-<pre class="line-numbers"><code class="language-go">type Book struct {
+比如，在下面的例子中，类型<code>*Book</code>、<code>MyInt</code>和<code>*MyInt</code>都拥有一个描述为<code>About() string</code>的方法，所以它们都实现了接口类型<code>Aboutable</code>。
+<pre class="line-numbers"><code class="language-go">type Aboutable interface {
+	About() string
+}
+
+type Book struct {
 	name string
 	// 更多其它字段……
 }
@@ -129,12 +255,9 @@ func (MyInt) About() string {
 </p>
 
 <p>
-注意：因为任何方法集都是一个空方法集的超集，所以<b>任何类型都实现了任何空接口类型</b>。
-这是Go中的一个重要事实。
-</p>
-
 隐式实现关系的设计使得一个声明在另一个代码包（包括标准库包）中的类型可以被动地实现一个用户代码包中的接口类型。
 比如，如果我们声明一个像下面这样的接口类型，则<a href="https://golang.google.cn/pkg/database/sql/"><code>database/sql</code></a>标准库包中声明的<code>DB</code>和<code>Tx</code>类型都实现了这个接口类型，因为它们都拥有此接口类型指定的三个方法。
+</p>
 
 <pre class="line-numbers"><code class="language-go">import "database/sql"
 
@@ -146,18 +269,33 @@ type DatabaseStorer interface {
 	Query(query string, args ...interface{}) (*sql.Rows, error)
 }
 </code></pre>
+
+<p>
+</p>
+
+<p>
+注意：因为空接口类型的类型集包含了所有的非接口类型，所以所有类型均实现了空接口类型。
+这是Go中的一个重要事实。
+</p>
+
 </div>
 
 <a class="anchor" id="boxing"></a>
 <h3>值包裹</h3>
 
 <div>
+
+<p>
+重申一遍：目前（Go 1.18），接口值的类型必须为一个基本接口类型。
+在本文余下的内容里，当一个值类型被提及，此值类型可能是一个非接口类型，也可能是一个基本接口类型，但它肯定不是一个非基本接口类型。
+</p>
+
 <p>
 每个接口值都可以看作是一个用来包裹一个非接口值的盒子。
 欲将一个非接口值包裹在一个接口值中，此非接口值的类型必须实现了此接口值的类型。
 </p>
 
-在Go中，如果类型<code>T</code>实现了一个接口类型<code>I</code>，则类型<code>T</code>的值都可以隐式转换到类型<code>I</code>。
+在Go中，如果类型<code>T</code>实现了一个（基本）接口类型<code>I</code>，则类型<code>T</code>的值都可以隐式转换到类型<code>I</code>。
 换句话说，类型<code>T</code>的值可以赋给类型<code>I</code>的可修改值。
 当一个<code>T</code>值被转换到类型<code>I</code>（或者赋给一个<code>I</code>值）的时候，
 <ul>
@@ -280,7 +418,7 @@ func main() {
 
 	// 将接口值i中包裹的值清除掉。
 	i = nil
-	fmt.Println(i) // <nil>
+	fmt.Println(i) // &lt;nil&gt;
 }
 </code></pre>
 
@@ -448,11 +586,6 @@ func main() {
 <p>
 一个接口值中存储的动态类型信息可以被用来检视此接口值的动态值和操纵此动态值所引用的值。
 这称为反射。
-</p>
-
-<p>
-到目前为止（Go 1.17），Go尚未支持自定义函数和类型的泛型。
-反射部分地弥补了一些因为缺少泛型而导致的编程不便。
 </p>
 
 <p>
@@ -633,7 +766,7 @@ default:
 </p>
 
 <p>
-在一个<code>type-switch</code>代码块中，每个<code>case</code>关键字后可以跟随一个<code>nil</code>标识符和若干个类型名或类型字面表示形式。
+在一个<code>type-switch</code>代码块中，每个<code>case</code>关键字后可以跟随预声明的<code>nil</code>标识符或者一个由逗号分割的若干个类型名和类型字面表示形式组成的类型列表。
 在同一个<code>type-switch</code>代码块中，这些跟随在所有<code>case</code>关键字后的条目不可重复。
 </p>
 
@@ -752,12 +885,13 @@ func main() {
 
 <h3>更多接口相关的内容</h3>
 
+<!--
 <a class="anchor" id="embedding"></a>
 <h4>接口类型内嵌</h4>
 
 <div>
 一个接口类型可以内嵌另一个接口类型的名称。
-此内嵌的效果相当于将此被内嵌的接口类型所指定的所有方法原型展开到内嵌它的接口类型的定义体内。
+此内嵌的效果相当于将此被内嵌的接口类型所指定的所有方法描述展开平铺到内嵌它的接口类型的定义体内。
 比如，在下面的例子中，接口类型<code>Ic</code>、<code>Id</code>和<code>Ie</code>的所指定的方法集完全一样。
 
 <pre class="line-numbers"><code class="language-go">type Ia interface {
@@ -787,7 +921,7 @@ type Ie interface {
 <p>
 </p>
 
-在Go 1.14版本之前，如果两个接口类型都指定了一个同名方法，则这两个接口类型不可被同时被内嵌在同一个接口类型中，即使它们指定的同名方法的原型也一致。
+在Go 1.14版本之前，如果两个接口类型都指定了一个同名方法，则这两个接口类型不可被同时被内嵌在同一个接口类型中，即使它们指定的同名方法的描述也一致。
 比如，下面的代码中的几个接口类型声明在Go 1.14版本之前都是均是非法的。
 
 <pre class="line-numbers"><code class="language-go">type Ix interface {
@@ -814,6 +948,7 @@ type Iz interface {
 一个接口类型不能内嵌（无论是直接还是间接）它自己。
 </p>
 </div>
+-->
 
 <a class="anchor" id="comparison"></a>
 <h4>接口值相关的比较</h4>
@@ -960,8 +1095,8 @@ func main() {
 <div>
 
 <p>
-如果接口类型<code>I</code>指定了一个名为<code>m</code>的方法原型，则编译器将隐式声明一个与之对应的函数名为<code>I.m</code>的函数。
-此函数比<code>m</code>的方法原型中的参数多一个。此多出来的参数为函数<code>I.m</code>的第一个参数，它的类型为<code>I</code>。
+如果接口类型<code>I</code>指定了一个名为<code>m</code>的方法描述，则编译器将隐式声明一个与之对应的函数名为<code>I.m</code>的函数。
+此函数比<code>m</code>的方法描述中的参数多一个。此多出来的参数为函数<code>I.m</code>的第一个参数，它的类型为<code>I</code>。
 对于一个类型为<code>I</code>的值<code>i</code>，方法调用<code>i.m(...)</code>和函数调用<code>I.m(i, ...)</code>是等价的。
 </p>
 

@@ -12,8 +12,7 @@
 
 <p>
 Go中有一些内置函数，这些函数展示在<a href="https://golang.google.cn/pkg/builtin/"><code>builtin</code></a>和<a href="https://golang.google.cn/pkg/unsafe/"><code>unsafe</code></a>标准包中。
-内置函数和自定义函数有很多差别。其中一个差别是很多内置函数支持泛型参数，但自定义函数不支持（至少到Go 1.17为止）。
-更多这两者之间的差异将在下面逐一提及。
+内置函数和自定义函数有很多差别。这些差别将在下面逐一提及。
 </p>
 
 <h3>函数签名（function signature）和函数类型</h3>
@@ -58,7 +57,7 @@ func (int, string, string) (a int, b int, _ bool)
 </code></pre>
 
 <p>
-所有上面列出的函数类型字面形式表示同一个（非定义）函数类型。
+所有上面列出的函数类型字面形式表示同一个（无名）函数类型。
 </p>
 
 参数列表必须用一对小括号<code>()</code>括起来，即使此列表为空。

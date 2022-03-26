@@ -28,7 +28,7 @@
 		<a class="index" href="#switch-expressions-are-typed"><code>switch</code>流程控制代码块里的switch表达式总是被估值为类型确定值。</a>
 	</li>
 	<li>
-		<a class="index" href="#default-switch-expression-value"><code>switch</code>流程控制代码块中的switch表达式的缺省默认值为类型确定值<code>true</code>（其类型为预定义类型<code>bool</code>）。</a>
+		<a class="index" href="#default-switch-expression-value"><code>switch</code>流程控制代码块中的switch表达式的缺省默认值为类型确定值<code>true</code>（其类型为预声明类型<code>bool</code>）。</a>
 	</li>
 	<li>
 		<a class="index" href="#open-brace-on-the-next-line">有时候，显式代码块的开括号<code>{</code>可以放在下一行。</a>
@@ -400,7 +400,7 @@ func main() {
 </div>
 
 <a class="anchor" id="default-switch-expression-value"></a>
-<h3><code>switch</code>流程控制代码块中的switch表达式的缺省默认值为类型确定值<code>true</code>（其类型为预定义类型<code>bool</code>）。</h3>
+<h3><code>switch</code>流程控制代码块中的switch表达式的缺省默认值为类型确定值<code>true</code>（其类型为预声明类型<code>bool</code>）。</h3>
 
 <div>
 例如，下列程序会打印出<code>true</code>。
@@ -760,7 +760,7 @@ func main() {
 
 	fmt.Println(&x, &y, &o, &p)
 
-	// 对于标准编译器1.17版本，x、y、o和p将
+	// 对于标准编译器1.18版本，x、y、o和p将
 	// 逃逸到堆上，但是a、b、m和n则开辟在栈上。
 
 	fmt.Println(&a == &b) // false
@@ -774,7 +774,7 @@ func main() {
 </code></pre>
 
 <p>
-上面代码中所示的输出是针对标准编译器1.17版本的。
+上面代码中所示的输出是针对标准编译器1.18版本的。
 </p>
 </div>
 
@@ -849,8 +849,8 @@ func main() {
 <div>
 
 <p>
-无论一个指针值的类型是定义的还是非定义的，如果它的（指针）类型的基类型为一个结构体类型，则我们可以使用此指针值来选择它所引用着的结构体中的字段。
-但是，如果此指针的类型为一个定义的类型，则我们不能使用此指针值来选择它所引用着的结构体中的方法。
+无论一个指针值的类型是具名的还是无名的，如果它的（指针）类型的基类型为一个结构体类型，则我们可以使用此指针值来选择它所引用着的结构体中的字段。
+但是，如果此指针的类型为一个具名类型，则我们不能使用此指针值来选择它所引用着的结构体中的方法。
 </p>
 
 <p>
@@ -864,8 +864,8 @@ type T struct {
 }
 func (T) m(){} // T有一个方法m。
 
-type P *T  // P为一个定义的一级指针。
-type PP *P // PP为一个定义的二级指针。
+type P *T  // P为一个具名一级指针类型。
+type PP *P // PP为一个具名二级指针类型。
 
 func main() {
 	var t T
@@ -1210,7 +1210,7 @@ func main() {
 我们不应该假设结果切片的长度和容量总是相等的。
 </p>
 
-在下面的例子中，如果最后一个<code>fmt.Println</code>行被删除，在其前面的两行会打印相同的值<code>32</code>，否则，一个打印<code>32</code>，一个打印<code>8</code>（对于标准编译器1.17版本来说）。
+在下面的例子中，如果最后一个<code>fmt.Println</code>行被删除，在其前面的两行会打印相同的值<code>32</code>；否则，一个打印<code>32</code>，一个打印<code>8</code>（对于标准编译器1.18版本来说）。
 
 <pre class="line-numbers"><code class="language-go">package main
 

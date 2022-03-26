@@ -48,7 +48,7 @@
 	<li><a class="index" href="#unaddressable-values">哪些值可以被取地址，哪些值不可以被取地址？</a></li>
 	<li><a class="index" href="#map-elements-are-unaddressable">为什么映射元素不可被取地址？</a></li>
 	<li><a class="index" href="#slice-elements-always-addressable">为什么非空切片的元素总是可被取地址，即便对于不可取地址的切片也是如此？</a></li>
-	<li><a class="index" href="#method-set-relation">对任意的非指针、非接口定义类型<code>T</code>，为什么类型<code>*T</code>的方法集总是类型<code>T</code>的方法集的超集，但是反之却不然？</a></li>
+	<li><a class="index" href="#method-set-relation">对任意的非指针、非接口类型<code>T</code>，为什么类型<code>*T</code>的方法集总是类型<code>T</code>的方法集的超集，但是反之却不然？</a></li>
 	<li><a class="index" href="#types-can-have-methods">我们可以为哪些类型声明方法？</a></li>
 	<li><a class="index" href="#declare-immutables">在Go里如何声明不可变量？</a></li>
 	<li><a class="index" href="#set-container-type">为什么没有内置的<code>set</code>容器类型？</a></li>
@@ -80,7 +80,7 @@
 	编译器错误信息<code>non-name *** on left side of :=</code>意味着什么?
 </h3>
 
-直到目前（Go 1.17）, Go中对短变量声明有一个<a href="https://golang.google.cn/ref/spec#Short_variable_declarations">强制性约束</a>：
+直到目前（Go 1.18）, Go中对短变量声明有一个<a href="https://golang.google.cn/ref/spec#Short_variable_declarations">强制性约束</a>：
 <div class="alert alert-success">
 所有位于<code>:=</code>符号左侧的条目都必须是纯<a href="https://golang.google.cn/ref/spec#Identifiers">标识符</a>，并且其中至少有一个为新变量名称。
 </div>
@@ -186,7 +186,7 @@ exception: https://github.com/golang/go/issues/8560
 </h3>
 
 <p>
-不。<a href="https://golang.google.cn/ref/spec#For_range">Go白皮书</a>明确提到映射元素的迭代顺序时未定义的。
+不。<a href="https://golang.google.cn/ref/spec#For_range">Go白皮书</a>明确提到映射元素的迭代顺序是未定义的。
 所以对于同一个映射值，它的一个遍历过程和下一个遍历过程中的元素呈现次序不保证是相同的。
 对于标准编译器，映射元素的遍历顺序是随机的。
 如果你需要固定的映射元素遍历顺序，那么你就需要自己来维护这个顺序。
@@ -403,7 +403,7 @@ func main() {
 </p>
 
 <div>
-目前（Go 1.17），对于标准编译器，
+目前（Go 1.18），对于标准编译器，
 <ul>
 <li>没有显式的方式来在用户代码中指定哪些函数应该被内联。</li>
 <li>尽管编译参数<code>-gcflags "-l"</code>可以阻止任何函数被内联，
@@ -607,7 +607,7 @@ func main() {
 	对于组合类型的参数，内置的<code>print</code>/<code>println</code>函数将输出参数的底层值部的地址，而<code>fmt</code>和<code>log</code>标准库包中的打印函数将输出接口参数的动态值的字面形式。
 </li>
 <li>
-	目前（Go 1.17），对于标准编译器，调用内置的<code>print</code>/<code>println</code>函数不会使调用参数引用的值逃逸到堆上，而<code>fmt</code>和<code>log</code>标准库包中的打印函数将使调用参数引用的值逃逸到堆上。
+	目前（Go 1.18），对于标准编译器，调用内置的<code>print</code>/<code>println</code>函数不会使调用参数引用的值逃逸到堆上，而<code>fmt</code>和<code>log</code>标准库包中的打印函数将使调用参数引用的值逃逸到堆上。
 </li>
 <li>
 	如果一个实参有<code>String() string</code>或<code>Error() string</code>方法，那么<code>fmt</code>和<code>log</code>标准库包里的打印函数在打印参数时会调用这两个方法，而内置的<code>print</code>/<code>println</code>函数则会忽略参数的这些方法。
@@ -749,7 +749,7 @@ func main() {
 </p>
 
 <p>
-一个非定义组合类型的底层类型是此组合类型本身。
+一个无名组合类型的底层类型是此组合类型本身。
 所以即便两个不同的类型<code>T1</code>和<code>T2</code>共享相同的底层类型，类型<code>[]T1</code>和<code>[]T2</code>也依然是不同的类型，因此它们的底层类型也是不同的。这意味着其中一个的值不能转换为另一个。
 </p>
 
@@ -797,7 +797,7 @@ func main() {
 <li>字符串的字节元素</li>
 <li>映射元素</li>
 <li>接口值的动态值（类型断言的结果）</li>
-<li>常量（包括有名常量和字面量）</li>
+<li>常量（包括具名常量和字面量）</li>
 <li>声明的包级别函数</li>
 <li>方法（用做函数值）</li>
 <li>中间结果值
@@ -885,20 +885,20 @@ func main() {
 
 <a class="anchor" id="method-set-relation"></a>
 <h3>
-	对任意的非指针和非接口定义类型<code>T</code>，为什么类型<code>*T</code>的方法集总是类型<code>T</code>的方法集的超集，但是反之却不然？
+	对任意的非指针和非接口类型<code>T</code>，为什么类型<code>*T</code>的方法集总是类型<code>T</code>的方法集的超集，但是反之却不然？
 </h3>
 
 <div>
-在Go语言中，为了方便，对于一个非指针和非接口定义类型<code>T</code>，
+在Go语言中，为了方便，对于一个非指针和非接口类型<code>T</code>，
 <ul>
 <li>
-	一个<code>T</code>类型的值可以调用为<code>*T</code>类型声明的方法，但是仅当此<code>T</code>的值是可寻址的情况下。
+	一个<code>T</code>类型的值可以调用为<code>*T</code>类型的方法，但是仅当此<code>T</code>的值是可寻址的情况下。
 	编译器在调用指针属主方法前，会自动取此<code>T</code>值的地址。
-	因为不是任何<code>T</code>值都是可寻址的，所以并非任何<code>T</code>值都能够调用为类型<code>*T</code>声明的方法。
+	因为不是任何<code>T</code>值都是可寻址的，所以并非任何<code>T</code>值都能够调用为类型<code>*T</code>的方法。
 	这种便利只是一个语法糖，而不是一种固有的规则。
 </li>
 <li>
-	一个<code>*T</code>类型的值可以调用为类型<code>T</code>声明的方法。
+	一个<code>*T</code>类型的值可以调用为类型<code>T</code>的方法。
 	这是因为解引用指针总是合法的。
 	这种便利不仅仅是一个语法糖，它也是一种固有的规则。
 </li>
@@ -955,11 +955,11 @@ func (pt *T) MethodX(v0 ParamType0, ...) (ResultType0, ...) {
 </ol>
 
 <p>
-在Go语言中，直到现在（Go 1.17），没有值满足第三种定义。
+在Go语言中，直到现在（Go 1.18），没有值满足第三种定义。
 </p>
 
 <p>
-有名常量值满足第一种定义。
+具名常量值满足第一种定义。
 </p>
 
 <p>

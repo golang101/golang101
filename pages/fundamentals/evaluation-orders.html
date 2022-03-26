@@ -19,7 +19,7 @@
 </ul>
 
 <p>
-另外，<a href="packages-and-imports.html#initialization-order">程序资源初始化顺序</a>章节中提供了一个关于包级变量初始化顺序的例子。
+另外，<a href="packages-and-imports.html#initialization-order">程序代码要素初始化顺序</a>章节中提供了一个关于包级变量初始化顺序的例子。
 </p>
 
 </div>
@@ -29,8 +29,7 @@
 
 <div>
 <p>
-在运行时刻，当一个包被加载的时候，不依赖于任何其它未初始化包级变量的未初始化包级变量将按照它们在代码中的声明顺序被初始化。
-此过程可能需要重复若干次，直到此过程中不再有任何包级变量被初始化。
+在运行时刻，当一个包被加载的时候，不依赖于任何其它未初始化包级变量的未初始化包级变量将按照它们在代码中的声明顺序被初始化，直到此过程中不再有任何包级变量被初始化。
 对于一个成功编译了的Go程序，当所有这样的过程结束之后，所有的包级变量都应该被初始化了。
 </p>
 
@@ -38,19 +37,47 @@
 在包级变量初始化过程中，呈现为空标识符的包级变量和其它包级变被同等对待。
 </p>
 
-比如，下面这个程序应该打印出<code>yzxw</code>。
+举个例子，在下面的这个程序中，变量<code>a</code>依赖于变量<code>b</code>，变量<code>c</code>和<code>_</code>依赖于变量<code>a</code>。
+所以
 <ol>
 <li>
-	在上述过程运行的第一轮，<code>y</code>和<code>z</code>是仅有的两个不依赖于任何其它未初始化包级变量的未初始化包级变量，所以它们将按照它们的声明顺序被初始化。
+	第一个被初始化的变量是<code>b</code>，因为它是第一个不依赖于其它变量的包级变量。
 </li>
 <li>
-	在上述过程运行的第二轮，<code>x</code>是仅有的一个不依赖于任何其它未初始化包级变量的未初始化包级变量，所以它将被初始化。
+	第二个被初始化的变量是<code>a</code>，因为在变量<code>b</code>初始化之后，变量<code>a</code>是第一个不再依赖于未初始化包级变量的包级变量。.
 </li>
 <li>
-	在上述过程运行的第三轮，<code>w</code>是仅有的一个不依赖于任何其它未初始化包级变量的未初始化包级变量，所以它将被初始化。
+	第三和第四个被初始化的变量是<code>_</code>和<code>c</code>。
+	在变量<code>a</code>和<code>b</code>初始化之后，标记变量<code>_</code>和<code>c</code>均不再依赖于未初始化包级变量。
 </li>
 </ol>
 
+<pre class="line-numbers"><code class="language-go">package main
+
+import "fmt"
+
+var (
+	_ = f()
+	a = b / 2
+	b = 6
+	c = f()
+)
+
+func f() int {
+	a++
+	return a
+}
+
+func main() {
+	fmt.Println(a, b, c) // 5 6 5
+}
+</code></pre>
+
+<p>
+上面这个程序打印出<code>5 6 5</code>。
+</p>
+
+<!--
 <pre class="line-numbers"><code class="language-go">package main
 
 var (
@@ -73,6 +100,7 @@ func main() {
 <p>
 （注意：标准Go编译器1.13之前的版本并未正确地实现上述规则。如果上面这个程序使用标准Go编译器1.12版本编译的话，它将打印出<code>zxwy</code>。）
 </p>
+-->
 
 <!--
 https://github.com/golang/go/issues/31292
@@ -129,6 +157,11 @@ func (T) ab() []int { return []int{a, b} }
 </code></pre>
 
 <p>
+</p>
+
+<p>
+注意：因为一个代码包中常常包含若干个代码源文件，而Go白皮书并没有强制规定编译器按照如何顺序来编译一个代码包中的源文件，
+所以尽量不要让一个代码包中不同源文件中的包级变量存在复杂的依赖关系；否则不同的编译器可能会将一些包级变量初始化为不同结果。
 </p>
 
 </div>

@@ -46,12 +46,12 @@
 
 <div>
 <p>
-在Go中，一个非定义指针类型的字面形式为<code>*T</code>，其中<code>T</code>为一个任意类型。类型<code>T</code>称为指针类型<code>*T</code>的基类型（base type）。
+在Go中，一个无名指针类型的字面形式为<code>*T</code>，其中<code>T</code>为一个任意类型。类型<code>T</code>称为指针类型<code>*T</code>的基类型（base type）。
 如果一个指针类型的基类型为<code>T</code>，则我们可以称此指针类型为一个<code>T</code>指针类型。
 </p>
 
 <p>
-虽然我们可以声明定义指针类型，但是一般不推荐这么做。非定义指针类型的可读性更高。
+虽然我们可以声明具名指针类型，但是一般不推荐这么做，因为无名指针类型的可读性更高。
 </p>
 
 <p>
@@ -59,15 +59,15 @@
 </p>
 
 <p>
-如果两个非定义指针类型的基类型为同一类型，则这两个非定义指针类型亦为同一类型。
+如果两个无名指针类型的基类型为同一类型，则这两个无名指针类型亦为同一类型。
 </p>
 
 一些指针类型的例子：
-<pre class="line-numbers"><code class="language-go">*int  // 一个基类型为int的非定义指针类型。
-**int // 一个多级非定义指针类型，它的基类型为*int。
+<pre class="line-numbers"><code class="language-go">*int  // 一个基类型为int的无名指针类型。
+**int // 一个多级无名指针类型，它的基类型为*int。
 
-type Ptr *int // Ptr是一个定义的指针类型，它的基类型为int。
-type PP *Ptr  // PP是一个定义的多级指针类型，它的基类型为Ptr。
+type Ptr *int // Ptr是一个具名指针类型，它的基类型为int。
+type PP *Ptr  // PP是一个具名多级指针类型，它的基类型为Ptr。
 </code></pre>
 
 <p>
@@ -316,11 +316,11 @@ func main() {
 <ol>
 <li>
 	类型<code>T1</code>和<code>T2</code>的底层类型必须一致（忽略结构体字段的标签）。
-	特别地，如果类型<code>T1</code>和<code>T2</code>中只要有一个是<a href="type-system-overview.html#non-defined-type">非定义类型</a>并且它们的底层类型一致（考虑结构体字段的标签），则此转换可以是隐式的。
+	特别地，如果类型<code>T1</code>和<code>T2</code>中只要有一个是<a href="type-system-overview.html#named-type">无名类型</a>并且它们的底层类型一致（考虑结构体字段的标签），则此转换可以是隐式的。
 	关于结构体，请参阅<a href="struct.html">下一篇文章</a>。
 </li>
 <li>
-	类型<code>T1</code>和<code>T2</code>都为非定义类型并且它们的基类型的底层类型一致（忽略结构体字段的标签）。
+	类型<code>T1</code>和<code>T2</code>都为无名类型并且它们的基类型的底层类型一致（忽略结构体字段的标签）。
 </li>
 </ol>
 
@@ -341,7 +341,7 @@ type Tb    *MyInt
 	类型 <code>*MyInt</code>的值可以被隐式转换到类型<code>Tb</code>，反之亦然（因为它们的底层类型均为<code>*MyInt</code>）。
 </li>
 <li>
-	类型<code>*MyInt</code>的值可以被显式转换为类型<code>*int64</code>，反之亦然（因为它们都是非定义的并且它们的基类型的底层类型均为<code>int64</code>）。
+	类型<code>*MyInt</code>的值可以被显式转换为类型<code>*int64</code>，反之亦然（因为它们都是无名的并且它们的基类型的底层类型均为<code>int64</code>）。
 </li>
 <li>
 	类型<code>Ta</code>的值不能直接被转换为类型<code>Tb</code>，即使是显式转换也是不行的。
@@ -364,7 +364,7 @@ Go指针值是支持（使用比较运算符<code>==</code>和<code>!=</code>）
 	这两个指针的类型相同。
 </li>
 <li>
-	其中一个指针可以被隐式转换为另一个指针的类型。换句话说，这两个指针的类型的底层类型必须一致并且其中一个指针类型为非定义的（考虑结构体字段的标签）。
+	其中一个指针可以被隐式转换为另一个指针的类型。换句话说，这两个指针的类型的底层类型必须一致并且至少其中一个指针类型为无名的（考虑结构体字段的标签）。
 </li>
 <li>
 	其中一个并且只有一个指针用类型不确定的<code>nil</code>标识符表示。

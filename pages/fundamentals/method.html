@@ -11,7 +11,7 @@ Go支持一些面向对象编程特性，方法是这些所支持的特性之一
 在Go中，我们可以为类型<code>T</code>和<code>*T</code>显式地声明一个方法，其中类型<code>T</code>必须满足四个条件：
 <ol>
 <li>
-	<code>T</code>必须是一个<a href="type-system-overview.html#non-defined-type">定义类型</a>；
+	<code>T</code>必须是一个<a href="type-system-overview.html#type-definition">定义类型</a>；
 </li>
 <li>
 	<code>T</code>必须和此方法声明定义在同一个代码包中；
@@ -48,7 +48,7 @@ Go支持一些面向对象编程特性，方法是这些所支持的特性之一
 	接口类型。但是接口类型可以拥有方法。详见<a href="interface.html">下一篇文章</a>。
 </li>
 <li>
-	除了满足上面条件的形如<code>*T</code>的指针类型之外的非定义组合类型。
+	除了满足上面条件的形如<code>*T</code>的指针类型之外的无名组合类型。
 </li>
 </ul>
 
@@ -225,16 +225,16 @@ func (b *Book) Pages = (*b).Pages
 </div>
 
 <a class="anchor" id="method-set"></a>
-<h3>方法原型（method prototype）和方法集（method set）</h3>
+<h3>方法描述（method specification）和方法集（method set）</h3>
 
 <div>
 
 <p>
-一个方法原型可以看作是一个不带<code>func</code>关键字的<a href="function.html#prototype">函数原型</a>。
-我们可以把每个方法声明看作是由一个<code>func</code>关键字、一个属主参数声明部分、一个方法原型和一个方法体组成。
+一个方法描述可以看作是一个不带<code>func</code>关键字的<a href="function.html#prototype">函数原型</a>。
+我们可以把每个方法声明看作是由一个<code>func</code>关键字、一个属主参数声明部分、一个方法描述和一个方法体组成。
 </p>
 
-比如，上面的例子中的<code>Pages</code>和<code>SetPages</code>的原型如下：
+比如，上面的例子中的<code>Pages</code>和<code>SetPages</code>的描述如下：
 
 <pre class="line-numbers"><code class="language-go">Pages() int
 SetPages(pages int)
@@ -244,7 +244,7 @@ SetPages(pages int)
 </p>
 
 <p>
-每个类型都有个方法集。一个非接口类型的方法集由所有为它声明的（不管是显式的还是隐式的，但不包含方法名为空标识符的）方法的原型组成。
+每个类型都有个方法集。一个非接口类型的方法集由所有为它声明的（不管是显式的还是隐式的，但不包含方法名为空标识符的）方法的描述组成。
 接口类型将在<a href="interface.html">下一篇文章</a>详述。
 </p>
 
@@ -262,11 +262,11 @@ SetPages(pages int)
 </p>
 
 <p>
-方法集中的方法原型的次序并不重要。
+方法集中的方法描述的次序并不重要。
 </p>
 
 <p>
-对于一个方法集，如果其中的每个方法原型都处于另一个方法集中，则我们说前者方法集为后者（即另一个）方法集的子集，后者为前者的超集。
+对于一个方法集，如果其中的每个方法描述都处于另一个方法集中，则我们说前者方法集为后者（即另一个）方法集的子集，后者为前者的超集。
 如果两个方法集互为子集（或超集），则这两个方法集必等价。
 </p>
 
@@ -288,7 +288,7 @@ SetPages(pages int)
 <li>内置基本类型；</li>
 <li>定义的指针类型；</li>
 <li>基类型为指针类型或者接口类型的指针类型；</li>
-<li>非定义的数组/切片/映射/函数/通道类型。</li>
+<li>无名数组/切片/映射/函数/通道类型。</li>
 </ul>
 
 <p>
