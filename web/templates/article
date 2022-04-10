@@ -63,9 +63,13 @@
 {{ define "navbar" }}
 
 {{- $is_fundamentals := (eq .Group "fundamentals") -}}
+{{- $is_generics := (eq .Group "generics") -}}
 {{- $is_optimizations := (eq .Group "optimizations") -}}
 {{- $is_details_and_tips := (eq .Group "details-and-tips") -}}
 {{- $is_quizzes := (eq .Group "quizzes") -}}
+
+{{- $is_apps_and_libs := (eq .Group "apps-and-libs") -}}
+{{- $is_blog := (eq .Group "blog") -}}
 
 {{- $is_index_page := (eq .FilenameWithoutExt "101") -}}
 
@@ -84,14 +88,14 @@
 		<a href="/article/101.html"><small>Go语言101</small></a>
 	</div>
 	{{- end -}}
-	
-	{{- if and $is_quizzes $is_index_page -}}
+
+	{{- if and $is_generics $is_index_page -}}
 	<div class="col-xs-6 col-sm-4 nav-item-active">
-		<small>Go测验101</small>
+		<small>Go自定义泛型101</small>
 	</div>
 	{{- else -}}
-	<div class="col-xs-6 col-sm-4 nav-item- {{- if not $is_quizzes -}} in {{- end -}} active">
-		<a href="/quizzes/101.html"><small>Go测验101</small></a>
+	<div class="col-xs-6 col-sm-4 nav-item- {{- if not $is_generics -}} in {{- end -}} active">
+		<a href="/generics/101.html"><small>Go自定义泛型101</small></a>
 	</div>
 	{{- end -}}
 	
@@ -115,7 +119,29 @@
 	</div>
 	{{- end -}}
 	
-	<div class="col-xs-6 col-sm-4 nav-item-inactive" style="color: #666;"><small>Go编程实战101</small></div>
+	{{- if and $is_quizzes $is_index_page -}}
+	<div class="col-xs-6 col-sm-4 nav-item-active">
+		<small>Go测验101</small>
+	</div>
+	{{- else -}}
+	<div class="col-xs-6 col-sm-4 nav-item- {{- if not $is_quizzes -}} in {{- end -}} active">
+		<a href="/quizzes/101.html"><small>Go测验101</small></a>
+	</div>
+	{{- end -}}
+	
+	<div class="hidden-xs col-sm-4 nav-item-inactive" style="color: #777;"><small>Go编程实战101</small></div>
+	
+	{{- if and $is_apps_and_libs $is_index_page -}}
+	<div class="col-xs-6 col-sm-4 nav-item-active">
+		<small>Go 101 Apps &amp; Libs</small>
+	</div>
+	{{- else -}}
+	<div class="col-xs-6 col-sm-4 nav-item- {{- if not $is_apps_and_libs -}} in {{- end -}} active">
+		<a href="/apps-and-libs/101.html"><small>Go 101 应用和库</small></a>
+	</div>
+	{{- end -}}
+	
+	<div class="col-xs-6 col-sm-4 nav-item-inactive" style="color: #777;"><small>Go 101 博客</small></div>
 
 </div>
 
@@ -184,7 +210,7 @@
 	<div class="col-xs-12 col-sm-5 text-center">
 		<img src="../res/101-reward-qrcode-8.png" alt="赞赏" style="margin-top: 12px; max-width: 100%; height: auto; width: auto\9;"></img>
 		<br/>
-		<span style="font-size: small;">（《Go语言101》系列丛书由老貘从五年前开始编写。目前此系列丛书仍在不断改进和增容中。你的赞赏是本系列丛书和Go101.org网站不断增容和维护的动力。）</span>
+		<span style="font-size: small;">（《Go语言101》系列丛书由老貘从2016年7月开始编写。目前此系列丛书仍在不断改进和增容中。你的赞赏是本系列丛书和Go101.org网站不断增容和维护的动力。）</span>
 	</div>
 	{{ end }}
 </div>

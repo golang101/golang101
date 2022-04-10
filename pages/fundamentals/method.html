@@ -634,6 +634,34 @@ func main() {
 
 </div>
 
+<a class="anchor" id="method-obtaining"></a>
+<h3>一个定义类型不会获取为它的源类型显式声明的方法</h3>
+
+<div>
+
+举个例子，在下面的代码中，定义类型<code>Age</code>并不像它的源类型<code>MyInt</code>一样拥有一个<code>IsOdd</code>方法。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+type MyInt int
+func (mi MyInt) IsOdd() bool {
+	return mi%2 == 1
+}
+
+type Age MyInt
+
+func main() {
+	var x MyInt = 3
+	_ = x.IsOdd() // okay
+	
+	var y Age = 36
+	// _ = y.IsOdd() // error: y.IsOdd undefined
+	_ = y
+}
+</code></pre>
+
+</div>
+
 <h3>如何决定一个方法声明使用值类型属主还是指针类型属主？</h3>
 
 <p>

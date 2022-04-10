@@ -1,3 +1,8 @@
+本页内容转移到了[gfw.go101.org](https://gfw.go101.org)网站：
+
+* [Go语言101博客](https://gfw.go101.org/blog/101.html)
+* [Go语言101在1.18版本之前的更新历史](https://gfw.go101.org/blog/2022-02-22-history.html)
+
 ### 1.16.b (2021/五月/18)
 
 * 增加Go 1.17内容。
