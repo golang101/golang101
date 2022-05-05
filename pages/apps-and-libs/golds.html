@@ -61,7 +61,7 @@
 <li>运行<code>golds ./...</code>来查看处于当前目录下的所有Go库包（以及它们的依赖包）的文档和代码。</li>
 <li>运行<code>golds toolchain</code>（或者<code>golds cmd</code>）来查看处于官方工具链中的所有Go库包（以及它们的依赖包）的文档和代码。</li>
 <li>运行<code>golds std</code>来查看处于所有Go标准库包库包的文档和代码；<code>std</code>可以和上面的三个参数并用。</li>
-<li>运行<code>golds aPackage</code>来查看某个库包（以及它的依赖包）的文档和代码。</li>
+<li>运行<code>golds aPackage[/...][@aVersion]</code>来查看某些（共享一个路径前缀的）库包（以及它们的依赖包）的文档和代码。</li>
 <li>运行<code>golds foo.go bar.go baz.go</code>来查看一些Go文件（以及它们的依赖包）的文档和代码。</li>
 </ul>
 
