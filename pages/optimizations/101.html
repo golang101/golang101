@@ -1,4 +1,4 @@
-﻿<h1>Go语言编程优化101</h1>
+﻿<h1>Go编程优化101</h1>
 
 <p>
 本书将列出一些Go编程中的一些性能优化技巧和建议。
@@ -19,29 +19,31 @@
 		<p>（约150页，75+优化建议）</p>
 	</div>
 	<div class="col-xs-12 col-sm-9" style="padding-top: 6px;"><small>
-		本书的电子版可以从以下途径得到：
-		<ul>
-		<li>
-			<a href="https://leanpub.com/golang101">Leanpub电子书书店</a> -
-			<i>大约25RMB起（paypal支付）</i>.
-		</li>
-		<li>
-			<a href="https://books.apple.com/us/book/id1459984231">Apple电子书商店</a> -
-			<i>大约25RMB</i>
-		</li>
-		<li>
-			<a href="https://www.amazon.com/dp/B07Q3HWZ98">Amazon Kindle电子书店</a> -
-			<i>大约25RMB（信用卡支付）</i>.
-		</li>
-		</ul>
 
 		<p>
-		“Go 101”微信公众号将时不时地免费放出一些章节。其它联系信息详见<a href="#contact">页底</a>。
+		本书目前尚未免费阅读。
+		请在微信中搜素“Go 101“或者扫描<a href="/">本网站首页</a>中展示的公众号二维码关注“Go 101”微信公众号。
+		该微信公众号将时不时地免费放出一些章节。
 		</p>
 
 		<p>
+		从2016年7月开始，老貘（本书作者）开始编写《Go语言101》丛书和维护此Go101.org网站。
+		目前，各种改进和新的内容仍在源源不断地加入本丛书和此网站。
+		你的赞赏是本系列丛书和Go101.org网站不断增容和维护的动力。
+		</p>
+
+		<p>
+		赞赏二维码和其它联系信息见<a href="#contact">页底</a>。
+		</p>
+		
+		<p>
 		感谢Olexandr Shalakhin授权使用<a href="https://github.com/shalakhin/gophericons">这些可爱的地鼠图片</a>。
 		其中一张图片使用在本书的封面中。
+		</p>
+
+		<p>
+		The English version of this book is avaiable
+		<a href="https://go101.org/optimizations/101.html">here</a>.
 		</p>
 		
 	</small></div>
@@ -56,65 +58,75 @@
 <div id="book-index">
 	
 <ul class="index part">
-	<li><a class="index" href="0.0-acknowledgements.html">Acknowledgements</a></li>
-	<li><a class="index" href="0.1-introduction.html">About Go Optimizations 101</a></li>
-	<li>Value Parts and Value Sizes <sup><small>(avaliable in <a href="#ebooks">the paid ebooks</a>)</small></sup></li>
+	<li><a class="index" href="0.0-acknowledgements.html">致谢</a></li>
+	<li><a class="index" href="0.1-introduction.html">关于《Go编程优化101》</a></li>
+	<li>值部和值尺寸</li>
 	<ul>
-		<li>value/type sizes</li>
-		<li>memory alignments</li>
-		<li>struct padding</li>
-		<li>avoid larger copy costs</li>
+		<li>值尺寸</li>
+		<li>内存对齐</li>
+		<li>结构体字节填充</li>
+		<li>避免大复制成本</li>
 	</ul>
-	<li><a class="index" href="0.3-memory-allocations.html">Memory Allocations</a></li>
-	<li>Stack and Escape Analysis <sup><small>(avaliable in <a href="#ebooks">the paid ebooks</a>)</small></sup></li>
+	<li>内存分配</li>
 	<ul>
-		<li>escape analysis</li>
-		<li>how to control value allocation places</li>
-		<li>stacks growth and shrinkage</li>
-		<li>how to reduce stack grow times</li>
+		<li>内存块和内存分配区域</li>
+		<li>如何减少内存分配量和次数</li>
 	</ul>
-	<li>Garbage Collection <sup><small>(avaliable in <a href="#ebooks">the paid ebooks</a>)</small></sup></li>
+	<li>栈、堆和逃逸分析</li>
 	<ul>
-		<li>GC pacer</li>
-		<li>how to reduce GC pressure</li>
-		<li>control GC frequency</li>
+		<li>逃逸分析</li>
+		<li>如何控制内存分配区域</li>
+		<li>栈增长和收缩</li>
+		<li>如何降低栈增长次数</li>
 	</ul>
-	<li><a class="index" href="1-pointer.html">Pointers</a></li>
-	<li>Structs <sup><small>(avaliable in <a href="#ebooks">the paid ebooks</a>)</small></sup></li>
+	<li>垃圾回收</li>
 	<ul>
-		<li>3 facts/suggestions</li>
+		<li>垃圾回收步幅控制</li>
+		<li>如何降低垃圾回收压力</li>
+		<li>控制垃圾回收频率</li>
 	</ul>
-	<li>Arrays and Slices <sup><small>(avaliable in <a href="#ebooks">the paid ebooks</a>)</small></sup></li>
+	<li>指针</li>
 	<ul>
-		<li>11 facts/suggestions</li>
+		<li>3 事实和建议</li>
 	</ul>
-	<li>String and Byte Slices <sup><small>(avaliable in <a href="#ebooks">the paid ebooks</a>)</small></sup></li>
+	<li>结构体</li>
 	<ul>
-		<li>10 facts/suggestions</li>
+		<li>3 事实和建议</li>
 	</ul>
-	<li>BCE (Bound Check Eliminate) <sup><small>(avaliable in <a href="#ebooks">the paid ebooks</a>)</small></sup></li>
+	<li>数组和切片</li>
 	<ul>
-		<li>the cases BCE works for</li>
-		<li>the cases BCE doesn't work for</li>
-		<li>the cases BCE works for when given hints</li>
+		<li>11 事实和建议</li>
 	</ul>
-	<li><a class="index" href="6-map.html">Maps</a></li>
-	<li>Channels <sup><small>(avaliable in <a href="#ebooks">the paid ebooks</a>)</small></sup></li>
+	<li>字符串和字节切片</li>
 	<ul>
-		<li>3 facts/suggestions</li>
+		<li>10 事实和建议</li>
 	</ul>
-	<li>Functions <sup><small>(avaliable in <a href="#ebooks">the paid ebooks</a>)</small></sup></li>
+	<li>边界检查消除（Bound Check Eliminate，BCE）</li>
 	<ul>
-		<li>how to make a function inline-able</li>
-		<li>how to make a function not inline-able</li>
-		<li>pointer parameters/results vs. non-pointer ones</li>
-		<li>named results vs. annonymous ones</li>
-		<li>10+ facts/suggestions</li>
+		<li>BCE起作用的情形</li>
+		<li>BCE不起作用的情形</li>
+		<li>BCE需要给出暗示才能起作用的情形</li>
 	</ul>
-	<li>Interfaces <sup><small>(avaliable in <a href="#ebooks">the paid ebooks</a>)</small></sup></li>
+	<li>映射</li>
 	<ul>
-		<li>value boxing costs</li>
-		<li>3+ facts/suggestions</li>
+		<li>7 事实和建议</li>
+	</ul>
+	<li>通道</li>
+	<ul>
+		<li>3 事实和建议</li>
+	</ul>
+	<li>函数</li>
+	<ul>
+		<li>如何尽量使一个函数可被内联</li>
+		<li>如何使一个函数不可被内联</li>
+		<li>指针和非指针参数对性能的影响</li>
+		<li>具名和匿名返回结果对性能的影响</li>
+		<li>10+ 事实和建议</li>
+	</ul>
+	<li>接口</li>
+	<ul>
+		<li>值装箱成本</li>
+		<li>3+ 事实和建议</li>
 	</ul>
 </ul>
 

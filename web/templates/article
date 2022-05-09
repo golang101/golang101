@@ -169,6 +169,7 @@
 {{ define "promotions" }}
 
 {{- $is_fundamentals := (eq .Group "fundamentals") -}}
+{{- $is_generics := (eq .Group "generics") -}}
 {{- $is_optimizations := (eq .Group "optimizations") -}}
 {{- $is_details_and_tips := (eq .Group "details-and-tips") -}}
 {{- $is_quizzes := (eq .Group "quizzes") -}}
@@ -186,18 +187,18 @@
 
 <hr>
 
-<div id="contact" class="row alert alert-success">
+<div id="contact" class="row alert alert-success"><small>
 	{{ if or true $not_index_page -}}
 	<div class="col-xs-12 col-sm-7">
 	{{ end }}
 		<p>
-		本Go101.org网站包括Go编程各种相关知识（比如Go基础、Go实战、Go测验、Go工具等）。后续将不断有新的内容加入。敬请收藏关注期待。
+		Go101.org网站内容包括Go编程各种相关知识（比如Go基础、Go优化、Go细节、Go实战、Go测验、Go工具等）。后续将不断有新的内容加入。敬请收藏关注期待。
 		</p>
 		<p>
-		本书微信公众号名称为<b>"Go 101"</b>（联系方式一）。此公众号将时不时地发表一些Go语言相关的原创短文。各位如果感兴趣，可以搜索关注一下。
+		本丛书微信公众号（联系方式一）名称为<b>"Go 101"</b>。二维码在<a href="/">网站首页</a>。此公众号将时不时地发表一些Go语言相关的原创短文。各位如果感兴趣，可以搜索关注一下。
 		</p>
 		<p>
-		《Go语言101》项目目前托管在<a href="https://github.com/golang101/golang101">Github</a>上（联系方式二）。欢迎各位在此项目中通过提交bug和PR的方式来改进完善《Go语言101》丛书中的各篇文章。我们可以在项目目录下运行<code>go run .</code>来浏览和确认各种改动。
+		《Go语言101》系列丛书项目目前托管在<a href="https://github.com/golang101/golang101">Github</a>上（联系方式二）。欢迎各位在此项目中通过提交bug和PR的方式来改进完善《Go语言101》丛书中的各篇文章。我们可以在项目目录下运行<code>go run .</code>来浏览和确认各种改动。
 		</p>
 		<p>
 		本书的twitter帐号为<a href="https://twitter.com/Golang_101">@Golang_101</a>（联系方式三）。玩推的Go友可以适当关注。
@@ -205,82 +206,42 @@
 		<p>
 		你或许对本书作者老貘开发的<a href="https://gfw.tapirgames.com">一些App</a>感兴趣。
 		</p>
+
+	{{ if $not_index_page -}}
+
+		<div id="ebooks">
+
+		{{- if $is_fundamentals }}
+The English version of this book is <a href="https://go101.org/details-and-tips/101.html">here</a>.
+		{{ end -}}
+
+		{{if $is_generics }}
+The English version of this book is <a href="https://go101.org/generics/101.html">here</a>.
+		{{ end -}}
+
+		{{- if $is_optimizations }}
+The English version of this book is <a href="https://go101.org/optimizations/101.html">here</a>.
+		{{ end -}}
+
+		{{- if $is_details_and_tips }}
+The English version of this book is <a href="https://go101.org/details-and-tips/101.html">here</a>.
+		{{ end -}}
+
+		</div>
+
+	{{ end -}}
+
 	{{ if or true $not_index_page }}
 	</div>
 	<div class="col-xs-12 col-sm-5 text-center">
-		<img src="../res/101-reward-qrcode-8.png" alt="赞赏" style="margin-top: 12px; max-width: 100%; height: auto; width: auto\9;"></img>
+		<img src="../res/101-reward-qrcode-8.png" alt="赞赏" style="max-width: 100%; height: auto; width: auto\9;"></img>
 		<br/>
-		<span style="font-size: small;">（《Go语言101》系列丛书由老貘从2016年7月开始编写。目前此系列丛书仍在不断改进和增容中。你的赞赏是本系列丛书和Go101.org网站不断增容和维护的动力。）</span>
+		<span style="font-size: small;">（《Go语言101》系列丛书由老貘从2016年7月开始编写。目前此系列丛书仍在不断改进和增容中。你的赞赏是本系列丛书和此Go101.org网站不断增容和维护的动力。）</span>
 	</div>
 	{{ end }}
-</div>
 
-{{ if $not_index_page -}}
-<div class="row alert alert-warning"><small>
-<div id="ebooks">
+</small></div>
 
-	{{- if $is_fundamentals }}
-本书的电子版可以从以下途径得到：
-<ul>
-<li>
-	<a href="https://leanpub.com/golang101">Leanpub电子书书店</a> -
-	<i>大约25RMB起（paypal支付）</i>。
-</li>
-<li>
-	<a href="https://books.apple.com/us/book/id1459984231">Apple电子书商店</a> -
-	<i>大约25RMB</i>。
-</li>
-<li>
-	<!--a href="https://www.amazon.com/dp/B07Q3HWZ98">Amazon Kindle电子书店</a> -
-	<i>大约25RMB（信用卡支付）</i>。-->
-	Amazon Kindle电子书店</a> - <i>暂时未上架</i>。
-</li>
-<li>
-	<a href="https://github.com/go101/go101/releases">免费电子书</a> -
-	包括pdf、epub和azw3等格式。
-</li>
-</ul>
-	{{ end -}}
-
-	{{- if $is_optimizations }}
-本书的电子版可以从以下途径得到：
-<ul>
-<li>
-	<a href="https://leanpub.com/golang101">Leanpub电子书书店</a> -
-	<i>大约25RMB起（paypal支付）</i>.
-</li>
-<li>
-	<a href="https://books.apple.com/us/book/id1459984231">Apple电子书商店</a> -
-	<i>大约25RMB</i>
-</li>
-<li>
-	<a href="https://www.amazon.com/dp/B07Q3HWZ98">Amazon Kindle电子书店</a> -
-	<i>大约25RMB（信用卡支付）</i>.
-</li>
-</ul>
-	{{ end -}}
-
-	{{- if $is_details_and_tips }}
-本书的电子版可以从以下途径得到： 
-<ul>
-<li>
-	<a href="https://leanpub.com/golang101">Leanpub电子书书店</a> -
-	<i>大约19RMB起（paypal支付）</i>.
-</li>
-<li>
-	<a href="https://books.apple.com/us/book/id1459984231">Apple电子书商店</a> -
-	<i>大约19RMB</i>.
-</li>
-<li>
-	<a href="https://www.amazon.com/dp/B07Q3HWZ98">Amazon Kindle电子书店</a> -
-	<i>大约19RMB（信用卡支付）</i>.
-</li>
-</ul>
-	{{ end -}}
-
-</div>
-</div>
-{{ end -}}
 
 {{ if and $not_index_page .Index -}}
 

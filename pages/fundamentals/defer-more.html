@@ -38,7 +38,7 @@ func main() {
 <h3>延迟调用的函数值的估值时刻</h3>
 
 <div>
-一个被延迟调用的函数值是在其调用被推入延迟调用堆栈之前被估值的。
+一个被延迟调用的函数值是在其调用被推入延迟调用队列之前被估值的。
 例如，下面这个例子将输出<code>false</code>。
 
 <pre class="line-numbers"><code class="language-go">package main
@@ -59,7 +59,7 @@ func main() {
 <p></p>
 
 一个被延迟调用的函数值可能是一个nil函数值。这种情形将导致一个恐慌。
-对于这种情形，恐慌产生在此延迟调用被执行而不是被推入延迟调用堆栈的时候。
+对于这种情形，恐慌产生在此延迟调用被执行而不是被推入延迟调用队列的时候。
 一个例子：
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -80,7 +80,7 @@ func main() {
 
 <div>
 
-前面的文章曾经解释过：一个延迟调用的实参<a href="control-flows-more.html#argument-evaluation-moment">也是在此调用被推入延迟调用堆栈之前估值的</a>。
+前面的文章曾经解释过：一个延迟调用的实参<a href="control-flows-more.html#argument-evaluation-moment">也是在此调用被推入延迟调用队列时估值的</a>。
 方法的属主实参也不例外。比如，下面这个程序将打印出<code>1342</code>。
 
 <pre class="line-numbers"><code class="language-go">package main
@@ -95,7 +95,7 @@ func (t T) M(n int) T {
 func main() {
 	var t T
 	// t.M(1)是方法调用M(2)的属主实参，因此它
-	// 将在M(2)调用被推入延迟调用堆栈之前被估值。
+	// 将在M(2)调用被推入延迟调用队列时被估值。
 	defer t.M(1).M(2)
 	t.M(3).M(4)
 }
@@ -254,7 +254,11 @@ func (t *T) IncreaseB() {
 <h3>延迟调用导致的暂时性内存泄露</h3>
 
 <div>
-一个较大的延迟调用堆栈可能会消耗很多内存，而且延迟调用堆栈中尚未执行的延迟调用可能会导致某些资源未被及时释放。
+<p>
+一个较大的延迟调用队列可能会消耗很多内存。
+另外，某些资源可能因为某些调用被延迟的太久而未能被及时释放。
+</p>
+
 比如，如果下面的例子中的函数需要处理大量的文件，则在此函数退出之前，将有大量的文件句柄得不到释放。
 
 <pre class="line-numbers"><code class="language-go">func writeManyFiles(files []File) error {

@@ -1,31 +1,32 @@
 
-<h1>defer 1</h1>
+<h1>延迟调用 1</h1>
 
 <div id="question">
 
-What does the following program print?
+下面这个程序打印出什么？
 
 <pre class="line-numbers"><code class="language-go">package main
 
-func bar() (r int) {
-	defer func() {
-		r += 4
-		if recover() != nil {
-			r += 8
-		}
-	}()
-	
-	var f func()
-	defer f()
-	f = func() {
-		r += 2
-	}
+type Foo struct {
+	v int
+}
 
-	return 1
+func MakeFoo(n *int) Foo {
+	print(*n)
+	return Foo{}
+}
+
+func (Foo) Bar(n *int) {
+	print(*n)
 }
 
 func main() {
-	println(bar())
+	var x = 1
+	var p = &x
+	defer MakeFoo(p).Bar(p) // line 19
+	x = 2
+	p = new(int) // line 21
+	MakeFoo(p)
 }
 </code></pre>
 </div>
@@ -38,45 +39,69 @@ func main() {
 <input type="radio" id="choiceD" name="choice">
 
 <div id="choices">
-<p>Choices:</p>
+<p>选项：</p>
 
 <ul style="list-style-type:none;">
-<li>
-<label for="choiceA">1</label>
-</li>
-<li>
-<label for="choiceB">7</label>
-</li>
-<li>
-<label for="choiceC">12</label>
-</li>
-<li>
-<label for="choiceD">13</label>
-</li>
+<li><label for="choiceA">
+	100
+</label></li>
+<li><label for="choiceB">
+	102
+</label></li>
+<li><label for="choiceC">
+	022
+</label></li>
+<li><label for="choiceD">
+	011
+</label></li>
 </ul>
 
 </div>
 
 <div id="answer">
-<p>Answer: 13</p>
+<p>答案：102</p>
 
-<p>Run it on <a href="https://go.dev/play/p/DV4k3pVhS4k" target="_blank">Go play</a>.</p>
+<p>（<a href="https://go.dev/play/p/WfuL8NQ4HKA" target="_blank">在线运行之</a>）</p>
 
-<p>Key points:</p>
+<p>关键点：</p>
 <ul>
 <li>
-Line 12: when the call <code>f()</code> is pushed to the defer call stack,
-<code>f</code> is evaluated as nil. Calling a nil function produces a panic.
-But the panic doesn't happen at the push time.
-Instead, it will panic at the execution time later during the exiting phase of the <code>bar()</code> call.
+	当一个函数调用被推入延迟调用队列，被调用的函数值和所有实参（包括属主实参和普通实参）都将被估值。
+	这些估值将在此延迟调用在以后被执行的时候使用。
 </li>
 <li>
-Line 13-15: the assignment to <code>f</code> has not any impacts on the execution effect.
-In other words, this assignment is actually a no-op.
+	所以，在第 19 行，延迟 <code>Bar</code> 调用被推入延迟调用队列时，它的属主实参 <code>MakeFoo(p)</code> 和普通实参 <code>p</code> 被估值。
+	在估值（即调用） <code>MakeFoo(p)</code> 时，将打印出 <code>1</code>。
 </li>
 <li>
-Line 4-9: a defer call could modify the named return result of its containing function (here the <code>bar</code> function).
+	后来在第 21 行对变量 <code>p</code> 的修改不影响上述估值结果。
+	这意味着传递给 <code>Bar</code> 调用的普通实参依旧是一个指向变量 <code>x</code> 的指针。
 </li>
 </ul>
+
+<p>
+一个类似的测验：
+</p>
+
+<pre class="line-numbers"><code class="language-go">package main
+
+type T int
+
+func (t T) M(n int) T {
+	print(n)
+	return t
+}
+
+func main() {
+	var t T
+	defer t.M(1).M(2)
+	t.M(3).M(4)
+}
+</code></pre>
+
+<p>
+上面这个程序打印出 <code>1342</code>。
+</p>
+
 </div>
 

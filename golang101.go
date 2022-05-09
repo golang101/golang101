@@ -52,6 +52,8 @@ func (go101 *Go101) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		item = tokens[0]
 	}
 
+	log.Println(group, item)
+
 	switch go101.ConfirmLocalServer(isLocalRequest(r)); group {
 	case "":
 		if item == "" {

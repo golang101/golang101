@@ -1,69 +1,74 @@
+<p id="f-0-1-introduction-md"></p>
+<h1>关于《Go编程优化101》</h1>
 
-<h1>About Go Optimizations 101</h1>
+<p>本书将列出一些Go编程中的一些性能优化技巧和建议。本书中的大多数内容是基于官方标准编译器和运行时的实现而做出的。</p>
 
-<p>This book provides some code performance optimization tricks, tips, and suggestions.
-Most of the contents in this book are made based on the official standard Go compiler and runtime implementation.</p>
+<p>生活中，我们常常需要做出一些折衷妥协。编程亦如是。
+在编程中，我们常常需要在代码简洁性、可读性、可维护性、开发效率和程序运行效率等指标之间进行折衷。
+即使对于其中的一个指标，也常常需要各种折衷权衡。
+以程序运行效率为例，我们很可能需要在节省内存、代码运行速度和实现难度等方面进行折衷。</p>
 
-<p>Life is full of trade-offs, the programming world is, too.
-In programming, we often need to make trade-offs between code readability, maintainability, development efficiency, and program efficiency, etc.
-Even for one of the aspects, there are also trade-offs needing to be made.
-Taking program efficiency for an example, we might need to make trade-offs between memory saving, code execution speed, and implementation difficuty, etc.</p>
+<p>在实际项目中，大多数环节的实现代码其实并不要求达到极高的效率。
+这些代码的可读性和可维护性常常更为重要。
+本书列出的这些建议只是为确实需要高性能的环节提供一些代码实现建议。
+其中的一些建议常常会导致更为繁琐的代码。
+另外需要注意的是，其中的某些建议实现可能在某些场景是高效的，但对于另一些场景却未必。
+所以请按需采纳这些建议。</p>
 
-<p>In practice, most parts of the code base of a project don't need to be implemented with high performances. Keeping them maintainable and readable is often more important (than making them memroy saving and run very fast).
-The suggestions made in this book are just for the code parts which implementations really need to be high performant.
-Some of the suggestions often causes more verbose code.
-And please note that some of the suggested implementation might only be performant at some certain scenarios, and might be not at others.</p>
-
-<p>The contents in this book include:</p>
+<p>本书中的建议包括：</p>
 
 <ul>
-<li>how to consume less CPU resources.</li>
-<li>how to consume less memory.</li>
-<li>how to make less memory allocations.</li>
-<li>how to control memory allocation places.</li>
-<li>how to reduce garbage collection pressure.</li>
+<li>如何消耗更少的CPU资源；</li>
+<li>如何消耗更少的内存；</li>
+<li>如何减少内存开辟；</li>
+<li>如何控制内存开辟位置；</li>
+<li>如何降低垃圾回收压力等。</li>
 </ul>
 
-<p>This book neither explain how to use performance analysis tools, such as pprof,
-nor try to study deeply on compiler and runtime implementation details.
-None of the contents provided in this book make use of unsafe pointers and cgo.
-The contents in this book also doesn't talk about algorithms.
-In other words, this book tries to provide some optimization suggestions
-in a way which is clear and easy to understand, for daily general Go programming.</p>
+<p>本书不解释如何使用性能分析工具（比如pprof）。
+本书也不深究Go编译器和运行时的实现细节。
+本书提供的所有建议和技巧均不使用非类型安全指针和cgo。
+本书不讨论算法。
+换句话说，本书尽量使用浅显易懂的方式来提供一些优化建议，希望这些建议对日常Go编程有所帮助。</p>
 
-<p>Without particularly indicated, the code examples provided in this book are tested and run on a notebook with the following enviroment setup:</p>
+<p>如果没有特别指出，本书的例子代码运行于一台如下配置和环境的笔记本上：</p>
 
-<pre><code>go version go1.17 linux/amd64
+<pre><code>go version go1.18 linux/amd64
 goos: linux
 goarch: amd64
 cpu: Intel(R) Core(TM) i5-4210U CPU @ 1.70GHz
 </code></pre>
 
-<p>Many benchmark times information are removed in benchmark results to keep benchmark lines short.</p>
+<p>为了排版整齐，本书中各个基准测试输出中的用例运行次数信息被删除了。</p>
 
-<p>Please note that:</p>
+<p>请注意：</p>
 
 <ul>
-<li>some of the talked suggestions in this book work on any platform and for any CPU models, some others might only work on specified platforms and for specified CPU models. So please benchmark them on the same enviroments as your production enviroments before adopting any of them.</li>
-<li>some implementation details of the official standard Go compiler and runtime might change from version to version, which means some of the talked suggestions might not work for future Go toolchain versions.</li>
-<li>the book will be open sourced eventually since a later undetermined time point (about 2023/Jun), in a chapter by chapter way.</li>
+<li>本书中的一些优化建议对各种平台和CPU型号均适用，另一些可能只适用于某些平台和CPU型号。所以请在你的生产环境同等环境下基准测试使用了这些建议的代码。</li>
+<li>官方标准编译器和运行时的实现细节可能不时地随着版本的变动而改动，这意味着本书中提供的一些建议可能会在今后的版本中失效。</li>
+<li>本书将从今后的某个时间节点（大约2023年六月）开始逐章开源。</li>
 </ul>
 
-<p>The book was ever considered to be titled as &quot;Performant Go&quot;.
-But after some thinking, I decided to title it under the &quot;Go 101&quot; brand.</p>
+<p>本书曾考虑用名《Performant Go》（高性能Go编程）。
+不过，经过一番思考，我还是决定将其命名为《Go 101》系列丛书之一。</p>
 
-<h2>About the author</h2>
+<h2>关于本书作者</h2>
 
-<p>Tapir is the author of this book.
-He also wrote the <a href="https://go101.org/article/101.html">Go 101</a> book.
-He is planning to write some other <strong>Go 101</strong> series books.
-Please look forward to.</p>
+<p>本书作者为老貘，也就是<a href="https://gfw.go101.org">《Go 101》</a>一书的作者。
+老貘正计划完成更多《Go 101》系列丛书。敬请期待。</p>
 
-<p>Tapir was ever (maybe will be again) an indie game developer.
-You can find his games here: <a href="https://tapirgames.com">tapirgames.com</a>.</p>
+<p>老貘曾（没准儿以后会重新成）为一个独立游戏开发者（<a href="https://tapirgames.com">他开发的游戏</a>）。</p>
 
-<h2>Feedback</h2>
+<p>你的赞赏是Go 101系列丛书不断改进和增容的动力：</p>
 
-<p>Welcome to improve this book by submitting corrections to Go 101 issue list (<a href="https://github.com/go101/go101">https://github.com/go101/go101</a>) for all kinds of mistakes, such as typos, grammar errors, wording inaccuracies, wrong explanations, description flaws, code bugs, etc.</p>
+<p><img src="../../go101-zanshang.png"></img></p>
 
-<p>It is also welcome to send your feekback to the Go 101 twitter account: @go100and1 (<a href="https://twitter.com/go100and1">https://twitter.com/go100and1</a>).</p>
+<h2>反馈</h2>
+
+<p>欢迎各位在Go 101中文项目 (<a href="https://github.com/golang101/golang101">https://github.com/golang101/golang101</a>) 中的问题列表中提交在本书中发现的各种问题和对这些问题的改正。</p>
+
+<p>欢迎关注本书的微信公众号：Go 101（可在微信中搜索“go 101”或者“golang101”，或者扫描下面的二维码）。</p>
+
+<p><img src="../../go101-wechat.png"></img></p>
+
+<p>本书的twitter帐号为 @Golang_101 (中文 <a href="https://twitter.com/Golang_101">https://twitter.com/Golang_101</a>) 和 @go100and1 (英文 <a href="https://twitter.com/go100and1)。">https://twitter.com/go100and1)。</a></p>
