@@ -5,7 +5,10 @@
 [<b>Go语言101</b>](https://gfw.go101.org)是关于Go语言编程的系列丛书。
 目前本系列丛书包括：
 
-* 
+* [Go (Fundamentals) 101](https://go101.org/article/101.html), which focuses on Go syntax/semantics (except custom generics related) and all kinds of runtime related things.
+* [Go Generics 101](https://go101.org/generics/101.html), which explains Go custom generics in detail.
+* [Go Optimizations 101](https://go101.org/optimizations/101.html), which provides some code performance optimization tricks, tips, and suggestions.
+* [Go Details & Tips 101](https://go101.org/details-and-tips/101.html), which collects many details and provides several tips in Go programming.
 
 
 本系列丛书同时适合Go初学者和有一定经验的Go程序员阅读，

@@ -36,6 +36,7 @@ var go101 = &Go101{
 	staticHandler: http.StripPrefix("/static/", staticFilesHandler),
 	isLocalServer: false, // may be modified later
 	pageGroups:    collectPageGroups(),
+	articlePages:  map[[2]string][]byte{},
 }
 
 func init() {
@@ -51,8 +52,6 @@ func (go101 *Go101) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	} else { // len(tokens) == 1
 		item = tokens[0]
 	}
-
-	log.Println(group, item)
 
 	switch go101.ConfirmLocalServer(isLocalRequest(r)); group {
 	case "":
