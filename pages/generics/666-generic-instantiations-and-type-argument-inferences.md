@@ -291,6 +291,8 @@ will be supported in future Go versions.
 
 <!--
 https://github.com/golang/go/issues/50482
+
+https://github.com/golang/go/issues/53389
 -->
 
 For the same reason, the following code doesn't compile (as of Go toolchain 1.18).

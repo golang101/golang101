@@ -852,7 +852,7 @@ Calls to the predeclared `new` function have not this requirement.
 
 ## A call to the predeclared `delete` function requires all types in the type set of its first argument have an identical key type
 
-Note, here, the identical key type may be ordinary type or type parameter type.
+Note, here, the identical key type may be an ordinary type or a type parameter type.
 
 The following functions both compile okay.
 
@@ -941,7 +941,7 @@ func g[V C](v V) {
 	f1(v) // okay
 	f2(v) // error: V does not implement comparable
 	f3(v) // okay
-	f4(v) // error: V does not implement comparable
+	f4(v) // error: V does not implement int
 }
 ```
 

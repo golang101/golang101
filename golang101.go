@@ -24,7 +24,7 @@ type Go101 struct {
 	pageGroups    map[string]*PageGroup
 	articlePages  map[[2]string][]byte
 	serverMutex   sync.Mutex
-	theme         string // default is "dark"
+	theme         string
 }
 
 type PageGroup struct {

@@ -2,7 +2,7 @@
 
 ----
 
-[<b>Go语言101</b>](https://gfw.go101.org)是关于Go语言编程的系列丛书。
+[<b>Go语言101</b>](https://gfw.go101.org)是关于Go语言编程的一系列丛书。
 目前本系列丛书包括：
 
 * [《Go语言（基础知识）101》](https://gfw.go101.org/article/101.html)是一本着墨于Go语法语义（除了自定义泛型）以及运行时相关知识点的编程指导书。
@@ -10,8 +10,7 @@
 * [《Go编程优化101》](https://gfw.go101.org/optimizations/101.html)列出了一些Go编程中的一些性能优化技巧和建议。
 * [《Go细节和小技巧101》](https://gfw.go101.org/details-and-tips/101.html)搜集了很多Go编程中的细节和小技巧。
 
-本系列丛书同时适合Go初学者和有一定经验的Go程序员阅读，
-希望它们能够帮助Go程序员更深更全面地理解Go语言。
+本系列丛书同时适合Go初学者和有一定经验的Go程序员阅读。希望它们能够帮助Go程序员更深更全面地理解Go语言。
 
 本丛书的英文项目地址为：[github.com/go101/go101](https://github.com/go101/go101)
 
@@ -19,7 +18,7 @@
 
 ![](pages/website/res/101-group-qrcode-2.jpg?raw=true)
 
-_(若上面二维码未显示出来，请点击此[墙内版链接](https://tool.oschina.net/action/qrcode/generate?data=http%3A%2F%2Fweixin.qq.com%2Fr%2FRy6ju1TE0AmvrRDY93tV&output=image%2Fgif&error=L&type=0&margin=12&size=4)或者在微信中搜索"Go 101"公众号。)_
+_(若上面二维码未显示出来，请点击此[墙内版链接](https://tool.oschina.net/action/qrcode/generate?data=http%3A%2F%2Fweixin.qq.com%2Fr%2FRy6ju1TE0AmvrRDY93tV&output=image%2Fgif&error=L&type=0&margin=12&size=4)或者在微信中搜索 "Go 101" 公众号。)_
 
 ### 安装、更新以及本地阅读本系列丛书
 
@@ -56,12 +55,12 @@ Server started:
    http://127.0.0.1:12345 (cached version)
 ```
 
-本系列丛书起始页将自动在用户默认浏览器中打开。如果没有，请手动访问http://localhost:12345
+本系列丛书起始页将自动在用户默认浏览器中打开。如果没有，请手动访问 http://localhost:12345
 
 命令行选项：
 ```
 -port=1234
--theme=light # 或者 dark （默认）
+-theme=light # 或者 dark （默认为 auto）
 ```
 
 ### 一些注意事项

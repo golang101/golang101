@@ -38,7 +38,7 @@ $(document).ready(function(){
 		head.appendChild(script);
 	}
 
-	var swithTheme = function(targetTheme) {
+	var swithTheme = function(targetTheme, manually) {
 		if (theme == targetTheme) {
 			return
 		}
@@ -56,34 +56,48 @@ $(document).ready(function(){
 			loadJS('js-prism', '/static/prism/2020-08-03-dark/prism.js')
 		}
 
-		document.cookie ="theme=" + theme  + "; path=/; SameSite=None; Secure"
+		if (manually) {
+			document.cookie = "theme=" + theme  + "; path=/; SameSite=None; Secure"
+		}
 	}
 
-	console.log(document.cookie)
-
-	var cookieTheme = "dark"
-	document.cookie.split(';').forEach(function(el) {
-		let [key, value] = el.split('=')
-		if (key.trim() == "theme") {
-			cookieTheme = value
+	var cookieTheme = theme
+	if (cookieTheme == "") {
+		document.cookie.split(';').forEach(function(el) {
+			let [key, value] = el.split('=')
+			if (key.trim() == "theme") {
+				cookieTheme = value
+			}
+		})
+		if (cookieTheme == "") {
+			const mediaQueryList = window.matchMedia("(prefers-color-scheme: light)")
+			if (mediaQueryList.matches) {
+				cookieTheme = "light"
+			}
 		}
-	})
-	swithTheme(cookieTheme)
+		if (cookieTheme == "") {
+			cookieTheme = "dark"
+		}
+	}
+	console.log("=== theme: ", theme)
+	console.log("=== document.cookie: ", document.cookie)
+	console.log("=== cookieTheme: ", cookieTheme)
+	swithTheme(cookieTheme, false)
 
 	var themeSwitch = document.getElementById('theme-switch')
 	if (themeSwitch == null) {
 		return
 	}
-
 	themeSwitch.style.cursor = 'pointer'
 	themeSwitch.style.color = ""
 	themeSwitch.classList.add("active")
 	themeSwitch.addEventListener("click", function() {
 		if (theme != "light") {
-			swithTheme("light")
+			swithTheme("light", true)
 		} else {
-			swithTheme("dark")
+			swithTheme("dark", true)
 		}
 	}); 
 });
+
 

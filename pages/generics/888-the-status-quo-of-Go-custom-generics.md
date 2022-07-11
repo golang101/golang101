@@ -202,7 +202,7 @@ The restriction mentioned in the last section is actually a special case
 of the one described in the current section.
 
 The restriction (described in the current section) was [added just before
-Go 1.18 is released](https://github.com/golang/go/issues/51576).
+Go 1.18 was released](https://github.com/golang/go/issues/51576).
 It might be removed since a future Go version.
 
 <!--

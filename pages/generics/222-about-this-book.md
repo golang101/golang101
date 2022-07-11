@@ -56,6 +56,11 @@ https://github.com/golang/proposal/blob/master/design/generics-implementation-di
 	https://github.com/golang/go/issues/49206 // type switch
 	https://github.com/golang/go/issues/45380 type switch on type parameters not supported
 	
+	https://github.com/golang/go/issues/53328
+	https://github.com/golang/go/issues/53376
+	https://github.com/golang/go/issues/53406
+	https://github.com/golang/go/issues/53390
+	
 -->
 
 
