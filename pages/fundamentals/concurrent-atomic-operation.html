@@ -10,7 +10,7 @@
 </p>
 
 <a class="anchor" id="overview"></a>
-<h3>Go支持的原子操作概述</h3>
+<h3>Go 1.19之前的版本中支持的原子操作概述</h3>
 
 <div>
 对于一个整数类型<code>T</code>，<code>sync/atomic</code>标准库包提供了下列原子操作函数。
@@ -48,26 +48,70 @@ func CompareAndSwapPointer(addr *unsafe.Pointer,
 </code></pre>
 
 <p>
-因为Go指针不支持算术运算，所以相对于整数类型，指针类型的原子操作少了一个<code>AddPointer</code>函数。
+因为Go（安全）指针不支持算术运算，所以相对于整数类型，指针类型的原子操作少了一个<code>AddPointer</code>函数。
 </p>
 
-<code>sync/atomic</code>标准库包也提供了一个<code>Value</code>类型。以它为基的指针类型<code>*Value</code>拥有两个方法：<code>Load</code>和<code>Store</code>。
+<code>sync/atomic</code>标准库包也提供了一个<code>Value</code>类型，以它为基的指针类型<code>*Value</code>拥有四个方法（见下，其中后两个是从Go 1.17开始才支持的）。
 <code>Value</code>值用来原子读取和修改任何类型的Go值。
 
-<pre class="line-numbers"><code class="language-go">func (v *Value) Load() (x interface{})
-func (v *Value) Store(x interface{})
+<pre class="line-numbers"><code class="language-go">func (*Value) Load() (x interface{})
+func (*Value) Store(x interface{})
+func (*Value) Swap(new interface{}) (old interface{})
+func (*Value) CompareAndSwap(old, new interface{}) (swapped bool)
+</code></pre>
+
+</div>
+
+<a class="anchor" id="overview-1.19"></a>
+<h3>Go 1.19+ 版本中新增的原子操作概述</h3>
+
+<div>
+
+<p>
+Go 1.19引入了几个各自拥有若干方法的类型用来实现上一节中列出的函数提供的同样的功能。
+</p>
+
+<p>
+在这些类型中，<code>Int32</code>、<code>Int64</code>、<code>Uint32</code>、<code>Uint64</code>和<code>Uintptr</code>用来实现整数原子操作。
+下面列出的是<code>atomic.Int32</code>类型的方法。其它四个类型的方法是类似的。
+</p>
+
+<pre class="line-numbers"><code class="language-go">func (*Int32) Add(delta int32) (new int32)
+func (*Int32) Load() int32
+func (*Int32) Store(val int32)
+func (*Int32) Swap(new int32) (old int32)
+func (*Int32) CompareAndSwap(old, new int32) (swapped bool)
 </code></pre>
 
 <p>
-本文的余下部分将通过一些示例来展示如何使用这些原子操作函数。
+从Go 1.18开始，Go已经开始支持自定义泛型。
+一些标准库包开始在Go 1.19中使用自定义泛型，这其中包括<code>sync/atomic</code>标准库包。
+此包在Go 1.19中引入的<code>atomic.Pointer[T any]</code>类型就是一个泛型类型。
+下面列出了它的方法：
 </p>
+
+<pre class="line-numbers"><code class="language-go">(*Pointer[T]) Load() *T
+(*Pointer[T]) Store(val *T)
+(*Pointer[T]) Swap(new *T) (old *T)
+(*Pointer[T]) CompareAndSwap(old, new *T) (swapped bool)
+</code></pre>
+
+<p>
+Go 1.19也引入了一个<code>Bool</code>类型来进行布尔原子操作。
+</p>
+
 </div>
 
 <a class="anchor" id="integer"></a>
 <h3>整数原子操作</h3>
 
 <div>
-下面这个例子展示了如何使用<code>add</code>原子操作来并发地递增一个<code>int32</code>值。
+
+<p>
+本文的余下部分将通过一些示例来展示如何使用这些原子操作函数。
+</p>
+
+下面这个例子展示了如何使用<code>Add</code>原子操作来并发地递增一个<code>int32</code>值。
 在此例子中，主协程中创建了1000个新协程。每个新协程将整数<code>n</code>的值增加<code>1</code>。
 原子操作保证这1000个新协程之间不会发生数据竞争。此程序肯定打印出<code>1000</code>。
 
@@ -99,7 +143,38 @@ func main() {
 如果我们将新协程中的语句<code>atomic.AddInt32(&amp;n, 1)</code>替换为<code>n++</code>，则最后的输出结果很可能不是<code>1000</code>。
 </p>
 
-<code>StoreT</code>和<code>LoadT</code>原子操作函数经常被用来需要并发运行的实现setter和getter方法。下面是一个这样的例子：
+下面的代码使用Go 1.19引入的<code>atomic.Int32</code>类型和它的方法重新实现了上面的程序。
+此实现略显整洁。
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import (
+	"fmt"
+	"sync"
+	"sync/atomic"
+)
+
+func main() {
+	var n atomic.Int32
+	var wg sync.WaitGroup
+	for i := 0; i < 1000; i++ {
+		wg.Add(1)
+		go func() {
+			n.Add(1)
+			wg.Done()
+		}()
+	}
+	wg.Wait()
+
+	fmt.Println(n.Load()) // 1000
+}
+</code></pre>
+
+<p>
+</p>
+
+<code>StoreT</code>和<code>LoadT</code>原子操作函数或者方法经常被用来需要并发运行的实现setter和getter方法。
+下面的例子使用了原子操作函数：
 
 <pre class="line-numbers"><code class="language-go">type Page struct {
 	views uint32
@@ -111,6 +186,21 @@ func (page *Page) SetViews(n uint32) {
 
 func (page *Page) Views() uint32 {
 	return atomic.LoadUint32(&page.views)
+}
+</code></pre>
+
+下面这个例子使用了Go 1.19引入的类型和方法：
+
+<pre class="line-numbers"><code class="language-go">type Page struct {
+	views atomic.Uint32
+}
+
+func (page *Page) SetViews(n uint32) {
+	page.views.Store(n)
+}
+
+func (page *Page) Views() uint32 {
+	return page.views.Load()
 }
 </code></pre>
 
@@ -188,6 +278,7 @@ func main() {
 </code></pre>
 
 <p>
+
 </p>
 
 <p>
@@ -219,11 +310,35 @@ func main() {
 }
 </code></pre>
 
+下面是与之对应的使用Go 1.19引入的类型和方法的实现：
+
+<pre class="line-numbers must-line-numbers"><code class="language-go">package main
+
+import (
+	"fmt"
+	"sync/atomic"
+)
+
+func main() {
+	var n atomic.Int64
+	n.Store(123)
+	var old = n.Swap(789)
+	fmt.Println(n.Load(), old) // 789 123
+	swapped := n.CompareAndSwap(123, 456)
+	fmt.Println(swapped)  // false
+	fmt.Println(n.Load()) // 789
+	swapped = n.CompareAndSwap(789, 456)
+	fmt.Println(swapped)  // true
+	fmt.Println(n.Load()) // 456
+}
+</code></pre>
+
 <p>
 </p>
 
 <p>
-请注意，到目前为止（Go 1.18），一个64位字（int64或uint64值）的原子操作要求此64位字的内存地址必须是8字节对齐的。
+请注意，到目前为止（Go 1.19），一个64位字（int64或uint64值）的原子操作要求此64位字的内存地址必须是8字节对齐的。
+对于Go 1.19引入的原子方法操作，此要求无论在32-bit还是64-bit架构上总是会得到满足，但是对于32-bit架构上的原子函数操作，此要求并非总会得到满足。
 请阅读<a href="memory-layout.html">关于Go值的内存布局</a>一文获取详情。
 </p>
 
@@ -253,9 +368,9 @@ import (
 )
 
 type T struct {x int}
-var pT *T
 
 func main() {
+	var pT *T
 	var unsafePPT = (*unsafe.Pointer)(unsafe.Pointer(&pT))
 	var ta, tb = T{1}, T{2}
 	// 修改
@@ -285,6 +400,7 @@ func main() {
 事实上，啰嗦还是次要的，更主要的是，因为指针的原子操作需要引入<code>unsafe</code>标准库包，所以这些操作函数不在<a href="https://golang.google.cn/doc/go1compat">Go 1兼容性保证</a>之列。
 </p>
 
+<!--
 <p>
 我个人认为目前支持的这些指针原子操作在今后变为不合法的可能性很小。
 即使它们变得不再合法，Go官方工具链中的<code>go fix</code>命令应该会将它们转换为今后的新的合法形式。
@@ -295,6 +411,47 @@ func main() {
 如果你确实担忧这些指针原子操作在未来的合法性，你可以使用下一节将要介绍的原子操作。
 但是下一节将要介绍的原子操作对于指针值来说比本节介绍的指针原子操作效率要低得多。
 </p>
+-->
+
+<p>
+与之相对，如果我们使用Go 1.19引入的<code>Pointer</code>泛型类型和它的方法来做指针原子操作，代码将变得简洁的多。
+下面的代码证明了这一点。
+</p>
+
+<pre class="line-numbers must-line-numbers"><code class="language-go">package main
+
+import (
+	"fmt"
+	"sync/atomic"
+)
+
+type T struct {x int}
+
+func main() {
+	var pT atomic.Pointer[T]
+	var ta, tb = T{1}, T{2}
+	// store
+	pT.Store(&ta)
+	fmt.Println(pT.Load()) // &{1}
+	// load
+	pa1 := pT.Load()
+	fmt.Println(pa1 == &ta) // true
+	// swap
+	pa2 := pT.Swap(&tb)
+	fmt.Println(pa2 == &ta) // true
+	fmt.Println(pT.Load())  // &{2}
+	// compare and swap
+	b := pT.CompareAndSwap(&ta, &tb)
+	fmt.Println(b) // false
+	b = pT.CompareAndSwap(&tb, &ta)
+	fmt.Println(b) // true
+}
+</code></pre>
+
+<p>
+更为重要的是，上面这段代码没有引入<code>unsafe</code>标准库包，所以Go 1会保证它的向后兼容性。
+</p>
+
 </div>
 
 <a class="anchor" id="arbitrary"></a>

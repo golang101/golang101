@@ -92,14 +92,16 @@ Go是一门支持自动内存管理的语言，比如自动内存开辟和自动
 <p>
 对每一个使用标准编译器编译的Go程序，在运行时刻，每一个协程将维护一个栈（stack）。
 一个栈是一个预申请的内存段，它做为一个内存池供某些内存块从中开辟。
-每个协程的初始栈大小比较小（2KiB）。
-每个栈的大小在协程运行的时候将按照需要增长和收缩。
+在官方Go工具链1.19版本之前，一个栈的初始尺寸总是2KiB。
+从1.19版本开始，栈的初始尺寸是<a href="https://docs.google.com/document/d/1YDlGIdVTPnmUiTAavlZxBI1d9pwGQgZT7IKFKlIXohQ">自适应的</a>。
+每个栈的尺寸在协程运行的时候将按照需要增长和收缩。
+栈的最小尺寸为2KiB。
 </p>
 
 <p><i>
 （注意：Go运行时维护着一个协程栈的最大尺寸限制，此限制为全局的。
 如果一个协程在增长它的栈的时候超过了此限制，整个程序将崩溃。
-对于目前的Go 1.18版本，此最大限制的默认值在64位系统上为1GB，在32位系统上为250MB。
+对于目前的官方标准Go工具链1.19版本，此最大限制的默认值在64位系统上为1GB，在32位系统上为250MB。
 我们可以在运行时刻调用<code>runtime/debug</code>标准库包中的<code>SetMaxStack</code>来修改此值。
 另外请注意，当前的官方标准编译器实现中，实际上允许的协程栈的最大尺寸为不超过最大尺寸限制的2的幂。
 所以对于默认设置，实际上允许的协程栈的最大尺寸在64位系统上为512MiB，在32位系统上为128MiB。）
@@ -199,14 +201,15 @@ The values referenced by values allocated on heap will never be allocated in sta
 使用内置<code>new</code>函数开辟的内存可能开辟在堆上，也可能开辟在栈上。这是与C++不同的一点。
 </p>
 
-当一个协程的栈的大小改变时，一个新的内存段将申请给此栈使用。原先已经开辟在老的内存段上的内存块将很有可能被转移到新的内存段上，或者说这些内存块的地址将改变。
+当一个协程的栈的大小（因为栈增长或者收缩而）改变时，一个新的内存段将申请给此栈使用。
+原先已经开辟在老的内存段上的内存块将很有可能被转移到新的内存段上，或者说这些内存块的地址将改变。
 相应地，引用着这些开辟在此栈上的内存块的指针（它们同样开辟在此栈上）中存储的地址也将得到刷新。
 下面是一个展示开辟在栈上的值的地址改变的例子。
 
 <pre class="line-numbers"><code class="language-go">package main
 
 func f(i int) byte {
-	type T int // 防止f被内联
+	type _ int // 防止f被内联
 	var a [1<<20]byte // 使栈增长
 	return a[i]
 }
@@ -220,7 +223,7 @@ func main(){
 </code></pre>
 
 <p>
-我们可以看到，上例打引出的两个地址不一样（如果使用官方标准编译器v1.18编译之）。
+我们可以看到，上例打引出的两个地址不一样（如果使用官方标准编译器v1.19编译之）。
 </p>
 
 <!--p>
@@ -335,11 +338,11 @@ func main() {
 </div>
 
 <a class="anchor" id="how-to-detect"></a>
-<h3>如何判断一个内存块是否仍在被使用？</h3>
+<h3>如何判断一个堆内存块是否仍在被使用？</h3>
 
 <div>
 <p>
-目前的官方Go标准运行时（1.18版本）使用<a href="https://blog.golang.org/go15gc">一个并发三色（tri-color）标记清扫（mark-sweep）算法</a>来实现垃圾回收。
+目前的官方Go标准运行时（1.19版本）使用<a href="https://blog.golang.org/go15gc">一个并发三色（tri-color）标记清扫（mark-sweep）算法</a>来实现垃圾回收。
 这里仅会对此算法的原理做一个大致的描述。一个具体实现可能和此大致描述会有很多细节上的差别。
 </p>
 
@@ -350,7 +353,7 @@ func main() {
 在标记阶段，垃圾回收器（实际上是一组协程）使用三色算法来分析哪些（开辟在堆上的）内存块已经不再使用了。
 <ul>
 <li>
-	在每一轮（见下一节的解释）垃圾回收过程的开始，所有的内存块将被标记为白色。
+	在每一轮（见下一节的解释）垃圾回收过程的开始，所有的堆内存块将被标记为白色。
 </li>
 <li>
 	然后垃圾回收器将所有开辟在栈和全局内存区上的内存块标记为灰色，并把它们加入一个灰色内存块列表。
@@ -376,7 +379,12 @@ func main() {
 </i></p>
 
 <p>
-在清扫阶段，仍被标记为白色的内存块将被认为是不再使用的而被回收掉。
+在清扫阶段，仍被标记为白色的内存块将被认为不再使用而被回收掉。
+</p>
+
+<p>
+一个不再被使用的内存块被回收后可能并不会立即释放给操作系统，这样Go运行时可以将其重新分配给其它值部使用。
+不用担心，官方Go运行时的实现比大多数主流的Java运行时要消耗少得多的内存。
 </p>
 
 <p>
@@ -388,6 +396,32 @@ func main() {
 <h3>不再被使用的内存块将在什么时候被回收？</h3>
 
 <div>
+
+<p>
+垃圾回收过程将消耗相当的CPU资源和一些内存资源。所以垃圾回收过程并非总在运行。
+一个新的垃圾回收过程将在程序运行中的某些实时指标达到某些条件时才会被触发。
+这些条件怎么定义的是一个垃圾回收调度问题。
+</p>
+
+官方标准运行时（runtime）的垃圾回收调度实现仍在随着版本递增而在不断地改善中。
+所以很难精确地描述此实现并同时保证描述的长期有效性。这里，我仅仅列出一些相关的参考文献：
+
+<ul>
+<li>
+	关于<a href="https://golang.org/pkg/runtime/#hdr-Environment_Variables"><code>GOGC</code>和<code>GOMEMLIMIT</code>环境变量</a>（注意<code>GOMEMLIMIT</code>环境变量从Go 1.19开始才支持）；
+</li>
+<li>
+	<a href="https://go.dev/doc/gc-guide">A Guide to the Go Garbage Collector</a>；
+</li>
+<li>
+	<a href="https://github.com/golang/proposal/blob/master/design/44167-gc-pacer-redesign.md">GC Pacer Redesign</a>；
+</li>
+<li>
+	我的<a href="https://gfw.go101.org/optimizations/101.html">Go编程优化101</a>一书中的“垃圾回收”一章（此书中文版目前尚未发布，<a href="https://go101.org/optimizations/101.html">英文版</a>可付费购买）。
+</li>
+</ul>
+
+<!--
 <p>
 开辟在堆上的不再使用的内存块将被Go运行时认为是垃圾而将被回收，以供以后重用或者释放（给操作系统）。
 垃圾回收器并不是时刻都在运行着。它只是每隔一段时间因为某些条件达成之后才开始新的一轮垃圾回收过程。
@@ -395,7 +429,7 @@ func main() {
 </p>
 
 <p>
-目前（Go官方工具链1.18），对于使用标准编译器编译的Go程序，一轮新的垃圾回收过程开启的默认条件是通过<a href="https://golang.google.cn/pkg/runtime/#hdr-Environment_Variables"><code>GOGC</code>环境变量</a>来控制的。
+目前（Go官方工具链1.19），对于使用标准编译器编译的Go程序，一轮新的垃圾回收过程开启的默认条件是通过<a href="https://golang.google.cn/pkg/runtime/#hdr-Environment_Variables"><code>GOGC</code>环境变量</a>来控制的。
 当从上一轮垃圾回收结束后新申请的内存块的内存总和占上一轮垃圾回收结束时仍在被使用的所有内存块的内存总和的百分比超过此值时，新的一轮垃圾回收过程将开始。
 所以此值决定了垃圾回收过程的频率。
 此环境变量的默认值为100。
@@ -404,20 +438,26 @@ func main() {
 </p>
 
 <p>
+Go官方工具链1.19引入了一种新的垃圾回收启动策略：<a href="https://go.dev/doc/gc-guide#Memory_limit">内存使用限制策略</a>。
+此策略可以通过设置<code>GOMEMLIMIT</code>环境变量或者调用<a href="https://golang.org/pkg/runtime/debug/#SetMemoryLimit">runtime/debug.SetMemoryLimit</a>函数来配置。
+此内存限制设置了Go运行时（runtime）应该使用的最大内存值。
+换句话说，如果运行时使用的内存超过了此限制，一轮新的垃圾回收过程将开启（这是一个软限制，Go程序不会因此而退出）。
+此限制的默认值为<code>math.MaxInt64</code>，这事实上是禁止了此策略发挥作用。
+请注意，如果此限制被设置为一个不够充分大的值，则垃圾回收过程将会很频繁的启动（但即使这样的情况发生，垃圾回收过程消耗的CPU资源一般也不会超过50%）。
+</p>
+
+<p>
 一轮新的垃圾回收过程也可以通过调用<a href="https://golang.google.cn/pkg/runtime/#GC"><code>runtime.GC</code>函数</a>来手动开启。
 </p>
 
 <p>
-另一点需要注意的是，当前的官方Go运行时（v1.18）同时采取了另一个策略：<a href="https://github.com/golang/go/blob/895b7c85addfffe19b66d8ca71c31799d6e55990/src/runtime/proc.go#L4481-L4486">一个Go程序的最大垃圾回收时间间隔为两分钟</a>。
+另一点需要注意的是，当前的官方Go运行时（v1.19）同时采取了另一个策略：<a href="https://github.com/golang/go/blob/895b7c85addfffe19b66d8ca71c31799d6e55990/src/runtime/proc.go#L4481-L4486">一个Go程序的最大垃圾回收时间间隔为两分钟</a>。
 </p>
 
 <p>
-以后的Go运行时版本可能会采取不同的垃圾回收策略。
+当前支持的几种垃圾回收启动策略都不能完美应对所有应用场景，所以以后的Go运行时版本可能会采取和支持更多不同的垃圾回收启动策略。
 </p>
+-->
 
-<p>
-一个不再被使用的内存块被回收后可能并不会立即释放给操作系统，这样Go运行时可以将其重新分配给其它值部使用。
-不用担心，官方Go运行时的实现比大多数主流的Java运行时要消耗少得多的内存。
-</p>
 </div>
 

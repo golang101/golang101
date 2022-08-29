@@ -287,23 +287,6 @@ func fd2(is []int, bs []byte) {
 	}
 }
 
-func fe(isa []int, isb []int) {
-	if len(isa) > 0xFFF {
-		for _, n := range isb {
-			_ = isa[n & 0xFFF] // 第24行： 需要边界检查
-		}
-	}
-}
-
-func fe2(isa []int, isb []int) {
-	if len(isa) > 0xFFF {
-		isa = isa[:0xFFF+1] // 第31行： 一个暗示
-		for _, n := range isb {
-			_ = isa[n & 0xFFF] // 第33行： 边界检查消除了！
-		}
-	}
-}
-
 func main() {}
 </code></pre>
 
@@ -330,7 +313,6 @@ func ff2(s []int) []int {
 
 <pre class="output"><code>$ go run -gcflags="-d=ssa/check_bce/debug=1" example5.go
 ./example5.go:7: Found IsInBounds
-./example5.go:24: Found IsInBounds
 </code></pre>
 </div>
 

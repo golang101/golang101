@@ -521,31 +521,35 @@ func fpq() {
 <h4>原子操作相关的顺序保证</h4>
 
 <div>
+
 <p>
-没有任何官方文档提到了原子操作所保证的内存顺序。
-然而，事实上，对于标准编译器来说，原子操作确实保证了某些特定的内存顺序。
-标准库的实现大量地依赖于这些原子操作做出的内存顺序保证。
+从Go 1.19开始，Go 1 内存模型正式地说明Go程序中执行的原子操作按照顺序一致次序（sequentially consistent order）执行。
+如果一个原子（写）操作A的效果被一个原子（读）操作B观察到，则A肯定被同步到B之前执行。
 </p>
 
-下面这个程序如果使用标准编译器1.18编译的话，它在运行时肯定打印出<code>1</code>。
+按照这个说法，在下面这个程序中，对变量<code>b</code>的原子写操作肯定发生在对其读取结果为<code>1</code>的原子原子读操作之前。
+从而使得对变量<code>a</code>的普通写操作也发生于对其的普通读操作之前。
+所以此程序保证会打印出<code>1</code>。
 
 <pre class="line-numbers"><code class="language-go">package main
 
-import "fmt"
-import "sync/atomic"
-import "runtime"
+import (
+	"fmt"
+	"runtime"
+	"sync/atomic"
+)
 
 func main() {
 	var a, b int32 = 0, 0
 
 	go func() {
-		atomic.StoreInt32(&a, 1)
+		a = 2
 		atomic.StoreInt32(&b, 1)
 	}()
 
 	for {
 		if n := atomic.LoadInt32(&b); n == 1 {
-			fmt.Println(atomic.LoadInt32(&a)) // 1
+			fmt.Println(a) // 2
 			break
 		}
 		runtime.Gosched()
@@ -554,17 +558,17 @@ func main() {
 </code></pre>
 
 <p>
-在此程序中，主协程总是会观察到对<code>a</code>的修改在对<code>b</code>的修改之前结束。
-但是，这种保证没有记录在任何Go官方文档中。
-如果你希望你编写的Go代码能够跨编译器和跨编译器版本兼容，那么安全的建议是<b>不要依赖于原子操作做出的内存顺序保证</b>。
-有<a href="https://github.com/golang/go/issues/5045">一个issue</a>建议Go官方文档将目前原子操作做出的内存顺序保证记录下来。
-但是到目前为止（Go 1.18），此建议还未被采纳。
-</p>
-
-<p>
 请阅读<a href="concurrent-atomic-operation.html">原子操作</a>一文来获取如何使用原子操作。
 </p>
 </div>
+
+<a class="anchor" id="finalizer"></a>
+<h4>和终结器相关的顺序保证</h4>
+
+<div>
+调用<code>runtime.SetFinalizer(x, f)</code>发生在终结调用<code>f(x)</code>被执行之前。 
+</div>
+
 
 <!--
 
