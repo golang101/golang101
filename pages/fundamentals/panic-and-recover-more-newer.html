@@ -91,16 +91,33 @@ func f3() int {
 
 <p>
 当一个函数调用中直接产生了一个恐慌的时候，我们可以认为此（尚未被恢复的）恐慌将和此函数调用相关联起来。
-类似地，当一个函数调用直接调用了<code>runtime.Goexit</code>函数，则<code>runtime.Goexit</code>函数返回完毕之后，我们可以认为一个Goexit信号将和此函数调用相关联起来。
-按照上一节中的解释，当一个恐慌或者一个Goexit信号和一个函数调用相关联之后，此函数调用将立即进入它的退出阶段。
+按照上一节中的解释，当一个恐慌和一个函数调用相关联之后，此函数调用将立即进入它的退出阶段。
+</p>
+
+一个<code>runtime.Goexit</code>函数将产生一个Goexit信号并和此Goexit信号相关联起来。
+我们可以认为一个Goexit信号是一个特殊的恐慌。下面的内容有时将Goexit信号称为Goexit恐慌。
+Goexit恐慌和普通恐慌在很多方面表现一致，但是也有两个不同点：
+
+<ol>
+<li>
+	Goexit恐慌是不可恢复的；
+</li>
+<li>
+	Goexit恐慌是无害的，它们不会导致程序崩溃。
+</li>
+</ol>
+
+<p>
+第三个不同点将在后面提到。
 </p>
 
 <p>
-我们已经了解到<a href="control-flows-more.html#panic-recover">恐慌是可以被恢复的</a>。
-但是，Goexit信号是不能被取消的。
+在程序运行的任何一个给定时刻，一个函数调用最多只能和一个未恢复的恐慌相关联。
+此未恢复的恐慌可能是一个普通恐慌，也可能是一个Goexit恐慌。
+在一个函数调用开始执行的时候，此调用没有和任何恐慌相关联，不论此调用的调用者（即父调用）是否已经进入退出阶段。
+当然，此函数调用的执行过程中可能会产生恐慌，所以此函数调用可能后来会关联一个恐慌。
 </p>
 
-在任何一个给定时刻，一个函数调用最多只能和一个未恢复的恐慌相关联。
 如果一个调用正和一个未恢复的恐慌相关联，则
 <ul>
 <li>
@@ -132,10 +149,6 @@ func main() {
 <p>
 </p>
 
-<p>
-因为Goexit信号不可被取消，争论一个函数调用是否最多只能和一个Goexit信号相关联是没有意义和没有必要的。
-</p>
-
 在某个时刻，一个协程中可能共存多个未被恢复的恐慌，尽管这在实际编程中并不常见。
 每个未被恢复的恐慌和此协程的调用堆栈中的一个尚未退出的函数调用相关联。
 当仍和一个未被恢复的恐慌相关联的一个内层函数调用退出完毕之后，此未被恢复的恐慌将传播到调用此内层函数调用的外层函数调用中。
@@ -153,12 +166,8 @@ func main() {
 
 <p>
 所以，当一个协程完成完毕后，此协程中最多只有一个尚未被恢复的恐慌。
-如果一个协程带着一个尚未被恢复的恐慌退出完毕，则这将使整个程序崩溃，此恐慌信息将在程序崩溃的时候被打印出来。
-</p>
-
-<p>
-在一个函数调用被执行的起始时刻，此调用将没有任何恐慌和Goexit信号和它相关联，这个事实和此函数调用的外层调用是否已经进入退出阶段无关。
-当然，在此函数调用的执行过程中，恐慌可能产生，<code>runtime.Goexit</code>函数也可能被调用，因此恐慌和Goexit信号以后可能和此调用相关联起来。
+如果一个协程带着一个尚未被恢复的恐慌退出完毕并且此恐慌不是一个Goexit恐慌，则这将使整个程序崩溃，此恐慌信息将在程序崩溃的时候被打印出来；
+否则，此协程将正常退出。这就是为什么我们说一个Goexit恐慌是无害的。
 </p>
 
 下面这个例子程序在运行时将崩溃，因为新开辟的协程在退出完毕时仍带有一个未被恢复的恐慌。
@@ -204,27 +213,16 @@ func main() {
 此输出的格式并非很完美，它容易让一些程序员误认为恐慌0是最终未被恢复的恐慌。而事实上，恐慌2才是最终未被恢复的恐慌。
 </p>
 
-<p>
-类似地，当一个和Goexit信号相关联的内层函数调用退出完毕后，此Goexit信号也将传播到外层函数调用中，并和外层函数调用相关联起来。
-如果外层函数调用尚未进入退出阶段，则其将立即进入。
-</p>
-
-当一个Goexit信号和一个函数调用相关联起来的时候，如果此函数调用正在和一个未被恢复的恐慌相关联着，则此恐慌将被恢复。
-比如下面这个程序将正常退出并打印出<code>&lt;nil&gt;</code>，因为恐慌<code>bye</code>被Goexit信号恢复了。
+下面这个程序在运行时将正常退出。
+其中的<code>runtime.Goexit</code>调用宛如一个终极恐慌恢复操作。
 
 <pre class="line-numbers"><code class="language-go">package main
 
-import (
-	"fmt"
-	"runtime"
-)
+import "runtime"
 
 func f() {
-	defer func() {
-		fmt.Println(recover())
-	}()
-
-	// 此调用产生的Goexit信号恢复之前产生的恐慌。
+	// 此Goexit信号替换了恐慌"bye"
+	// 而成为最终的（无害）恐慌。
 	defer runtime.Goexit()
 	panic("bye")
 }
@@ -237,71 +235,6 @@ func main() {
 	}
 }
 </code></pre>
-
-<!--
-上面提到了恐慌和Goexit信号是互不干扰的。
-换句话说，一个尚未被恢复的恐慌不会导致一个Goexit信号被取消；一个Goexit信号也不会压制遮挡一个尚未被恢复的恐慌。
-不过目前最新版本的官方两个编译器（标准编译器v1.19和gccgo v10）都并未正确实现此规则。
-比如，下面这个程序本应崩溃退出，但是并没有（使用最新版本的标准编译器和gccgo编译器编译）。
-
-<pre class="line-numbers"><code class="language-go">package main
-
-import "runtime"
-
-func f() {
-	// 此调用产生的Goexit信号将压制先前
-	// 产生的恐慌"bye"，但是不应该如此。
-	defer runtime.Goexit()
-	panic("bye")
-}
-
-func main() {
-	go f()
-	
-	for runtime.NumGoroutine() > 1 {
-		runtime.Gosched()
-	}
-}
-</code></pre>
-
-<p>
-标准编译器和gccgo编译器将在以后的版本中修复<a href="https://github.com/golang/go/issues/35378">此问题</a>。
-</p>
--->
-
-<!--
-
-下面这个例子程序运行时应该马上退出，但是当前版本的gccgo编译器（v8.0）和Go官方工具链1.14之前的官方标准编译器均未正确实现之，从而导致此程序在运行时永不退出。
-
-<pre class="line-numbers"><code class="language-go">package main
-
-import "runtime"
-
-func f() {
-	defer func() {
-		recover()
-	}()
-	defer panic("将取消Goexit信号但是不应该这样")
-	runtime.Goexit()
-}
-
-func main() {
-	c := make(chan struct{})
-	go func() {
-		defer close(c)
-		f()
-		for {
-			runtime.Gosched()
-		}
-	}()
-	<-c
-}
-</code></pre>
-
-<p>
-标准编译器从1.14版本开始修复了<a href="https://github.com/golang/go/issues/29226">此问题</a>。
-</p>
--->
 
 </div>
 
@@ -419,7 +352,7 @@ func main() {
 
 <p>
 当前版本的白皮书没提到的一点是：每个<code>recover</code>调用都试图恢复当前协程中最新产生的且尚未恢复的恐慌。
-当然，如果这个假设中的最新产生的且尚未恢复的恐慌不存在，则此<code>recover</code>调用是一个空操作。
+当然，如果这个假设中的最新产生的且尚未恢复的恐慌不存在或者它是一个Goexit信号，则此<code>recover</code>调用是一个空操作。
 </p>
 
 <p>
@@ -439,7 +372,7 @@ Go运行时认为上例中的第二个<code>recover</code>调用试图恢复最�
 
 好了，到此我们可以对哪些<code>recover</code>调用会起作用做一个简短的描述：
 <div class="alert alert-warning">
-一个<code>recover</code>调用只有在它的直接外层调用（即<code>recover</code>调用的父调用）是一个延迟调用，并且此延迟调用（即父调用）的直接外层调用（即<code>recover</code>调用的爷调用）和当前协程中最新产生并且尚未恢复的恐慌相关联时才起作用。
+一个<code>recover</code>调用只有在它的直接外层调用（即<code>recover</code>调用的父调用）是一个延迟调用，并且此延迟调用（即父调用）的直接外层调用（即<code>recover</code>调用的爷调用）和当前协程中最新产生并且尚未恢复的恐慌相关联并且此尚未恢复的恐慌不为一个Goexit信号时才起作用。
 一个有效的<code>recover</code>调用将最新产生并且尚未恢复的恐慌和与此恐慌相关联的函数调用（即爷调用）剥离开来，并且返回当初传递给产生此恐慌的<code>panic</code>函数调用的参数。
 </div>
 
