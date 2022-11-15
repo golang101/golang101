@@ -1,18 +1,16 @@
-**[微信群召集帖](https://github.com/golang101/golang101/issues/11)** | **[电子书下载](https://github.com/golang101/golang101/releases)**
+**[微信群召集帖](https://github.com/golang101/golang101/issues/11)** | **公众号二维码见下方** | [英文项目地址](https://github.com/go101/go101)
 
 ----
 
 [<b>Go语言101</b>](https://gfw.go101.org)是关于Go语言编程的一系列丛书。
 目前本系列丛书包括：
 
-* [《Go语言（基础知识）101》](https://gfw.go101.org/article/101.html)是一本着墨于Go语法语义（除了自定义泛型）以及运行时相关知识点的编程指导书。
+* [《Go语言（基础知识）101》](https://gfw.go101.org/article/101.html)是一本着墨于Go语法语义（除了自定义泛型）以及运行时相关知识点的编程指导书（[电子书下载](https://github.com/golang101/golang101/releases)）。
 * [《Go自定义泛型101》](https://gfw.go101.org/generics/101.html)详细介绍了Go自定义泛型中的方方面面。
 * [《Go编程优化101》](https://gfw.go101.org/optimizations/101.html)列出了一些Go编程中的一些性能优化技巧和建议。
-* [《Go细节和小技巧101》](https://gfw.go101.org/details-and-tips/101.html)搜集了很多Go编程中的细节和小技巧。
+* [《Go细节和小技巧101》](https://gfw.go101.org/details-and-tips/101.html)搜集了很多Go编程中的细节和小技巧（[电子书下载](https://github.com/golang101/golang101/issues/127)）。
 
 本系列丛书同时适合Go初学者和有一定经验的Go程序员阅读。希望它们能够帮助Go程序员更深更全面地理解Go语言。
-
-本丛书的英文项目地址为：[github.com/go101/go101](https://github.com/go101/go101)
 
 微信公众号（用于发布一些Go细节、常识和技巧）：
 
