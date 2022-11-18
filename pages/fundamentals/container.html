@@ -182,7 +182,7 @@ be assignable to the corresponding map key type.
 <ul>
 <li>
 	如果一个索引下标出现，它的类型不必是数组和切片类型的键值类型<code>int</code>，但它必须是一个可以表示为int值的非负常量；
-	如果它是一个类型确定值，则它的类型必须为一个基本整数类型。
+	如果它是一个类型确定值，则它的类型必须为一个内置整数类型。
 </li>
 <li>
 	<b>在一个数组或切片组合字面量中，如果一个元素的索引下标缺失，则编译器认为它的索引下标为出现在它之前的元素的索引下标加一。</b>
@@ -1229,7 +1229,9 @@ func main() {
 
 <div>
 从Go 1.17开始，一个切片可以被转化为一个相同元素类型的数组的指针类型。
-但是如果数组的长度大于被转化切片的长度，则将导致恐慌产生。一个例子：
+但是如果数组的长度大于被转化切片的长度，则将导致恐慌产生。
+转换结果和被转化切片将共享底层元素。
+一个例子：
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1257,6 +1259,36 @@ func main() {
 	var _ = P(w)         // okay
 
 	var _ = (*[4]int)(z) // 会产生恐慌
+}
+</code></pre>
+
+</div>
+
+<a class="anchor" id="slice-to-array"></a>
+<h3>切片转化为数组</h3>
+
+<!--
+https://github.com/golang/go/issues/46505
+-->
+
+<div>
+从Go 1.20开始，一个切片可以被转化为一个相同元素类型的数组。
+但是如果数组的长度大于被转化切片的长度，则将导致恐慌产生。
+转换过程中将复制所需的元素，因此结果数组和被转化切片不共享底层元素。
+一个例子：
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import "fmt"
+
+func main() {
+	var s = []int{0, 1, 2, 3}
+	var a = [3]int(s[1:])
+	s[2] = 9
+	fmt.Println(s) // [0 1 9 3]
+	fmt.Println(a) // [1 2 3]
+	
+	_ = [3]int(s[:2]) // panic
 }
 </code></pre>
 

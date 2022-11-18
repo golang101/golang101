@@ -183,7 +183,24 @@ Go 1.17引入的两个函数为：
 </li>
 </ul>
 
-Go 1.17引入的这两个函数具有一定的危险性，需谨慎使用。下面时使用了这两个函数的一个例子。
+Go 1.20进一步引入了三个函数：
+<ul>
+<li>
+	<code>func String(ptr *byte, len IntegerType) string</code>。
+	此函数用来从一个任意（安全）<code>byte</code>指针派生出一个指定长度的字符串。
+</li>
+<li>
+	<code>func StringData(str string) *byte</code>。
+	此函数用来获取一个字符串底层字节序列中的第一个<code>byte</code>的指针。
+</li>
+<li>
+	<code>func SliceData(slice []ArbitraryType) *ArbitraryType</code>。
+	此函数用来获取一个切片底层元素序列中的第一个元素的指针。
+</li>
+</ul>
+
+Go 1.17之后引入的这些函数具有一定的危险性，需谨慎使用。
+下面是使用了Go 1.17引入的两个函数的一个例子。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -211,6 +228,29 @@ func main() {
 	// 的返回结果引用了未知的内存块。
 	_ = unsafe.Add(up9, 7 * eleSize)
 	_ = unsafe.Slice(p9, 8)
+}
+</code></pre>
+
+<p>
+</p>
+
+下面这两个函数使用了非类型安全的方式实现了字符串和字节切片之间的类型转换。
+和类型安全方式相比，它们不用复制字符串和字节切片的底层字节序列，因此效率更高。
+
+<pre class="line-numbers"><code class="language-go">import "unsafe"
+
+func String2ByteSlice(str string) []byte {
+	if str == "" {
+		return nil
+	}
+	return unsafe.Slice(unsafe.StringData(str), len(str))
+}
+
+func ByteSlice2String(bs []byte) string {
+	if len(bs) == 0 {
+		return ""
+	}
+	return unsafe.String(unsafe.SliceData(bs), len(bs))
 }
 </code></pre>
 
@@ -525,15 +565,24 @@ func main() {
 	fmt.Printf("%s\n", ms)  // [C C++ Go]
 	// ss := ([]string)(ms) // 编译错误
 	ss := *(*[]string)(unsafe.Pointer(&ms))
-	ss[1] = "Rust"
-	fmt.Printf("%s\n", ms) // [C Rust Go]
+	ss[1] = "Zig"
+	fmt.Printf("%s\n", ms) // [C Zig Go]
 	// ms = []MyString(ss) // 编译错误
 	ms = *(*[]MyString)(unsafe.Pointer(&ss))
 }
 </code></pre>
 
+顺便说一句，从Go 1.17开始，我们也可以使用<code>unsafe.Slice</code>函数来实现这样的转换：
+
+<pre class="line-numbers"><code class="language-go">func main() {
+	...
+	
+	ss = unsafe.Slice((*string)(&ms[0]), len(ms))
+	ms = unsafe.Slice((*MyString)(&ss[0]), len(ss))
+}
+</code></pre>
+
 <p>
-当然，从Go 1.17开始，我们也可以使用<code>unsafe.Slice((*string)(&amp;ms[0]), len(ms))</code>来实现此类型转换。
 </p>
 
 此模式在实践中的另一个应用是将一个不再使用的字节切片转换为一个字符串（从而避免对底层字节序列的一次开辟和复制）。如下例所示：
@@ -547,7 +596,7 @@ func main() {
 此实现借鉴于<code>strings</code>标准库包中的<code>Builder</code>类型的<code>String</code>方法的实现。
 字节切片的尺寸比字符串的尺寸要大，并且<a href="value-part.html#internal-definitions">它们的底层结构</a>类似，所以此转换（对于当前的主流Go编译器来说）是安全的。
 即使这样，此实现也只推荐在标准库中使用，而不推荐在用户代码中使用。
-在用户代码中，最好尽量使用文末提供的另一种实现。
+从Go 1.20开始，在用户代码中，最好尽量使用本文前面介绍使用<code>unsafe.String</code>函数的实现。
 </p>
 
 反过来，下面这个例子中的转换是非法的，因为字符串的尺寸比字节切片的尺寸小。
@@ -935,10 +984,6 @@ func main() {
 </p>
 
 <p>
-<code>reflect</code>标准库包中<code>SliceHeader</code>和<code>StringHeader</code>类型的<a href="https://golang.google.cn/pkg/reflect/#SliceHeader">文档</a>提到这两个结构体类型的定义不保证在以后的版本中不发生改变。好在目前的两个主流Go编译器（标准编译器和gccgo编译器）都认可当前版本中的定义。这也可以看作是使用非类型安全指针的另一个（较低的）潜在风险。
-</p>
-
-<p>
 注意：当使用上面展示的使用非类型安全指针将一个字符串转换为字节切片时，请确保结果此源字符串的生命期内务必不要修改结果字节切片中的字节值（上面的例子违背了此原则）。
 事实上，更为推荐的是最好永远不要修改结果字节切片中的字节值。此非类型安全方式的目的主要是为了在局部感知范围内避免一次内存开辟，而不是一种通用的方式。
 </p>
@@ -1005,7 +1050,14 @@ func Example_Good2() *byte {
 </p>
 
 <p>
-注意：<code>reflect.SliceHeader</code>和<code>reflect.StringHeader</code>类型可能会在Go 1.20中<a href="https://github.com/golang/go/issues/53079">被废弃掉</a>。
+<code>reflect</code>标准库包中<code>SliceHeader</code>和<code>StringHeader</code>类型的<a href="https://golang.google.cn/pkg/reflect/#SliceHeader">文档</a>提到这两个结构体类型的定义不保证在以后的版本中不发生改变。
+这也可以看作是使用非类型安全指针的另一个（较低的）潜在风险。
+好在目前的两个主流Go编译器（标准编译器和gccgo编译器）都认可当前版本中的定义。
+</p>
+
+<p>
+Go核心开发团队也意识到了这两个类型的使用不方便并且容易出错，因此，这两个类型在Go 1.20中<a href="https://github.com/golang/go/issues/53079">被废弃</a>了。
+取而代之，我们应该尽量使用本文前面介绍的<code>unsafe.String</code>、<code>unsafe.StringData</code>、<code>unsafe.Slice</code>和<code>unsafe.SliceData</code>这几个函数。
 </p>
 
 </div>

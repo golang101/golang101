@@ -353,6 +353,15 @@ func main() {
 这里有<a href="container.html#slice-to-array-pointer">一个例子</a>。
 </p>
 
+<div class="well">
+从Go 1.20开始，一个切片可以被转化为一个相同元素类型的数组。
+但是如果数组的长度大于被转化切片的长度，则将导致恐慌产生。
+</div>
+
+<p>
+这里有<a href="container.html#slice-to-array">一个例子</a>。
+</p>
+
 <h4>10. 非类型安全指针相关的类型转换规则</h4>
 
 <p>

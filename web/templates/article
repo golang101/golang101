@@ -140,8 +140,16 @@
 	<div class="col-xs-6 col-sm-4 nav-item-inactive" style="color: #777;"><small>Go编程实战101</small></div>
 
 	<div class="col-xs-6 col-sm-4 nav-item-inactive" style="color: #777;"><small>Go聚合101</small></div>
-
-	<div class="col-xs-6 col-sm-4 nav-item-inactive" style="color: #777;"><small>Go 101 博客</small></div>
+	
+	{{- if and $is_blog $is_index_page -}}
+	<div class="col-xs-6 col-sm-4 nav-item-active">
+		<small>Go 101 博客</small>
+	</div>
+	{{- else -}}
+	<div class="col-xs-6 col-sm-4 nav-item- {{- if not $is_blog -}} in {{- end -}} active">
+		<a href="/blog/101.html"><small>Go 101 博客</small></a>
+	</div>
+	{{- end -}}
 
 	{{- if and $is_apps_and_libs $is_index_page -}}
 	<div class="col-xs-6 col-sm-4 nav-item-active">
@@ -187,9 +195,10 @@
 {{- $is_quizzes := (eq .Group "quizzes") -}}
 
 {{- $not_index_page := (ne .FilenameWithoutExt "101") -}}
+{{- $is_book_page := (or (lt (len .FilenameWithoutExt) 4) (ne (slice .FilenameWithoutExt 0 4) "100-")) -}}
+{{- $show_index := (and $not_index_page $is_book_page) -}}
 
-
-{{ if and $not_index_page .Index -}}
+{{ if and $show_index .Index -}}
 
 <hr>
 
@@ -200,7 +209,7 @@
 <hr>
 
 <div id="contact" class="row alert alert-success">
-	{{ if or true $not_index_page -}}
+	{{ if or true $show_index -}}
 	<div class="col-xs-12 col-sm-7 col-md-7 col-lg-7"><small>
 	{{ end }}
 		<p>
@@ -219,7 +228,7 @@
 		你或许对本书作者老貘开发的<a href="https://gfw.tapirgames.com">一些App</a>感兴趣。
 		</p>
 
-	{{ if $not_index_page -}}
+	{{ if $show_index -}}
 
 		<div id="ebooks">
 
@@ -243,7 +252,7 @@ The English version of this book is <a href="https://go101.org/details-and-tips/
 
 	{{ end -}}
 
-	{{ if or true $not_index_page }}
+	{{ if or true $show_index }}
 	</small></div>
 	<div class="col-xs-12 col-sm-5 col-md-5 col-lg-5 text-center"><small>
 		<img src="../res/101-reward-qrcode-8.png" alt="赞赏" style="max-width: 100%; height: auto; width: auto\9;"/>
@@ -255,7 +264,7 @@ The English version of this book is <a href="https://go101.org/details-and-tips/
 </div>
 
 
-{{ if and $not_index_page .Index -}}
+{{ if and $show_index .Index -}}
 
 <hr>
 目录：

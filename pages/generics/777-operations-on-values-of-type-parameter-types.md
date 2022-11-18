@@ -6,9 +6,9 @@ This chapter will talk about which operations on values of type parameters
 are valid and which are invalid in generic function bodies.
 
 Within a generic function body,
-if an operation on a value of a type parameter is valid, then it must be
+an operation on a value of a type parameter is valid only if it is
 valid for values of every type in the type set of the constraint of the type parameter.
-In the current custom generic design and implementation (Go 1.18),
+In the current custom generic design and implementation (Go 1.19),
 it is not always vice versa.
 Some extra requirements must be met to make the operation valid.
 
@@ -112,21 +112,36 @@ func cat[T chan int | Ch](c T) {
 }
 ```
 
-Type parameters may be type asserted to.
+This rule [might be relaxed to some extent in future Go versions](https://github.com/golang/go/issues/52129).
+
+## Type parameters may be type asserted to
+
+As a type parameter is a specified type, it may be type asserted to.
+The following code compiles, even if there are duplicate `case` type expressions
+at run time in the `type-switch` code block within the `wua` function.
 
 ```Go
 import "fmt"
 
-func nel[T int | string](v T, x any) {
-	if _, ok := x.(T); ok {
+func nel[T int | string](x any) {
+	if v, ok := x.(T); ok {
 		fmt.Printf("x is a %T\n", v)
 	} else {
 		fmt.Printf("x is not a %T\n", v)
 	}
 }
-```
 
-This rule [might be relaxed to some extent in future Go versions](https://github.com/golang/go/issues/52129).
+func wua[T int | string](x any) {
+	switch v := x.(type) {
+	case T:
+		fmt.Println(v)
+	case int:
+		fmt.Println("int")
+	case string:
+		fmt.Println("string")
+	}
+}
+```
 
 ## Type parameters may be not used as types of (local) named constants
 
@@ -201,7 +216,7 @@ then the identical underlying type is called the core type of the interface type
 but they are all [channel types](https://go101.org/article/channel.html)
 which share an identical element type `E`, and all directional channels in them have the same direction,
 then the core type of the interface type is the directional channel type
-`chan<- E` or `<-chan E` depending on the direction of the directional channels present.
+`chan<- E` or `<-chan E`, depending on the direction of the directional channels present.
 1. For cases other than the above two, the interface type has not a core type.
 
 For example, in the following code, each of the types shown in the first group
@@ -238,7 +253,7 @@ of a type parameter as the core type of the type parameter.
 
 ## A function is required to have a core type to be callable
 
-For example, currently (Go 1.18), in the following code, the functions `foo` and `bar` don't compile, bit the `tag` function does.
+For example, currently (Go 1.19), in the following code, the functions `foo` and `bar` don't compile, bit the `tag` function does.
 The reason is the `F` type parameters in the `foo` and `bar` generic functions
 both have not a core type, even
 
@@ -264,7 +279,7 @@ It is unclear whether or not the rule will be relaxed in future Go versions.
 
 ## The type literal in a composite literal must have a core type
 
-For example, currently (Go 1.18), in the following code snippet,
+For example, currently (Go 1.19), in the following code snippet,
 the functions `foo` and `bar` compile okay, but the other ones don't.
 
 ```Go
@@ -294,7 +309,7 @@ And if all types in the type set are maps, then their underlying types must be i
 Otherwise, their element types must be identical.
 The elements of strings are viewed as `byte` values.
 
-For example, currently (Go 1.18), in the following code snippet, only the functions `foo` and `bar` compile okay.
+For example, currently (Go 1.19), in the following code snippet, only the functions `foo` and `bar` compile okay.
 
 ```Go
 func foo[T []byte | [2]byte | string](c T) {
@@ -333,7 +348,7 @@ The specification requires the index expression must has a core type.)_
 
 ## A (sub)slice operation requires the container operand has a core type
 
-For example, currently (Go 1.18), the following two functions both fail to compile,
+For example, currently (Go 1.19), the following two functions both fail to compile,
 even if the subslice operations are valid for all types in the corresponding type sets.
 
 ```Go
@@ -364,7 +379,7 @@ then all types set of its type set must be all integers.
 
 ## In a `for-range` loop, the ranged container is required to have a core type
 
-For example, currently (Go 1.18), in the following code, 
+For example, currently (Go 1.19), in the following code, 
 only the last two functions, `dot1` and `dot2`, compile okay.
 
 ```Go
@@ -470,7 +485,7 @@ The conversion `[]byte(v)` (if it follows the `range` keyword) is [specifically
 optimized by the official standard Go compiler](https://go101.org/article/string.html#conversion-optimizations) so that it doesn't duplicate
 underlying bytes.
 
-The following function doesn't compile now (Go 1.18),
+The following function doesn't compile now (Go 1.19),
 even if the types of the two iteration variables are always `int` and `rune`.
 Whether or not it will compile in future Go versions is unclear.
 
@@ -493,7 +508,7 @@ https://github.com/golang/go/issues/51053
 
 Firstly, we should know [the conversion rules for ordinary types/values](https://go101.org/article/value-conversions-assignments-and-comparisons.html).
 
-By the current specification (Go 1.18),
+By the current specification (Go 1.19),
 given two types `From` and `To`, assume at least one of them is a type parameter,
 then a value of `From` can be converted to `To` if a value of each type in
 the type set of `From` can be converted to each type in the type set of `T`
@@ -520,6 +535,15 @@ func voc[V ~[]byte | ~[]rune](x string) V {
 }
 ```
 
+But the following function fails to compile,
+because `string` values may not be converted to `int`.
+
+```Go
+func eve[X, Y int | string](x X) Y {
+	return Y(x) // error
+}
+```
+
 The following function doesn't compile, even if the conversion in it
 is valid for all possible type arguments.
 The reason is `[]T` is an ordinary type, not a type parameter,
@@ -527,10 +551,8 @@ and its underlying type is itself.
 There is not a rule which allows converting values from `[]T` to `string`.
 
 ```Go
-func mud[T byte|rune](x []T) string {
-	// error: cannot convert x (variable of type []T)
-	//        to type string
-	return string(x)
+func jon[T byte](x Bytes) []T {
+	return []T(x) // error
 }
 ```
 
@@ -544,7 +566,7 @@ By using the official standard Go compiler, in the following program,
 * all the other three generic functions compile okay, but the `dot` function
   should not compile by the above described rule.
   This might be [a bug of the standard compiler, or the rule described in
-  the current Go specification needs to an adjustment](https://github.com/golang/go/issues/50815).
+  the current Go specification needs a small adjustment](https://github.com/golang/go/issues/50815).
 
 ```Go
 package main
@@ -583,14 +605,7 @@ func main() {
 }
 ```
 
-The following function also fails to compile,
-because `string` values may not be converted to `int`.
 
-```Go
-func eve[X, Y int | string](x X) Y {
-	return Y(x) // error
-}
-```
 
 ## Type parameter involved assignments
 
@@ -598,7 +613,7 @@ Firstly, we should know [the assignment rules for ordinary types/values](https:/
 
 In the following descriptions, the type of the destination value is called as the destination type, and the type of the source value is called as the source type.
 
-By the current specification (Go 1.18), for a type parameter involved assignment,
+By the current specification (Go 1.19), for a type parameter involved assignment,
 
 * if the destination type is a type parameter and the source value is
   an untyped value, then the assignment is valid only if
@@ -785,7 +800,7 @@ func MyNew[T any]() *T {
 
 ## A call to the predeclared `make` function requires its first argument (the container type) has a core type 
 
-Currently (Go 1.18), in the following code snippet, the functions `voc` and `ted` both
+Currently (Go 1.19), in the following code snippet, the functions `voc` and `ted` both
 fail to compile, the other two compile okay.
 The reason is the first argument of a call to the predeclared `make` function
 is required to have a core type.
@@ -852,7 +867,7 @@ Calls to the predeclared `new` function have not this requirement.
 
 ## A call to the predeclared `delete` function requires all types in the type set of its first argument have an identical key type
 
-Note, here, the identical key type may be an ordinary type or a type parameter type.
+Note, here, the identical key type may be ordinary type or type parameter type.
 
 The following functions both compile okay.
 
@@ -897,11 +912,11 @@ Empty-type-set interface types are totally useless in practice,
 but they might affect the implementation perfection from theory view.
 
 There are really several imperfections in the implementation
-of the current official standard Go compiler (v1.18).
+of the current official standard Go compiler (v1.19).
 
 For [example](https://github.com/golang/go/issues/51470),
 should the following function compile?
-It does with the latest official standard Go compiler (v1.18).
+It does with the latest official standard Go compiler (v1.19).
 However, one of the above sections has mentioned that a `make` call
 requires its argument must have a core type.
 The type set of the constraint `C` declared in the following code
@@ -923,7 +938,7 @@ func foo[T C]() {
 This following is [another example](https://github.com/golang/go/issues/51917#issuecomment-1084188702),
 in which all the function calls in the function `g` should compile okay.
 However, two of them fail to compile with
-the latest official standard Go compiler (v1.18).
+the latest official standard Go compiler (v1.19).
 
 ```Go
 func f1[T any](x T) {}

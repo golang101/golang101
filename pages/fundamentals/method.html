@@ -146,7 +146,7 @@ func (*Book).SetPages(b *Book, pages int) {
 </p>
 
 两个隐式函数名<code>Book.Pages</code>和<code>(*Book).SetPages</code>都是<code>aType.MethodName</code>这种形式的。
-我们不能显式声明名称为这种形式的函数，因为这种形式不属于合法标识符。这样的函数只能由编译器隐式声明。
+我们不能显式声明名称为这种形式的函数，因为这种形式中的函数名不属于合法标识符。这样的函数只能由编译器隐式声明。
 但是我们可以在代码中调用这些隐式声明的函数：
 
 <pre class="line-numbers"><code class="language-go">package main
