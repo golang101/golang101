@@ -68,7 +68,7 @@ func SayGreetings(greeting string, times int) {
 }
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano()) // Go 1.20之前需要
 	log.SetFlags(0)
 	go SayGreetings("hi!", 10)
 	go SayGreetings("hello!", 10)
@@ -184,7 +184,7 @@ func SayGreetings(greeting string, times int) {
 }
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano()) // Go 1.20之前需要
 	log.SetFlags(0)
 	wg.Add(2) // 注册两个新任务。
 	go SayGreetings("hi!", 10)

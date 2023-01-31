@@ -760,7 +760,7 @@ func main() {
 
 	fmt.Println(&x, &y, &o, &p)
 
-	// 对于标准编译器1.19版本，x、y、o和p将
+	// 对于标准编译器1.20版本，x、y、o和p将
 	// 逃逸到堆上，但是a、b、m和n则开辟在栈上。
 
 	fmt.Println(&a == &b) // false
@@ -774,7 +774,7 @@ func main() {
 </code></pre>
 
 <p>
-上面代码中所示的输出是针对标准编译器1.19版本的。
+上面代码中所示的输出是针对标准编译器1.20版本的。
 </p>
 </div>
 
@@ -1210,7 +1210,7 @@ func main() {
 我们不应该假设结果切片的长度和容量总是相等的。
 </p>
 
-在下面的例子中，如果最后一个<code>fmt.Println</code>行被删除，在其前面的两行会打印相同的值<code>32</code>；否则，一个打印<code>32</code>，一个打印<code>8</code>（对于标准编译器1.19版本来说）。
+在下面的例子中，如果最后一个<code>fmt.Println</code>行被删除，在其前面的两行会打印相同的值<code>32</code>；否则，一个打印<code>32</code>，一个打印<code>8</code>（对于标准编译器1.20版本来说）。
 
 <pre class="line-numbers"><code class="language-go">package main
 

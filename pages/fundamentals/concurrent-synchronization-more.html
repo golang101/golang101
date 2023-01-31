@@ -69,7 +69,7 @@ import (
 )
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano()) // Go 1.20之前需要
 
 	const N = 5
 	var values [N]int32
@@ -123,7 +123,7 @@ values: [71 89 50 62 60]
 当对应的<code>sync.WaitGroup</code>值维护的计数降为0，这些协程都将得到一个（广播）通知而结束阻塞状态。
 
 <pre class="line-numbers"><code class="language-go">func main() {
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano()) // Go 1.20之前需要
 
 	const N = 5
 	var values [N]int32
@@ -539,7 +539,7 @@ import (
 )
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano()) // Go 1.20之前需要
 
 	const N = 10
 	var values [N]string

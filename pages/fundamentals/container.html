@@ -854,7 +854,7 @@ func main() {
 </p>
 
 <p>
-截至目前（Go 1.19），<code>append</code>函数调用的第一个实参不能为类型不确定的<code>nil</code>。
+截至目前（Go 1.20），<code>append</code>函数调用的第一个实参不能为类型不确定的<code>nil</code>。
 </p>
 
 </div>
@@ -1337,6 +1337,7 @@ func main() {
 <p>
 </p>
 
+<!--
 事实上，<code>copy</code>并不是一个基本函数。我们可以用<code>append</code>来实现它。
 
 <pre class="line-numbers"><code class="language-go">// 假设元素类型为T。
@@ -1358,13 +1359,14 @@ func Copy(dest, src []T) int {
 <p>
 从另外一个角度，我们也可以认为<code>append</code>不是一个基本函数，因为我们可以用<code>make</code>加<code>copy</code>函数来实现它。
 </p>
+-->
 
 <p>
 注意，做为一个特例，<code>copy</code>函数可以用来<a href="string.html#use-string-as-byte-slice">将一个字符串中的字节复制到一个字节切片</a>。
 </p>
 
 <p>
-截至目前（Go 1.19），<code>copy</code>函数调用的两个实参均不能为类型不确定的<code>nil</code>。
+截至目前（Go 1.20），<code>copy</code>函数调用的两个实参均不能为类型不确定的<code>nil</code>。
 </p>
 
 </div>
@@ -1883,7 +1885,7 @@ Go不支持更多的内置切片操作，比如切片克隆、元素删除和插
 <h4>切片克隆</h4>
 
 <div>
-对于当前的Go版本（1.19），最简单的克隆一个切片的方法为：
+对于当前的Go版本（1.20），最简单的克隆一个切片的方法为：
 <pre class="disable-line-numbers111"><code class="language-go">sClone := append(s[:0:0], s...)
 </code></pre>
 
@@ -1898,7 +1900,7 @@ sClone := make([]T, len(s))
 copy(sClone, s)
 
 // 或者下面的make+append实现。
-// 对于目前的官方Go工具链v1.19来说，这种
+// 对于目前的官方Go工具链v1.20来说，这种
 // 实现比上面的make+copy实现略慢一点。
 sClone := append(make([]T, 0, len(s)), s...)
 </code></pre>
@@ -1917,6 +1919,8 @@ if s != nil {
 
 <p>
 </p>
+
+<!--
 
 在Go官方工具链1.15版本之前，对于一些常见的使用场景，使用<code>append</code>来克隆切片比使用<code>make</code>加<code>copy</code>要<a href="https://github.com/go101/go101/wiki/How-to-efficiently-clone-a-slice%3F">高效得多</a>。但是从1.15版本开始，官方标准编译器对<code>make+copy</code>这种方法做了特殊的优化，从而使得此方法总是比使用<code>append</code>来克隆切片高效。
 但是请注意：此优化只在被克隆的切片呈现为一个标识符（包括限定标识符）并且<code>make</code>调用只有两个实参的时候才有效。
@@ -1943,6 +1947,8 @@ if s != nil {
 	y = make([]T, len(t.x)) // not work
 	copy(y, t.x)
 </code></pre>
+
+-->
 
 </div>
 
@@ -2071,7 +2077,7 @@ s = append(s[:i], append(elements, s[i:]...)...)
 // 最多导致两次内存开辟（最少一次）。
 // 下面这种繁琐的实现只把s[i:]中的元素复制了一次，并且
 // 它最多只会导致一次内存开辟（最少零次）。
-// 但是，在当前的官方标准编译器实现中（1.19版本），此
+// 但是，在当前的官方标准编译器实现中（1.20版本），此
 // 繁琐实现中的make调用将会把部分刚开辟出来的元素清零。
 // 这其实是没有必要的。所以此繁琐实现并非总是比上面的
 // 单行实现效率更高。事实上，它仅在处理小切片时更高效。

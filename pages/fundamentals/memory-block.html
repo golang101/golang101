@@ -101,7 +101,7 @@ Go是一门支持自动内存管理的语言，比如自动内存开辟和自动
 <p><i>
 （注意：Go运行时维护着一个协程栈的最大尺寸限制，此限制为全局的。
 如果一个协程在增长它的栈的时候超过了此限制，整个程序将崩溃。
-对于目前的官方标准Go工具链1.19版本，此最大限制的默认值在64位系统上为1GB，在32位系统上为250MB。
+对于目前的官方标准Go工具链1.20版本，此最大限制的默认值在64位系统上为1GB，在32位系统上为250MB。
 我们可以在运行时刻调用<code>runtime/debug</code>标准库包中的<code>SetMaxStack</code>来修改此值。
 另外请注意，当前的官方标准编译器实现中，实际上允许的协程栈的最大尺寸为不超过最大尺寸限制的2的幂。
 所以对于默认设置，实际上允许的协程栈的最大尺寸在64位系统上为512MiB，在32位系统上为128MiB。）
@@ -208,8 +208,9 @@ The values referenced by values allocated on heap will never be allocated in sta
 
 <pre class="line-numbers"><code class="language-go">package main
 
+// 下面这行是为了防止f函数的调用被内联。
+//go:noinline
 func f(i int) byte {
-	type _ int // 防止f被内联
 	var a [1<<20]byte // 使栈增长
 	return a[i]
 }
@@ -223,7 +224,7 @@ func main(){
 </code></pre>
 
 <p>
-我们可以看到，上例打引出的两个地址不一样（如果使用官方标准编译器v1.19编译之）。
+我们可以看到，上例打引出的两个地址不一样（如果使用官方标准编译器v1.20编译之）。
 </p>
 
 <!--p>
@@ -342,7 +343,7 @@ func main() {
 
 <div>
 <p>
-目前的官方Go标准运行时（1.19版本）使用<a href="https://blog.golang.org/go15gc">一个并发三色（tri-color）标记清扫（mark-sweep）算法</a>来实现垃圾回收。
+目前的官方Go标准运行时（1.20版本）使用<a href="https://blog.golang.org/go15gc">一个并发三色（tri-color）标记清扫（mark-sweep）算法</a>来实现垃圾回收。
 这里仅会对此算法的原理做一个大致的描述。一个具体实现可能和此大致描述会有很多细节上的差别。
 </p>
 
@@ -429,7 +430,7 @@ func main() {
 </p>
 
 <p>
-目前（Go官方工具链1.19），对于使用标准编译器编译的Go程序，一轮新的垃圾回收过程开启的默认条件是通过<a href="https://golang.google.cn/pkg/runtime/#hdr-Environment_Variables"><code>GOGC</code>环境变量</a>来控制的。
+目前（Go官方工具链1.20），对于使用标准编译器编译的Go程序，一轮新的垃圾回收过程开启的默认条件是通过<a href="https://golang.google.cn/pkg/runtime/#hdr-Environment_Variables"><code>GOGC</code>环境变量</a>来控制的。
 当从上一轮垃圾回收结束后新申请的内存块的内存总和占上一轮垃圾回收结束时仍在被使用的所有内存块的内存总和的百分比超过此值时，新的一轮垃圾回收过程将开始。
 所以此值决定了垃圾回收过程的频率。
 此环境变量的默认值为100。
@@ -451,7 +452,7 @@ Go官方工具链1.19引入了一种新的垃圾回收启动策略：<a href="ht
 </p>
 
 <p>
-另一点需要注意的是，当前的官方Go运行时（v1.19）同时采取了另一个策略：<a href="https://github.com/golang/go/blob/895b7c85addfffe19b66d8ca71c31799d6e55990/src/runtime/proc.go#L4481-L4486">一个Go程序的最大垃圾回收时间间隔为两分钟</a>。
+另一点需要注意的是，当前的官方Go运行时（v1.20）同时采取了另一个策略：<a href="https://github.com/golang/go/blob/895b7c85addfffe19b66d8ca71c31799d6e55990/src/runtime/proc.go#L4481-L4486">一个Go程序的最大垃圾回收时间间隔为两分钟</a>。
 </p>
 
 <p>

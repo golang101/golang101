@@ -148,7 +148,7 @@ func main() {
 
 <pre class="line-numbers"><code class="language-go">func doSomething() (err error) {
 	defer func() {
-		err = recover()
+		err, _ = recover().(error)
 	}()
 
 	doStep1()
@@ -290,6 +290,25 @@ func doSomething() (err error) {
 
 <p>
 但是，这种<code>panic</code>/<code>recover</code>函数调用的使用方式一般并不推荐使用，因为它的效率略低一些，并且这种用法不太符合Go编程习俗。
+</p>
+
+另外需要注意的是：从今后某个Go版本开始（很可能是v1.21），一个<code>panic(nil)</code>调用将<a href="https://github.com/golang/go/issues/25448">变得和<code>panic(new(runtime.PanicNilError))</code>等价</a>。
+从那时开始，上面代码中的延迟函数调用应该被重写为：
+
+<pre class="line-numbers"><code class="language-go">func doSomething() (err error) {
+	defer func() {
+		err, _ = recover().(error)
+		if e := (*runtime.PanicNilError)(nil); errors.As(err, &e) {
+			err = nil
+		}
+	}()
+
+	doStep1()
+	...
+}
+</code></pre>
+
+<p>
 </p>
 </div>
 

@@ -66,7 +66,7 @@ func sumSquares(a, b int32) int32 {
 }
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano()) // Go 1.20之前需要
 
 	a, b := longTimeRequest(), longTimeRequest()
 	fmt.Println(sumSquares(<-a, <-b))
@@ -104,7 +104,7 @@ func sumSquares(a, b int32) int32 {
 }
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano()) // Go 1.20之前需要
 
 	ra, rb := make(chan int32), make(chan int32)
 	go longTimeRequest(ra)
@@ -170,7 +170,7 @@ func source(c chan<- int32) {
 }
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano()) // Go 1.20之前需要
 
 	startTime := time.Now()
 	c := make(chan int32, 5) // 必须用一个缓冲通道
@@ -554,7 +554,7 @@ func (bar Bar) ServeCustomer(c int) {
 }
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano()) // Go 1.20之前需要
 
 	bar24x7 := make(Bar, 10) // 此酒吧有10个座位
 	// 摆放10个座位。
@@ -594,7 +594,7 @@ func (bar Bar) ServeCustomerAtSeat(c int, seat Seat) {
 }
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano()) // Go 1.20之前需要
 
 	bar24x7 := make(Bar, 10)
 	for seatId := 0; seatId < cap(bar24x7); seatId++ {
@@ -630,7 +630,7 @@ func (bar Bar) ServeCustomerAtSeat(consumers chan int) {
 }
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano()) // Go 1.20之前需要
 
 	bar24x7 := make(Bar, 10)
 	for seatId := 0; seatId < cap(bar24x7); seatId++ {
@@ -662,7 +662,7 @@ func ServeCustomer(consumers chan int) {
 }
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano()) // Go 1.20之前需要
 
 	const BarSeatCount = 10
 	consumers := make(chan int)
@@ -701,7 +701,7 @@ func (bar Bar) ServeCustomer(c Customer) {
 }
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano()) // Go 1.20之前需要
 
 	bar24x7 := make(Bar, 10) // 最对同时服务10位顾客
 	for customerId := 0; ; customerId++ {
@@ -1057,7 +1057,7 @@ func source(c chan<- int32) {
 }
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano()) // Go 1.20之前需要
 
 	c := make(chan int32, 1) // 此通道容量必须至少为1
 	for i := 0; i < 5; i++ {
@@ -1100,7 +1100,7 @@ func source() <-chan int32 {
 }
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano()) // Go 1.20之前需要
 
 	var rnd int32
 	// 阻塞在此直到某个数据源率先回应。

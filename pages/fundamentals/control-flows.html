@@ -119,7 +119,7 @@ import (
 )
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano()) // Go 1.20之前需要
 
 	if n := rand.Int(); n%2 == 0 {
 		fmt.Println(n, "是一个偶数。")
@@ -407,7 +407,7 @@ import (
 )
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano()) // Go 1.20之前需要
 	switch n := rand.Intn(100); n%9 {
 	case 0:
 		fmt.Println(n, "is a multiple of 9.")
@@ -440,7 +440,7 @@ https://github.com/golang/go/blob/5a7cfbc0117bce314c3f079ece459173b9efc854/src/c
 -->
 <p>
 注意，编译器可能会不允许一个<code>switch-case</code>流程控制中有任何两个case表达式可以在编译时刻确定相等。
-比如，当前的官方标准编译器（1.19版本）认为上例中的<code>case 6, 7, 8</code>一行是不合法的（如果此行未被注释掉）。但是其它编译器未必这么认为。
+比如，当前的官方标准编译器（1.20版本）认为上例中的<code>case 6, 7, 8</code>一行是不合法的（如果此行未被注释掉）。但是其它编译器未必这么认为。
 事实上，当前的官方标准编译器<a href="https://github.com/golang/go/issues/28357">允许重复的布尔case表达式在同一个<code>switch-case</code>流程控制中出现</a>，
 而gccgo（v8.2）允许重复的布尔和字符串类型的case表达式在同一个<code>switch-case</code>流程控制中出现。
 </p>
@@ -449,7 +449,7 @@ https://github.com/golang/go/blob/5a7cfbc0117bce314c3f079ece459173b9efc854/src/c
 那么如何让执行从一个<code>case</code>分支代码块的结尾跳入下一个分支代码块？Go提供了一个<code>fallthrough</code>关键字来完成这个任务。
 比如，在下面的例子中，所有的分支代码块都将得到执行（从上到下）。
 
-<pre class="line-numbers"><code class="language-go">rand.Seed(time.Now().UnixNano())
+<pre class="line-numbers"><code class="language-go">rand.Seed(time.Now().UnixNano()) // Go 1.20之前需要
 switch n := rand.Intn(100) % 5; n {
 case 0, 1, 2, 3, 4:
 	fmt.Println("n =", n)
