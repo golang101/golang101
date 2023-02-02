@@ -1,6 +1,13 @@
 
 # Go 101 更新历史
 
+### v1.20.a (2023/二月/01)
+
+* Go 1.20 [开始支持切片类型转换到数组](https://gfw.go101.org/article/container.html#slice-to-array).
+* Go 1.20 [在"unsafe"标准库包中加入了三个函数](https://gfw.go101.org/article/unsafe.html)：`SliceData`、`String`和`StringData`.
+* 从Go 1.20开始，`math/rand`标准库包中的全局随机数产生器将被自动设置随机种子。
+* 在 [边界检查消除](https://gfw.go101.org/article/bounds-check-elimination.html) 一章中提及 `-gcflags="-d=ssa/check_bce"` 不会报告一些泛型函数中的边界检查。
+
 ### v1.19.a (2022/八月/29)
 
 * Go 1.19 [加入了一些原子操作类型s](https://gfw.go101.org/article/concurrent-atomic-operation.html).

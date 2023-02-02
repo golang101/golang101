@@ -73,6 +73,44 @@ func main() {}
 <p>
 编译器也正确地认为函数<code>f4</code>中的唯一一行（第<i>22</i>行）是无需边界检查的。
 </p>
+
+注意：目前（Go工具链1.20）,如果一个泛型函数中的操作涉及到类型参数，则标准编译器不会检查此操作是否需要边界检查。
+下面是一个示例来证明这一点：
+
+<pre class="line-numbers must-line-numbers"><code class="language-go">// example1b.go
+package main
+
+func foo[E any](s []E) {
+	_ = s[0] // 第5行
+	_ = s[1] // 第6行
+	_ = s[2] // 第7行
+}
+
+// var _ = foo[bool]
+
+func main() {
+}
+</code></pre>
+
+如果其中的变量声明行被注释掉，则标准编译器什么也不输出：
+
+<pre class="output"><code>$ go run -gcflags="-d=ssa/check_bce" example1b.go
+</code></pre>
+
+<p>
+</p>
+
+如果其中的变量声明行被启用，则标准编译器输出：
+
+<pre class="output"><code>./aaa.go:5:7: Found IsInBounds
+./example1b.go:6:7: Found IsInBounds
+./example1b.go:7:7: Found IsInBounds
+./example1b.go:4:6: Found IsInBounds
+</code></pre>
+
+<p>
+</p>
+
 </div>
 
 <h3>例子2</h3>
