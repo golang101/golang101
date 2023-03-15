@@ -956,6 +956,7 @@ func (pt *T) MethodX(v0 ParamType0, ...) (ResultType0, ...) {
 
 <p>
 在Go语言中，直到现在（Go 1.20），没有值满足第三种定义。
+但是零尺寸类型的变量值可以被视为事实上的（可被取地址的）不变量。
 </p>
 
 <p>
@@ -963,8 +964,8 @@ func (pt *T) MethodX(v0 ParamType0, ...) (ResultType0, ...) {
 </p>
 
 <p>
-方法和声明的函数可以被视为声明的不可变值。
-它们满足第二种定义。字符串的字节元素同样满足第二种定义。
+方法和包级函数可以被视为声明的不可变值。它们满足第二种定义。
+字符串的字节元素和映射条目中的元素值同样满足第二种定义。
 </p>
 
 <p>
@@ -1030,49 +1031,7 @@ func main() {
 </h3>
 
 <div>
-例如:
-<pre class="line-numbers"><code class="language-go">import (
-	"unsafe"
-	"sync/atomic"
-)
-
-type T int // just a demo
-
-var p *T
-
-func demo(newP *T) {
-	// 加载（读取）
-	var _ = (*T)(atomic.LoadPointer(
-		(*unsafe.Pointer)(unsafe.Pointer(&p)),
-		))
-
-	// 存储（修改）
-	atomic.StorePointer(
-		(*unsafe.Pointer)(unsafe.Pointer(&p)),
-		unsafe.Pointer(newP),
-		)
-
-
-	// 交换
-	var oldP = (*T)(atomic.SwapPointer(
-		(*unsafe.Pointer)(unsafe.Pointer(&p)),
-		unsafe.Pointer(newP),
-		))
-
-	// 比较并交换
-	var swapped = atomic.CompareAndSwapPointer(
-		(*unsafe.Pointer)(unsafe.Pointer(&p)),
-		unsafe.Pointer(oldP),
-		unsafe.Pointer(newP),
-		)
-
-	_ = swapped
-}
-</code></pre>
-
-<p>
-是的，目前指针的原子操作使用起来非常得繁琐。
-</p>
+参见<a href="concurrent-atomic-operation.html#pointer">指针值的原子操作</a>。
 </div>
 
 <!-- 其它 -->

@@ -529,7 +529,7 @@ func fpq() {
 
 按照这个说法，在下面这个程序中，对变量<code>b</code>的原子写操作肯定发生在对其读取结果为<code>1</code>的原子原子读操作之前。
 从而使得对变量<code>a</code>的普通写操作也发生于对其的普通读操作之前。
-所以此程序保证会打印出<code>1</code>。
+所以此程序保证会打印出<code>2</code>。
 
 <pre class="line-numbers"><code class="language-go">package main
 
