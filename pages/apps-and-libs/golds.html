@@ -8,7 +8,7 @@
 
 <ul>
 <li>
-演示地址：<a href="https://docs.go101.org/index.html" target="_blank">标准库文档和代码</a>（使用命令<code>golds -gen -nouses -only-list-exporteds -render-doclinks std</code>生成）。
+演示地址：<a href="https://docs.go101.org/index.html" target="_blank">标准库文档和代码</a>（使用命令<code>golds -gen -nouses -only-list-exporteds -render-doclinks -theme=dark std</code>生成）。
 </li>
 
 <li>
@@ -26,22 +26,15 @@
 
 <h3 id="faq">安装</h3>
 
-<ul>
-<li>如果你已经在使用官方工具链1.16+版本，则可运行<code>go install go101.org/golds@latest</code>来安装Golds；</li>
-<li>如果你仍在使用官方工具链1.15-版本，则可运行<code>go get -u go101.org/golds</code>来安装Golds（注意：<code>GO111MODULE</code>环境变量需要暂时设置成<code>on</code>以利用<code>GOPROXY</code>设置）。</li>
-</ul>
+运行<code>go install go101.org/golds@latest</code>来安装Golds。
 
 如果程序名<code>golds</code>和其它程序冲突，也可将Golds程序安装为其它名称：
 <ul>
 <li>
-<b>Go</b> <b>do</b>cs <b>ge</b>nerator<br/>
-如果你已经在使用官方工具链1.16+版本，运行<code>go install go101.org/golds/godoge@latest</code><br/>
-如果你仍在使用官方工具链1.15-版本，运行<code>go get -u go101.org/golds/godoge</code>
+<b>Go</b> <b>do</b>cs <b>ge</b>nerator：运行<code>go install go101.org/golds/godoge@latest</code>
 </li>
 <li>
-<b>Go</b> <b>co</b>de <b>re</b>ader<br/>
-如果你已经在使用官方工具链1.16+版本，运行<code>go install go101.org/golds/gocore@latest</code><br/>
-如果你仍在使用官方工具链1.15-版本，运行<code>go get -u go101.org/golds/gocore</code>
+<b>Go</b> <b>co</b>de <b>re</b>ader<br/>：运行<code>go install go101.org/golds/gocore@latest</code>
 </li>
 </ul>
 
@@ -126,8 +119,8 @@
 
 <p>
 <code>-theme</code>选项用来控制页面渲染风格。
-目前支持 `auto`（默认值）、 `light` 和 `dark`。
-`auto` 相当于 `light` 加上在 `$UserConfigDir/golds/custom.css` 文件中配置的自定义风格。
+目前支持 <code>auto<code/>（默认值）、 <code>light<code/> 和 <code>dark<code/>。
+<code>auto</code> 相当于 <code>light<code> 加上在 <code>$UserConfigDir/golds/custom.css</code> 文件中配置的自定义风格。
 </p>
 
 <p>

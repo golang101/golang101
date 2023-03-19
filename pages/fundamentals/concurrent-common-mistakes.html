@@ -127,20 +127,17 @@ import (
 	"time"
 )
 
-var x = 0
-
 func main() {
-	var num = 123
-	var p = &num
+	var n = 123
 
 	c := make(chan int)
 
 	go func() {
-		c <- *p + x
+		c <- n + 0
 	}()
 
 	time.Sleep(time.Second)
-	num = 789
+	n = 789
 	fmt.Println(<-c)
 }
 </code></pre>
@@ -148,18 +145,18 @@ func main() {
 <p>
 你觉得此程序会输出什么？<code>123</code>还是<code>789</code>？
 事实上，它的输出是和具体使用的编译器相关的。
-对于标准编译器1.19版本来说，它很可能输出<code>123</code>。
+对于标准编译器1.20版本来说，它很可能输出<code>123</code>。
 但是从理论上说，它也可能输出<code>789</code>。
 </p>
 
 <p>
-让我们将此例中的<code>c &lt;- *p + x</code>一行换成<code>c &lt;- *p</code>，然后重新运行它，你将会发现它的输出变成了<code>789</code>（如果它使用标准编译器1.19版本编译的话）。
+让我们将此例中的<code>c &lt;- n + 0</code>一行换成<code>c &lt;- n</code>，然后重新运行它，你将会发现它的输出变成了<code>789</code>（如果它使用标准编译器1.20版本编译的话）。
 重申一次，此结果是和具体使用的编译器和编译器的版本相关的。
 </p>
 
 <p>
-是的，此程序中存在数据竞争。表达式<code>*p</code>的估值可能发生在赋值<code>num = 789</code>之前、之后、或者同时。
-<code>time.Sleep</code>调用并不能保证<code>*p</code>的估值发生在此赋值之后。
+是的，此程序中存在数据竞争。表达式<code>n</code>的估值可能发生在赋值语句<code>n = 789</code>执行之前、之后、或者期间。
+<code>time.Sleep</code>调用并不能保证<code>n</code>的估值发生在此赋值之后。
 </p>
 
 对于这个特定的例子，我们应该将欲发送的值在开启新协程之前存储在一个临时变量中来避免数据竞争。

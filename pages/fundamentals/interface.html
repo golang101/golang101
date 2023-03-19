@@ -722,7 +722,7 @@ func main() {
 
 	// y的动态类型为string。string类型并没有实现Writer。
 	w, ok = y.(Writer)
-	fmt.Println(w, ok) // <nil> false
+	fmt.Println(w, ok) // &lt;nil&gt; false
 	w = y.(Writer)     // 将产生一个恐慌
 }
 </code></pre>

@@ -362,7 +362,7 @@ func main() {
 	vb := reflect.ValueOf(123)
 	vx.Set(vb)     // okay, 因为vx代表的值是可修改的。
 	// vy.Set(vb)  // 会造成恐慌，因为vy代表的值是不可修改的。
-	fmt.Println(s) // {123 <nil>
+	fmt.Println(s) // {123 &lt;nil&gt;
 	fmt.Println(vx.IsNil(), vy.IsNil()) // false true
 }
 </code></pre>
@@ -528,7 +528,7 @@ func main() {
 	vs, sentBeforeClosed := vc.Recv()
 	fmt.Println(vs.String(), sentBeforeClosed) // Go true
 	vs, succeeded = vc.TryRecv()
-	fmt.Println(vs.String()) // <invalid Value>
+	fmt.Println(vs.String()) // &lt;$1&gt;
 	fmt.Println(succeeded)   // false
 }
 </code></pre>
@@ -581,13 +581,13 @@ import "fmt"
 
 func main() {
 	var z reflect.Value // 一个reflect.Value零值
-	fmt.Println(z)      // <invalid reflect.Value>
+	fmt.Println(z)      // &lt;$1&gt;
 	v := reflect.ValueOf((*int)(nil)).Elem()
-	fmt.Println(v)      // <invalid reflect.Value>
+	fmt.Println(v)      // &lt;$1&gt;
 	fmt.Println(v == z) // true
 	var i = reflect.ValueOf([]interface{}{nil}).Index(0)
-	fmt.Println(i)             // <nil>
-	fmt.Println(i.Elem())      // <invalid reflect.Value>
+	fmt.Println(i)             // &lt;nil&gt;
+	fmt.Println(i.Elem())      // &lt;$1&gt;
 	fmt.Println(i.Elem() == z) // true
 }
 </code></pre>
