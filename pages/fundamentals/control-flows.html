@@ -390,7 +390,7 @@ default:
 </p>
 
 <p>
-当一个<code>switch-case</code>流程控制被执行到的时候，其中的简单语句<code>InitSimpleStatement</code>将率先被执行。
+当一个<code>switch-case</code>流程控制被执行到的时候，其中的简单语句<code>InitSimpleStatement</code>将率先被执行（只执行一次）。
 随后switch表达式<code>CompareOperand0</code>将被估值（仅一次）。上面已经提到，此估值结果一定为一个类型确定值。
 然后此结果值将从上到下从左到右和各个<code>CompareOperandListX</code>表达式列表中的各个case表达式逐个依次比较（使用<code>==</code>运算符）。
 一旦发现某个表达式和<code>CompareOperand0</code>相等，比较过程停止并且此表达式对应的分支代码块将得到执行。

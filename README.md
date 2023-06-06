@@ -18,6 +18,10 @@
 
 _(若上面二维码未显示出来，请点击此[墙内版链接](https://tool.oschina.net/action/qrcode/generate?data=http%3A%2F%2Fweixin.qq.com%2Fr%2FRy6ju1TE0AmvrRDY93tV&output=image%2Fgif&error=L&type=0&margin=12&size=4)或者在微信中搜索 "Go 101" 公众号。)_
 
+老貘从2016年开始编写《Go语言101》系列丛书和维护go101.org网站。
+你的赞赏是本书和网站不断增容的动力：
+![](pages/website/res/101-reward-qrcode-8.png?raw=true)
+
 ### 安装、更新以及本地阅读本系列丛书
 
 如果你使用官方Go工具链v1.16+，则不需克隆本项目代码：
@@ -67,4 +71,4 @@ Server started:
 * 本人保留本系列丛书的出版权（包括纸质和各种电子版）。请勿随意在线转载（转载之前请在本项目中开一个issue问询）。
 * 本系列丛书仍在不断改进中。请关注本系列丛书微信（二维码见上）和[博客](https://gfw.go101.org/blog/101.html)以注意各种更新。
 
-![](pages/website/res/101-reward-qrcode-5.png?raw=true)
+
