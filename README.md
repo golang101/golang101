@@ -62,13 +62,14 @@ Server started:
 命令行选项：
 ```
 -port=1234
--theme=light # 或者 dark （默认为 auto）
+-theme=light # 或者 dark （默认为 light）
 ```
 
 ### 一些注意事项
 
+++
 * 如果在线版被墙了，请运行如上所述本地版或者下载[离线版](https://github.com/golang101/golang101/releases)阅读。
 * 本人保留本系列丛书的出版权（包括纸质和各种电子版）。请勿随意在线转载（转载之前请在本项目中开一个issue问询）。
-* 本系列丛书仍在不断改进中。请关注本系列丛书微信（二维码见上）和[博客](https://gfw.go101.org/blog/101.html)以注意各种更新。
+* 本系列丛书仍在不断改进中。请关注本系列丛书微信公众号（二维码见上）和[博客](https://gfw.go101.org/blog/101.html)以注意各种更新。
 
 
