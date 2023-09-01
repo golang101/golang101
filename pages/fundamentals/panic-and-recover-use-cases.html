@@ -161,11 +161,12 @@ func main() {
 }
 
 // 在现实中，各个doStepN函数的原型可能不同。
-// 每个doStepN函数的行为如下：
+// 这里，每个doStepN函数的行为如下：
 // * 如果已经成功，则调用panic(nil)来制造一个恐慌
 //   以示不需继续；
 // * 如果本步失败，则调用panic(err)来制造一个恐慌
 //   以示不需继续；
+// * 不会制造其它恐慌；
 // * 不制造任何恐慌表示继续下一步。
 func doStepN() {
 	...
@@ -295,7 +296,11 @@ func doSomething() (err error) {
 另外需要注意的是：从今后某个Go版本开始（很可能是v1.21），一个<code>panic(nil)</code>调用将<a href="https://github.com/golang/go/issues/25448">变得和<code>panic(new(runtime.PanicNilError))</code>等价</a>。
 从那时开始，上面代码中的延迟函数调用应该被重写为：
 
-<pre class="line-numbers"><code class="language-go">func doSomething() (err error) {
+<pre class="line-numbers"><code class="language-go">import "runtime"
+
+...
+
+func doSomething() (err error) {
 	defer func() {
 		err, _ = recover().(error)
 		if e := (*runtime.PanicNilError)(nil); errors.As(err, &e) {

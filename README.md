@@ -7,7 +7,7 @@
 
 * [《Go语言（基础知识）101》](https://gfw.go101.org/article/101.html)是一本着墨于Go语法语义（除了自定义泛型）以及运行时相关知识点的编程指导书（[电子书下载](https://github.com/golang101/golang101/releases)）。
 * [《Go自定义泛型101》](https://gfw.go101.org/generics/101.html)详细介绍了Go自定义泛型中的方方面面。
-* [《Go编程优化101》](https://gfw.go101.org/optimizations/101.html)列出了一些Go编程中的一些性能优化技巧和建议。
+* [《Go程序优化101》](https://gfw.go101.org/optimizations/101.html)列出了一些Go编程中的一些性能优化技巧和建议。
 * [《Go细节和小技巧101》](https://gfw.go101.org/details-and-tips/101.html)搜集了很多Go编程中的细节和小技巧（[电子书下载](https://github.com/golang101/golang101/issues/127)）。
 
 本系列丛书同时适合Go初学者和有一定经验的Go程序员阅读。希望它们能够帮助Go程序员更深更全面地理解Go语言。
@@ -67,7 +67,6 @@ Server started:
 
 ### 一些注意事项
 
-++
 * 如果在线版被墙了，请运行如上所述本地版或者下载[离线版](https://github.com/golang101/golang101/releases)阅读。
 * 本人保留本系列丛书的出版权（包括纸质和各种电子版）。请勿随意在线转载（转载之前请在本项目中开一个issue问询）。
 * 本系列丛书仍在不断改进中。请关注本系列丛书微信公众号（二维码见上）和[博客](https://gfw.go101.org/blog/101.html)以注意各种更新。
