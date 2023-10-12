@@ -144,7 +144,7 @@ map[string]int{"C": 1972, "Python": 1991, "Go": 2009}
 </code></pre>
 
 <p>
-映射组合字面量中大括号中的每一项称为一个键值对（key-value pair），或者称为一个条目（entry）。
+映射组合字面量中大括号中的每一项称为一个键值元素对（key-value pair），或者称为一个条目（entry）。
 </p>
 
 数组和切片组合字面量有一些微小的变种：
@@ -854,7 +854,7 @@ func main() {
 </p>
 
 <p>
-截至目前（Go 1.20），<code>append</code>函数调用的第一个实参不能为类型不确定的<code>nil</code>。
+截至目前（Go 1.21），<code>append</code>函数调用的第一个实参不能为类型不确定的<code>nil</code>。
 </p>
 
 </div>
@@ -1366,7 +1366,7 @@ func Copy(dest, src []T) int {
 </p>
 
 <p>
-截至目前（Go 1.20），<code>copy</code>函数调用的两个实参均不能为类型不确定的<code>nil</code>。
+截至目前（Go 1.21），<code>copy</code>函数调用的两个实参均不能为类型不确定的<code>nil</code>。
 </p>
 
 </div>
@@ -1471,31 +1471,34 @@ for range aContainer {
 </li>
 </ul>
 
-如果可以确保没有其它协程操纵一个映射<code>m</code>，则下面的代码保证将清空<code>m</code>中所有条目。
+如果可以确保没有其它协程操纵一个映射<code>m</code>，则下面的代码保证将清空<code>m</code>中所有条目（除了那些键值为<code>NaN</code>的条目）。
 <pre class="line-numbers"><code class="language-go">for key := range m {
 	delete(m, key)
 }
 </code></pre>
+
+<i>
+（Go 1.21引入了一个<a href="#clear"><code>clear</code>内置函数</a>，此函数可以用来清空一个映射中所有条目，包括那些键值为<code>NaN</code>的条目。）
+</i>
 
 <p>
 </p>
 
 当然，数组和切片元素也可以用传统的<code>for</code>循环来遍历。
 <pre class="line-numbers"><code class="language-go">for i := 0; i < len(anArrayOrSlice); i++ {
-	element := anArrayOrSlice[i]
-	// ...
+	// ... 使用 anArrayOrSlice[i]
 }
 </code></pre>
 
 <p>
 </p>
 
-对一个<code>for-range</code>循环代码块
+对一个<code>for-range</code>循环代码块（不论在<code>range</code>前面的是<code>=</code>还是<code>:=</code>）
 
 <pre class="line-numbers"><code class="language-go">for key, element = range aContainer {...}
 </code></pre>
 
-有三个重要的事实存在：
+有两个重要的事实存在：
 
 <ol>
 <li>
@@ -1518,12 +1521,9 @@ for range aContainer {
 	所以对循环变量的直接部分的修改将不会体现在<code>aContainer</code>中的对应元素中。
 	（因为这个原因，并且<code>for-range</code>循环是遍历映射条目的唯一途径，所以最好不要使用大尺寸的映射键值和元素类型，以避免较大的复制负担。）
 </li>
-<li>
-	所有被遍历的键值对将被赋值给<b>同一对</b>循环变量实例。
-</li>
 </ol>
 
-下面这个例子验证了上述第一个和第二个事实。
+下面这个例子验证了上述两个事实。
 
 <pre class="line-numbers"><code class="language-go">package main
 
@@ -1563,7 +1563,7 @@ persons: &[{Alice 28} {Jack 25}]
 
 <pre class="line-numbers"><code class="language-go">...
 
-	// 改为一个切片。
+	// 数组改为切片
 	persons := []Person {{"Alice", 28}, {"Bob", 25}}
 	for i, p := range persons {
 		fmt.Println(i, p)
@@ -1585,46 +1585,28 @@ persons: &[{Alice 28} {Jack 25}]
 <p>
 </p>
 
-下面这个例子验证了上述的第二个和第三个事实：
+下面这个例子验证了上述第二个事实。
+
 <pre class="line-numbers"><code class="language-go">package main
 
 import "fmt"
 
 func main() {
-	langs := map[struct{ dynamic, strong bool }]map[string]int{
-		{true, false}:  {"JavaScript": 1995},
-		{false, true}:  {"Go": 2009},
-		{false, false}: {"C": 1972},
+	m := map[int]struct{ dynamic, strong bool } {
+		0: {true, false},
+		1: {false, true},
+		2: {false, false},
 	}
-	// 此映射的键值和元素类型均为指针类型。
-	// 这有些不寻常，只是为了讲解目的。
-	m0 := map[*struct{ dynamic, strong bool }]*map[string]int{}
-	for category, langInfo := range langs {
-		m0[&category] = &langInfo
-		// 下面这行修改对映射langs没有任何影响。
-		category.dynamic, category.strong = true, true
+	
+	for _, v := range m {
+		// This following line has no effects on the map m.
+		v.dynamic, v.strong = true, true
 	}
-	for category, langInfo := range langs {
-		fmt.Println(category, langInfo)
-	}
-
-	m1 := map[struct{ dynamic, strong bool }]map[string]int{}
-	for category, langInfo := range m0 {
-		m1[*category] = *langInfo
-	}
-	// 映射m0和m1中均只有一个条目。
-	fmt.Println(len(m0), len(m1)) // 1 1
-	fmt.Println(m1) // map[{true true}:map[C:1972]]
+	
+	fmt.Println(m[0]) // {true false}
+	fmt.Println(m[1]) // {false true}
+	fmt.Println(m[2]) // {false false}
 }
-</code></pre>
-
-上面已经提到了，映射条目的遍历顺序是随机的。所以下面前三行的输出顺序可能会略有不同：
-
-<pre class="output"><code>{false true} map[Go:2009]
-{false false} map[C:1972]
-{true false} map[JavaScript:1995]
-1 1
-map[{true true}:map[Go:2009]]
 </code></pre>
 
 <p>
@@ -1663,6 +1645,80 @@ func fb(buffers []Buffer) int {
 </code></pre>
 
 <p>
+</p>
+
+在Go 1.22之前，对一个如下<code>for-range</code>循环代码块（注意<code>range</code>前面是<code>:=</code>）
+
+<pre class="line-numbers"><code class="language-go">for key, element := range aContainer {...}
+</code></pre>
+
+所有被遍历的键值元素对将被赋值给<b>同一对</b>循环变量实例。
+但是从Go 1.22版本开始，每组键值元素对将被赋值给一对<b>与众不同</b>的循环变量实例（既循环变量在每个循环步都会生成一份新的实例）。
+
+<p></p>
+
+下面这个例子展示了Go 1.21-和Go 1.22+之间的行为差异。
+
+<pre class="line-numbers"><code class="language-go">// forrange1.go
+package main
+
+import "fmt"
+
+func main() {
+	for i, n := range []int{0, 1, 2} {
+		defer func() {
+			fmt.Println(i, n)
+		}()
+	}
+}
+</code></pre>
+
+使用不同版本的Go编译器运行之（<a href="https://gfw.go101.org/apps-and-libs/gotv.html">gotv</a>是一个管理运行多个Go工具链版本的工具；未来的Go 1.22版本将来从tip版本开出来），将得到不同的输出：
+
+<pre class="line-numbers"><code class="language-go">$ gotv 1.21. run forrange1.go
+[Run]: $HOME/.cache/gotv/tag_go1.21.2/bin/go run forrange1.go
+2 3
+2 3
+2 3
+$ gotv :tip run forrange1.go
+[Run]: $HOME/.cache/gotv/bra_master/bin/go run forrange1.go
+2 3
+1 2
+0 1
+</code></pre>
+
+<p></p>
+
+另一个例子：
+
+<pre class="line-numbers"><code class="language-go">// forrange2.go
+package main
+
+import "fmt"
+
+func main() {
+	var m = map[*int]uint32{}
+	for i, n := range []int{1, 2, 3} {
+		m[&i]++
+		m[&n]++
+	}
+	fmt.Println(len(m))
+}
+</code></pre>
+
+使用不同版本的Go编译器运行之，得到如下输出：
+
+<pre class="line-numbers"><code class="language-go">$ gotv 1.21. run forrange2.go
+[Run]: $HOME/.cache/gotv/tag_go1.21.2/bin/go run forrange2.go
+2
+$ gotv :tip run forrange2.go
+[Run]: $HOME/.cache/gotv/bra_master/bin/go run forrange2.go
+6
+</code></pre>
+
+<p>
+因此，这是一个破坏了向后兼容性的语义改变。
+但是新的语义更符合人们的直觉；并且从理论上，到目前还没有发现旧的在逻辑上正确的代码因为此改变而导致行为变化的情况。
 </p>
 
 </div>
@@ -1798,9 +1854,56 @@ fmt.Println(len(pa), cap(pa)) // 5 5
 </p>
 
 <p>
-注意：Go 1.21将引入一个<code>clear</code>内置函数，用来清空一个映射中的所有条目或者重置一个切片中的所有元素。
+注意：Go 1.21引入了一个<code>clear</code>内置函数，用来清空一个映射中的所有条目或者重置一个切片中的所有元素。
+我们应该尽量使用此内置函数而不是依赖于此<code>memclr</code>优化来重置切片或者数组的元素。
+<code>clear</code>内置函数见下一节。
 </p>
 </div>
+
+
+<a class="anchor" id="clear"></a>
+<h3>使用内置<code>clear</code>函数来清空映射条目或者重置切片元素</h3>
+
+<div>
+<p>
+Go 1.21引入了一个<code>clear</code>内置函数。
+此函数可以用来清空映射条目或者重置切片元素。
+</p>
+
+一个例子：
+<pre class="line-numbers"><code class="language-go">package main
+
+import "fmt"
+
+func main() {
+	s := []int{1, 2, 3}
+	clear(s)
+	fmt.Println(s) // [0 0 0]
+	
+	a := [4]int{5, 6, 7, 8}
+	clear(a[1:3])
+	fmt.Println(a) // [5 0 0 8]
+	
+	m := map[float64]float64{}
+	x := 0.0
+	m[x] = x
+	x /= x // x变成了NaN
+	m[x] = x
+	fmt.Println(len(m)) // 2
+	for k := range m {
+		delete(m, k)
+	}
+	fmt.Println(len(m)) // 1
+	clear(m)
+	fmt.Println(len(m)) // 0
+}
+</code></pre>
+
+<p>
+从上例中，我们可以发现此<code>clear</code>函数甚至可以清除那些键值为<code>NaN</code>的映射条目.
+</p>
+</div>
+
 
 <a class="anchor" id="compile-time-evaluation"></a>
 <h3>内置函数<code>len</code>和<code>cap</code>的调用可能会在编译时刻被估值</h3>
@@ -1889,7 +1992,7 @@ Go不支持更多的内置切片操作，比如切片克隆、元素删除和插
 <h4>切片克隆</h4>
 
 <div>
-对于当前的Go版本（1.20），最简单的克隆一个切片的方法为：
+对于当前的Go版本（1.21），最简单的克隆一个切片的方法为：
 <pre class="disable-line-numbers111"><code class="language-go">sClone := append(s[:0:0], s...)
 </code></pre>
 
@@ -1904,8 +2007,8 @@ sClone := make([]T, len(s))
 copy(sClone, s)
 
 // 或者下面的make+append实现。
-// 对于目前的官方Go工具链v1.20来说，这种
-// 实现比上面的make+copy实现略慢一点。
+// 对于目前的官方Go工具链1.21版本来说，
+// 这种实现比上面的make+copy实现略慢一点。
 sClone := append(make([]T, 0, len(s)), s...)
 </code></pre>
 
@@ -2081,7 +2184,7 @@ s = append(s[:i], append(elements, s[i:]...)...)
 // 最多导致两次内存开辟（最少一次）。
 // 下面这种繁琐的实现只把s[i:]中的元素复制了一次，并且
 // 它最多只会导致一次内存开辟（最少零次）。
-// 但是，在当前的官方标准编译器实现中（1.20版本），此
+// 但是，在当前的官方标准编译器实现中（1.21版本），此
 // 繁琐实现中的make调用将会把部分刚开辟出来的元素清零。
 // 这其实是没有必要的。所以此繁琐实现并非总是比上面的
 // 单行实现效率更高。事实上，它仅在处理小切片时更高效。

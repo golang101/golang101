@@ -440,7 +440,7 @@ https://github.com/golang/go/blob/5a7cfbc0117bce314c3f079ece459173b9efc854/src/c
 -->
 <p>
 注意，编译器可能会不允许一个<code>switch-case</code>流程控制中有任何两个case表达式可以在编译时刻确定相等。
-比如，当前的官方标准编译器（1.20版本）认为上例中的<code>case 6, 7, 8</code>一行是不合法的（如果此行未被注释掉）。但是其它编译器未必这么认为。
+比如，当前的官方标准编译器（1.21版本）认为上例中的<code>case 6, 7, 8</code>一行是不合法的（如果此行未被注释掉）。但是其它编译器未必这么认为。
 事实上，当前的官方标准编译器<a href="https://github.com/golang/go/issues/28357">允许重复的布尔case表达式在同一个<code>switch-case</code>流程控制中出现</a>，
 而gccgo（v8.2）允许重复的布尔和字符串类型的case表达式在同一个<code>switch-case</code>流程控制中出现。
 </p>

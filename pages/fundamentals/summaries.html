@@ -329,7 +329,13 @@
 	<tr class="active">
 	<th scope="row" class="text-center">unsafe.Sizeof</th>
 	<td rowspan="3" style="vertical-align: middle"><code>uintptr</code></td>
-	<td rowspan="3" style="vertical-align: middle">是</td>
+	<td rowspan="3" style="vertical-align: middle">
+		总是如此。
+		<br/><br/>
+		<i>
+		但是请注意，如果这样的一个函数调用的实参类型为一个<a href="https://go101.org/generics/555-type-constraints-and-parameters.html">类型参数</a>，则此函数调用的结果将不被视为一个常量。
+		</i>
+	</td>
 	</tr>
 	<tr class="active">
 	<th scope="row" class="text-center" style="vertical-align: middle">unsafe.Alignof</th>
@@ -354,6 +360,10 @@
 		</li>
 		</ul>
 		</div>
+		<br/><br/>
+		<i>
+		请注意，即使这样的一个函数调用在编译时刻被估值，如果函数调用的实参类型为一个<a href="https://go101.org/generics/555-type-constraints-and-parameters.html">类型参数</a>，则此函数调用的结果将不被视为一个常量。
+		</i>
 	</td>
 	</tr>
 	<tr>

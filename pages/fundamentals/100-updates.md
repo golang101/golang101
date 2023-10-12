@@ -1,6 +1,12 @@
 
 # Go 101 更新历史
 
+
+### v1.21.a (2023/十月/11)
+
+* Go 1.21[添加了一个`clear`内置函数](https://go101.org/article/container.html#clear)。
+* 从Go 1.21开始，[调用`panic(nil)`将产生一个运行时刻的非nil新恐慌](https://go101.org/article/panic-and-recover-use-cases.html#avoid-verbose)。
+
 ### v1.20.a (2023/二月/01)
 
 * Go 1.20 [开始支持切片类型转换到数组](https://gfw.go101.org/article/container.html#slice-to-array).
