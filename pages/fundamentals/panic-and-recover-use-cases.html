@@ -148,7 +148,13 @@ func main() {
 
 <pre class="line-numbers"><code class="language-go">func doSomething() (err error) {
 	defer func() {
-		err, _ = recover().(error)
+		switch e := recover().(type) {
+		case nil:
+		case error:
+			err = e
+		default:
+			panic(e) // 重新抛出此恐慌
+		}
 	}()
 
 	doStep1()
@@ -166,7 +172,6 @@ func main() {
 //   以示不需继续；
 // * 如果本步失败，则调用panic(err)来制造一个恐慌
 //   以示不需继续；
-// * 不会制造其它恐慌；
 // * 不制造任何恐慌表示继续下一步。
 func doStepN() {
 	...
@@ -302,9 +307,12 @@ func doSomething() (err error) {
 
 func doSomething() (err error) {
 	defer func() {
-		err, _ = recover().(error)
-		if e := (*runtime.PanicNilError)(nil); errors.As(err, &e) {
-			err = nil
+		switch e := recover().(type) {
+		case nil, *runtime.PanicNilError:
+		case error:
+			err = e
+		default:
+			panic(e) // 重新抛出此恐慌
 		}
 	}()
 

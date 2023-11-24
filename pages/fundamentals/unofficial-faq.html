@@ -365,7 +365,7 @@ func main() {
 <div>
 <p>
 对于大部分类型，答案是肯定的。不过事实上，这依赖于编译器。
-例如，对于标准编译器，对于某些字符串类型的零值，此结论并不十分正确。
+例如，对于标准编译器，对于字符串或者浮点数类型的某些零值，此结论并不十分正确。
 </p>
 
 比如:
@@ -377,13 +377,18 @@ import (
 )
 
 func main() {
-	var s1 string
-	fmt.Println(s1 == "") // true
-	fmt.Println(*(*uintptr)(unsafe.Pointer(&s1))) // 0
-	var s2 = "abc"[0:0]
-	fmt.Println(s2 == "") // true
-	fmt.Println(*(*uintptr)(unsafe.Pointer(&s2))) // 4869856
-	fmt.Println(s1 == s2) // true
+	// case 1:
+	var s = "abc"[0:0]
+	fmt.Println(s == "") // true
+	var addr = *(*uintptr)(unsafe.Pointer(&s))
+	fmt.Println(addr) // <a-non-zero-value>
+
+	// case 2:
+	var x = 0.0
+	var y = -x
+	fmt.Println(y == 0) // true
+	var n = *(*uintptr)(unsafe.Pointer(&y))
+	fmt.Println(n) // 9223372036854775808
 }
 </code></pre>
 </div>

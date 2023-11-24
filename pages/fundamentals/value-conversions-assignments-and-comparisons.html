@@ -250,11 +250,11 @@ func main() {
 </i></p>
 
 <p>
-常量的类型转换结果一般仍然是一个常量。（除了下面第8条规则中将介绍的字符串转换为字节切片或者码点切片的情况。）
+常量的类型转换结果一般仍然是一个常量（除非目标类型不是基本类型）。
 </p>
 
 <div class="well">
-给定一个常量值<code>x</code>和一个类型<code>T</code>，如果<code>x</code>可以表示成类型<code>T</code>的一个值，则<code>x</code>可以被显式地转换为类型<code>T</code>；特别地，如果<code>x</code>是一个类型不确定值，则它可以被<u><b>隐式</b></u>转换为类型<code>T</code>。
+给定一个常量值<code>x</code>和一个基本类型<code>T</code>，如果<code>x</code>可以表示成类型<code>T</code>的一个值，则<code>x</code>可以被显式地转换为类型<code>T</code>；特别地，如果<code>x</code>是一个类型不确定值，则它可以被<u><b>隐式</b></u>转换为类型<code>T</code>。
 </div>
 
 <!--
@@ -270,18 +270,21 @@ but with an IEEE <code>-0.0</code> further rounded to an unsigned <code>0.0</cod
 <pre class="line-numbers"><code class="language-go">package main
 
 func main() {
+	// 这些隐式转换都是合法的。
 	const I = 123
 	const I1, I2 int8 = 0x7F, -0x80
 	const I3, I4 int8 = I, 0.0
-
 	const F = 0.123456789
 	const F32 float32 = F
 	const F32b float32 = I
 	const F64 float64 = F
-	const F64b = float64(I3) // 这里必须显式转换
-
 	const C1, C2 complex64 = F, I
-	const I5 = int(C2) // 这里必须显式转换
+
+	// const F64b float64 = I3 // 这个赋值编译将失败
+	const F64b = float64(I3)   // 这个编译没问题
+	
+	// const I5 int = C2 // 这个赋值编译将失败
+	const I5 = int(C2)   // 这个编译没问题
 }
 </code></pre>
 </div>
