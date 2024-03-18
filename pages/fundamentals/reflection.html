@@ -33,13 +33,17 @@ Go反射机制设计的目标之一是任何非反射操作都可以通过反射
 
 <div>
 <p>
-通过调用<code>reflect.TypeOf</code>函数，我们可以从一个任何非接口类型的值创建一个<code>reflect.Type</code>值。
-此<code>reflect.Type</code>值表示着此非接口值的类型。通过此值，我们可以得到很多此非接口类型的信息。
+通过调用<code>reflect.TypeOf</code>函数，我们可以从一个任何非接口类型的值创建一个<code>reflect.Type</code>值，此<code>reflect.Type</code>值表示着此非接口值的类型。通过此值，我们可以得到很多此非接口类型的信息。
 当然，我们也可以将一个接口值传递给一个<code>reflect.TypeOf</code>函数调用，但是此调用将返回一个表示着此接口值的动态类型的<code>reflect.Type</code>值。
 实际上，<code>reflect.TypeOf</code>函数的唯一参数的类型为<code>interface{}</code>，
 <code>reflect.TypeOf</code>函数将总是返回一个表示着此唯一接口参数值的动态类型的<code>reflect.Type</code>值。
 那如何得到一个表示着某个接口类型的<code>reflect.Type</code>值呢？
 我们必须通过下面将要介绍的一些间接途径来达到这一目的。
+</p>
+
+<p>
+从Go 1.22开始，我们也可以调用[<code>reflect.TypeFor</code>函数](https://docs.go101.org/std/pkg/reflect.html#name-TypeFor)来得到一个表示着一个编译时刻已知的类型的<code>reflect.Type</code>值。
+此编译时刻已知的类型可以是一个非接口类型，也可以是一个接口类型。
 </p>
 
 <p>
@@ -275,7 +279,7 @@ func main() {
 </p>
 
 <p>
-注意，到目前为止（Go 1.21），我们无法通过反射动态创建一个接口类型。这是Go反射目前的一个限制。
+注意，到目前为止（Go 1.22），我们无法通过反射动态创建一个接口类型。这是Go反射目前的一个限制。
 </p>
 
 <p>

@@ -20,33 +20,61 @@ including Go built-in generics, which and Go custom generics are two different s
 Currently, the book mainly focuses on the syntax of (and concepts in) custom generics.
 More practical examples will be provided when I get more experiences of using custom generics.
 
+## About GoTV
+
+During writing this book, the tool [GoTV](https://go101.org/apps-and-libs/gotv.html)
+is used to manage installations of multiple Go toolchain versions and check
+the behavior differences between Go toolchain versions.
+
 
 <!--
+
+https://github.com/golang/go/issues/58573 local types in different instantiations of a generic function
+https://github.com/golang/go/issues/58573#issuecomment-1433898205
+https://github.com/golang/go/issues/65152
+
+https://github.com/golang/go/issues/58608
+
 https://github.com/golang/proposal/blob/master/design/generics-implementation-dictionaries-go1.18.md
 
-* show some basic interfeace type argument examples
-
-* ~T is called underlying term
+* type argument inferences still have some limitations
+  * https://github.com/golang/go/issues/63750
 
 * type argument inference needs more detailed explainations.
-
-* Implementation restriction: A compiler need not report an error if an operand's type is a type parameter with an empty type set. Functions with such type parameters cannot be instantiated; any attempt will lead to an error at the instantiation site. 
+ 
 
 * example: how to define an expected constraint?
   * some achievable, some are not.  
 
-* An example show the difference of using ordinary interface and generic constraint
-
-* What does this constraint mean?
-  interface {
-  	M1()
-  	M2() error
-  	I
-  	int | bool
-  }
-  使用bullet一条一条列出来。
+* An example show the difference of using ordinary interface and generic constraint.
 
 * more
+
+	https://github.com/golang/go/issues/62172
+		https://github.com/golang/go/issues/40301#issuecomment-885119414
+		https://github.com/golang/go/issues/40301#issuecomment-754156626
+		
+				package main
+
+				import "unsafe"
+
+				func f(x int64) byte {
+				  return 1 << unsafe.Sizeof(x) >> unsafe.Sizeof(x)
+				}
+
+				func g[T int64](x T) byte {
+				  return 1 << unsafe.Sizeof(x) >> unsafe.Sizeof(x)
+				}
+
+				func main() {
+				  var n int64 = 0
+				  println(f(n), g(n))
+				}
+
+	https://github.com/golang/go/issues/61741
+
+	https://github.com/golang/go/issues/60130
+	https://github.com/golang/go/issues/60117
 
 	https://github.com/golang/go/issues/51522 miscompilation of comparison between type parameter and interface
 	https://github.com/golang/go/issues/51521 wrong panic message for method call on nil of generic interface type
@@ -85,6 +113,72 @@ https://github.com/golang/proposal/blob/master/design/generics-implementation-di
 	
 	https://github.com/golang/go/issues/56923
 	
+	https://github.com/golang/go/issues/62157
+
+
+==================== type argument inference https://go.dev/blog/type-inference
+
+ * https://twitter.com/go100and1/status/1714885320599302598
+
+interace:
+	
+		https://twitter.com/go100and1/status/1714187265310957864
+		
+		package main
+
+		func f       (...A) {}
+		func g[T any](...T) {}
+
+		type A any
+		type B any                                            
+
+		var a A
+		var b B
+
+		func main(){
+			g(a, b)
+		}
+
+channel
+
+		package main
+
+		import "fmt"
+
+		func g[T any](...T) (_ T){return}
+
+		type A = chan int
+		type B = <-chan int
+		type C chan int
+		type D <-chan int
+
+		var a A
+		var b B
+		var c C
+		var d D
+
+		func main(){
+		  // T is infered as C
+		 fmt.Printf("%T ", g(a, b, c, d)) // type D of d does not match inferred type C for T
+		}
+
+more composite types
+
+		package main
+
+		import "fmt"
+
+		func g[T any](...T) (_ T){return}
+
+		type A = []int
+		type B []int
+		type C []int
+
+		func main(){
+		  // T is inferred as B
+		 fmt.Printf("%T ", g(A{}, B{}, C{})) // type C of C{} does not match inferred type B for T
+		}
+
 -->
 
 

@@ -296,7 +296,7 @@ func main() {
 
 <p>
 在运行时刻，我们可以调用<a href="https://golang.google.cn/pkg/runtime/#GOMAXPROCS"><code>runtime.GOMAXPROCS</code></a>函数来获取和设置逻辑处理器的数量。
-对于官方标准编译器，在Go 1.5之前，默认初始逻辑处理器的数量为1；自从Go 1.5之后，默认初始逻辑处理器的数量和逻辑CPU的数量一致。
+对于官方标准编译器，在Go官方工具链1.5之前，默认初始逻辑处理器的数量为1；自从Go官方工具链1.5之后，默认初始逻辑处理器的数量和逻辑CPU的数量一致。
 此新的默认设置在大多数情况下是最佳选择。但是对于某些文件操作十分频繁的程序，设置一个大于<code>runtime.NumCPU()</code>的<code>GOMAXPROCS</code>值可能是有好处的。
 </p>
 
@@ -426,40 +426,55 @@ func main() {
 
 一个例子：
 
-<pre class="line-numbers"><code class="language-go">package main
+<pre class="line-numbers"><code class="language-go">// eval-moment.go
+package main
 
 import "fmt"
 
 func main() {
 	func() {
+		var x = 0
 		for i := 0; i < 3; i++ {
-			defer fmt.Println("a:", i)
+			defer fmt.Println("a:", i + x)
 		}
+		x = 10
 	}()
 	fmt.Println()
 	func() {
+		var x = 0
 		for i := 0; i < 3; i++ {
 			defer func() {
-				fmt.Println("b:", i)
+				fmt.Println("b:", i + x)
 			}()
 		}
+		x = 10
 	}()
 }
 </code></pre>
 
-运行之，将得到如下结果：
-<pre class="output"><code>a: 2
+使用不同版本的Go编译器运行之（<a href="https://gfw.go101.org/apps-and-libs/gotv.html">gotv</a>是一个管理运行多个Go官方工具链版本的工具；未来的Go 1.22版本将来从tip版本开出来），将得到如下输出结果：
+<pre class="output"><code>$ gotv 1.21. run eval-moment.go
+[Run]: $HOME/.cache/gotv/tag_go1.21.8/bin/go run eval-moment.go
+a: 2
 a: 1
 a: 0
 
-b: 3
-b: 3
-b: 3
+b: 13
+b: 13
+b: 13
+$ gotv 1.22. run eval-moment.go
+[Run]: $HOME/.cache/gotv/tag_go1.22.1/bin/go run eval-moment.go
+a: 2
+a: 1
+a: 0
+
+b: 12
+b: 11
+b: 10
 </code></pre>
 
 <p>
-第一个匿名函数中的循环打印出<code>2</code>、<code>1</code>和<code>0</code>这个序列，但是第二个匿名函数中的循环打印出三个<code>3</code>。
-因为第一个循环中的<code>i</code>是在<code>fmt.Println</code>函数调用被推入延迟调用队列的时候估的值，而第二个循环中的<code>i</code>是在第二个匿名函数调用的退出阶段估的值（此时循环变量<code>i</code>的值已经变为<code>3</code>）。
+请注意<a href="control-flows.html#for-semantic-change">Go 1.22对<code>for</code>循环流程控制做出的语义修改</a>而导致的代码行为变化。
 </p>
 
 我们可以对第二个循环略加修改（使用两种方法），使得它和第一个循环打印出相同的结果。

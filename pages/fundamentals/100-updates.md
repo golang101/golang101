@@ -1,6 +1,12 @@
 
 # Go 101 更新历史
 
+### v1.21.a (2023/三月/18)
+
+* Go 1.22引入了`for range Integer`循环变种并改变了for循环的语义。相关的章节做了修改：
+  * [基本流程控制语法](https://go101.org/article/control-flows.html#for-semantic-change)
+  * [协程、延迟函数调用、以及恐慌和恢复](https://go101.org/article/control-flows-more.html#argument-evaluation-moment)
+  * [数组、切片和映射](https://go101.org/article/container.html#iteration)
 
 ### v1.21.a (2023/十月/11)
 
@@ -9,15 +15,15 @@
 
 ### v1.20.a (2023/二月/01)
 
-* Go 1.20 [开始支持切片类型转换到数组](https://gfw.go101.org/article/container.html#slice-to-array).
-* Go 1.20 [在"unsafe"标准库包中加入了三个函数](https://gfw.go101.org/article/unsafe.html)：`SliceData`、`String`和`StringData`.
+* Go 1.20[开始支持切片类型转换到数组](https://gfw.go101.org/article/container.html#slice-to-array).
+* Go 1.20[在"unsafe"标准库包中加入了三个函数](https://gfw.go101.org/article/unsafe.html)：`SliceData`、`String`和`StringData`.
 * 从Go 1.20开始，`math/rand`标准库包中的全局随机数产生器将被自动设置随机种子。
 * 在 [边界检查消除](https://gfw.go101.org/article/bounds-check-elimination.html) 一章中提及 `-gcflags="-d=ssa/check_bce"` 不会报告一些泛型函数中的边界检查。
 
 ### v1.19.a (2022/八月/29)
 
-* Go 1.19 [加入了一些原子操作类型s](https://gfw.go101.org/article/concurrent-atomic-operation.html).
-* Go 1.19 [更新内存顺序保证](https://gfw.go101.org/article/memory-model.html#atomic).
+* Go 1.19[加入了一些原子操作类型s](https://gfw.go101.org/article/concurrent-atomic-operation.html).
+* Go 1.19[更新内存顺序保证](https://gfw.go101.org/article/memory-model.html#atomic).
 
 ### v1.18.a (2022/四月/06)
 
@@ -45,7 +51,7 @@
 
 ### 1.15.a (2020/八月/07)
 
-* 指出从Go工具链1.15开始，使用make+copy总是比使用append来克隆切片更快。
+* 指出从Go官方工具链1.15开始，使用make+copy总是比使用append来克隆切片更快。
 
 ### 1.14.g (2020/六月/12)
 

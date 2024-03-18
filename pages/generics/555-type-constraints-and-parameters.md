@@ -142,11 +142,12 @@ So simply speaking, since Go 1.18, an interface type may specify some methods an
 An interface type without any embedding elements is called an empty interface.
 For example, the predeclared `any` type alias denotes an empty interface type.
 
-## Type sets and method sets
+{#type-sets-and-implementations}
+## Type sets and type implementations
 
 Before Go 1.18, an interface type is defined as a method set.
 Since Go 1.18, an interface type is defined as a type set.
-A type set only consists of non-interface types.
+A type set consists of only non-interface types.
 
 In fact, every type term defines a method set.
 Calculations of type sets follow the following rules:
@@ -248,7 +249,7 @@ Interface types whose type sets can be defined entirely by a method set (may be 
 are called basic interface types.
 Before 1.18, Go only supports basic interface types.
 Basic interfaces may be used as either value types or type constraints,
-but non-basic interfaces may only be used as type constraints (as of Go 1.19).
+but non-basic interfaces may only be used as type constraints (as of Go 1.22).
 
 Take the types declared above as an example,, `L`, `M`, `U`, `Z` and `any` are basic types.
 
@@ -278,22 +279,26 @@ type C3 = interface {~[]byte | ~string}
 ## More about the predeclared `comparable` constraint
 
 As aforementioned, besides `any`, Go 1.18 also introduced another new predeclared identifier `comparable`,
-which denotes an interface type whose method set is composed of all comparable (non-interfaace) types.
+which denotes an interface type whose method set is composed of all strictly comparable (non-interface) types
+("strictly comparable" is explained in the next section).
 
 The `comparable` interface type could be embedded in other interface types
-to filter out incomparable types from their type sets.
+to filter out types which are not strictly comparable from their type sets.
 For example, the type set of the following declared constraint `C` contains only one type: `string`,
-because the other three types in the union are all
-[incomprarable](https://go101.org/article/type-system-overview.html#types-not-support-comparison).
+because the other types in the union are either
+[incomprarable](https://go101.org/article/type-system-overview.html#types-not-support-comparison)
+(the first three) or not [strictly comparable](#strictly-comparable) (the last one).
 
 ```Go
 type C interface {
 	comparable
-	[]byte | string | func() | map[int]bool
+	[]byte | func() | map[int]bool | string | [2]any
 }
 ```
 
-Currently (Go 1.19), the `comparable` interface is treated as a non-basic interface type.
+_(Note, some earlier Go toolchain 1.18 and 1.19 versions failed to exclude `[2]any` from the type set of `C`. The bug has been fixed in newer Go toolchain 1.18 and 1.19 versions.)_
+
+Currently (Go 1.22), the `comparable` interface is treated as a non-basic interface type.
 So, now, it may only be used as type parameter constraints, not as value types.
 The following code is illegal:
 
@@ -304,12 +309,104 @@ var x comparable = 123
 The type set of the `comparable` interface is obviously a subset of the type set of the `any` interface,
 so `comparable` undoubtedly implements `any`, and not vice versa.
 
+{#strictly-comparable}
+## Comparable vs. strictly comparable
+
+We know that, although interface types are comparable, comparing two values of an interface type
+will produce a panic at run time if the dynamic types
+of the two interface values are identical and the identical dynamic type is incomparable.
+Comparing values of struct or array types which contain interface components might also produce a panic.
+
+For example, any of the comparisons shown in the `main` function will produce a panic at run time.
+
+```Go
+package main
+
+var m any = map[int]string{}
+var a = [2]any{1, func(){}}
+var s = struct{x any}{x: m}
+
+func main() {
+	_ = m == m
+	_ = a == a
+	_ = s == s
+}
+```
+
+The concept of "strictly comparable" is introduced in Go 1.20.
+Comparing values of a strictly comparable type is guaranteed to be run-time panic free.
+An ordinary type is strictly comparable if it is comparable and neither an interface type nor composed of interface types.
+
+The following value types are not strictly comparable:
+
+* (basic) interface types.
+* struct types which fields contain interfaces.
+* array types which elements contain interfaces.
+* type parameters which type set contains at least one type of the above two cases (structs and arrays).
+
+In the above example, the types `any`, `[2]any` and `struct{x any}` are all comparable but not strictly comparable.
+
+As mentioned in the last section, all types in the type set of the predeclared `comparable` interface are strictly comparable.
+
+{#implementation-vs-satisfaction}
+## Type implementation vs. type satisfaction
+
+Before Go 1.20, the two terminologies were used interchangeably.
+In other words, the following two descriptions were equivalent to each other before Go 1.20:
+
+* a type `X` implements an interface type `Y`.
+* a type `X` satisfies an interface type `Y`.
+
+Before Go 1.20, they both meant the type set of the type `X` is a sub-set of the interface type `Y`.
+So, before Go 1.20, if a type `X` implements an interface type `Y`,
+then it must also satisfy `Y`; and vice versa.
+
+Since Go 1.20, the meaning of type implementation remains the same.
+However, sometimes, an ordinary value type `X` might satisfy an interface type `Y`, even if it doesn't implement `Y`.
+In other words, since Go 1.20, if an ordinary value type `X` implements an interface type `Y`,
+then it must also satisfy `Y`; but not vice versa.
+
+Specifically speaking, since Go 1.20, if a comparable ordinary value type `X` is not strictly comparable
+and it doesn't implement a type constraint `Y`,
+but the underlying type of `Y` can be written as `interface{ comparable; E }`,
+where `E` is a basic interface type and the ordinary value type `X` implements `E`,
+then `X` also satisfies `Y`.
+
+For example, the type `any` surely doesn't implements the type constraint `comparable`.
+But when it is used as an ordinary value type, it satisfies `comparable`.
+Because the underlying type of `comparable` can be written as `interface{ comparable; any }`
+and `any` implements `any`.
+
+In the following code, the types `*A` and `*B` both satisfy (but don't implement) the interface type `C`.
+Because `C` can be written as `interface{ comparable; interface{ M() } }` and
+both `*A` and `*B` implement `interface{ M() }`.
+
+```Go
+type A [2]any
+
+func (a *A) M() {}
+
+type B struct{
+	A
+	x any
+}
+
+type C interface {
+	comparable
+	M()
+}
+```
+
+As of Go 1.22, type satisfactions are used to verify whether or not an ordinary value type
+can be used as a type argument of an instantiation of a generic type/function.
+Please read the next chapter for details.
+
 ## More requirements for union terms
 
 The above has mentioned that a union term may not be a type parameter. There are two other requirements for union terms.
 
 The first is an implementation specific requirement: a term union with more than one term cannot contain the predeclared identifier `comparable` or interfaces that have methods. 
-For example, the following term unions are both illegal (as of Go toolchain 1.19):
+For example, the following term unions are both illegal (as of Go toolchain 1.22):
 
 ```Go
 []byte | comparable
@@ -425,7 +522,7 @@ of a generic type specification declares a single type parameter
 which constraint presents in simplified form and starts with `*` or `(`.
 
 <!--
-Either the spec is not accurate or the implementaiton is still not perfect yet.
+Either the spec is not accurate or the implementation is still not perfect yet.
 
 type bar[T **string] struct{} // *string (type) is not an expression
 -->
@@ -494,7 +591,7 @@ type C5[T *int|bool, ] struct{} // compiles okay
 
 (Note: this way doesn't work with Go toolchain 1.18. It was [a bug](https://github.com/golang/go/issues/51488) and has been fixed since Go toolchain 1.19.)
 
-We could also use full constraint form or exchange the places of `*int` and `bool` to make it compile okay.
+We could also use full constraint form or swap the positions of `*int` and `bool` to make it compile okay.
 
 ```Go
 // Assume int and bool are predeclared types.
@@ -537,7 +634,7 @@ Two different type parameters are never identical.
 The type of a type parameter is a constraint, a.k.a an interface type.
 This means the underlying type of a type parameter type should be an interface type.
 However, this doesn't mean a type parameter behaves like an interface type.
-Its values may not box non-interface values and be type asserted (as of Go 1.19).
+Its values may neither box non-interface values nor be type asserted (as of Go 1.22).
 In fact, it is almost totally meaningless to talk about underlying types of type parameters.
 We just need to know that the underlying type of a type parameter is not itself.
 And we ought to think that two type parameters never share an identical underlying type,
@@ -569,7 +666,7 @@ type Cy[T int] interface {
 }
 ```
 
-In fact, currently (Go 1.19), [type parameters may not be embedded in struct types](888-the-status-quo-of-Go-custom-generics.md#embed-type-parameter), too.
+In fact, currently (Go 1.22), [type parameters may not be embedded in struct types](888-the-status-quo-of-Go-custom-generics.md#embed-type-parameter), too.
 
 {#type-parameter-scope}
 ## The scopes of a type parameters
@@ -603,7 +700,7 @@ type G[G any] struct{x G} // okay
 func (E G[E]) Bar1() {}   // error: E redeclared
 ```
 
-The following `Bar2` method declaration should compile okay, but it doesn't now (Go toolchain 1.19). This is [a bug which will be fixed in Go toolchain 1.20](https://github.com/golang/go/issues/51503).
+The following `Bar2` method declaration should compile okay, but it doesn't now (Go toolchain 1.22.n). This is [a bug which will be fixed in future Go toolchain versions](https://github.com/golang/go/issues/51503).
 
 ```Go
 type G[G any] struct{x G} // okay

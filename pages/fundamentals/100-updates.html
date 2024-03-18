@@ -1,6 +1,18 @@
 <p id="f-100-updates-md"></p>
 <h1>Go 101 更新历史</h1>
 
+<h3>v1.21.a (2023/三月/18)</h3>
+
+<ul>
+<li>Go 1.22引入了<code>for range Integer</code>循环变种并改变了for循环的语义。相关的章节做了修改：
+
+<ul>
+<li><a href="https://go101.org/article/control-flows.html#for-semantic-change">基本流程控制语法</a></li>
+<li><a href="https://go101.org/article/control-flows-more.html#argument-evaluation-moment">协程、延迟函数调用、以及恐慌和恢复</a></li>
+<li><a href="https://go101.org/article/container.html#iteration">数组、切片和映射</a></li>
+</ul></li>
+</ul>
+
 <h3>v1.21.a (2023/十月/11)</h3>
 
 <ul>
@@ -11,8 +23,8 @@
 <h3>v1.20.a (2023/二月/01)</h3>
 
 <ul>
-<li>Go 1.20 <a href="https://gfw.go101.org/article/container.html#slice-to-array">开始支持切片类型转换到数组</a>.</li>
-<li>Go 1.20 <a href="https://gfw.go101.org/article/unsafe.html">在&quot;unsafe&quot;标准库包中加入了三个函数</a>：<code>SliceData</code>、<code>String</code>和<code>StringData</code>.</li>
+<li>Go 1.20<a href="https://gfw.go101.org/article/container.html#slice-to-array">开始支持切片类型转换到数组</a>.</li>
+<li>Go 1.20<a href="https://gfw.go101.org/article/unsafe.html">在&quot;unsafe&quot;标准库包中加入了三个函数</a>：<code>SliceData</code>、<code>String</code>和<code>StringData</code>.</li>
 <li>从Go 1.20开始，<code>math/rand</code>标准库包中的全局随机数产生器将被自动设置随机种子。</li>
 <li>在 <a href="https://gfw.go101.org/article/bounds-check-elimination.html">边界检查消除</a> 一章中提及 <code>-gcflags=&quot;-d=ssa/check_bce&quot;</code> 不会报告一些泛型函数中的边界检查。</li>
 </ul>
@@ -20,8 +32,8 @@
 <h3>v1.19.a (2022/八月/29)</h3>
 
 <ul>
-<li>Go 1.19 <a href="https://gfw.go101.org/article/concurrent-atomic-operation.html">加入了一些原子操作类型s</a>.</li>
-<li>Go 1.19 <a href="https://gfw.go101.org/article/memory-model.html#atomic">更新内存顺序保证</a>.</li>
+<li>Go 1.19<a href="https://gfw.go101.org/article/concurrent-atomic-operation.html">加入了一些原子操作类型s</a>.</li>
+<li>Go 1.19<a href="https://gfw.go101.org/article/memory-model.html#atomic">更新内存顺序保证</a>.</li>
 </ul>
 
 <h3>v1.18.a (2022/四月/06)</h3>
@@ -63,7 +75,7 @@
 <h3>1.15.a (2020/八月/07)</h3>
 
 <ul>
-<li>指出从Go工具链1.15开始，使用make+copy总是比使用append来克隆切片更快。</li>
+<li>指出从Go官方工具链1.15开始，使用make+copy总是比使用append来克隆切片更快。</li>
 </ul>
 
 <h3>1.14.g (2020/六月/12)</h3>
