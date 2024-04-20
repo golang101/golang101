@@ -421,11 +421,11 @@ Go程序员常犯的一个错误是关闭一个后续可能还会有协程向其
 <div>
 <p>
 <code>time</code>标准库包中的<code>After</code>函数返回<a href="channel-use-cases.html#timer">一个用做延迟通知的通道</a>。
-此函数给并发编程带来了很多便利，但是它的每个调用都需要创建一个<code>time.Timer</code>值，此新创建的<code>Timer</code>值在传递给<code>After</code>函数调用的时长（实参）内肯定不会被垃圾回收。
+此函数给并发编程带来了很多便利，但是它的每个调用都需要创建一个<code>time.Timer</code>值，在Go 1.23之前，此新创建的<code>Timer</code>值在传递给<code>After</code>函数调用的时长（实参）内肯定不会被垃圾回收。
 如果此函数在某个时段内被多次频繁调用，则可能导致积累很多尚未过期的<code>Timer</code>值从而造成大量的内存和计算消耗。
 </p>
 
-比如在下面这个例子中，如果<code>longRunning</code>函数被调用并且在一分钟内有一百万条消息到达，
+比如在下面这个例子中，（在Go 1.23之前），如果<code>longRunning</code>函数被调用并且在一分钟内有一百万条消息到达，
 那么在某个特定的很小时间段（大概若干秒）内将存在一百万个活跃的<code>Timer</code>值，即使其中只有一个是真正有用的。
 
 <pre class="line-numbers"><code class="language-go">import (
@@ -447,9 +447,10 @@ func longRunning(messages <-chan string) {
 </code></pre>
 
 <p>
+注意：从Go 1.23开始，这个问题不再存在。从Go 1.23开始的Go运行时做了改进，从而使得当一个<code>Timer</code>对象不再被使用时将立即变得可以垃圾回收。
 </p>
 
-为了避免太多的<code>Timer</code>值被创建，我们应该只使用（并复用）一个<code>Timer</code>值，像下面这样：
+在Go 1.23之前，为了避免太多的<code>Timer</code>值被创建，我们应该只使用（并复用）一个<code>Timer</code>值，像下面这样：
 
 <pre class="line-numbers"><code class="language-go">func longRunning(messages <-chan string) {
 	timer := time.NewTimer(time.Minute)
@@ -475,14 +476,38 @@ func longRunning(messages <-chan string) {
 </code></pre>
 
 <p>
-注意，此示例中的<code>if</code>代码块用来舍弃一个可能在执行第二个分支代码块的时候发送过来的超时通知。
+注意，此示例中的<code>if</code>代码块用来舍弃一个潜在的在执行第二个分支代码块的时候发送过来的超时通知（从Go 1.23开始，此举已经不再必要）。
 </p>
+
+注意：从Go 1.23开始，<code>Timer.Reset</code>方法将会自动舍弃潜在的超时通知。
+因此，上面的代码可以被简化为：
+
+<pre class="line-numbers"><code class="language-go">func longRunning(messages <-chan string) {
+	timer := time.NewTimer(time.Minute)
+	// defer timer.Stop() // 从Go 1.23开始，可要可不要
+
+	for {
+		select {
+		case <-timer.C:
+			return
+		case msg := <-messages:
+			fmt.Println(msg)
+		}
+
+		timer.Reset(time.Minute)
+	}
+}
+</code></pre>
 
 </div>
 
 <h3>不正确地使用<code>time.Timer</code>值</h3>
 
 <div>
+
+<p><i>
+（注意：本节提到的问题从Go 1.23开始不再存在。）
+</i></p>
 
 一个典型的<code>time.Timer</code>的使用已经在上一节中展示了。一些解释：
 <ul>
@@ -491,10 +516,10 @@ func longRunning(messages <-chan string) {
 	在此<code>Timer</code>值尚未终止的时候，<code>Stop</code>方法调用返回<code>false</code>只能意味着此<code>Timer</code>值已经过期。
 </li>
 <li>
-	一个<code>Timer</code>值被终止之后，它的通道字段<code>C</code>最多只能含有一个过期的通知。
+	在Go 1.23之前，一个<code>Timer</code>值被终止之后，它的通道字段<code>C</code>最多只能含有一个过期的通知。
 </li>
 <li>
-	在一个<code>Timer</code>终止（stopped）之后并且在重置和重用此<code>Timer</code>值之前，我们应该确保此<code>Timer</code>值中肯定不存在过期的通知。
+	在Go 1.23之前，在一个<code>Timer</code>终止（stopped）之后并且在重置和重用此<code>Timer</code>值之前，我们应该确保此<code>Timer</code>值中肯定不存在过期的通知。
 	这就是上一节中的例子中的<code>if</code>代码块的意义所在。
 </li>
 </ul>
@@ -507,7 +532,7 @@ func longRunning(messages <-chan string) {
 <p>
 如果上一节中的例子中的<code>select</code>流程控制代码块中的第一个分支被选中，则这表示相应的<code>Timer</code>值已经过期，所以我们不必终止它。
 但是我们必须在第二个分支中通过终止此<code>Timer</code>以检查此<code>Timer</code>中是否存在一个过期的通知。
-如果确实有一个过期的通知，我们必须在重用这个<code>Timer</code>之前将此过期的通知取出；否则，此过期的通知将下一个循环步导致在第一个分支立即被选中。
+如果确实有一个过期的通知，我们必须在重用这个<code>Timer</code>之前将此过期的通知取出；否则，此过期的通知将下一个循环步导致在第一个分支立即被选中（Go 1.23之前）。
 </p>
 
 比如，下面这个程序将在运行后大概一秒钟（而不是十秒钟）后退出。

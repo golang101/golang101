@@ -164,6 +164,17 @@ func (T) ab() []int { return []int{a, b} }
 所以尽量不要让一个代码包中不同源文件中的包级变量存在复杂的依赖关系；否则不同的编译器可能会将一些包级变量初始化为不同结果。
 </p>
 
+另请注意：Go官方工具链的某些版本未正确实现在本节中描述的规则。
+
+<ul>
+<li>
+Go官方工具链1.22.n版本中的<a href="https://github.com/golang/go/issues/66575">一个bug</a>。
+</li>
+<li>
+Go官方工具链1.22-版本中的<a href="https://github.com/golang/go/issues/66585">一个bug</a>。
+</li>
+</ul>
+
 </div>
 
 <h3>布尔（逻辑）运算表达式中的操作数子表达式的估值顺序</h3>
