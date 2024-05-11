@@ -848,7 +848,7 @@ p := (*int)(unsafe.Pointer(u))
 <p>
 注意：Go 1.19引入了一个新的方法：<code>reflect.Value.UnsafePointer()</code>。
 官方推荐以后使用此方法来替换上述两个方法。也就说，承认了原来的设计思路并不太对路。
-<code>UnsafePointer()</code>放回一个<code>unsafe.Pointer</code>值。
+<code>UnsafePointer()</code>返回一个<code>unsafe.Pointer</code>值。
 </p>
 
 </div>
