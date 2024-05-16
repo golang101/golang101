@@ -703,7 +703,7 @@ func (bar Bar) ServeCustomer(c Customer) {
 func main() {
 	rand.Seed(time.Now().UnixNano()) // Go 1.20之前需要
 
-	bar24x7 := make(Bar, 10) // 最对同时服务10位顾客
+	bar24x7 := make(Bar, 10) // 最多同时服务10位顾客
 	for customerId := 0; ; customerId++ {
 		time.Sleep(time.Second * 2)
 		customer := Customer{customerId}
