@@ -31,7 +31,7 @@ vertical-align: top;
 font-size: 62%;
 }
 
-b.index {border-top: 3px solid #555; border-bottom: 3px solid #555; margin-top: 5px; margin-bottom: 5px;}
+b.index {border-top: 3px solid #888; border-bottom: 3px solid #888; margin-top: 5px; margin-bottom: 5px;}
 
 
 input[name="choice"] {display: none;}
