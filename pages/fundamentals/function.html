@@ -5,7 +5,7 @@
 <p></p>
 
 <div class="tmd-usual">
-<a href="function-declarations-and-calls.html">函数声明和调用</a></sup>已经在前面的文章中解释过了。当前这篇文章将介绍更多关于函数的概念和细节。
+<a href="function-declarations-and-calls.html">函数声明和调用</a>已经在前面的文章中解释过了。当前这篇文章将介绍更多关于函数的概念和细节。
 </div>
 
 <p></p>
@@ -23,7 +23,7 @@
 <p></p>
 
 <div class="tmd-usual">
-Go中有一些内置函数，这些函数展示在<a href="https://docs.go101.org/std/pkg/builtin.html"><code class="tmd-code-span">builtin</code></a></sup>和<a href="https://docs.go101.org/std/pkg/unsafe.html"><code class="tmd-code-span">unsafe</code></a></sup>标准包中。内置函数和自定义函数有很多差别。这些差别将在下面逐一提及。
+Go中有一些内置函数，这些函数展示在<a href="https://docs.go101.org/std/pkg/builtin.html"><code class="tmd-code-span">builtin</code></a>和<a href="https://docs.go101.org/std/pkg/unsafe.html"><code class="tmd-code-span">unsafe</code></a>标准包中。内置函数和自定义函数有很多差别。这些差别将在下面逐一提及。
 </div>
 
 <p></p>
@@ -58,7 +58,7 @@ Go中有一些内置函数，这些函数展示在<a href="https://docs.go101.or
 </code></pre>
 
 <div class="tmd-usual">
-从前面的<a href="function-declarations-and-calls.html">函数声明和调用</a></sup>一文中，我们了解到连续的同类型参数和结果可以声明在一块儿。所以上面的字面形式等价于：
+从前面的<a href="function-declarations-and-calls.html">函数声明和调用</a>一文中，我们了解到连续的同类型参数和结果可以声明在一块儿。所以上面的字面形式等价于：
 </div>
 <pre class="tmd-code disable-line-numbers111"><code class="language-go">func (a int, b, c string) (x, y int, z bool)
 </code></pre>
@@ -146,7 +146,7 @@ func (sep string, tokens ...string) string
 <p></p>
 
 <div class="tmd-usual">
-<a href="type-system-overview.html#types-not-support-comparison">Go类型系统概述</a></sup>一文已经提到了函数类型属于不可比较类型。但是，和映射值以及切片值类似，一个函数值可以和类型不确定的<code class="tmd-code-span">nil</code>比较。（函数值将在本文最后一节介绍。）
+<a href="type-system-overview.html#types-not-support-comparison">Go类型系统概述</a>一文已经提到了函数类型属于不可比较类型。但是，和映射值以及切片值类似，一个函数值可以和类型不确定的<code class="tmd-code-span">nil</code>比较。（函数值将在本文最后一节介绍。）
 </div>
 
 <p></p>
@@ -194,7 +194,7 @@ func (sep string, tokens ...string) string
 <p></p>
 
 <div class="tmd-usual">
-普通非变长函数的声明和调用已经在<a href="function-declarations-and-calls.html">函数声明和调用</a></sup>一文中介绍过了。本节将介绍变长函数的声明和调用。
+普通非变长函数的声明和调用已经在<a href="function-declarations-and-calls.html">函数声明和调用</a>一文中介绍过了。本节将介绍变长函数的声明和调用。
 </div>
 
 <p></p>
@@ -254,7 +254,7 @@ func Println(a ...interface{}) (n int, err error)
 <p></p>
 
 <div class="tmd-usual">
-这三个函数中的变长参数的类型均为<code class="tmd-code-span">[]interface{}</code>。此类型的元素类型为<code class="tmd-code-span">interface{}</code>，这是一个接口类型。接口类型和接口值将在后面的<a href="interface.html">接口</a></sup>一文中详述。
+这三个函数中的变长参数的类型均为<code class="tmd-code-span">[]interface{}</code>。此类型的元素类型为<code class="tmd-code-span">interface{}</code>，这是一个接口类型。接口类型和接口值将在后面的<a href="interface.html">接口</a>一文中详述。
 </div>
 
 <p></p>
@@ -396,7 +396,7 @@ func main() {
 <li class="tmd-list-item">
 
 <div class="tmd-usual">
-同一个包内可以声明若干个原型为<code class="tmd-code-span">func ()</code>的<a href="packages-and-imports.html#init">名称为<code class="tmd-code-span">init</code>的函数</a></sup>。
+同一个包内可以声明若干个原型为<code class="tmd-code-span">func ()</code>的<a href="packages-and-imports.html#init">名称为<code class="tmd-code-span">init</code>的函数</a>。
 </div>
 
 </li>
@@ -425,7 +425,7 @@ func main() {
 <p></p>
 
 <div class="tmd-usual">
-大多数函数调用都是在运行时刻被估值的。但<code class="tmd-code-span">unsafe</code>标准库包中的函数的调用都是在编译时刻估值的。另外，某些其它内置函数（比如<code class="tmd-code-span">len</code>和<code class="tmd-code-span">cap</code>等）的调用在所传实参满足一定的条件的时候也将在编译时刻估值。详见<a href="summaries.html#compile-time-evaluation">在编译时刻估值的函数调用</a></sup>。
+大多数函数调用都是在运行时刻被估值的。但<code class="tmd-code-span">unsafe</code>标准库包中的函数的调用都是在编译时刻估值的。另外，某些其它内置函数（比如<code class="tmd-code-span">len</code>和<code class="tmd-code-span">cap</code>等）的调用在所传实参满足一定的条件的时候也将在编译时刻估值。详见<a href="summaries.html#compile-time-evaluation">在编译时刻估值的函数调用</a>。
 </div>
 
 <p></p>
@@ -442,7 +442,7 @@ func main() {
 <p></p>
 
 <div class="tmd-usual">
-再重申一次，和赋值一样，传参也属于值（浅）复制。当一个值被复制时，只有它的<a href="value-part.html#about-value-copy">直接部分</a></sup>被复制了。
+再重申一次，和赋值一样，传参也属于值（浅）复制。当一个值被复制时，只有它的<a href="value-part.html#about-value-copy">直接部分</a>被复制了。
 </div>
 
 <p></p>
@@ -459,7 +459,7 @@ func main() {
 <p></p>
 
 <div class="tmd-usual">
-我们可以使用<a href="https://golang.google.cn/doc/asm">Go汇编（Go assembly）</a></sup>来实现一个Go函数。Go汇编代码放在后缀为<code class="tmd-code-span">.a</code>的文件中。一个使用Go汇编实现的函数依旧必须在一个<code class="tmd-code-span">*.go</code>文件中声明，但是它的声明必须不能含有函数体。换句话说，一个使用Go汇编实现的函数的声明中只含有它的原型。
+我们可以使用<a href="https://golang.google.cn/doc/asm">Go汇编（Go assembly）</a>来实现一个Go函数。Go汇编代码放在后缀为<code class="tmd-code-span">.a</code>的文件中。一个使用Go汇编实现的函数依旧必须在一个<code class="tmd-code-span">*.go</code>文件中声明，但是它的声明必须不能含有函数体。换句话说，一个使用Go汇编实现的函数的声明中只含有它的原型。
 </div>
 
 <p></p>
@@ -476,7 +476,7 @@ func main() {
 <p></p>
 
 <div class="tmd-usual">
-如果一个函数有返回值，则它的函数体内的最后一条语句必须为一条<a href="https://golang.google.cn/ref/spec#Terminating_statements">终止语句</a></sup>。Go中有多种终止语句，<code class="tmd-code-span">return</code>语句只是其中一种。所以一个有返回值的函数的体内不一定需要一个<code class="tmd-code-span">return</code>语句。比如下面两个函数（它们均可编译通过）：
+如果一个函数有返回值，则它的函数体内的最后一条语句必须为一条<a href="https://golang.google.cn/ref/spec#Terminating_statements">终止语句</a>。Go中有多种终止语句，<code class="tmd-code-span">return</code>语句只是其中一种。所以一个有返回值的函数的体内不一定需要一个<code class="tmd-code-span">return</code>语句。比如下面两个函数（它们均可编译通过）：
 </div>
 <pre class="tmd-code line-numbers"><code class="language-go">func fa() int {
 	a:
@@ -578,7 +578,7 @@ func main() {
 <p></p>
 
 <div class="tmd-usual">
-注意，在目前的标准编译器的实现中，<a href="exceptions.html#nest-function-calls">有几个内置函数破坏了上述规则的普遍性</a></sup>。
+注意，在目前的标准编译器的实现中，<a href="exceptions.html#nest-function-calls">有几个内置函数破坏了上述规则的普遍性</a>。
 </div>
 
 <p></p>
@@ -619,7 +619,7 @@ func main() {
 <p></p>
 
 <div class="tmd-usual">
-从<a href="value-part.html">值部</a></sup>一文，我们得知，当一个函数值被赋给另一个函数值后，这两个函数值将共享底层部分（内部的函数结构）。换句话说，这两个函数值表示的函数可以看作是同一个函数。调用它们的效果是相同的。
+从<a href="value-part.html">值部</a>一文，我们得知，当一个函数值被赋给另一个函数值后，这两个函数值将共享底层部分（内部的函数结构）。换句话说，这两个函数值表示的函数可以看作是同一个函数。调用它们的效果是相同的。
 </div>
 
 <p></p>
@@ -836,7 +836,7 @@ func main() {
 <p></p>
 
 <div class="tmd-usual">
-请阅读<a href="https://go.dev/blog/range-functions">这篇官方博客文章</a></sup>了解更多关于遍历器的内容。
+请阅读<a href="https://go.dev/blog/range-functions">这篇官方博客文章</a>了解更多关于遍历器的内容。
 </div>
 
 <p></p>
