@@ -1,6 +1,10 @@
 
 # Go 101 更新历史
 
+### v1.24.a (2024/十月/16)
+
+* 增加了[遍历函数值](https://gfw.go101.org/article/function.html#range)一节。
+
 ### v1.21.a (2023/三月/18)
 
 * Go 1.22引入了`for range Integer`循环变种并改变了for循环的语义。相关的章节做了修改：
