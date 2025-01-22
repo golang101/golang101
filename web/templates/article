@@ -135,11 +135,11 @@
 	</div>
 	{{- end -}}
 	
-	<div class="col-xs-6 col-sm-4 nav-item-inactive" style="color: #777;"><small>Go如何做101</small></div>
+	<div class="col-xs-6 col-sm-4 nav-item-inactive" style="color: #777;"><small>Go问答101</small></div>
 	
 	<div class="col-xs-6 col-sm-4 nav-item-inactive" style="color: #777;"><small>Go编程实战101</small></div>
 
-	<div class="col-xs-6 col-sm-4 nav-item-inactive" style="color: #777;"><small>Go聚合101</small></div>
+	<div class="col-xs-6 col-sm-4 nav-item-inactive" style="color: #777;"><small>Go Bugs 101</small></div>
 	
 	{{- if and $is_blog $is_index_page -}}
 	<div class="col-xs-6 col-sm-4 nav-item-active">
@@ -165,6 +165,11 @@
 
 </div>
 
+<div class="alert alert-warning text-center"><small>
+<a href="https://tmd.tapirgames.com/">TapirMD</a> - 一款强大的下一代致力于简化内容创作的标记语言（比markdown强大的多；<a href="https://tmd.tapirgames.com/play.html">在线体验</a>）。
+</small></div>
+
+<p></p>
 
 {{ end }}
 

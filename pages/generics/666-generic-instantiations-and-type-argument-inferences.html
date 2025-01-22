@@ -246,7 +246,7 @@ some suffix type arguments could be inferred. For example</p>
 	return x + y
 }
 
-// The followig two lines compile okay only since Go 1.21.
+// The following two lines compile okay only since Go 1.21.
 var _ func(float32, float32) float32 = Sum
 var _ func(float64, float64) float64 = Sum
 
@@ -352,7 +352,7 @@ Please read <a href="https://go.dev/ref/spec#Type_inference">Go specification</a
 
 <h2>Type argument inferences don't work for generic type instantiations</h2>
 
-<p>Currently (Go 1.22), inferring type arguments of instantiated types from value literals is not supported.
+<p>Currently (Go 1.23), inferring type arguments of instantiated types from value literals is not supported.
 That means the type argument list of a generic type instantiation must be always in full form.</p>
 
 <p>For example, in the following code snippet, the declaration line for variable <code>y</code> is invalid,

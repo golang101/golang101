@@ -1,108 +1,86 @@
-
 <h1 class="tmd-header-1">
-函数</h1>
-
+函数
+</h1>
 <p></p>
-
 <div class="tmd-usual">
 <a href="function-declarations-and-calls.html">函数声明和调用</a>已经在前面的文章中解释过了。当前这篇文章将介绍更多关于函数的概念和细节。
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 事实上，在Go中，函数是一种一等公民类型。换句话说，我们可以把函数当作值来使用。尽管Go是一门静态语言，但是Go函数的灵活性宛如甚至超越了很多动态语言。
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 Go中有一些内置函数，这些函数展示在<a href="https://docs.go101.org/std/pkg/builtin.html"><code class="tmd-code-span">builtin</code></a>和<a href="https://docs.go101.org/std/pkg/unsafe.html"><code class="tmd-code-span">unsafe</code></a>标准包中。内置函数和自定义函数有很多差别。这些差别将在下面逐一提及。
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 
 </div>
-
 <p></p>
-
 <h3 class="tmd-header-3">
-函数签名（function signature）和函数类型</h3>
-
+函数签名（function signature）和函数类型
+</h3>
 <p></p>
-
 <div class="tmd-usual">
 刚已经提到了，在Go中，函数是一种一等公民类型。一个函数类型的字面表示形式由一个<code class="tmd-code-span">func</code>关键字和一个函数签名字面表示表示形式组成。一个函数签名由一个输入参数类型列表和一个输出结果类型列表组成。参数名称和结果名称可以出现函数签名的字面表示形式中，但是它们并不重要。
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 <code class="tmd-code-span">func</code>关键字可以出现在函数签名的字面形式中，也可以不出现。鉴于此，我们常常混淆使用函数类型（见下）和函数签名这两个概念。
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 下面是一个函数类型的字面形式:
 </div>
-<pre class="tmd-code disable-line-numbers111"><code class="language-go">func (a int, b string, c string) (x int, y int, z bool)
+<pre class="tmd-code disable-line-numbers111">
+<code class="language-go">func (a int, b string, c string) (x int, y int, z bool)
 </code></pre>
-
 <div class="tmd-usual">
 从前面的<a href="function-declarations-and-calls.html">函数声明和调用</a>一文中，我们了解到连续的同类型参数和结果可以声明在一块儿。所以上面的字面形式等价于：
 </div>
-<pre class="tmd-code disable-line-numbers111"><code class="language-go">func (a int, b, c string) (x, y int, z bool)
+<pre class="tmd-code disable-line-numbers111">
+<code class="language-go">func (a int, b, c string) (x, y int, z bool)
 </code></pre>
-
 <p></p>
-
 <div class="tmd-usual">
 参数名称和结果名称并不重要，只要它们不重名即可。上面两个字面形式等价于下面这个：
 </div>
-<pre class="tmd-code disable-line-numbers111"><code class="language-go">func (x int, y, z string) (a, b int, c bool)
+<pre class="tmd-code disable-line-numbers111">
+<code class="language-go">func (x int, y, z string) (a, b int, c bool)
 </code></pre>
-
 <p></p>
-
 <div class="tmd-usual">
 参数名和结果名可以是空标识符<code class="tmd-code-span">_</code>。上面的字面形式等价于：
 </div>
-<pre class="tmd-code disable-line-numbers111"><code class="language-go">func (_ int, _, _ string) (_, _ int, _ bool)
+<pre class="tmd-code disable-line-numbers111">
+<code class="language-go">func (_ int, _, _ string) (_, _ int, _ bool)
 </code></pre>
-
 <p></p>
-
 <div class="tmd-usual">
 函数参数列表中的参数名或者结果列表中的结果名可以同时省略（即匿名）。上面的字面形式等价于：
 </div>
-<pre class="tmd-code disable-line-numbers111"><code class="language-go">func (int, string, string) (int, int, bool) // 标准函数字面形式
+<pre class="tmd-code disable-line-numbers111">
+<code class="language-go">func (int, string, string) (int, int, bool) // 标准函数字面形式
 func (a int, b string, c string) (int, int, bool)
 func (x int, _ string, z string) (int, int, bool)
 func (int, string, string) (x int, y int, z bool)
 func (int, string, string) (a int, b int, _ bool)
 </code></pre>
-
 <p></p>
-
 <div class="tmd-usual">
 所有上面列出的函数类型字面形式表示同一个（无名）函数类型。
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 参数列表必须用一对小括号<code class="tmd-code-span">()</code>括起来，即使此列表为空。如果一个函数类型一个结果列表为空，则它可以在函数类型的字面形式中被省略掉。当一个结果列表含有最多一个结果，则此结果列表的字面形式在它不包含结果名称的时候可以不用括号<code class="tmd-code-span">()</code>括起来。
 </div>
-<pre class="tmd-code disable-line-numbers111"><code class="language-go">// 这三个函数类型字面形式是等价的。
+<pre class="tmd-code disable-line-numbers111">
+<code class="language-go">// 这三个函数类型字面形式是等价的。
 func () (x int)
 func () (int)
 func () int
@@ -111,105 +89,80 @@ func () int
 func (a int, b string) ()
 func (a int, b string)
 </code></pre>
-
 <p></p>
-
 <h4 class="tmd-header-4">
-变长参数和变长参数函数类型</h4>
-
+变长参数和变长参数函数类型
+</h4>
 <p></p>
-
 <div class="tmd-usual">
 一个函数的最后一个参数可以是一个变长参数。一个函数可以最多有一个变长参数。一个变长参数的类型总为一个切片类型。变长参数在声明的时候必须在它的（切片）类型的元素类型前面前置三个点<code class="tmd-code-span">...</code>，以示这是一个变长参数。两个变长函数类型的例子：
 </div>
-<pre class="tmd-code disable-line-numbers111"><code class="language-go">func (values ...int64) (sum int64)
+<pre class="tmd-code disable-line-numbers111">
+<code class="language-go">func (values ...int64) (sum int64)
 func (sep string, tokens ...string) string
 </code></pre>
-
 <p></p>
-
 <div class="tmd-usual">
 一个变长函数类型和一个非变长函数类型绝对不可能是同一个类型。
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 后面的一节将展示几个变长函数声明和使用的例子。
 </div>
-
 <p></p>
-
 <h4 class="tmd-header-4">
-所有的函数类型都属于不可比较类型</h4>
-
+所有的函数类型都属于不可比较类型
+</h4>
 <p></p>
-
 <div class="tmd-usual">
 <a href="type-system-overview.html#types-not-support-comparison">Go类型系统概述</a>一文已经提到了函数类型属于不可比较类型。但是，和映射值以及切片值类似，一个函数值可以和类型不确定的<code class="tmd-code-span">nil</code>比较。（函数值将在本文最后一节介绍。）
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 因为函数类型属于不可比较类型，所以函数类型不可用做映射类型的键值类型。
 </div>
-
 <p></p>
-
 <h3 id="prototype" class="tmd-header-3">
-函数原型（function prototype）</h3>
-
+函数原型（function prototype）
+</h3>
 <p></p>
-
 <div class="tmd-usual">
 一个函数原型由一个函数名称和一个函数类型（或者说一个函数签名）组成。它的字面形式由一个<code class="tmd-code-span">func</code>关键字、一个函数名和一个函数签名字面形式组成。
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 一个函数原型的例子：
 </div>
-<pre class="tmd-code disable-line-numbers111"><code class="language-go">func Double(n int) (result int)
+<pre class="tmd-code disable-line-numbers111">
+<code class="language-go">func Double(n int) (result int)
 </code></pre>
-
 <p></p>
-
 <div class="tmd-usual">
 换句话说，一个函数原型可以看作是一个不带函数体的函数声明；或者说一个函数声明由一个函数原型和一个函数体组成。
 </div>
-
 <p></p>
-
 <h3 id="variadic-function" class="tmd-header-3">
-变长函数声明和变长函数调用</h3>
-
+变长函数声明和变长函数调用
+</h3>
 <p></p>
-
 <div class="tmd-usual">
 普通非变长函数的声明和调用已经在<a href="function-declarations-and-calls.html">函数声明和调用</a>一文中介绍过了。本节将介绍变长函数的声明和调用。
 </div>
-
 <p></p>
-
 <h4 class="tmd-header-4">
-变长函数声明</h4>
-
+变长函数声明
+</h4>
 <p></p>
-
 <div class="tmd-usual">
 变长函数声明和普通函数声明类似，只不过最后一个参数必须为变长参数。一个变长参数在函数体内将被视为一个切片。
 </div>
-
 <p></p>
-<pre class="tmd-code line-numbers"><code class="language-go">// Sum返回所有输入实参的和。
+<pre class="tmd-code line-numbers">
+<code class="language-go">// Sum返回所有输入实参的和。
 func Sum(values ...int64) (sum int64) {
 	// values的类型为[]int64。
 	sum = 0
@@ -232,79 +185,58 @@ func Concat(sep string, tokens ...string) string {
 	return r
 }
 </code></pre>
-
 <p></p>
-
 <div class="tmd-usual">
 从上面的两个变长参数函数声明可以看出，如果一个变长参数的类型部分为<code class="tmd-code-span">...T</code>，则此变长参数的类型实际为<code class="tmd-code-span">[]T</code>。
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 事实上，在前面的文章中多次使用过的<code class="tmd-code-span">fmt</code>标准库包中的<code class="tmd-code-span">Print</code>、<code class="tmd-code-span">Println</code>和<code class="tmd-code-span">Printf</code>函数均为变长参数函数。它们的声明大致如下：
 </div>
-
 <p></p>
-<pre class="tmd-code line-numbers"><code class="language-go">func Print(a ...interface{}) (n int, err error)
+<pre class="tmd-code line-numbers">
+<code class="language-go">func Print(a ...interface{}) (n int, err error)
 func Printf(format string, a ...interface{}) (n int, err error)
 func Println(a ...interface{}) (n int, err error)
 </code></pre>
-
 <p></p>
-
 <div class="tmd-usual">
 这三个函数中的变长参数的类型均为<code class="tmd-code-span">[]interface{}</code>。此类型的元素类型为<code class="tmd-code-span">interface{}</code>，这是一个接口类型。接口类型和接口值将在后面的<a href="interface.html">接口</a>一文中详述。
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 
 </div>
-
 <p></p>
-
 <h4 id="variadic-call" class="tmd-header-4">
-变长参数函数调用</h4>
-
+变长参数函数调用
+</h4>
 <p></p>
-
 <div class="tmd-usual">
 在变长参数函数调用中，可以使用两种风格的方式将实参传递给类型为<code class="tmd-code-span">[]T</code>的变长形参：
 </div>
-
 <ol class="tmd-list">
 <li class="tmd-list-item">
-
 <div class="tmd-usual">
 传递一个切片做为实参。此切片必须可以被赋值给类型为<code class="tmd-code-span">[]T</code>的值（或者说此切片可以被隐式转换为类型<code class="tmd-code-span">[]T</code>）。此实参切片后必须跟随三个点<code class="tmd-code-span">...</code>。
 </div>
-
 </li>
-
 <li class="tmd-list-item">
-
 <div class="tmd-usual">
 传递零个或者多个可以被隐式转换为<code class="tmd-code-span">T</code>的实参（或者说这些实参可以赋值给类型为<code class="tmd-code-span">T</code>的值）。这些实参将被添加入一个匿名的在运行时刻创建的类型为<code class="tmd-code-span">[]T</code>的切片中，然后此切片将被传递给此函数调用。
 </div>
-
 </li>
-
 </ol>
-
 <p></p>
-
 <div class="tmd-usual">
 注意，这两种风格的方式不可在同一个变长参数函数调用中混用。
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 下面这个例子展示了一些变长参数函数调用：
 </div>
-<pre class="tmd-code line-numbers"><code class="language-go">package main
+<pre class="tmd-code line-numbers">
+<code class="language-go">package main
 
 import "fmt"
 
@@ -328,13 +260,12 @@ func main() {
 	fmt.Println(b0, b1, b3) // 0 2 10
 }
 </code></pre>
-
 <p></p>
-
 <div class="tmd-usual">
 另一个展示了一些变长参数函数调用的例子：
 </div>
-<pre class="tmd-code line-numbers"><code class="language-go">package main
+<pre class="tmd-code line-numbers">
+<code class="language-go">package main
 
 import "fmt"
 
@@ -355,15 +286,13 @@ func main() {
 	fmt.Println(langsA == langsB)           // true
 }
 </code></pre>
-
 <p></p>
-
 <div class="tmd-usual">
 下面这个例子编译不通过，因为两种调用风格混用了。
 </div>
-
 <p></p>
-<pre class="tmd-code line-numbers"><code class="language-go">package main
+<pre class="tmd-code line-numbers">
+<code class="language-go">package main
 
 // 这两个函数的声明见前面几例。
 func Sum(values ...int64) (sum int64) {......}
@@ -375,110 +304,80 @@ func main() {
 	_ = Concat(",", "Go", []string{"C", "Rust"}...)
 }
 </code></pre>
-
 <p></p>
-
 <h3 class="tmd-header-3">
-更多关于函数声明和函数调用的事实</h3>
-
+更多关于函数声明和函数调用的事实
+</h3>
 <p></p>
-
 <h4 class="tmd-header-4">
-同一个包中可以同名的函数</h4>
-
+同一个包中可以同名的函数
+</h4>
 <p></p>
-
 <div class="tmd-usual">
 一般来说，同一个包中声明的函数的名称不能重复，但有两个例外：
 </div>
-
 <ol class="tmd-list">
 <li class="tmd-list-item">
-
 <div class="tmd-usual">
 同一个包内可以声明若干个原型为<code class="tmd-code-span">func ()</code>的<a href="packages-and-imports.html#init">名称为<code class="tmd-code-span">init</code>的函数</a>。
 </div>
-
 </li>
-
 <li class="tmd-list-item">
-
 <div class="tmd-usual">
 多个函数的名称可以被声明为空标识符<code class="tmd-code-span">_</code>。这样声明的函数不可被调用。
 </div>
-
 </li>
-
 </ol>
-
 <p></p>
-
 <div class="tmd-usual">
 
 </div>
-
 <p></p>
-
 <h4 id="compile-time-evaluated-calls" class="tmd-header-4">
-某些函数调用是在编译时刻被估值的</h4>
-
+某些函数调用是在编译时刻被估值的
+</h4>
 <p></p>
-
 <div class="tmd-usual">
 大多数函数调用都是在运行时刻被估值的。但<code class="tmd-code-span">unsafe</code>标准库包中的函数的调用都是在编译时刻估值的。另外，某些其它内置函数（比如<code class="tmd-code-span">len</code>和<code class="tmd-code-span">cap</code>等）的调用在所传实参满足一定的条件的时候也将在编译时刻估值。详见<a href="summaries.html#compile-time-evaluation">在编译时刻估值的函数调用</a>。
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 
 </div>
-
 <p></p>
-
 <h4 class="tmd-header-4">
-所有的函数调用的传参均属于值复制</h4>
-
+所有的函数调用的传参均属于值复制
+</h4>
 <p></p>
-
 <div class="tmd-usual">
 再重申一次，和赋值一样，传参也属于值（浅）复制。当一个值被复制时，只有它的<a href="value-part.html#about-value-copy">直接部分</a>被复制了。
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 
 </div>
-
 <p></p>
-
 <h4 class="tmd-header-4">
-不含函数体的函数声明</h4>
-
+不含函数体的函数声明
+</h4>
 <p></p>
-
 <div class="tmd-usual">
 我们可以使用<a href="https://golang.google.cn/doc/asm">Go汇编（Go assembly）</a>来实现一个Go函数。Go汇编代码放在后缀为<code class="tmd-code-span">.a</code>的文件中。一个使用Go汇编实现的函数依旧必须在一个<code class="tmd-code-span">*.go</code>文件中声明，但是它的声明必须不能含有函数体。换句话说，一个使用Go汇编实现的函数的声明中只含有它的原型。
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 
 </div>
-
 <p></p>
-
 <h4 class="tmd-header-4">
-某些有返回值的函数可以不必返回</h4>
-
+某些有返回值的函数可以不必返回
+</h4>
 <p></p>
-
 <div class="tmd-usual">
 如果一个函数有返回值，则它的函数体内的最后一条语句必须为一条<a href="https://golang.google.cn/ref/spec#Terminating_statements">终止语句</a>。Go中有多种终止语句，<code class="tmd-code-span">return</code>语句只是其中一种。所以一个有返回值的函数的体内不一定需要一个<code class="tmd-code-span">return</code>语句。比如下面两个函数（它们均可编译通过）：
 </div>
-<pre class="tmd-code line-numbers"><code class="language-go">func fa() int {
+<pre class="tmd-code line-numbers">
+<code class="language-go">func fa() int {
 	a:
 	goto a
 }
@@ -487,66 +386,48 @@ func fb() bool {
 	for{}
 }
 </code></pre>
-
 <p></p>
-
 <div class="tmd-usual">
 
 </div>
-
 <p></p>
-
 <h4 class="tmd-header-4">
-自定义函数的调用返回结果可以被舍弃，但是某些内置函数的调用返回结果不可被舍弃</h4>
-
+自定义函数的调用返回结果可以被舍弃，但是某些内置函数的调用返回结果不可被舍弃
+</h4>
 <p></p>
-
 <div class="tmd-usual">
 自定义函数的调用结果都是可以被舍弃掉的。但是大多数内置函数（除了<code class="tmd-code-span">recover</code>和<code class="tmd-code-span">copy</code>）的调用结果都是不可被舍弃的。调用结果不可被舍弃的函数是不可以被用做延迟调用函数和协程起始函数的，比如<code class="tmd-code-span">append</code>函数。
 </div>
-
 <p></p>
-
 <h4 id="call-as-expression" class="tmd-header-4">
-有返回值的函数的调用是一种表达式</h4>
-
+有返回值的函数的调用是一种表达式
+</h4>
 <p></p>
-
 <div class="tmd-usual">
 一个有且只有一个返回值的函数的每个调用总可以被当成一个单值表达式使用。比如，它可以被内嵌在其它函数调用中当作实参使用，或者可以被当作其它表达式中的操作数使用。
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 如果一个有多个返回结果的函数的一个调用的返回结果没有被舍弃，则此调用可以当作一个多值表达式使用在两种场合：
 </div>
-
 <ol class="tmd-list">
 <li class="tmd-list-item">
-
 <div class="tmd-usual">
 此调用可以在一个赋值语句中当作源值来使用，但是它不能和其它源值掺和到一块。
 </div>
-
 </li>
-
 <li class="tmd-list-item">
-
 <div class="tmd-usual">
 此调用可以内嵌在另一个函数调用中当作实参来使用，但是它不能和其它实参掺和到一块。
 </div>
-
 </li>
-
 </ol>
-
 <p></p>
-
 <div class="tmd-usual">
 一个例子：
 </div>
-<pre class="tmd-code line-numbers"><code class="language-go">package main
+<pre class="tmd-code line-numbers">
+<code class="language-go">package main
 
 func HalfAndNegative(n int) (int, int) {
 	return n/2, -n
@@ -574,66 +455,48 @@ func main() {
 	*/
 }
 </code></pre>
-
 <p></p>
-
 <div class="tmd-usual">
 注意，在目前的标准编译器的实现中，<a href="exceptions.html#nest-function-calls">有几个内置函数破坏了上述规则的普遍性</a>。
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 
 </div>
-
 <p></p>
-
 <h3 class="tmd-header-3">
-函数值</h3>
-
+函数值
+</h3>
 <p></p>
-
 <div class="tmd-usual">
 本文开头已经介绍了函数类型是Go中天然支持的一种类型。函数类型的值称为函数值。在字面上，函数类型的零值也使用预定义的<code class="tmd-code-span">nil</code>来表示。
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 当我们声明了一个函数的时候，我们实际上同时声明了一个不可修改的函数值。此函数值用此函数的名称来标识。此函数值的类型的字面表示形式为此函数的原型刨去函数名部分。
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 注意：内置函数和<code class="tmd-code-span">init</code>函数不可被用做函数值。
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 任何函数值都可以被当作普通声明函数来调用。调用一个nil函数来开启一个协程将产生一个致命的不可恢复的错误，此错误将使整个程序崩溃。在其它情况下调用一个nil函数将产生一个可恢复的恐慌。
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 从<a href="value-part.html">值部</a>一文，我们得知，当一个函数值被赋给另一个函数值后，这两个函数值将共享底层部分（内部的函数结构）。换句话说，这两个函数值表示的函数可以看作是同一个函数。调用它们的效果是相同的。
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 一个例子：
 </div>
-<pre class="tmd-code line-numbers"><code class="language-go">package main
+<pre class="tmd-code line-numbers">
+<code class="language-go">package main
 
 import "fmt"
 
@@ -659,21 +522,17 @@ func main() {
 	fmt.Println(Apply(6, f))  // 12
 }
 </code></pre>
-
 <p></p>
-
 <div class="tmd-usual">
 在上例中，<code class="tmd-code-span">g(6, Double)</code>和<code class="tmd-code-span">Apply(6, f)</code>是等价的。
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 在实践中，我们常常将一个匿名函数赋值给一个函数类型的变量，从而可以在以后多次调用此匿名函数。
 </div>
-
 <p></p>
-<pre class="tmd-code line-numbers"><code class="language-go">package main
+<pre class="tmd-code line-numbers">
+<code class="language-go">package main
 
 import "fmt"
 
@@ -699,26 +558,21 @@ func main() {
 	fmt.Println(isMultipleOf15(60)) // true
 }
 </code></pre>
-
 <p></p>
-
 <div class="tmd-usual">
 Go中所有的函数都可以看作是闭包，这是Go语言编程常常给人一种和动态脚本语言一样灵活的一个重要原因。
 </div>
-
 <p></p>
-
 <h3 id="range" class="tmd-header-3">
-遍历函数值（从Go 1.23开始）</h3>
-
+遍历函数值（从Go 1.23开始）
+</h3>
 <p></p>
-
 <div class="tmd-usual">
 从Go 1.23开始，底层类型为下列函数类型的函数值可以使用<code class="tmd-code-span">for-range</code>循环来遍历。
 </div>
-
 <p></p>
-<pre class="tmd-code disable-line-numbers111"><code class="language-go">// K和V是特定类型
+<pre class="tmd-code disable-line-numbers111">
+<code class="language-go">// K和V是特定类型
 
 func(yield func() bool)
 
@@ -726,27 +580,21 @@ func(yield func(V) bool)
 
 func(yield func(K, V) bool)
 </code></pre>
-
 <p></p>
-
 <div class="tmd-usual">
 这样的函数值称为推遍历器（push iterator），常简称为遍历器。
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 当使用一个<code class="tmd-code-span">for-range</code>循环遍历这样的一个遍历器函数值时，这个遍历器函数值将被调用（一次）并被传入一个隐式创建的<code class="tmd-code-span">yield</code>回调函数。此<code class="tmd-code-span">yield</code>回调函数返回一个<code class="tmd-code-span">bool</code>结果。当它返回<code class="tmd-code-span">false</code>时，这个遍历器函数的调用应该（但并不强求一定）立即退出；否则（当此<code class="tmd-code-span">yield</code>回调函数返回<code class="tmd-code-span">true</code>时），这个遍历器函数应该继续执行，直到自然退出。
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 下面是一些使用遍历器函数的例子：
 </div>
-
 <p></p>
-<pre class="tmd-code line-numbers"><code class="language-go">package main
+<pre class="tmd-code line-numbers">
+<code class="language-go">package main
 
 import "fmt"
 
@@ -796,15 +644,13 @@ func main() {
 	// 输出：0:0 1:1 2:4 3:9 4:16 5:25 6:36 7:49 
 }
 </code></pre>
-
 <p></p>
-
 <div class="tmd-usual">
 上面这些<code class="tmd-code-span">for-range</code>循环和下面这些相应的函数调用是等价的：
 </div>
-
 <p></p>
-<pre class="tmd-code line-numbers"><code class="language-go">func main() {
+<pre class="tmd-code line-numbers">
+<code class="language-go">func main() {
 	var n = 0
 	Loop3(func() bool {
 		fmt.Print(n)
@@ -826,23 +672,16 @@ func main() {
 	fmt.Println()
 }
 </code></pre>
-
 <p></p>
-
 <div class="tmd-usual">
 是的，我们可以认为Go 1.23引入的遍历函数特性是一个语法糖。
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 请阅读<a href="https://go.dev/blog/range-functions">这篇官方博客文章</a>了解更多关于遍历器的内容。
 </div>
-
 <p></p>
-
 <div class="tmd-usual">
 
 </div>
-
 <p></p>
