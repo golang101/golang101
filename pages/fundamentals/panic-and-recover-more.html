@@ -192,7 +192,7 @@ func main() {
 }
 </code></pre>
 
-此程序的输出（当使用标准编译器1.23版本编译）：
+此程序的输出（当使用标准编译器1.24版本编译）：
 <pre class="output"><code>panic: 0
 	panic: 1
 	panic: 2
@@ -209,21 +209,16 @@ func main() {
 如果外层函数调用尚未进入退出阶段，则其将立即进入。
 </p>
 
-当一个Goexit信号和一个函数调用相关联起来的时候，如果此函数调用正在和一个未被恢复的恐慌相关联着，则此恐慌将被恢复。
-比如下面这个程序将正常退出并打印出<code>&lt;nil&gt;</code>，因为恐慌<code>bye</code>被Goexit信号恢复了。
+当一个Goexit信号和一个函数调用相关联起来的时候，如果此函数调用正在和一个未被恢复的恐慌相关联着，则此恐慌将被恢复（我感觉这有些诡异）。
+比如下面这个程序将正常退出，因为恐慌<code>bye</code>被Goexit信号恢复了。
 
 <pre class="line-numbers"><code class="language-go">package main
 
 import (
-	"fmt"
 	"runtime"
 )
 
 func f() {
-	defer func() {
-		fmt.Println(recover())
-	}()
-
 	// 此调用产生的Goexit信号恢复之前产生的恐慌。
 	defer runtime.Goexit()
 	panic("bye")

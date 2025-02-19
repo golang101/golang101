@@ -854,7 +854,7 @@ func main() {
 </p>
 
 <p>
-截至目前（Go 1.23），<code>append</code>函数调用的第一个实参不能为类型不确定的<code>nil</code>。
+截至目前（Go 1.24），<code>append</code>函数调用的第一个实参不能为类型不确定的<code>nil</code>。
 </p>
 
 </div>
@@ -1366,7 +1366,7 @@ func Copy(dest, src []T) int {
 </p>
 
 <p>
-截至目前（Go 1.23），<code>copy</code>函数调用的两个实参均不能为类型不确定的<code>nil</code>。
+截至目前（Go 1.24），<code>copy</code>函数调用的两个实参均不能为类型不确定的<code>nil</code>。
 </p>
 
 </div>
@@ -1992,7 +1992,7 @@ Go不支持更多的内置切片操作，比如切片克隆、元素删除和插
 <h4>切片克隆</h4>
 
 <div>
-对于当前的Go版本（1.23），最简单的克隆一个切片的方法为：
+对于当前的Go版本（1.24），最简单的克隆一个切片的方法为：
 <pre class="disable-line-numbers111"><code class="language-go">sClone := append(s[:0:0], s...)
 </code></pre>
 
@@ -2007,7 +2007,7 @@ sClone := make([]T, len(s))
 copy(sClone, s)
 
 // 或者下面的make+append实现。
-// 对于目前的Go官方工具链1.23版本来说，
+// 对于目前的Go官方工具链1.24版本来说，
 // 这种实现比上面的make+copy实现略慢一点。
 sClone := append(make([]T, 0, len(s)), s...)
 </code></pre>
@@ -2184,7 +2184,7 @@ s = append(s[:i], append(elements, s[i:]...)...)
 // 最多导致两次内存开辟（最少一次）。
 // 下面这种繁琐的实现只把s[i:]中的元素复制了一次，并且
 // 它最多只会导致一次内存开辟（最少零次）。
-// 但是，在当前的官方标准编译器实现中（1.23版本），此
+// 但是，在当前的官方标准编译器实现中（1.24版本），此
 // 繁琐实现中的make调用将会把部分刚开辟出来的元素清零。
 // 这其实是没有必要的。所以此繁琐实现并非总是比上面的
 // 单行实现效率更高。事实上，它仅在处理小切片时更高效。
