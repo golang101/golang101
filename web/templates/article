@@ -180,8 +180,6 @@
 
 {{ define "body" }}
 
-{{ if .Title }}{{ .Title }}{{ end }}
-
 {{ .Content -}}
 
 {{ end }}
