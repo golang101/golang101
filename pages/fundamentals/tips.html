@@ -147,7 +147,7 @@ func main() {
 <div>
 
 <p>
-目前(Go 1.24)，在一些多值赋值中<a href="https://github.com/go101/go101/wiki/Some-evaluation-orders-in-multi-value-assignments-are-unspecified">有一些表达式估值顺序是未指定的</a>。
+目前(Go 1.25)，在一些多值赋值中<a href="https://github.com/go101/go101/wiki/Some-evaluation-orders-in-multi-value-assignments-are-unspecified">有一些表达式估值顺序是未指定的</a>。
 因此，如果一个多值赋值语句中涉及的表达式会相互干涉，或者不太容易确定是否会相互干涉，我们应该将此多值赋值语句分拆成多个单值赋值语句。
 </p>
 
@@ -212,8 +212,24 @@ func main() {
 }
 </code></pre>
 
-</div>
+<p>
+注意，从Go 1.22开始，我们可以直接使用`for i = range N`语法来遍历整数。
+</p>
 
+<pre class="line-numbers"><code class="language-go">package main
+
+import "fmt"
+
+func main() {
+	const N = 5
+
+	for i := range N {
+		fmt.Println(i)
+	}
+}
+</code></pre>
+
+</div>
 
 
 <a class="anchor" id="reset-pointers-for-dead-elements"></a>

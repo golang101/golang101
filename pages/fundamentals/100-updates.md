@@ -1,6 +1,8 @@
 
 # Go 101 更新历史
 
+
+
 ### v1.24.a (2024/十月/16)
 
 * 增加了[遍历函数值](https://gfw.go101.org/article/function.html#range)一节。

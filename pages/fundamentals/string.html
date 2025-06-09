@@ -315,83 +315,7 @@ func main() {
 <h3>字符串和字节切片之间的转换的编译器优化</h3>
 
 <div>
-上面已经提到了字符串和字节切片之间的转换将深复制它们的底层字节序列。
-标准编译器做了一些优化，从而在某些情形下避免了深复制。
-至少这些优化在当前（Go官方工具链1.24版本）是存在的。
-这样的情形包括：
-<ul>
-<li>
-	一个<code>for-range</code>循环中跟随<code>range</code>关键字的从字符串到字节切片的转换；
-</li>
-<li>
-	一个在映射元素读取索引语法中被用做键值的从字节切片到字符串的转换（注意：对修改写入索引语法无效）；
-</li>
-<li>
-	一个字符串比较表达式中被用做比较值的从字节切片到字符串的转换；
-</li>
-<li>
-	一个（至少有一个被衔接的字符串值为非空字符串常量的）字符串衔接表达式中的从字节切片到字符串的转换。
-</li>
-</ul>
-
-一个例子：
-<pre class="line-numbers"><code class="language-go">package main
-
-import "fmt"
-
-func main() {
-	var str = "world"
-	// 这里，转换[]byte(str)将不需要一个深复制。
-	for i, b := range []byte(str) {
-		fmt.Println(i, ":", b)
-	}
-
-	key := []byte{'k', 'e', 'y'}
-	m := map[string]string{}
-	// 这个string(key)转换仍然需要深复制。
-	m[string(key)] = "value"
-	// 这里的转换string(key)将不需要一个深复制。
-	// 即使key是一个包级变量，此优化仍然有效。
-	fmt.Println(m[string(key)]) // value
-}
-</code></pre>
-
-<p>
-注意：在最后一行中，如果在估值<code>string(key)</code>的时候有数据竞争的情况，则这行的输出有可能并不是<code>value</code>。
-但是，无论如何，此行都不会造成恐慌（即使有数据竞争的情况发生）。
-</p>
-
-另一个例子：
-<pre class="line-numbers"><code class="language-go">package main
-
-import "fmt"
-import "testing"
-
-var s string
-var x = []byte{1023: 'x'}
-var y = []byte{1023: 'y'}
-
-func fc() {
-	// 下面的四个转换都不需要深复制。
-	if string(x) != string(y) {
-		s = (" " + string(x) + string(y))[1:]
-	}
-}
-
-func fd() {
-	// 两个在比较表达式中的转换不需要深复制，
-	// 但两个字符串衔接中的转换仍需要深复制。
-	// 请注意此字符串衔接和fc中的衔接的差别。
-	if string(x) != string(y) {
-		s = string(x) + string(y)
-	}
-}
-
-func main() {
-	fmt.Println(testing.AllocsPerRun(1, fc)) // 1
-	fmt.Println(testing.AllocsPerRun(1, fd)) // 3
-}
-</code></pre>
+请阅读<a href="https://gfw.go101.org/optimizations/101.html">《Go程序优化101》</a>一书中的“字符串和字节片”章节。 
 </div>
 
 <h3>使用<code>for-range</code>循环遍历字符串中的码点</h3>
@@ -485,27 +409,7 @@ func main() {
 <h3>更多字符串衔接方法</h3>
 
 <div>
-除了使用<code>+</code>运算符来衔接字符串，我们也可以用下面的方法来衔接字符串：
-<ul>
-<li>
-	<code>fmt</code>标准库包中的<code>Sprintf</code>/<code>Sprint</code>/<code>Sprintln</code>函数可以用来衔接各种类型的值的字符串表示，当然也包括字符串类型的值。
-</li>
-<li>
-	使用<code>strings</code>标准库包中的<code>Join</code>函数。
-</li>
-<li>
-	<code>bytes</code>标准库包提供的<code>Buffer</code>类型可以用来构建一个字节切片，然后我们可以将此字节切片转换为一个字符串。
-</li>
-<li>
-	从Go 1.10开始，<code>strings</code>标准库包中的<code>Builder</code>类型可以用来拼接字符串。
-	和<code>bytes.Buffer</code>类型类似，此类型内部也维护着一个字节切片，但是它在将此字节切片转换为字符串时避免了底层字节的深复制。
-</li>
-</ul>
-
-<p>
-标准编译器对使用<code>+</code>运算符的字符串衔接做了特别的优化。
-所以，一般说来，当所有被衔接的字符串都可以呈现在一条<code>+</code>字符串衔接语句中的情况下，使用<code>+</code>运算符进行字符串衔接是比较高效的。
-</p>
+请阅读<a href="https://gfw.go101.org/optimizations/101.html">《Go程序优化101》</a>一书中的“字符串和字节片”章节。
 </div>
 
 <a class="anchor" id="use-string-as-byte-slice"></a>

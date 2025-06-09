@@ -854,7 +854,7 @@ func main() {
 </p>
 
 <p>
-截至目前（Go 1.24），<code>append</code>函数调用的第一个实参不能为类型不确定的<code>nil</code>。
+截至目前（Go 1.25），<code>append</code>函数调用的第一个实参不能为类型不确定的<code>nil</code>。
 </p>
 
 </div>
@@ -1366,7 +1366,7 @@ func Copy(dest, src []T) int {
 </p>
 
 <p>
-截至目前（Go 1.24），<code>copy</code>函数调用的两个实参均不能为类型不确定的<code>nil</code>。
+截至目前（Go 1.25），<code>copy</code>函数调用的两个实参均不能为类型不确定的<code>nil</code>。
 </p>
 
 </div>
@@ -1833,33 +1833,6 @@ fmt.Println(len(pa), cap(pa)) // 5 5
 
 </div>
 
-<a class="anchor" id="memclr"></a>
-<h3><code>memclr</code>优化</h3>
-
-<div>
-假设<code>t0</code>是一个类型<code>T</code>的零值字面量，并且<code>a</code>是一个元素类型为<code>T</code>的数组或者切片，则官方标准编译器将把下面的单循环变量<code>for-range</code>代码块优化为一个<a href="https://github.com/golang/go/issues/5373">内部的<code>memclr</code>调用</a>。
-大多数情况下，此<code>memclr</code>调用比一个一个地重置元素要快。
-
-<pre class="line-numbers"><code class="language-go">for i := range a {
-	a[i] = t0
-}
-</code></pre>
-
-<p>
-此优化在官方标准编译器1.5版本中被引入。
-</p>
-
-<p>
-从Go官方工具链1.19开始，此优化也适用于<code>a</code>为一个数组指针的情形。
-</p>
-
-<p>
-注意：Go 1.21引入了一个<code>clear</code>内置函数，用来清空一个映射中的所有条目或者重置一个切片中的所有元素。
-我们应该尽量使用此内置函数而不是依赖于此<code>memclr</code>优化来重置切片或者数组的元素。
-<code>clear</code>内置函数见下一节。
-</p>
-</div>
-
 
 <a class="anchor" id="clear"></a>
 <h3>使用内置<code>clear</code>函数来清空映射条目或者重置切片元素</h3>
@@ -1905,6 +1878,18 @@ func main() {
 </div>
 
 
+<a class="anchor" id="memclr"></a>
+<h3><code>memclr</code>优化</h3>
+
+<div>
+
+Go 标准编译器做了多项优化，将特定模式的循环转换为内部<code>memclr</code>调用。
+在 Go 1.21 之前，我们可以利用这些优化来重置数组/切片元素和清除映射条目。
+这些优化（以及更多其它优化）被收集在<a href="https://gfw.go101.org/optimizations/101.html">《Go程序优化101》</a>一书中。
+
+</div>
+
+
 <a class="anchor" id="compile-time-evaluation"></a>
 <h3>内置函数<code>len</code>和<code>cap</code>的调用可能会在编译时刻被估值</h3>
 
@@ -1933,6 +1918,10 @@ func main() {
 </code></pre>
 
 <p>
+
+内置函数<code>len</code>和<code>cap</code>的调用会在更多场景中在编译时被估值。
+请阅读<a href="https://gfw.go101.org/details-and-tips/101.html">《Go 细节与技巧 101》</a>一书以了解此类场景。
+
 </p>
 </div>
 
@@ -1986,13 +1975,19 @@ Go不支持更多的内置切片操作，比如切片克隆、元素删除和插
 </p>
 
 <p>
+有关如何高效地进行此类操作，请阅读<a href="https://gfw.go101.org/optimizations/101.html">《Go程序优化101》</a>一书中的“数组和切片”一章。
+</p>
+
+<!--
+
+<p>
 在下面当前大节中的例子中，假设<code>s</code>是被谈到的切片、<code>T</code>是它的元素类型、<code>t0</code>是类型<code>T</code>的零值字面量。
 </p>
 
 <h4>切片克隆</h4>
 
 <div>
-对于当前的Go版本（1.24），最简单的克隆一个切片的方法为：
+对于当前的Go版本（1.25），最简单的克隆一个切片的方法为：
 <pre class="disable-line-numbers111"><code class="language-go">sClone := append(s[:0:0], s...)
 </code></pre>
 
@@ -2007,7 +2002,7 @@ sClone := make([]T, len(s))
 copy(sClone, s)
 
 // 或者下面的make+append实现。
-// 对于目前的Go官方工具链1.24版本来说，
+// 对于目前的Go官方工具链1.25版本来说，
 // 这种实现比上面的make+copy实现略慢一点。
 sClone := append(make([]T, 0, len(s)), s...)
 </code></pre>
@@ -2027,35 +2022,7 @@ if s != nil {
 <p>
 </p>
 
-<!--
 
-在Go官方工具链1.15版本之前，对于一些常见的使用场景，使用<code>append</code>来克隆切片比使用<code>make</code>加<code>copy</code>要<a href="https://github.com/go101/go101/wiki/How-to-efficiently-clone-a-slice%3F">高效得多</a>。但是从1.15版本开始，官方标准编译器对<code>make+copy</code>这种方法做了特殊的优化，从而使得此方法总是比使用<code>append</code>来克隆切片高效。
-但是请注意：此优化只在被克隆的切片呈现为一个标识符（包括限定标识符）并且<code>make</code>调用只有两个实参的时候才有效。
-比如，在下面的代码中，它只在第一种情况中才有效：
-
-<pre class="disable-line-numbers111"><code class="language-go">	// 情况一：
-	var s = make([]byte, 10000)
-	y = make([]T, len(s)) // works
-	copy(y, s)
-
-	// 情况二：
-	var s = make([]byte, 10000)
-	y = make([]T, len(s), len(s)) // not work
-	copy(y, s)
-
-	// 情况三：
-	var a = [1][]byte{s}
-	y = make([]T, len(a[0])) // not work
-	copy(y, a[0])
-
-	// 情况四：
-	type T struct {x []byte}
-	var t = T{x: s}
-	y = make([]T, len(t.x)) // not work
-	copy(y, t.x)
-</code></pre>
-
--->
 
 </div>
 
@@ -2184,7 +2151,7 @@ s = append(s[:i], append(elements, s[i:]...)...)
 // 最多导致两次内存开辟（最少一次）。
 // 下面这种繁琐的实现只把s[i:]中的元素复制了一次，并且
 // 它最多只会导致一次内存开辟（最少零次）。
-// 但是，在当前的官方标准编译器实现中（1.24版本），此
+// 但是，在当前的官方标准编译器实现中（1.25版本），此
 // 繁琐实现中的make调用将会把部分刚开辟出来的元素清零。
 // 这其实是没有必要的。所以此繁琐实现并非总是比上面的
 // 单行实现效率更高。事实上，它仅在处理小切片时更高效。
@@ -2247,6 +2214,8 @@ s = append(s, e)
 在实践中，需求是各种各样的。对于某些特定的情形，上面的例子中的代码实现可能并非是最优化的，甚至是不满足要求的。
 所以，请在实践中根据具体情况来实现代码。或许，这就是Go没有支持更多的内置切片操作的原因。
 </p>
+
+-->
 
 <h3>用映射来模拟集合（set）</h3>
 
